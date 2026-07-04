@@ -1,6 +1,6 @@
 """
 ingest_mente.py — P0X mente/pipeline
-ORQUESTADOR: recorre mente/{codice,corpus,esferas,doctrina}/**.md, decide qué
+ORQUESTADOR: recorre mente/{codice,corpus,esferas,doctrina,voces}/**.md, decide qué
 reindexar por hash sha256 (manifiesto local), y para lo que cambió corre
 chunk -> embed -> to_qdrant. Al final siempre regenera grafo/second_brain.json.
 
@@ -27,7 +27,7 @@ from chunk import chunk_markdown  # noqa: E402
 from embed import embed_batch  # noqa: E402
 from to_qdrant import ensure_collection, get_client, replace_file_points  # noqa: E402
 
-SCOPE_DIRS = ["codice", "corpus", "esferas", "doctrina"]
+SCOPE_DIRS = ["codice", "corpus", "esferas", "doctrina", "voces"]
 
 
 def _iter_md_files():

@@ -6,7 +6,7 @@ grafo/second_brain.json — la PROYECCIÓN derivada (no fuente de verdad).
 Archivos sin front-matter YAML válido (p.ej. CODICE_david.md, que usa un
 comentario HTML como cabecera) se OMITEN del grafo con aviso — no se les
 inventa un `tipo` fuera del enum del doc de arquitectura
-(esfera|principio|tecnica|fracaso|analogia|doctrina). Siguen indexados en
+(esfera|principio|tecnica|fracaso|analogia|doctrina|voz). Siguen indexados en
 Qdrant para búsqueda vía ingest_mente.py; solo no aparecen como nodo aquí.
 """
 import json
