@@ -1,0 +1,16 @@
+# mente/pipeline/hw.yaml — lo físico vive AQUÍ (aísla migraciones Beato→Castelo Branco)
+# Sin secretos: la API key de Qdrant NO vive aquí. Se lee en runtime de $QDRANT_API_KEY
+# o, si no está exportada, de /home/ubuntu/hexelion/config/.env (solo lectura).
+nvme_root: /mnt/nvme/p0x/mente
+qdrant:
+  host: 100.82.94.83
+  port: 6333
+  collection: mente
+ollama_embed:
+  host: 100.82.94.83
+  port: 11434
+  model: nomic-embed-text
+  dims: 768
+gateway:
+  host: 100.82.94.83
+  port: 8001

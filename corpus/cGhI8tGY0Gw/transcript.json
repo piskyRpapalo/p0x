@@ -1,0 +1,901 @@
+{
+	"systeminfo": "WHISPER : COREML = 0 | OPENVINO = 0 | CPU : NEON = 1 | ARM_FMA = 1 | FP16_VA = 1 | DOTPROD = 1 | OPENMP = 1 | REPACK = 1 | ",
+	"model": {
+		"type": "small",
+		"multilingual": true,
+		"vocab": 51865,
+		"audio": {
+			"ctx": 1500,
+			"state": 768,
+			"head": 12,
+			"layer": 12
+		},
+		"text": {
+			"ctx": 448,
+			"state": 768,
+			"head": 12,
+			"layer": 12
+		},
+		"mels": 80,
+		"ftype": 1
+	},
+	"params": {
+		"model": "/mnt/nvme/p0x/pipeline/models/ggml-small.bin",
+		"language": "auto",
+		"translate": false
+	},
+	"result": {
+		"language": "en"
+	},
+	"transcription": [
+		{
+			"timestamps": {
+				"from": "00:00:00,000",
+				"to": "00:00:02,580"
+			},
+			"offsets": {
+				"from": 0,
+				"to": 2580
+			},
+			"text": " (upbeat music)"
+		},
+		{
+			"timestamps": {
+				"from": "00:00:05,500",
+				"to": "00:00:09,840"
+			},
+			"offsets": {
+				"from": 5500,
+				"to": 9840
+			},
+			"text": " Physical AI represents the next phase of AI adoption,"
+		},
+		{
+			"timestamps": {
+				"from": "00:00:09,840",
+				"to": "00:00:13,520"
+			},
+			"offsets": {
+				"from": 9840,
+				"to": 13520
+			},
+			"text": " building on the advances of generative AI and agentic AI,"
+		},
+		{
+			"timestamps": {
+				"from": "00:00:13,520",
+				"to": "00:00:17,320"
+			},
+			"offsets": {
+				"from": 13520,
+				"to": 17320
+			},
+			"text": " and extending intelligence beyond the digital world."
+		},
+		{
+			"timestamps": {
+				"from": "00:00:17,320",
+				"to": "00:00:20,680"
+			},
+			"offsets": {
+				"from": 17320,
+				"to": 20680
+			},
+			"text": " Physical AI makes a shift from retrospective insight"
+		},
+		{
+			"timestamps": {
+				"from": "00:00:20,680",
+				"to": "00:00:23,880"
+			},
+			"offsets": {
+				"from": 20680,
+				"to": 23880
+			},
+			"text": " to intelligence embedded directly into the systems"
+		},
+		{
+			"timestamps": {
+				"from": "00:00:23,880",
+				"to": "00:00:25,680"
+			},
+			"offsets": {
+				"from": 23880,
+				"to": 25680
+			},
+			"text": " that drive the physical world."
+		},
+		{
+			"timestamps": {
+				"from": "00:00:25,680",
+				"to": "00:00:30,080"
+			},
+			"offsets": {
+				"from": 25680,
+				"to": 30080
+			},
+			"text": " These systems sense, they decide, and act autonomously"
+		},
+		{
+			"timestamps": {
+				"from": "00:00:30,080",
+				"to": "00:00:33,280"
+			},
+			"offsets": {
+				"from": 30080,
+				"to": 33280
+			},
+			"text": " at speed, at scale, and in real time."
+		},
+		{
+			"timestamps": {
+				"from": "00:00:33,280",
+				"to": "00:00:35,120"
+			},
+			"offsets": {
+				"from": 33280,
+				"to": 35120
+			},
+			"text": " Powering autonomous vehicles,"
+		},
+		{
+			"timestamps": {
+				"from": "00:00:35,120",
+				"to": "00:00:37,760"
+			},
+			"offsets": {
+				"from": 35120,
+				"to": 37760
+			},
+			"text": " highly automated factories and warehouses,"
+		},
+		{
+			"timestamps": {
+				"from": "00:00:37,760",
+				"to": "00:00:40,520"
+			},
+			"offsets": {
+				"from": 37760,
+				"to": 40520
+			},
+			"text": " self-monitoring and self-healing infrastructure,"
+		},
+		{
+			"timestamps": {
+				"from": "00:00:40,520",
+				"to": "00:00:44,520"
+			},
+			"offsets": {
+				"from": 40520,
+				"to": 44520
+			},
+			"text": " and intelligent medical device and industrial systems,"
+		},
+		{
+			"timestamps": {
+				"from": "00:00:44,520",
+				"to": "00:00:47,280"
+			},
+			"offsets": {
+				"from": 44520,
+				"to": 47280
+			},
+			"text": " physical AI turns intelligence into action"
+		},
+		{
+			"timestamps": {
+				"from": "00:00:47,280",
+				"to": "00:00:49,360"
+			},
+			"offsets": {
+				"from": 47280,
+				"to": 49360
+			},
+			"text": " and action into outcomes."
+		},
+		{
+			"timestamps": {
+				"from": "00:00:49,360",
+				"to": "00:00:52,520"
+			},
+			"offsets": {
+				"from": 49360,
+				"to": 52520
+			},
+			"text": " (upbeat music)"
+		},
+		{
+			"timestamps": {
+				"from": "00:00:52,520",
+				"to": "00:00:55,280"
+			},
+			"offsets": {
+				"from": 52520,
+				"to": 55280
+			},
+			"text": " Industries are at a turning point."
+		},
+		{
+			"timestamps": {
+				"from": "00:00:55,280",
+				"to": "00:00:58,440"
+			},
+			"offsets": {
+				"from": 55280,
+				"to": 58440
+			},
+			"text": " The real challenge is engineering intelligence"
+		},
+		{
+			"timestamps": {
+				"from": "00:00:58,440",
+				"to": "00:01:02,400"
+			},
+			"offsets": {
+				"from": 58440,
+				"to": 62400
+			},
+			"text": " that performs safely, reliably, and at scale"
+		},
+		{
+			"timestamps": {
+				"from": "00:01:02,400",
+				"to": "00:01:04,460"
+			},
+			"offsets": {
+				"from": 62400,
+				"to": 64460
+			},
+			"text": " amid the uncertainty of the real world"
+		},
+		{
+			"timestamps": {
+				"from": "00:01:04,460",
+				"to": "00:01:07,440"
+			},
+			"offsets": {
+				"from": 64460,
+				"to": 67440
+			},
+			"text": " where data is incomplete, conditions change,"
+		},
+		{
+			"timestamps": {
+				"from": "00:01:07,440",
+				"to": "00:01:10,240"
+			},
+			"offsets": {
+				"from": 67440,
+				"to": 70240
+			},
+			"text": " and decisions must be made in motion."
+		},
+		{
+			"timestamps": {
+				"from": "00:01:10,240",
+				"to": "00:01:12,600"
+			},
+			"offsets": {
+				"from": 70240,
+				"to": 72600
+			},
+			"text": " Gartner identifies physical AI"
+		},
+		{
+			"timestamps": {
+				"from": "00:01:12,600",
+				"to": "00:01:15,440"
+			},
+			"offsets": {
+				"from": 72600,
+				"to": 75440
+			},
+			"text": " as the strategic technology trend expected"
+		},
+		{
+			"timestamps": {
+				"from": "00:01:15,440",
+				"to": "00:01:19,840"
+			},
+			"offsets": {
+				"from": 75440,
+				"to": 79840
+			},
+			"text": " to shape enterprise priorities over the next five years."
+		},
+		{
+			"timestamps": {
+				"from": "00:01:19,840",
+				"to": "00:01:21,640"
+			},
+			"offsets": {
+				"from": 79840,
+				"to": 81640
+			},
+			"text": " Moving from pilots to production"
+		},
+		{
+			"timestamps": {
+				"from": "00:01:21,640",
+				"to": "00:01:23,440"
+			},
+			"offsets": {
+				"from": 81640,
+				"to": 83440
+			},
+			"text": " remains the defining hurdle."
+		},
+		{
+			"timestamps": {
+				"from": "00:01:25,800",
+				"to": "00:01:26,920"
+			},
+			"offsets": {
+				"from": 85800,
+				"to": 86920
+			},
+			"text": " (upbeat music)"
+		},
+		{
+			"timestamps": {
+				"from": "00:01:26,920",
+				"to": "00:01:30,160"
+			},
+			"offsets": {
+				"from": 86920,
+				"to": 90160
+			},
+			"text": " Physical AI has to be embedded from the outset"
+		},
+		{
+			"timestamps": {
+				"from": "00:01:30,160",
+				"to": "00:01:33,800"
+			},
+			"offsets": {
+				"from": 90160,
+				"to": 93800
+			},
+			"text": " because once you move from pilots into live operations,"
+		},
+		{
+			"timestamps": {
+				"from": "00:01:33,800",
+				"to": "00:01:37,320"
+			},
+			"offsets": {
+				"from": 93800,
+				"to": 97320
+			},
+			"text": " constraints show up fast, such as latency, safety,"
+		},
+		{
+			"timestamps": {
+				"from": "00:01:37,320",
+				"to": "00:01:41,000"
+			},
+			"offsets": {
+				"from": 97320,
+				"to": 101000
+			},
+			"text": " and integration across hardware and enterprise systems."
+		},
+		{
+			"timestamps": {
+				"from": "00:01:41,000",
+				"to": "00:01:44,200"
+			},
+			"offsets": {
+				"from": 101000,
+				"to": 104200
+			},
+			"text": " These are the challenges that models alone cannot solve."
+		},
+		{
+			"timestamps": {
+				"from": "00:01:44,200",
+				"to": "00:01:47,320"
+			},
+			"offsets": {
+				"from": 104200,
+				"to": 107320
+			},
+			"text": " Complexity rises, costs escalate,"
+		},
+		{
+			"timestamps": {
+				"from": "00:01:47,320",
+				"to": "00:01:50,400"
+			},
+			"offsets": {
+				"from": 107320,
+				"to": 110400
+			},
+			"text": " and when systems lack transparency and explainability"
+		},
+		{
+			"timestamps": {
+				"from": "00:01:50,400",
+				"to": "00:01:53,200"
+			},
+			"offsets": {
+				"from": 110400,
+				"to": 113200
+			},
+			"text": " in real world conditions, confidence erodes,"
+		},
+		{
+			"timestamps": {
+				"from": "00:01:53,200",
+				"to": "00:01:56,200"
+			},
+			"offsets": {
+				"from": 113200,
+				"to": 116200
+			},
+			"text": " especially in regulated environments."
+		},
+		{
+			"timestamps": {
+				"from": "00:01:56,200",
+				"to": "00:01:58,120"
+			},
+			"offsets": {
+				"from": 116200,
+				"to": 118120
+			},
+			"text": " That's why scaling breaks,"
+		},
+		{
+			"timestamps": {
+				"from": "00:01:58,120",
+				"to": "00:01:59,880"
+			},
+			"offsets": {
+				"from": 118120,
+				"to": 119880
+			},
+			"text": " not because ambition is missing,"
+		},
+		{
+			"timestamps": {
+				"from": "00:01:59,880",
+				"to": "00:02:02,920"
+			},
+			"offsets": {
+				"from": 119880,
+				"to": 122920
+			},
+			"text": " but because the system was never designed to run,"
+		},
+		{
+			"timestamps": {
+				"from": "00:02:02,920",
+				"to": "00:02:05,440"
+			},
+			"offsets": {
+				"from": 122920,
+				"to": 125440
+			},
+			"text": " adapt, and stay safe in the real world."
+		},
+		{
+			"timestamps": {
+				"from": "00:02:08,280",
+				"to": "00:02:12,160"
+			},
+			"offsets": {
+				"from": 128280,
+				"to": 132160
+			},
+			"text": " Physical AI must be architected across the full stack,"
+		},
+		{
+			"timestamps": {
+				"from": "00:02:12,160",
+				"to": "00:02:15,800"
+			},
+			"offsets": {
+				"from": 132160,
+				"to": 135800
+			},
+			"text": " integrating sensing, decision-making, actuation,"
+		},
+		{
+			"timestamps": {
+				"from": "00:02:15,800",
+				"to": "00:02:18,440"
+			},
+			"offsets": {
+				"from": 135800,
+				"to": 138440
+			},
+			"text": " data platforms, and enterprise systems"
+		},
+		{
+			"timestamps": {
+				"from": "00:02:18,440",
+				"to": "00:02:21,200"
+			},
+			"offsets": {
+				"from": 138440,
+				"to": 141200
+			},
+			"text": " into a single coherent design."
+		},
+		{
+			"timestamps": {
+				"from": "00:02:21,200",
+				"to": "00:02:24,560"
+			},
+			"offsets": {
+				"from": 141200,
+				"to": 144560
+			},
+			"text": " That means validating performance through simulation"
+		},
+		{
+			"timestamps": {
+				"from": "00:02:24,560",
+				"to": "00:02:29,400"
+			},
+			"offsets": {
+				"from": 144560,
+				"to": 149400
+			},
+			"text": " before deployment, introducing capability in staged releases,"
+		},
+		{
+			"timestamps": {
+				"from": "00:02:29,400",
+				"to": "00:02:32,800"
+			},
+			"offsets": {
+				"from": 149400,
+				"to": 152800
+			},
+			"text": " and governing models continuously as they evolve."
+		},
+		{
+			"timestamps": {
+				"from": "00:02:32,800",
+				"to": "00:02:36,240"
+			},
+			"offsets": {
+				"from": 152800,
+				"to": 156240
+			},
+			"text": " This is an architectural shift, not a feature upgrade,"
+		},
+		{
+			"timestamps": {
+				"from": "00:02:36,240",
+				"to": "00:02:38,840"
+			},
+			"offsets": {
+				"from": 156240,
+				"to": 158840
+			},
+			"text": " and it's not confined to one team."
+		},
+		{
+			"timestamps": {
+				"from": "00:02:38,840",
+				"to": "00:02:43,560"
+			},
+			"offsets": {
+				"from": 158840,
+				"to": 163560
+			},
+			"text": " It requires clear ownership across IT, OT, engineering,"
+		},
+		{
+			"timestamps": {
+				"from": "00:02:43,560",
+				"to": "00:02:46,360"
+			},
+			"offsets": {
+				"from": 163560,
+				"to": 166360
+			},
+			"text": " and operations because physical AI"
+		},
+		{
+			"timestamps": {
+				"from": "00:02:46,360",
+				"to": "00:02:48,360"
+			},
+			"offsets": {
+				"from": 166360,
+				"to": 168360
+			},
+			"text": " doesn't live in a single function."
+		},
+		{
+			"timestamps": {
+				"from": "00:02:51,680",
+				"to": "00:02:54,760"
+			},
+			"offsets": {
+				"from": 171680,
+				"to": 174760
+			},
+			"text": " We're already seeing this shift across industries"
+		},
+		{
+			"timestamps": {
+				"from": "00:02:54,760",
+				"to": "00:02:56,880"
+			},
+			"offsets": {
+				"from": 174760,
+				"to": 176880
+			},
+			"text": " as digital and physical intelligence"
+		},
+		{
+			"timestamps": {
+				"from": "00:02:56,880",
+				"to": "00:02:59,600"
+			},
+			"offsets": {
+				"from": 176880,
+				"to": 179600
+			},
+			"text": " converge in real-world systems."
+		},
+		{
+			"timestamps": {
+				"from": "00:02:59,600",
+				"to": "00:03:02,960"
+			},
+			"offsets": {
+				"from": 179600,
+				"to": 182960
+			},
+			"text": " In manufacturing, AI is shifting operations"
+		},
+		{
+			"timestamps": {
+				"from": "00:03:02,960",
+				"to": "00:03:07,680"
+			},
+			"offsets": {
+				"from": 182960,
+				"to": 187680
+			},
+			"text": " from periodic inspection to continuous autonomous optimization."
+		},
+		{
+			"timestamps": {
+				"from": "00:03:07,680",
+				"to": "00:03:10,360"
+			},
+			"offsets": {
+				"from": 187680,
+				"to": 190360
+			},
+			"text": " In mobility, software-defined vehicles"
+		},
+		{
+			"timestamps": {
+				"from": "00:03:10,360",
+				"to": "00:03:14,440"
+			},
+			"offsets": {
+				"from": 190360,
+				"to": 194440
+			},
+			"text": " are evolving safely over time through embedded intelligence."
+		},
+		{
+			"timestamps": {
+				"from": "00:03:14,440",
+				"to": "00:03:18,680"
+			},
+			"offsets": {
+				"from": 194440,
+				"to": 198680
+			},
+			"text": " And in life sciences, simulation and human-in-the-loop validation"
+		},
+		{
+			"timestamps": {
+				"from": "00:03:18,680",
+				"to": "00:03:21,400"
+			},
+			"offsets": {
+				"from": 198680,
+				"to": 201400
+			},
+			"text": " are accelerating innovation while protecting"
+		},
+		{
+			"timestamps": {
+				"from": "00:03:21,400",
+				"to": "00:03:23,240"
+			},
+			"offsets": {
+				"from": 201400,
+				"to": 203240
+			},
+			"text": " safety and regulatory trust."
+		},
+		{
+			"timestamps": {
+				"from": "00:03:26,840",
+				"to": "00:03:31,000"
+			},
+			"offsets": {
+				"from": 206840,
+				"to": 211000
+			},
+			"text": " At Cognizant, we engineer physical AI across the full lifecycle,"
+		},
+		{
+			"timestamps": {
+				"from": "00:03:31,000",
+				"to": "00:03:34,040"
+			},
+			"offsets": {
+				"from": 211000,
+				"to": 214040
+			},
+			"text": " from simulation and validation through to deployment"
+		},
+		{
+			"timestamps": {
+				"from": "00:03:34,040",
+				"to": "00:03:36,560"
+			},
+			"offsets": {
+				"from": 214040,
+				"to": 216560
+			},
+			"text": " in complex, regulated environments,"
+		},
+		{
+			"timestamps": {
+				"from": "00:03:36,560",
+				"to": "00:03:39,680"
+			},
+			"offsets": {
+				"from": 216560,
+				"to": 219680
+			},
+			"text": " building intelligent, connected systems designed"
+		},
+		{
+			"timestamps": {
+				"from": "00:03:39,680",
+				"to": "00:03:42,840"
+			},
+			"offsets": {
+				"from": 219680,
+				"to": 222840
+			},
+			"text": " for autonomous operation in the real world."
+		},
+		{
+			"timestamps": {
+				"from": "00:03:42,840",
+				"to": "00:03:46,120"
+			},
+			"offsets": {
+				"from": 222840,
+				"to": 226120
+			},
+			"text": " That's why we continue to invest in our global innovation"
+		},
+		{
+			"timestamps": {
+				"from": "00:03:46,120",
+				"to": "00:03:49,960"
+			},
+			"offsets": {
+				"from": 226120,
+				"to": 229960
+			},
+			"text": " centers that allow our clients to design, test,"
+		},
+		{
+			"timestamps": {
+				"from": "00:03:49,960",
+				"to": "00:03:53,080"
+			},
+			"offsets": {
+				"from": 229960,
+				"to": 233080
+			},
+			"text": " and industrialize solutions before scaling them"
+		},
+		{
+			"timestamps": {
+				"from": "00:03:53,080",
+				"to": "00:03:54,440"
+			},
+			"offsets": {
+				"from": 233080,
+				"to": 234440
+			},
+			"text": " into live operations."
+		},
+		{
+			"timestamps": {
+				"from": "00:03:57,880",
+				"to": "00:04:01,840"
+			},
+			"offsets": {
+				"from": 237880,
+				"to": 241840
+			},
+			"text": " The next phase of AI won't be defined by algorithms alone,"
+		},
+		{
+			"timestamps": {
+				"from": "00:04:01,840",
+				"to": "00:04:04,720"
+			},
+			"offsets": {
+				"from": 241840,
+				"to": 244720
+			},
+			"text": " but by how intelligently we engineer them"
+		},
+		{
+			"timestamps": {
+				"from": "00:04:04,720",
+				"to": "00:04:06,240"
+			},
+			"offsets": {
+				"from": 244720,
+				"to": 246240
+			},
+			"text": " into the real world."
+		},
+		{
+			"timestamps": {
+				"from": "00:04:06,240",
+				"to": "00:04:08,240"
+			},
+			"offsets": {
+				"from": 246240,
+				"to": 248240
+			},
+			"text": " The organizations that succeed will"
+		},
+		{
+			"timestamps": {
+				"from": "00:04:08,240",
+				"to": "00:04:10,040"
+			},
+			"offsets": {
+				"from": 248240,
+				"to": 250040
+			},
+			"text": " be those that engineer intelligence"
+		},
+		{
+			"timestamps": {
+				"from": "00:04:10,040",
+				"to": "00:04:14,960"
+			},
+			"offsets": {
+				"from": 250040,
+				"to": 254960
+			},
+			"text": " with rigor, discipline, and responsibility from day one."
+		},
+		{
+			"timestamps": {
+				"from": "00:04:16,120",
+				"to": "00:04:18,700"
+			},
+			"offsets": {
+				"from": 256120,
+				"to": 258700
+			},
+			"text": " (gentle music)"
+		}
+	]
+}

@@ -1,0 +1,26 @@
+# mandado por el Protocolo del MD Evolutivo — repo soberano de /mnt/nvme/p0x
+pipeline/out/
+pipeline/whisper.cpp/
+*.bin
+*.gguf
+*.onnx
+*.wav
+*.bak-*
+__pycache__/
+.venv/
+
+# derivados ligeros pero 100% regenerables desde el corpus .md ya versionado —
+# trackearlos solo crea diffs de ruido en cada ingesta, sin historia nueva real
+# (mismo criterio ya usado en el repo hexelion con disk_nodes.json/vessel_db.sqlite)
+mente/grafo/second_brain.json
+mente/pipeline/.ingest_manifest.json
+
+# transcripciones de builds manuales puntuales (jun-2026, whisper.cpp bootstrap) —
+# log de una corrida, no fuente ni configuración
+pipeline_build*.log
+
+# corpus: solo se trackea el resultado curado (transcript.*, meta.tsv). El audio
+# crudo bajado (webm) y el volcado de metadata de yt-dlp (info.json, listas de
+# formatos/thumbnails, no contenido) son artefactos de la descarga, no fuente.
+corpus/**/audio.webm
+corpus/**/audio.info.json

@@ -1,0 +1,186 @@
+
+== 0 · PRE-VUELO ==
+  id      : cGhI8tGY0Gw
+  modelo  : ggml-small.bin
+  idioma  : auto
+  salida  : /mnt/nvme/p0x/corpus/cGhI8tGY0Gw
+
+== 1 · METADATOS + DESCARGA DE AUDIO (yt-dlp) ==
+    $ yt-dlp -f bestaudio/best --no-playlist --write-info-json --no-progress -o /mnt/nvme/p0x/corpus/cGhI8tGY0Gw/audio.%(ext)s --print-to-file %(id)s	%(title)s	%(duration)s	%(uploader)s /mnt/nvme/p0x/corpus/cGhI8tGY0Gw/meta.tsv https://youtu.be/cGhI8tGY0Gw?is=y3_0kMMwGDlnikMw
+[youtube] Extracting URL: https://youtu.be/cGhI8tGY0Gw?is=y3_0kMMwGDlnikMw
+[youtube] cGhI8tGY0Gw: Downloading webpage
+WARNING: [youtube] No supported JavaScript runtime could be found. Only deno is enabled by default; to use another runtime add  --js-runtimes RUNTIME[:PATH]  to your command/config. YouTube extraction without a JS runtime has been deprecated, and some formats may be missing. See  https://github.com/yt-dlp/yt-dlp/wiki/EJS  for details on installing one
+[youtube] cGhI8tGY0Gw: Downloading android vr player API JSON
+[info] cGhI8tGY0Gw: Downloading 1 format(s): 251
+[info] Writing '%(id)s\t%(title)s\t%(duration)s\t%(uploader)s' to: /mnt/nvme/p0x/corpus/cGhI8tGY0Gw/meta.tsv
+[info] Writing video metadata as JSON to: /mnt/nvme/p0x/corpus/cGhI8tGY0Gw/audio.info.json
+[download] Destination: /mnt/nvme/p0x/corpus/cGhI8tGY0Gw/audio.webm
+[download] Download completed
+  audio   : audio.webm (3699 KiB)
+
+== 2 · NORMALIZACIÓN A WAV 16 kHz mono (ffmpeg) ==
+    $ ffmpeg -y -hide_banner -loglevel error -i /mnt/nvme/p0x/corpus/cGhI8tGY0Gw/audio.webm -ar 16000 -ac 1 -c:a pcm_s16le /mnt/nvme/p0x/corpus/cGhI8tGY0Gw/audio.16k.wav
+  wav     : audio.16k.wav (8151 KiB)
+
+== 3 · TRANSCRIPCIÓN (whisper-cli, CPU OpenBLAS) ==
+    $ /mnt/nvme/p0x/pipeline/whisper.cpp/build/bin/whisper-cli -m /mnt/nvme/p0x/pipeline/models/ggml-small.bin -f /mnt/nvme/p0x/corpus/cGhI8tGY0Gw/audio.16k.wav -t 8 -otxt -oj -osrt -of /mnt/nvme/p0x/corpus/cGhI8tGY0Gw/transcript -pp -l auto
+whisper_init_from_file_with_params_no_state: loading model from '/mnt/nvme/p0x/pipeline/models/ggml-small.bin'
+whisper_init_with_params_no_state: use gpu    = 1
+whisper_init_with_params_no_state: flash attn = 1
+whisper_init_with_params_no_state: gpu_device = 0
+whisper_init_with_params_no_state: dtw        = 0
+whisper_init_with_params_no_state: devices    = 2
+whisper_init_with_params_no_state: backends   = 2
+whisper_model_load: loading model
+whisper_model_load: n_vocab       = 51865
+whisper_model_load: n_audio_ctx   = 1500
+whisper_model_load: n_audio_state = 768
+whisper_model_load: n_audio_head  = 12
+whisper_model_load: n_audio_layer = 12
+whisper_model_load: n_text_ctx    = 448
+whisper_model_load: n_text_state  = 768
+whisper_model_load: n_text_head   = 12
+whisper_model_load: n_text_layer  = 12
+whisper_model_load: n_mels        = 80
+whisper_model_load: ftype         = 1
+whisper_model_load: qntvr         = 0
+whisper_model_load: type          = 3 (small)
+whisper_model_load: adding 1608 extra tokens
+whisper_model_load: n_langs       = 99
+whisper_model_load:          CPU total size =   487.01 MB
+whisper_model_load: model size    =  487.01 MB
+whisper_backend_init_gpu: device 0: BLAS (type: 3)
+whisper_backend_init_gpu: device 1: CPU (type: 0)
+whisper_backend_init_gpu: no GPU found
+whisper_backend_init: using BLAS backend
+whisper_init_state: kv self size  =   18.87 MB
+whisper_init_state: kv cross size =   56.62 MB
+whisper_init_state: kv pad  size  =    4.72 MB
+whisper_init_state: compute buffer (conv)   =   22.42 MB
+whisper_init_state: compute buffer (encode) =   33.85 MB
+whisper_init_state: compute buffer (cross)  =    6.20 MB
+whisper_init_state: compute buffer (decode) =   97.28 MB
+read_audio_data: reading audio data from '/mnt/nvme/p0x/corpus/cGhI8tGY0Gw/audio.16k.wav' ...
+read_audio_data: trying to decode with miniaudio
+
+system_info: n_threads = 8 / 8 | WHISPER : COREML = 0 | OPENVINO = 0 | CPU : NEON = 1 | ARM_FMA = 1 | FP16_VA = 1 | DOTPROD = 1 | OPENMP = 1 | REPACK = 1 | 
+
+main: processing '/mnt/nvme/p0x/corpus/cGhI8tGY0Gw/audio.16k.wav' (4173648 samples, 260.9 sec), 8 threads, 1 processors, 5 beams + best of 5, lang = auto, task = transcribe, timestamps = 1 ...
+
+whisper_full_with_state: auto-detected language: en (p = 0.992095)
+
+[00:00:00.000 --> 00:00:02.580]   (upbeat music)
+[00:00:05.500 --> 00:00:09.840]   Physical AI represents the next phase of AI adoption,
+[00:00:09.840 --> 00:00:13.520]   building on the advances of generative AI and agentic AI,
+[00:00:13.520 --> 00:00:17.320]   and extending intelligence beyond the digital world.
+[00:00:17.320 --> 00:00:20.680]   Physical AI makes a shift from retrospective insight
+[00:00:20.680 --> 00:00:23.880]   to intelligence embedded directly into the systems
+[00:00:23.880 --> 00:00:25.680]   that drive the physical world.
+whisper_print_progress_callback: progress =   9%
+[00:00:25.680 --> 00:00:30.080]   These systems sense, they decide, and act autonomously
+[00:00:30.080 --> 00:00:33.280]   at speed, at scale, and in real time.
+[00:00:33.280 --> 00:00:35.120]   Powering autonomous vehicles,
+[00:00:35.120 --> 00:00:37.760]   highly automated factories and warehouses,
+[00:00:37.760 --> 00:00:40.520]   self-monitoring and self-healing infrastructure,
+[00:00:40.520 --> 00:00:44.520]   and intelligent medical device and industrial systems,
+[00:00:44.520 --> 00:00:47.280]   physical AI turns intelligence into action
+[00:00:47.280 --> 00:00:49.360]   and action into outcomes.
+[00:00:49.360 --> 00:00:52.520]   (upbeat music)
+[00:00:52.520 --> 00:00:55.280]   Industries are at a turning point.
+whisper_print_progress_callback: progress =  21%
+[00:00:55.280 --> 00:00:58.440]   The real challenge is engineering intelligence
+[00:00:58.440 --> 00:01:02.400]   that performs safely, reliably, and at scale
+[00:01:02.400 --> 00:01:04.460]   amid the uncertainty of the real world
+[00:01:04.460 --> 00:01:07.440]   where data is incomplete, conditions change,
+[00:01:07.440 --> 00:01:10.240]   and decisions must be made in motion.
+[00:01:10.240 --> 00:01:12.600]   Gartner identifies physical AI
+[00:01:12.600 --> 00:01:15.440]   as the strategic technology trend expected
+[00:01:15.440 --> 00:01:19.840]   to shape enterprise priorities over the next five years.
+[00:01:19.840 --> 00:01:21.640]   Moving from pilots to production
+[00:01:21.640 --> 00:01:23.440]   remains the defining hurdle.
+whisper_print_progress_callback: progress =  32%
+[00:01:25.800 --> 00:01:26.920]   (upbeat music)
+[00:01:26.920 --> 00:01:30.160]   Physical AI has to be embedded from the outset
+[00:01:30.160 --> 00:01:33.800]   because once you move from pilots into live operations,
+[00:01:33.800 --> 00:01:37.320]   constraints show up fast, such as latency, safety,
+[00:01:37.320 --> 00:01:41.000]   and integration across hardware and enterprise systems.
+[00:01:41.000 --> 00:01:44.200]   These are the challenges that models alone cannot solve.
+[00:01:44.200 --> 00:01:47.320]   Complexity rises, costs escalate,
+[00:01:47.320 --> 00:01:50.400]   and when systems lack transparency and explainability
+[00:01:50.400 --> 00:01:53.200]   in real world conditions, confidence erodes,
+whisper_print_progress_callback: progress =  43%
+[00:01:53.200 --> 00:01:56.200]   especially in regulated environments.
+[00:01:56.200 --> 00:01:58.120]   That's why scaling breaks,
+[00:01:58.120 --> 00:01:59.880]   not because ambition is missing,
+[00:01:59.880 --> 00:02:02.920]   but because the system was never designed to run,
+[00:02:02.920 --> 00:02:05.440]   adapt, and stay safe in the real world.
+[00:02:08.280 --> 00:02:12.160]   Physical AI must be architected across the full stack,
+[00:02:12.160 --> 00:02:15.800]   integrating sensing, decision-making, actuation,
+[00:02:15.800 --> 00:02:18.440]   data platforms, and enterprise systems
+[00:02:18.440 --> 00:02:21.200]   into a single coherent design.
+whisper_print_progress_callback: progress =  54%
+[00:02:21.200 --> 00:02:24.560]   That means validating performance through simulation
+[00:02:24.560 --> 00:02:29.400]   before deployment, introducing capability in staged releases,
+[00:02:29.400 --> 00:02:32.800]   and governing models continuously as they evolve.
+[00:02:32.800 --> 00:02:36.240]   This is an architectural shift, not a feature upgrade,
+[00:02:36.240 --> 00:02:38.840]   and it's not confined to one team.
+[00:02:38.840 --> 00:02:43.560]   It requires clear ownership across IT, OT, engineering,
+[00:02:43.560 --> 00:02:46.360]   and operations because physical AI
+[00:02:46.360 --> 00:02:48.360]   doesn't live in a single function.
+whisper_print_progress_callback: progress =  65%
+[00:02:51.680 --> 00:02:54.760]   We're already seeing this shift across industries
+[00:02:54.760 --> 00:02:56.880]   as digital and physical intelligence
+[00:02:56.880 --> 00:02:59.600]   converge in real-world systems.
+[00:02:59.600 --> 00:03:02.960]   In manufacturing, AI is shifting operations
+[00:03:02.960 --> 00:03:07.680]   from periodic inspection to continuous autonomous optimization.
+[00:03:07.680 --> 00:03:10.360]   In mobility, software-defined vehicles
+[00:03:10.360 --> 00:03:14.440]   are evolving safely over time through embedded intelligence.
+[00:03:14.440 --> 00:03:18.680]   And in life sciences, simulation and human-in-the-loop validation
+whisper_print_progress_callback: progress =  76%
+[00:03:18.680 --> 00:03:21.400]   are accelerating innovation while protecting
+[00:03:21.400 --> 00:03:23.240]   safety and regulatory trust.
+[00:03:26.840 --> 00:03:31.000]   At Cognizant, we engineer physical AI across the full lifecycle,
+[00:03:31.000 --> 00:03:34.040]   from simulation and validation through to deployment
+[00:03:34.040 --> 00:03:36.560]   in complex, regulated environments,
+[00:03:36.560 --> 00:03:39.680]   building intelligent, connected systems designed
+[00:03:39.680 --> 00:03:42.840]   for autonomous operation in the real world.
+[00:03:42.840 --> 00:03:46.120]   That's why we continue to invest in our global innovation
+whisper_print_progress_callback: progress =  86%
+[00:03:46.120 --> 00:03:49.960]   centers that allow our clients to design, test,
+[00:03:49.960 --> 00:03:53.080]   and industrialize solutions before scaling them
+[00:03:53.080 --> 00:03:54.440]   into live operations.
+[00:03:57.880 --> 00:04:01.840]   The next phase of AI won't be defined by algorithms alone,
+[00:04:01.840 --> 00:04:04.720]   but by how intelligently we engineer them
+[00:04:04.720 --> 00:04:06.240]   into the real world.
+[00:04:06.240 --> 00:04:08.240]   The organizations that succeed will
+[00:04:08.240 --> 00:04:10.040]   be those that engineer intelligence
+[00:04:10.040 --> 00:04:14.960]   with rigor, discipline, and responsibility from day one.
+whisper_print_progress_callback: progress =  98%
+[00:04:16.120 --> 00:04:18.700]   (gentle music)
+whisper_print_progress_callback: progress = 100%
+output_txt: saving output to '/mnt/nvme/p0x/corpus/cGhI8tGY0Gw/transcript.txt'
+output_srt: saving output to '/mnt/nvme/p0x/corpus/cGhI8tGY0Gw/transcript.srt'
+output_json: saving output to '/mnt/nvme/p0x/corpus/cGhI8tGY0Gw/transcript.json'
+
+whisper_print_timings:     load time =   462.81 ms
+whisper_print_timings:     fallbacks =   1 p /   0 h
+whisper_print_timings:      mel time =   225.51 ms
+whisper_print_timings:   sample time =  4943.65 ms /  3970 runs (     1.25 ms per run)
+whisper_print_timings:   encode time = 101199.03 ms /    11 runs (  9199.91 ms per run)
+whisper_print_timings:   decode time =   300.49 ms /     4 runs (    75.12 ms per run)
+whisper_print_timings:   batchd time = 53272.54 ms /  3921 runs (    13.59 ms per run)
+whisper_print_timings:   prompt time = 34317.69 ms /  1611 runs (    21.30 ms per run)
+whisper_print_timings:    total time = 195139.84 ms
+
+== 4 · VERIFICACIÓN ==
+  transcript.txt: OK (3504 bytes)
+    | (upbeat music)
+    |  Physical AI represents the next phase of AI adoption,
+    |  building on the advances of generative AI and agentic AI,
+
+== LISTO ==
+  Vídeo cGhI8tGY0Gw ingerido en /mnt/nvme/p0x/corpus/cGhI8tGY0Gw
+    meta.tsv: 62 bytes
+    transcript.txt: 3504 bytes
+    transcript.json: 16581 bytes
+    transcript.srt: 6181 bytes

@@ -1,0 +1,79 @@
+ (upbeat music)
+ Physical AI represents the next phase of AI adoption,
+ building on the advances of generative AI and agentic AI,
+ and extending intelligence beyond the digital world.
+ Physical AI makes a shift from retrospective insight
+ to intelligence embedded directly into the systems
+ that drive the physical world.
+ These systems sense, they decide, and act autonomously
+ at speed, at scale, and in real time.
+ Powering autonomous vehicles,
+ highly automated factories and warehouses,
+ self-monitoring and self-healing infrastructure,
+ and intelligent medical device and industrial systems,
+ physical AI turns intelligence into action
+ and action into outcomes.
+ (upbeat music)
+ Industries are at a turning point.
+ The real challenge is engineering intelligence
+ that performs safely, reliably, and at scale
+ amid the uncertainty of the real world
+ where data is incomplete, conditions change,
+ and decisions must be made in motion.
+ Gartner identifies physical AI
+ as the strategic technology trend expected
+ to shape enterprise priorities over the next five years.
+ Moving from pilots to production
+ remains the defining hurdle.
+ (upbeat music)
+ Physical AI has to be embedded from the outset
+ because once you move from pilots into live operations,
+ constraints show up fast, such as latency, safety,
+ and integration across hardware and enterprise systems.
+ These are the challenges that models alone cannot solve.
+ Complexity rises, costs escalate,
+ and when systems lack transparency and explainability
+ in real world conditions, confidence erodes,
+ especially in regulated environments.
+ That's why scaling breaks,
+ not because ambition is missing,
+ but because the system was never designed to run,
+ adapt, and stay safe in the real world.
+ Physical AI must be architected across the full stack,
+ integrating sensing, decision-making, actuation,
+ data platforms, and enterprise systems
+ into a single coherent design.
+ That means validating performance through simulation
+ before deployment, introducing capability in staged releases,
+ and governing models continuously as they evolve.
+ This is an architectural shift, not a feature upgrade,
+ and it's not confined to one team.
+ It requires clear ownership across IT, OT, engineering,
+ and operations because physical AI
+ doesn't live in a single function.
+ We're already seeing this shift across industries
+ as digital and physical intelligence
+ converge in real-world systems.
+ In manufacturing, AI is shifting operations
+ from periodic inspection to continuous autonomous optimization.
+ In mobility, software-defined vehicles
+ are evolving safely over time through embedded intelligence.
+ And in life sciences, simulation and human-in-the-loop validation
+ are accelerating innovation while protecting
+ safety and regulatory trust.
+ At Cognizant, we engineer physical AI across the full lifecycle,
+ from simulation and validation through to deployment
+ in complex, regulated environments,
+ building intelligent, connected systems designed
+ for autonomous operation in the real world.
+ That's why we continue to invest in our global innovation
+ centers that allow our clients to design, test,
+ and industrialize solutions before scaling them
+ into live operations.
+ The next phase of AI won't be defined by algorithms alone,
+ but by how intelligently we engineer them
+ into the real world.
+ The organizations that succeed will
+ be those that engineer intelligence
+ with rigor, discipline, and responsibility from day one.
+ (gentle music)

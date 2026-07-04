@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# p0x-enqueue — encola un trabajo PESADO en la-fragua, serializado (1 a la vez),
+# cediendo CPU/IO a los servicios vivos (Faro/Gateway/Qdrant) para no throttlear.
+# El proxy LiteLLM y esta cola son ORTOGONALES: se tocan solo cuando el trabajo
+# encolado llama al proxy. Uso: p0x-enqueue <comando...>
+set -euo pipefail
+export TS_SLOTS="${TS_SLOTS:-1}"          # 1 trabajo pesado a la vez -> sin OOM (15 GiB, swap=0)
+TSP="$(command -v tsp || command -v ts || true)"
+[ -n "$TSP" ] || { echo "ERROR: task-spooler no instalado -> sudo apt-get install -y task-spooler" >&2; exit 1; }
+"$TSP" -S "$TS_SLOTS" >/dev/null 2>&1 || true
+exec "$TSP" nice -n 19 ionice -c3 "$@"
