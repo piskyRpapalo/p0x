@@ -1,0 +1,14 @@
+# PROPUESTO, NO HABILITADO — vigilancia continua opcional (además del
+# ExecStartPost): si algo descarga el modelo sin reiniciar ollama, esto lo
+# repone en ≤5 min. Instalar junto a modelo-residente.service:
+#   cp modelo-residente.{service,timer} ~/.config/systemd/user/
+#   systemctl --user daemon-reload && systemctl --user enable --now modelo-residente.timer
+[Unit]
+Description=HEXELION — vigila cada 5 min que el cerebro siga residente
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+
+[Install]
+WantedBy=timers.target
