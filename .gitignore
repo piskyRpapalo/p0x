@@ -19,6 +19,10 @@ mente/pipeline/.ingest_manifest.json
 # log de una corrida, no fuente ni configuración
 pipeline_build*.log
 
+# telemetría viva del Sínodo (Bloque T): dato operativo append-only, no fuente —
+# se versiona el README del directorio, jamás el jsonl (crecería sin historia real)
+mente/telemetria/*.jsonl
+
 # corpus: solo se trackea el resultado curado (transcript.*, meta.tsv). El audio
 # crudo bajado (webm) y el volcado de metadata de yt-dlp (info.json, listas de
 # formatos/thumbnails, no contenido) son artefactos de la descarga, no fuente.
