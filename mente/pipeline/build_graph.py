@@ -67,6 +67,9 @@ def build_graph() -> dict:
     skipped: list[str] = []
 
     for md in md_files:
+        # la necrópolis es tierra de descartados: jamás se proyecta al grafo
+        if "necropolis" in md.relative_to(MENTE_ROOT).parts:
+            continue
         fm = _parse_frontmatter(md)
         if fm is None:
             skipped.append(str(md.relative_to(MENTE_ROOT)))
