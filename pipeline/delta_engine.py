@@ -383,12 +383,27 @@ def generar_delta(job_id: str) -> None:
     texto = cargar_transcript(video_id)
     ol.log_runner(job_id, f"transcript: {len(texto.split())} palabras, "
                           f"{len(ventanas(texto))} ventanas")
-    claims = map_claims(job_id, texto, foco)
-    ol.log_runner(job_id, f"MAP: {len(claims)} claims")
-    claims = clasificar(job_id, claims)
-    nuevos = sum(1 for c in claims if c["clase"] == "NUEVO")
-    ol.log_runner(job_id, f"CLASSIFY: {nuevos} nuevos / "
-                          f"{len(claims) - nuevos} ya sabidos")
+    # Checkpoints de fase: un re-encolado térmico reanuda donde murió en vez
+    # de rehacer MAP+CLASSIFY (~45 min de CPU) y chocar contra el mismo muro.
+    clasificados = ol.leer_checkpoint(job_id, "claims_classify.json")
+    if clasificados is not None:
+        claims = clasificados
+        nuevos = sum(1 for c in claims if c["clase"] == "NUEVO")
+        ol.log_runner(job_id, f"CLASSIFY en cache — skip ({nuevos} nuevos / "
+                              f"{len(claims) - nuevos} ya sabidos)")
+    else:
+        claims = ol.leer_checkpoint(job_id, "claims_map.json")
+        if claims is not None:
+            ol.log_runner(job_id, f"MAP en cache — skip ({len(claims)} claims)")
+        else:
+            claims = map_claims(job_id, texto, foco)
+            ol.guardar_checkpoint(job_id, "claims_map.json", claims)
+            ol.log_runner(job_id, f"MAP: {len(claims)} claims")
+        claims = clasificar(job_id, claims)
+        ol.guardar_checkpoint(job_id, "claims_classify.json", claims)
+        nuevos = sum(1 for c in claims if c["clase"] == "NUEVO")
+        ol.log_runner(job_id, f"CLASSIFY: {nuevos} nuevos / "
+                              f"{len(claims) - nuevos} ya sabidos")
     delta_md, sidecar = reduce_delta(job_id, claims, foco, video_id, titulo_video)
 
     d = ol.job_dir(job_id)

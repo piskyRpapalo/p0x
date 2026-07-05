@@ -160,6 +160,23 @@ def listar_jobs(estado: str | None = None) -> list[dict]:
     return out
 
 
+def leer_checkpoint(job_id: str, nombre: str):
+    """Checkpoint de fase del motor delta (claims_map.json / claims_classify.json).
+    None si no existe o está corrupto — el llamante rehace la fase."""
+    p = job_dir(job_id) / nombre
+    if not p.exists():
+        return None
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+
+
+def guardar_checkpoint(job_id: str, nombre: str, data) -> None:
+    _atomic_write(job_dir(job_id) / nombre,
+                  json.dumps(data, ensure_ascii=False, indent=2))
+
+
 def log_runner(job_id: str, msg: str) -> None:
     with open(job_dir(job_id) / "runner.log", "a", encoding="utf-8") as f:
         f.write(f"{utcnow()} {msg}\n")
