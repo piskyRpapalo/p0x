@@ -1,0 +1,35 @@
+{
+  "job_id": "cGhI8tGY0Gw-20260705171830",
+  "url": "https://www.youtube.com/watch?v=cGhI8tGY0Gw",
+  "video_id": "cGhI8tGY0Gw",
+  "comentario": "Me interesa cómo la IA física conecta percepción y acción, y qué implicaciones tiene para un organismo soberano con sensores propios (M5, AIS, ADS-B).",
+  "state": "discarded",
+  "transcript_cached": true,
+  "requeues_thermal": 0,
+  "created_at": "2026-07-05T17:18:30+00:00",
+  "updated_at": "2026-07-05T17:32:08+00:00",
+  "history": [
+    {
+      "ts": "2026-07-05T17:18:30+00:00",
+      "state": "queued",
+      "temp_c": 54.538
+    },
+    {
+      "ts": "2026-07-05T17:18:33+00:00",
+      "state": "delta",
+      "temp_c": 55.461
+    },
+    {
+      "ts": "2026-07-05T17:30:47+00:00",
+      "state": "pending_review",
+      "temp_c": 83.153
+    },
+    {
+      "ts": "2026-07-05T17:32:08+00:00",
+      "state": "discarded",
+      "temp_c": 57.307,
+      "motivo": "pase 2 de verificación E2E: el conocimiento ya entró en la mente con el ACEPTAR del pase 1 — 5/6 claims YA_SABIDO citando esfera-ia-fisica; nada nuevo que conservar"
+    }
+  ],
+  "motivo": "pase 2 de verificación E2E: el conocimiento ya entró en la mente con el ACEPTAR del pase 1 — 5/6 claims YA_SABIDO citando esfera-ia-fisica; nada nuevo que conservar"
+}

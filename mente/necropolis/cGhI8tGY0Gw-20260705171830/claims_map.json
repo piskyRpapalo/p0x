@@ -1,0 +1,32 @@
+[
+  {
+    "texto": "La IA física conecta percepción y acción mediante sistemas que sensan, deciden y actúan de forma autónoma en tiempo real.",
+    "relevancia_foco": 0.95,
+    "ventana": 0
+  },
+  {
+    "texto": "Un organismo soberano con sensores propios como M5, AIS y ADS-B puede integrar percepción y acción mediante IA física.",
+    "relevancia_foco": 0.9,
+    "ventana": 0
+  },
+  {
+    "texto": "La IA física transforma la inteligencia en acciones que generan resultados reales en el mundo físico.",
+    "relevancia_foco": 0.85,
+    "ventana": 0
+  },
+  {
+    "texto": "La seguridad, fiabilidad y escalabilidad de la IA física son desafíos clave en entornos reales con datos incompletos y condiciones cambiantes.",
+    "relevancia_foco": 0.8,
+    "ventana": 0
+  },
+  {
+    "texto": "La arquitectura de la IA física debe integrar sensores, toma de decisiones, actuación, plataformas de datos y sistemas empresariales en un diseño coherente.",
+    "relevancia_foco": 0.85,
+    "ventana": 0
+  },
+  {
+    "texto": "La escalabilidad de la IA física requiere validación en simulación, lanzamientos en fases y gobernanza continua de los modelos en condiciones reales.",
+    "relevancia_foco": 0.8,
+    "ventana": 0
+  }
+]

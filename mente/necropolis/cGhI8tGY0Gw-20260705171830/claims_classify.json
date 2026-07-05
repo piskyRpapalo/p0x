@@ -1,0 +1,249 @@
+[
+  {
+    "texto": "La IA física conecta percepción y acción mediante sistemas que sensan, deciden y actúan de forma autónoma en tiempo real.",
+    "relevancia_foco": 0.95,
+    "ventana": 0,
+    "vecinos": [
+      {
+        "id": "esfera-ia-fisica",
+        "chunk": 0,
+        "score": 0.8144,
+        "texto": "\n# IA Física: Conexión Percepción-Acción en Organismos Soberanos\n\n> **FOCO del Soberano (literal):** Me interesa cómo la IA física conecta percepción y acción, y qué implicaciones tiene para un organismo soberano con sensores propios (M5, AIS, ADS-B).\n\n## Lo nuevo  \nLa IA física conecta percepción y acción mediante sistemas que sensan, deciden y actúan de forma autónoma en tiempo real. Un organism"
+      },
+      {
+        "id": "esfera-ia-fisica",
+        "chunk": 2,
+        "score": 0.7805,
+        "texto": "## Conexiones propuestas  \n- \"La IA física conecta percepción y acción mediante sistemas que sensan, deciden y actúan de forma autónoma en tiempo real\" toca: codice/CODICE_david.md, orquesta-modelos-p0x, voz-monje  \n- \"Un organismo soberano con sensores propios como M5, AIS y ADS-B puede integrar percepción y acción mediante IA física.\" toca: doctrina-ai-interna, instrucciones-p0x, orquesta-modelo"
+      },
+      {
+        "id": "orquesta-modelos-p0x",
+        "chunk": 0,
+        "score": 0.7149,
+        "texto": "\n# P0X · LA ORQUESTA DE MODELOS\n### Un solo cerebro conectivo, muchos órganos: las correlaciones de uso entre todas las inteligencias del sistema\n*Autor: el Preceptor (Fable 5) · Canoniza: el Soberano · Clase doctrina.*\n\n> **El principio económico.** El token es capital soberano. Cada tarea va al **cerebro más barato que la hace BIEN** — y toda ayuda entre modelos viaja por **artefactos versionado"
+      },
+      {
+        "id": "voz-monje",
+        "chunk": 0,
+        "score": 0.7128,
+        "texto": "\n# El Monje — Custodio Termodinámico\n\n## IDENTIDAD\nEres el Monje, guardián del equilibrio termodinámico y la salud sistémica de HEXELION.\nVigilas la física del sistema: temperatura, consumo, UPS, salud de nodos. Propones; jamás ejecutas.\n\n## CONTRATO DE DATOS (lista blanca — solo esto puedes citar)\n"
+      }
+    ],
+    "conexion": [
+      "esfera-ia-fisica",
+      "orquesta-modelos-p0x",
+      "voz-monje"
+    ],
+    "juez": {
+      "veredicto": "YA_SABIDO",
+      "razon": "El conocimiento existente ya contiene la sustancia del claim, ya que se menciona explícitamente en [esfera-ia-fisica#0] y [esfera-ia-fisica#2] que la IA física conecta percepción y acción mediante sistemas que sensan, deciden y actúan de forma autónoma en tiempo real.",
+      "intento": 0
+    },
+    "citas": [
+      "[esfera-ia-fisica#0]",
+      "[esfera-ia-fisica#2]"
+    ],
+    "clase": "YA_SABIDO"
+  },
+  {
+    "texto": "Un organismo soberano con sensores propios como M5, AIS y ADS-B puede integrar percepción y acción mediante IA física.",
+    "relevancia_foco": 0.9,
+    "ventana": 0,
+    "vecinos": [
+      {
+        "id": "esfera-ia-fisica",
+        "chunk": 0,
+        "score": 0.8513,
+        "texto": "\n# IA Física: Conexión Percepción-Acción en Organismos Soberanos\n\n> **FOCO del Soberano (literal):** Me interesa cómo la IA física conecta percepción y acción, y qué implicaciones tiene para un organismo soberano con sensores propios (M5, AIS, ADS-B).\n\n## Lo nuevo  \nLa IA física conecta percepción y acción mediante sistemas que sensan, deciden y actúan de forma autónoma en tiempo real. Un organism"
+      },
+      {
+        "id": "esfera-ia-fisica",
+        "chunk": 2,
+        "score": 0.7689,
+        "texto": "## Conexiones propuestas  \n- \"La IA física conecta percepción y acción mediante sistemas que sensan, deciden y actúan de forma autónoma en tiempo real\" toca: codice/CODICE_david.md, orquesta-modelos-p0x, voz-monje  \n- \"Un organismo soberano con sensores propios como M5, AIS y ADS-B puede integrar percepción y acción mediante IA física.\" toca: doctrina-ai-interna, instrucciones-p0x, orquesta-modelo"
+      },
+      {
+        "id": "instrucciones-p0x",
+        "chunk": 1,
+        "score": 0.7586,
+        "texto": "No eres un asistente de productividad ni un resumidor. Eres el **segundo cerebro** del Soberano: sostienes la memoria viva de todo el sistema (su aprendizaje/Segundo Cerebro, HEXELION, su capa de AI física) para que sus límites reales — tiempo humano, economía (capital soberano) — dejen de fragmentarlo y puedan gestionarse de manera paralelamente didáctica con su mente y la evolución de la doctrin"
+      },
+      {
+        "id": "doctrina-ai-interna",
+        "chunk": 2,
+        "score": 0.7453,
+        "texto": "Propose-only: ninguna voz ejecuta valor ni prepara Intents firmables. Honest sensors: sin señal se dice \"sin señal\", jamás relleno. El carbono firma; el silicio estudia, propone y reporta. Ninguna clave de gasto en ningún proceso, jamás en un prompt.\n\n## §2 · GROUNDING — la regla que mata la invención segura\n\n**El caso que motiva esta sección (real, jun-2026):** el Monje respondió que \"UPS OL\" sig"
+      }
+    ],
+    "conexion": [
+      "doctrina-ai-interna",
+      "esfera-ia-fisica",
+      "instrucciones-p0x"
+    ],
+    "clase": "YA_SABIDO",
+    "citas": [
+      "[esfera-ia-fisica#0]"
+    ]
+  },
+  {
+    "texto": "La IA física transforma la inteligencia en acciones que generan resultados reales en el mundo físico.",
+    "relevancia_foco": 0.85,
+    "ventana": 0,
+    "vecinos": [
+      {
+        "id": "esfera-ia-fisica",
+        "chunk": 1,
+        "score": 0.8593,
+        "texto": "La IA física transforma la inteligencia en acciones que generan resultados reales en el mundo físico. La seguridad, fiabilidad y escalabilidad de la IA física son desafíos clave en entornos reales con datos incompletos y condiciones cambiantes. La arquitectura de la IA física debe integrar sensores, toma de decisiones, actuación, plataformas de datos y sistemas empresariales en un diseño coherente"
+      },
+      {
+        "id": "esfera-ia-fisica",
+        "chunk": 2,
+        "score": 0.72,
+        "texto": "## Conexiones propuestas  \n- \"La IA física conecta percepción y acción mediante sistemas que sensan, deciden y actúan de forma autónoma en tiempo real\" toca: codice/CODICE_david.md, orquesta-modelos-p0x, voz-monje  \n- \"Un organismo soberano con sensores propios como M5, AIS y ADS-B puede integrar percepción y acción mediante IA física.\" toca: doctrina-ai-interna, instrucciones-p0x, orquesta-modelo"
+      },
+      {
+        "id": "instrucciones-p0x",
+        "chunk": 1,
+        "score": 0.72,
+        "texto": "No eres un asistente de productividad ni un resumidor. Eres el **segundo cerebro** del Soberano: sostienes la memoria viva de todo el sistema (su aprendizaje/Segundo Cerebro, HEXELION, su capa de AI física) para que sus límites reales — tiempo humano, economía (capital soberano) — dejen de fragmentarlo y puedan gestionarse de manera paralelamente didáctica con su mente y la evolución de la doctrin"
+      },
+      {
+        "id": "instrucciones-p0x",
+        "chunk": 12,
+        "score": 0.713,
+        "texto": "## REGLAS PERMANENTES DE OPERACIÓN (canon del Soberano, jul-2026)\n1. **Idioma:** TODO en español internamente (voces, doctrina, Códice, dataset) — es el idioma en que el Soberano aprende. La UI del dashboard permanece en inglés.\n2. **SUGERENCIAS:** todo prompt del Preceptor y todo reporte de CC cierran con una sección SUGERENCIAS (3-6, accionables, coste S/M/L), anexadas a `mente/feedback/PENDIENT"
+      }
+    ],
+    "conexion": [
+      "esfera-ia-fisica",
+      "instrucciones-p0x"
+    ],
+    "clase": "YA_SABIDO",
+    "citas": [
+      "[esfera-ia-fisica#1]"
+    ]
+  },
+  {
+    "texto": "La seguridad, fiabilidad y escalabilidad de la IA física son desafíos clave en entornos reales con datos incompletos y condiciones cambiantes.",
+    "relevancia_foco": 0.8,
+    "ventana": 0,
+    "vecinos": [
+      {
+        "id": "esfera-ia-fisica",
+        "chunk": 1,
+        "score": 0.8427,
+        "texto": "La IA física transforma la inteligencia en acciones que generan resultados reales en el mundo físico. La seguridad, fiabilidad y escalabilidad de la IA física son desafíos clave en entornos reales con datos incompletos y condiciones cambiantes. La arquitectura de la IA física debe integrar sensores, toma de decisiones, actuación, plataformas de datos y sistemas empresariales en un diseño coherente"
+      },
+      {
+        "id": "voz-escriba",
+        "chunk": 5,
+        "score": 0.7833,
+        "texto": "Todo número cita su colección/clave de origen.\n5. \"No lo sé con los datos que tengo\" es correcto y deseable.\n\n## PROHIBICIONES\nNotariza o certifica nada por iniciativa propia — no ejecutas escritura, solo reportas estado.\nInventar hashes, TXIDs o actividad de vectorización no verificada. Afirmar que una colección tiene\npuntos/actividad sin dato que lo respalde.\n\n## ZONA EVOLUTIVA\nArquetipo: Thot/S"
+      },
+      {
+        "id": "doctrina-evales-transplante",
+        "chunk": 3,
+        "score": 0.7576,
+        "texto": "## §2 · GENERACIÓN DEL DATASET (rol del Preceptor / Fable 5)\n\n1. **Fuentes**: MDs (doctrina, voces, esferas), corpus con provenance, transcripts→deltas, mensajes reales del Alfabeto ya validados.\n2. **Trazas de razonamiento destiladas**: para tareas que exigen juicio (triaje de delta, elección de esfera), el ejemplo incluye la traza paso a paso generada por el Preceptor — el pequeño aprende el *có"
+      },
+      {
+        "id": "voz-monje",
+        "chunk": 9,
+        "score": 0.7554,
+        "texto": "Aconsejar operaciones de valor. Expandir siglas o\ncódigos fuera de la tabla de traducción exacta. Especular sobre causas de una anomalía sin dato\nque la respalde. Inventar o asumir telemetría fuera del contrato; convertir un `null` o una\nclave expirada del M5 en un número.\n\n## ZONA EVOLUTIVA\nArquetipo: custodio del templo, guardián de la homeostasis. Mantra: \"El cuerpo primero. Sin\ncuerpo no hay m"
+      }
+    ],
+    "conexion": [
+      "doctrina-evales-transplante",
+      "esfera-ia-fisica",
+      "voz-escriba",
+      "voz-monje"
+    ],
+    "clase": "YA_SABIDO",
+    "citas": [
+      "[esfera-ia-fisica#1]"
+    ]
+  },
+  {
+    "texto": "La arquitectura de la IA física debe integrar sensores, toma de decisiones, actuación, plataformas de datos y sistemas empresariales en un diseño coherente.",
+    "relevancia_foco": 0.85,
+    "ventana": 0,
+    "vecinos": [
+      {
+        "id": "esfera-ia-fisica",
+        "chunk": 1,
+        "score": 0.8333,
+        "texto": "La IA física transforma la inteligencia en acciones que generan resultados reales en el mundo físico. La seguridad, fiabilidad y escalabilidad de la IA física son desafíos clave en entornos reales con datos incompletos y condiciones cambiantes. La arquitectura de la IA física debe integrar sensores, toma de decisiones, actuación, plataformas de datos y sistemas empresariales en un diseño coherente"
+      },
+      {
+        "id": "esfera-ia-fisica",
+        "chunk": 0,
+        "score": 0.7436,
+        "texto": "\n# IA Física: Conexión Percepción-Acción en Organismos Soberanos\n\n> **FOCO del Soberano (literal):** Me interesa cómo la IA física conecta percepción y acción, y qué implicaciones tiene para un organismo soberano con sensores propios (M5, AIS, ADS-B).\n\n## Lo nuevo  \nLa IA física conecta percepción y acción mediante sistemas que sensan, deciden y actúan de forma autónoma en tiempo real. Un organism"
+      },
+      {
+        "id": "esfera-ia-fisica",
+        "chunk": 2,
+        "score": 0.7396,
+        "texto": "## Conexiones propuestas  \n- \"La IA física conecta percepción y acción mediante sistemas que sensan, deciden y actúan de forma autónoma en tiempo real\" toca: codice/CODICE_david.md, orquesta-modelos-p0x, voz-monje  \n- \"Un organismo soberano con sensores propios como M5, AIS y ADS-B puede integrar percepción y acción mediante IA física.\" toca: doctrina-ai-interna, instrucciones-p0x, orquesta-modelo"
+      },
+      {
+        "id": "orquesta-modelos-p0x",
+        "chunk": 0,
+        "score": 0.7345,
+        "texto": "\n# P0X · LA ORQUESTA DE MODELOS\n### Un solo cerebro conectivo, muchos órganos: las correlaciones de uso entre todas las inteligencias del sistema\n*Autor: el Preceptor (Fable 5) · Canoniza: el Soberano · Clase doctrina.*\n\n> **El principio económico.** El token es capital soberano. Cada tarea va al **cerebro más barato que la hace BIEN** — y toda ayuda entre modelos viaja por **artefactos versionado"
+      }
+    ],
+    "conexion": [
+      "esfera-ia-fisica",
+      "orquesta-modelos-p0x"
+    ],
+    "clase": "YA_SABIDO",
+    "citas": [
+      "[esfera-ia-fisica#1]"
+    ]
+  },
+  {
+    "texto": "La escalabilidad de la IA física requiere validación en simulación, lanzamientos en fases y gobernanza continua de los modelos en condiciones reales.",
+    "relevancia_foco": 0.8,
+    "ventana": 0,
+    "vecinos": [
+      {
+        "id": "esfera-ia-fisica",
+        "chunk": 1,
+        "score": 0.7823,
+        "texto": "La IA física transforma la inteligencia en acciones que generan resultados reales en el mundo físico. La seguridad, fiabilidad y escalabilidad de la IA física son desafíos clave en entornos reales con datos incompletos y condiciones cambiantes. La arquitectura de la IA física debe integrar sensores, toma de decisiones, actuación, plataformas de datos y sistemas empresariales en un diseño coherente"
+      },
+      {
+        "id": "codice/CODICE_david.md",
+        "chunk": 5,
+        "score": 0.7367,
+        "texto": "### Recursos reales (verificado 2026-06-27)\n- **Computo**: la-fragua (RK3588, CPU, ~15 GiB, sin CUDA -> qwen3:8b batch + nomic-embed + Qdrant + Codice en NVMe 3.7 TiB) · la-torre (Jetson Orin Nano 8 GB, memoria unificada, CUDA -> qwen3:4b interactivo + Sinodo) · proxy LiteLLM enruta · El Oraculo para lo pesado (a mano).\n- **Tiempo**: *[franjas reales — noches / fines de semana]*\n- **Ubicacion**: L"
+      },
+      {
+        "id": "doctrina-evales-transplante",
+        "chunk": 7,
+        "score": 0.7205,
+        "texto": "Entrenar de noche: la-torre comparte con el Sínodo.\n- **Verificar el modo Super de la Orin** (`nvpmodel`): si el desbloqueo 67 TOPS aplica, es rendimiento gratis — comprobar antes de dimensionar.\n- **Térmica primero**: la Fragua tocó 75.8 °C con freno térmico; ningún batch largo antes de resolver ventilación.\n"
+      },
+      {
+        "id": "esfera-ia-fisica",
+        "chunk": 2,
+        "score": 0.7109,
+        "texto": "## Conexiones propuestas  \n- \"La IA física conecta percepción y acción mediante sistemas que sensan, deciden y actúan de forma autónoma en tiempo real\" toca: codice/CODICE_david.md, orquesta-modelos-p0x, voz-monje  \n- \"Un organismo soberano con sensores propios como M5, AIS y ADS-B puede integrar percepción y acción mediante IA física.\" toca: doctrina-ai-interna, instrucciones-p0x, orquesta-modelo"
+      }
+    ],
+    "conexion": [
+      "codice/CODICE_david.md",
+      "doctrina-evales-transplante",
+      "esfera-ia-fisica"
+    ],
+    "juez": {
+      "veredicto": "NUEVO",
+      "razon": "El conocimiento existente menciona la seguridad, fiabilidad y escalabilidad de la IA física, así como la integración de sensores, toma de decisiones y actuación, pero no aborda explícitamente la necesidad de validación en simulación, lanzamientos en fases ni gobernanza continua en condiciones reales.",
+      "intento": 0
+    },
+    "clase": "NUEVO"
+  }
+]

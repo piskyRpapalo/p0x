@@ -1,0 +1,8 @@
+2026-07-05T17:18:33+00:00 guard térmico [inicio]: zone0=55.461°C
+2026-07-05T17:18:33+00:00 transcript en cache — skip ingest_youtube
+2026-07-05T17:18:33+00:00 guard térmico [post-transcript]: zone0=55.461°C
+2026-07-05T17:18:33+00:00 transcript: 491 palabras, 2 ventanas
+2026-07-05T17:21:56+00:00 MAP: 6 claims
+2026-07-05T17:26:01+00:00 CLASSIFY: 1 nuevos / 5 ya sabidos
+2026-07-05T17:30:47+00:00 REDUCE: nota_sobre_esfera → corpus/observaciones/cGhI8tGY0Gw-ia-fisica-y-conexion-percepcion-accion-en-organi.md
+2026-07-05T17:30:47+00:00 listo: pending_review

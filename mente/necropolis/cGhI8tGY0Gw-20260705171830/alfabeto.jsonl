@@ -1,0 +1,5 @@
+{"v": "alfabeto-p0x@1.0.0", "md": "pipeline-ingesta@1.0.0", "dom": "ingesta", "op": "delta", "in": {"src": "ventana:0", "vs": "mente"}, "out": "{claims:[{texto,relevancia_foco}]}"}
+{"v": "alfabeto-p0x@1.0.0", "md": "pipeline-ingesta@1.0.0", "dom": "ingesta", "op": "delta", "in": {"src": "ventana:1", "vs": "mente"}, "out": "{claims:[{texto,relevancia_foco}]}"}
+{"v": "alfabeto-p0x@1.0.0", "md": "pipeline-ingesta@1.0.0", "dom": "ingesta", "op": "eval", "in": {"src": "claim", "vs": "mente", "k": 4}, "out": "{veredicto,razon}"}
+{"v": "alfabeto-p0x@1.0.0", "md": "pipeline-ingesta@1.0.0", "dom": "ingesta", "op": "eval", "in": {"src": "claim", "vs": "mente", "k": 4}, "out": "{veredicto,razon}"}
+{"v": "alfabeto-p0x@1.0.0", "md": "pipeline-ingesta@1.0.0", "dom": "ingesta", "op": "delta", "in": {"src": "claims:1", "vs": "esferas"}, "out": "{accion,esfera,titulo,razon}"}
