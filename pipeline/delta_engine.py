@@ -185,9 +185,11 @@ def clasificar(job_id: str, claims: list[dict]) -> list[dict]:
     client = get_client()
     for c in claims:
         vec = embed_text(c["texto"], prefix="search_query: ")
-        hits = client.search(collection_name=COLLECTION,
-                             query_vector=vec.tolist(),
-                             limit=CFG["top_k"], with_payload=True)
+        # query_points: .search() fue retirado en qdrant-client modernos
+        hits = client.query_points(collection_name=COLLECTION,
+                                   query=vec.tolist(),
+                                   limit=CFG["top_k"],
+                                   with_payload=True).points
         vecinos = [{
             "id": h.payload.get("id") or h.payload.get("path"),
             "chunk": h.payload.get("chunk_index"),
