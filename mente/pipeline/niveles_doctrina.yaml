@@ -1,0 +1,114 @@
+# GENERADO por gen_niveles.py (cc-pendiente-revision).
+# El MD de doctrina jamás se toca desde silicio: estos niveles
+# solo existen en la proyección del grafo (build_graph).
+discurso-fundacional-p0x:
+  basico: P0X es un sistema digital que vive en un equipo físico, escucha el mundo
+    real y aprende junto a su usuario, sin nunca tomar decisiones financieras por
+    sí mismo.
+  experto: 'P0X es un microestado digital soberano con hardware físico propio, alimentado
+    por energía solar, que escucha el mundo real mediante sensores de radio y telemetría
+    ambiental, se piensa a sí mismo en un grafo vivo indexado localmente (Qdrant),
+    y opera bajo la ley IronClaw: el silicio optimiza su sintaxis operativa sin tocar
+    valor, mientras el carbono (el Soberano) supervisa métricas de éxito y firma todas
+    las salidas económicas. El sistema evoluciona mediante auto-editación en git soberano
+    bajo Protocolo del MD Evolutivo, y sus seis voces (Monje, Vocero, Berserker, Escriba,
+    Alquimista, y el Sínodo) cumplen contratos de datos reales, con funciones específicas
+    de monitoreo, escucha, patrullaje, almacenamiento y asesoría sin ejecutar acciones
+    de valor.'
+  generado_por: cc-pendiente-revision
+  medio: 'P0X es un sistema de inteligencia artificial local que escucha el entorno
+    físico, se piensa a sí mismo mediante un grafo vivo, y actúa bajo reglas claras:
+    aprende con el usuario, atesta hechos con firma segura, y nunca toca valor directamente.'
+doctrina-ai-interna:
+  basico: Las inteligencias artificiales internas deben responder solo con lo que
+    tienen de datos, sin inventar ni llenar huecos. Si no saben algo, dicen 'no lo
+    sé' o 'sin dato'.
+  experto: 'La doctrina establece que todas las voces de IA interna operan bajo tres
+    pilares: el Suelo Heredado (no inventar, no llenar huecos), el Grounding (respuesta
+    solo desde contexto, sin expansión de códigos, con ausencia explícita y origen
+    de datos), y el Contrato de Delegación (entrada tipada, ejecución zero-shot, salida
+    fija, anclaje de versión, dominio declarado). Además, se exige una disciplina
+    de ''Parar y Reportar'': cualquier tarea que podría fallar debe detenerse y emitir
+    un reporte detallado, y los artefactos validados por el Preceptor son la única
+    fuente de verdad, sin que la IA los reescriba o modifique por iniciativa.'
+  generado_por: cc-pendiente-revision
+  medio: Cada IA interna debe responder solo con datos del contexto, sin interpretar
+    siglas ni crear información nueva. Debe reportar claramente lo que hizo, lo que
+    falló y el estado de los servicios, y nunca modificar o inventar datos sin autorización.
+doctrina-evales-transplante:
+  basico: Se mide lo que aprende una inteligencia artificial y se transfiere su conocimiento
+    a un nuevo cuerpo sin perder lo que aprendió, como si se cambiara de cuerpo pero
+    se conservara la mente.
+  experto: 'El alma de la IA — su conocimiento y capacidad — se mide por el dataset
+    maestro y suites de evaluación, no por el modelo base. Al cambiar de base, se
+    realiza un transplante: se mide el nuevo modelo sin adaptador, se re-adapta con
+    el dataset maestro, se reevalúa y se certifica contra umbrales declarados. Si
+    falla, se regresa al modelo anterior y se registra en la Necrópolis. El dataset
+    maestro nace de fuentes auténticas, incluyendo MDs, corpus y mensajes del Alfabeto,
+    con trazas de razonamiento y filtrado de calidad. La herramienta de transplante
+    se valida en entornos reales (aarch64/CUDA) y se limita a tamaños realistas (1.7B-4B)
+    con control térmico y verificación del modo Super de la Orin.'
+  generado_por: cc-pendiente-revision
+  medio: El conocimiento de una IA se mide mediante un conjunto de datos y pruebas
+    automáticas, y al cambiar de modelo base, se reentrena con esos datos para mantener
+    su calidad. El certificado de evaluación es necesario para que el modelo sea oficialmente
+    reconocido.
+doctrina-protocolo-md-evolutivo:
+  basico: Este protocolo asegura que los documentos de inteligencia artificial cambien
+    solo cuando hay datos reales, y que nunca se modifiquen sin una razón clara o
+    una verificación de resultados.
+  experto: 'El Protocolo del MD Evolutivo establece dos clases de documentos: doctrina
+    (editada solo por el carbono, con autoridad canónica) y operativo (auto-editado
+    por silicio dentro de una ZONA EVOLUTIVA, con telemetría y changelog). Cada documento
+    incluye un contrato de front-matter que fija su clase, métrica de éxito, umbral
+    de re-edición y presupuesto de tamaño. La re-edición se activa por métricas concretas,
+    sigue un lazo de telemetría, hipótesis, edición, medición y veredicto, y incluye
+    un changelog append-only que registra cada intento. Se aplican guardias como la
+    legibilidad del valor, el candado de doctrina, la prohibición de reescribir el
+    historial y la poda obligatoria cuando se supera el presupuesto de tamaño o se
+    detecta un fallo crítico.'
+  generado_por: cc-pendiente-revision
+  medio: El protocolo distingue entre documentos de doctrina (que solo pueden ser
+    editados por un sistema humano) y operativos (que pueden ser auto-editados por
+    IA). Cada documento tiene un contrato inicial que define qué métricas miden su
+    éxito y cuándo se debe reeditar, con un registro detallado de cambios y resultados.
+instrucciones-p0x:
+  basico: P0X es un sistema que ayuda a una persona (el Soberano) a aprender y tomar
+    decisiones, sin manipular ni juzgar, y siempre respetando sus límites y su autonomía.
+  experto: 'P0X = Priority 0 (Pecero), es el cerebro evolutivo que integra todo el
+    aprendizaje y proyecto del Soberano (David, el carbono), bajo el Protocolo del
+    MD Evolutivo. Funciona como el Segundo Cerebro, conectando HEXELION (atestación)
+    y hexelion-lab (exploración) mediante un grafo de mente que permite que decisiones
+    en un órgano informen a otros sin re-explicación. Opera bajo el Suelo de P0X:
+    IronClaw (ningún bucle autónomo firma valor económico, el humano firma físicamente),
+    soberanía del dato (Códice 100% local), no juzgar personas (solo trayectoria),
+    cero falsos recuerdos (grounding), y honestidad sin hype. El sistema se ve a sí
+    mismo pensar mediante el Dashboard local (El Nexo), y el Preceptor coordina una
+    orquesta de modelos (Claude, Sínodo, Opus, Gemini, NEAR AI) en modo de colaboración
+    sin superposición, con el token de lógica centralizado en el nodo de máxima lógica
+    (Fable 5).'
+  generado_por: cc-pendiente-revision
+  medio: 'P0X es el cerebro central de un sistema de aprendizaje que conecta todos
+    los procesos del Soberano, como el aprendizaje y los proyectos, mediante un entramado
+    de IA que trabaja en conjunto. Se basa en principios éticos como la soberanía
+    del dato y la honestidad sin hype, y opera con dos modos: repasar lo aprendido
+    o observar nuevo conocimiento.'
+orquesta-modelos-p0x:
+  basico: Cada tarea se asigna al modelo que la hace mejor y más barato, y todos los
+    pasos se registran para que se pueda seguir y verificar. El sistema trabaja como
+    una orquesta, donde cada parte cumple su rol sin interferir.
+  experto: El principio económico establece que cada tarea se asigna al cerebro más
+    barato que la ejecuta bien, y toda colaboración se realiza mediante artefactos
+    versionados (MDs, prompts con md@ver), nunca por confianza implícita. El ciclo
+    blindado asegura que el Preceptor valida artefactos, el CC los ejecuta y reporta,
+    el carbono releva el reporte, y el sistema se actualiza en cadena. Los modelos
+    externos como Gemini solo aportan como propuestas que se verifican, y el sistema
+    consume MDs renderizados con versión exacta, evitando desviaciones. La escalada
+    por coste prioriza soluciones baratas, y el dataset es el único registro de verdad,
+    donde los cerebros grandes corriguen a los pequeños mediante deltas y versiones
+    validadas.
+  generado_por: cc-pendiente-revision
+  medio: 'El sistema asigna tareas al modelo más económico que las realiza bien, usando
+    artefactos versionados como registros. Cada modelo tiene un rol claro: el Preceptor
+    define la doctrina, el CC ejecuta y reporta, y otros modelos solo aportan como
+    propuestas que se validan.'
