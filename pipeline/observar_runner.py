@@ -6,9 +6,14 @@ Lo que corre tsp: p0x-enqueue python3 observar_runner.py <job_id>
 Cadena: (ingest_youtube si falta transcript) → delta_engine → pending_review.
 Guard térmico: al inicio, entre fases y cada 10 llamadas LLM (callback);
 >80°C → re-encolar (máx 3), estado requeued_thermal. Temps en history.
+Pacing térmico (#20): antes de CADA llamada LLM, si zone0>=78°C se pausa
+hasta enfriar a 74°C (máx 240s) — la inferencia sostenida asienta el SoC en
+81–85°C; pausar el duty-cycle mantiene el job bajo el muro del guard a
+cualquier hora, cambiando tiempo de reloj por cero re-encolados.
 """
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 PIPE = Path(__file__).resolve().parent
@@ -19,6 +24,9 @@ import observar_lib as ol  # noqa: E402
 
 TMAX = 80.0
 MAX_REQUEUES = 3
+PAUSA_UMBRAL_C = 78.0    # pausa preventiva bajo el muro TMAX del guard
+PAUSA_OBJETIVO_C = 74.0  # reanudar cuando el SoC baje de aquí
+PAUSA_MAX_S = 240        # tope de espera: jamás cuelga el job indefinidamente
 ENQUEUE = PIPE.parent / "bin" / "p0x-enqueue"
 
 
@@ -31,6 +39,22 @@ def guard_termico(job_id: str, fase: str) -> None:
     ol.log_runner(job_id, f"guard térmico [{fase}]: zone0={t}°C")
     if t is not None and t > TMAX:
         raise Recalentado(f"{t}°C > {TMAX} en {fase}")
+
+
+def pausa_termica(job_id: str) -> None:
+    """Se inyecta en delta_engine y corre antes de cada llamada LLM."""
+    t = ol.leer_temp_c()
+    if t is None or t < PAUSA_UMBRAL_C:
+        return
+    ol.log_runner(job_id, f"pausa térmica: {t}°C >= {PAUSA_UMBRAL_C} — "
+                          f"enfriando hasta {PAUSA_OBJETIVO_C}°C (máx {PAUSA_MAX_S}s)")
+    inicio = time.time()
+    while time.time() - inicio < PAUSA_MAX_S:
+        time.sleep(10)
+        t = ol.leer_temp_c()
+        if t is None or t <= PAUSA_OBJETIVO_C:
+            break
+    ol.log_runner(job_id, f"pausa térmica: fin a {t}°C tras {int(time.time() - inicio)}s")
 
 
 def reencolar(job_id: str, motivo: str) -> int:
@@ -80,6 +104,7 @@ def main() -> int:
         ol.transicion(job_id, "delta")
         delta_engine.set_thermal_callback(
             lambda: guard_termico(job_id, "cada-10-llamadas"))
+        delta_engine.set_pacing_callback(lambda: pausa_termica(job_id))
         delta_engine.generar_delta(job_id)
         ol.transicion(job_id, "pending_review")
         ol.log_runner(job_id, "listo: pending_review")

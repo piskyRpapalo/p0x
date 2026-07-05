@@ -40,11 +40,17 @@ ESFERAS_DIR = PIPE.parent / "mente" / "esferas"
 
 _llm_calls = 0
 _thermal_cb = None  # inyectado por el runner: se invoca cada 10 llamadas LLM
+_pacing_cb = None   # inyectado por el runner (#20): antes de CADA llamada LLM
 
 
 def set_thermal_callback(cb) -> None:
     global _thermal_cb
     _thermal_cb = cb
+
+
+def set_pacing_callback(cb) -> None:
+    global _pacing_cb
+    _pacing_cb = cb
 
 
 def _slug(texto: str) -> str:
@@ -61,6 +67,8 @@ def _llm(prompt: str, dom: str, op: str, keep_alive="5m") -> tuple[str, dict]:
     """Llamada LLM con telemetría lengua.jsonl y guard térmico inyectado."""
     global _llm_calls
     _llm_calls += 1
+    if _pacing_cb:
+        _pacing_cb()  # pacing primero: el guard de abajo mide temp ya enfriada
     if _thermal_cb and _llm_calls % 10 == 0:
         _thermal_cb()
     body = json.dumps({
