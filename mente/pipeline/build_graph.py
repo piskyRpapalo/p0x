@@ -19,6 +19,9 @@ import yaml
 MENTE_ROOT = Path(__file__).resolve().parent.parent
 GRAFO_OUT = MENTE_ROOT / "grafo" / "second_brain.json"
 DEST_ASSETS = Path("/home/ubuntu/hexelion/assets/second_brain.json")
+# Niveles de doctrina: el silicio JAMÁS edita el MD de clase doctrina, así que
+# sus descripcion_niveles viven en este sidecar y se fusionan SOLO al proyectar.
+NIVELES_DOCTRINA = Path(__file__).with_name("niveles_doctrina.yaml")
 
 FRONTMATTER_RE_START = "---"
 
@@ -70,6 +73,17 @@ def build_graph() -> dict:
             continue
         fm_by_id[fm["id"]] = fm
 
+    # fusión del sidecar de doctrina (mismo marcador que en front-matter)
+    if NIVELES_DOCTRINA.exists():
+        try:
+            sidecar = yaml.safe_load(NIVELES_DOCTRINA.read_text(encoding="utf-8")) or {}
+        except yaml.YAMLError:
+            sidecar = {}
+            print("[build_graph] WARN: niveles_doctrina.yaml malformado — ignorado")
+        for node_id, niveles in sidecar.items():
+            if node_id in fm_by_id and isinstance(niveles, dict):
+                fm_by_id[node_id].setdefault("descripcion_niveles", niveles)
+
     # 'enlaces' se resuelve por slug pelado (convención esferas: "redes-linux")
     # O por id completo (convención doctrina: "doctrina-ai-interna") — aditivo,
     # no reemplaza la resolución por slug pelado ya usada por las esferas.
@@ -99,6 +113,7 @@ def build_graph() -> dict:
             "nivel": fm.get("nivel"),
             "size": degree[node_id],
             "descripcion": fm.get("descripcion", ""),
+            "descripcion_niveles": fm.get("descripcion_niveles"),
         }
         for node_id, fm in sorted(fm_by_id.items())
     ]
