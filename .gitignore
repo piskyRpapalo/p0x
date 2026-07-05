@@ -38,3 +38,8 @@ mente/necropolis/**/.lock
 # formatos/thumbnails, no contenido) son artefactos de la descarga, no fuente.
 corpus/**/audio.webm
 corpus/**/audio.info.json
+
+# Gate 0 voz: venv y modelos .onnx descargables (HuggingFace) — regenerables
+# con voz/gate0_sintesis.sh; solo se versiona script + métricas + veredictos
+voz/.venv-piper/
+voz/modelos/
