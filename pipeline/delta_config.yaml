@@ -2,8 +2,12 @@
 # Umbrales PROVISIONALES (stub-refina-con-dato): los scores crudos se
 # persisten en delta.json de cada job para calibrarlos con corpus real.
 
-# model: se fija con el dato del benchmark (pipeline/out/bench_delta.json)
-model: PENDIENTE_BENCHMARK
+# model: elegido por dato (pipeline/out/bench_delta.json, 2026-07-05):
+#   qwen3:4b-instruct-2507 — JSON 3/3 limpio, juez 2/2, claims EN ESPAÑOL,
+#   3.71 tok/s eval y pico 80.4°C vs qwen2.5:7b-instruct: JSON 3/3 y juez 2/2
+#   pero claims en INGLÉS, 2.85 tok/s y pico 84.1°C (dispararía el guard 80°C).
+#   El tag qwen3 8B instruct NO existe en el registry (404 verificado).
+model: qwen3:4b-instruct-2507-q4_K_M
 num_ctx: 6144
 temperature: 0.1
 
