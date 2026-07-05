@@ -1,0 +1,16 @@
+# INSTALADO Y HABILITADO en el-vigia 2026-07-05 (copia canónica versionada aquí)
+# Destino: /etc/systemd/system/p0x-m5-ingest.service
+[Unit]
+Description=P0X Fase 4 - ingesta telemetria M5 Atom -> Redis fragua (read-only serial)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+ExecStart=/home/pi/p0x-telemetry/venv/bin/python /home/pi/p0x-telemetry/ingest_m5.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
