@@ -23,6 +23,10 @@ pipeline_build*.log
 # se versiona el README del directorio, jamás el jsonl (crecería sin historia real)
 mente/telemetria/*.jsonl
 
+# auditoría: el informe AUDIT_*.md se versiona (registro); la evidencia
+# cruda out/*.json es runtime regenerable en cada corrida
+mente/auditorias/out/
+
 # jobs OBSERVAR: estado operativo runtime (state.json, runner.log, checkpoints
 # de fase) — el resultado curado entra a mente/ al ACEPTAR y el descarte queda
 # versionado en mente/necropolis/ (sin su .lock, que es artefacto de flock)

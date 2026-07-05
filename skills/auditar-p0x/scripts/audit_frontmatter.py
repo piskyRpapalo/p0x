@@ -99,7 +99,13 @@ def main() -> int:
                                           "el changelog del worktree no es "
                                           "append-only sobre HEAD (§4.3)"))
 
-    # enlaces resuelven (segunda pasada, con el censo de ids completo)
+    # enlaces resuelven (segunda pasada, con el censo de ids completo).
+    # Resolución IDÉNTICA a build_graph.py:93-96: id completo O slug pelado
+    # (id.split('-',1)[-1], convención de las esferas) — divergir aquí
+    # fabricaría falsos rotos que el grafo sí resuelve (afinado en B4).
+    slugs = set(ids)
+    for fid in ids:
+        slugs.add(fid.split("-", 1)[-1])
     for p in vivos:
         fm, _ = leer_frontmatter(p)
         if not fm:
@@ -107,10 +113,11 @@ def main() -> int:
         enlaces = fm.get("enlaces") or []
         if isinstance(enlaces, list):
             for e in enlaces:
-                if isinstance(e, str) and e and e not in ids:
+                if isinstance(e, str) and e and e not in slugs:
                     inf.append(infraccion(p, "enlace-roto",
                                           f"enlace `{e}` no resuelve a "
-                                          f"ningún id de mente/"))
+                                          f"ningún id/slug de mente/ "
+                                          f"(resolución de build_graph)"))
 
     for b in baks:
         inf.append(infraccion(b, "basura-en-mente",
