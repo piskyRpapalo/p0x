@@ -26,5 +26,3 @@ Docker/systemd/task-spooler. Es la infraestructura que sostiene a las otras
 cuatro esferas técnicas (edge-ai, rf-sdr, cripto-atestación, energía-solar).
 
 Nivel practicante según el Códice.
-
-*(línea de verificación E2E — edición del carbono vía dashboard, 2026-07-05)*
