@@ -1,0 +1,13 @@
+# Gate 0 Piper · 2026-07-05T21:27:39Z · fragua zone0 antes: 49.9°C
+
+== es_ES-sharvard-medium (74M) ==
+clip=monje wall=0:03.88s audio=6.14s rss=250444KB cpu=282% wav=/mnt/nvme/p0x/voz/gate0/sharvard-medium_monje.wav
+clip=alquimista wall=0:03.80s audio=5.22s rss=229948KB cpu=257% wav=/mnt/nvme/p0x/voz/gate0/sharvard-medium_alquimista.wav
+clip=sindato wall=0:03.56s audio=4.32s rss=194340KB cpu=248% wav=/mnt/nvme/p0x/voz/gate0/sharvard-medium_sindato.wav
+
+== es_ES-davefx-medium (61M) ==
+clip=monje wall=0:03.66s audio=5.65s rss=225952KB cpu=263% wav=/mnt/nvme/p0x/voz/gate0/davefx-medium_monje.wav
+clip=alquimista wall=0:03.68s audio=4.63s rss=207072KB cpu=244% wav=/mnt/nvme/p0x/voz/gate0/davefx-medium_alquimista.wav
+clip=sindato wall=0:03.78s audio=4.75s rss=185616KB cpu=246% wav=/mnt/nvme/p0x/voz/gate0/davefx-medium_sindato.wav
+
+# fragua zone0 después: 57.3°C
