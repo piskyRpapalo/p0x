@@ -1,0 +1,19 @@
+# delta_config.yaml — motor delta OBSERVAR (Bloque A/B)
+# Umbrales PROVISIONALES (stub-refina-con-dato): los scores crudos se
+# persisten en delta.json de cada job para calibrarlos con corpus real.
+
+# model: se fija con el dato del benchmark (pipeline/out/bench_delta.json)
+model: PENDIENTE_BENCHMARK
+num_ctx: 6144
+temperature: 0.1
+
+ventana_tokens: 450          # tamaño de ventana del transcript (aprox tokens)
+max_claims: 40               # cap global de claims por video
+
+umbral_ya_sabido: 0.82       # score coseno >= -> YA_SABIDO directo con citas
+umbral_nuevo: 0.55           # score coseno <= -> NUEVO directo
+umbral_conexion: 0.65        # >=2 ids distintos con score >= -> señal CONEXIÓN
+top_k: 4                     # vecinos Qdrant por claim
+
+juez_reintentos: 1           # zona gris: reintentos del juez LLM antes del
+                             # fallback NUEVO + flag juez_fallback
