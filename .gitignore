@@ -23,6 +23,12 @@ pipeline_build*.log
 # se versiona el README del directorio, jamás el jsonl (crecería sin historia real)
 mente/telemetria/*.jsonl
 
+# jobs OBSERVAR: estado operativo runtime (state.json, runner.log, checkpoints
+# de fase) — el resultado curado entra a mente/ al ACEPTAR y el descarte queda
+# versionado en mente/necropolis/ (sin su .lock, que es artefacto de flock)
+pipeline/observar/
+mente/necropolis/**/.lock
+
 # corpus: solo se trackea el resultado curado (transcript.*, meta.tsv). El audio
 # crudo bajado (webm) y el volcado de metadata de yt-dlp (info.json, listas de
 # formatos/thumbnails, no contenido) son artefactos de la descarga, no fuente.
