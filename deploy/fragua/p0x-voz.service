@@ -1,0 +1,23 @@
+# p0x-voz.service — Piper residente (voz local del Sínodo) · PROPUESTA
+# PROPOSE-ONLY: instalar/habilitar es mano del Soberano (patrón #4):
+#   sudo cp /mnt/nvme/p0x/deploy/fragua/p0x-voz.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now p0x-voz
+# Sin este servicio la voz FUNCIONA igual (subprocess frío <4s); esto baja
+# la latencia a ~1.5s manteniendo ~250MB de RAM ocupados.
+[Unit]
+Description=P0X Voz — Piper residente 127.0.0.1:8021 (100%% local, texto jamás sale del rack)
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/mnt/nvme/p0x/voz
+ExecStart=/mnt/nvme/p0x/voz/.venv-piper/bin/python /mnt/nvme/p0x/voz/voz_server.py
+Restart=on-failure
+RestartSec=10
+Nice=15
+IOSchedulingClass=idle
+MemoryMax=700M
+
+[Install]
+WantedBy=multi-user.target

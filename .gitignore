@@ -43,3 +43,4 @@ corpus/**/audio.info.json
 # con voz/gate0_sintesis.sh; solo se versiona script + métricas + veredictos
 voz/.venv-piper/
 voz/modelos/
+voz/cache/
