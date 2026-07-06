@@ -6,10 +6,13 @@ Ejecutar SIEMPRE encolado para no saturar la-fragua:
 Salida: /mnt/nvme/p0x/pipeline/out/<id>/{transcript.json, meta.json}
 El 'delta' contra el Codice es el paso SIGUIENTE; aqui se produce el transcript crudo.
 SUELO: nada de esto firma valor ni sale del rack."""
-import argparse, json, os, subprocess, wave
+import argparse, json, os, shutil, subprocess, wave
 from pathlib import Path
 P0X = Path(os.environ.get("P0X_ROOT", "/mnt/nvme/p0x"))
 PIPE = P0X / "pipeline"
+# El PATH de los servicios systemd (gateway->tsp) no incluye ~/.local/bin:
+# resolver por PATH y caer a la ruta de instalación real, como WHISPER_BIN.
+YTDLP_BIN = shutil.which("yt-dlp") or str(Path.home() / ".local" / "bin" / "yt-dlp")
 WHISPER_BIN = PIPE / "whisper.cpp" / "build" / "bin" / "whisper-cli"
 WHISPER_MODEL = Path(os.environ.get(
     "P0X_WHISPER_MODEL", PIPE / "whisper.cpp" / "models" / "ggml-small.bin"))
@@ -22,14 +25,14 @@ def run(cmd, **kw):
 
 def video_id(url):
     try:
-        r = subprocess.run(["yt-dlp", "--no-playlist", "--skip-download", "--print", "id", url],
+        r = subprocess.run([YTDLP_BIN, "--no-playlist", "--skip-download", "--print", "id", url],
                            check=True, capture_output=True, text=True)
         return (r.stdout.strip().splitlines() or ["video"])[0]
     except Exception:
         return "video"
 
 def download_audio(url, workdir):
-    run(["yt-dlp", "--no-playlist", "-x", "--audio-format", "wav",
+    run([YTDLP_BIN, "--no-playlist", "-x", "--audio-format", "wav",
          "-o", str(workdir / "audio.%(ext)s"), url])
     wavs = list(workdir.glob("audio.*"))
     if not wavs:

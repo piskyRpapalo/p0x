@@ -4,6 +4,7 @@
 # El proxy LiteLLM y esta cola son ORTOGONALES: se tocan solo cuando el trabajo
 # encolado llama al proxy. Uso: p0x-enqueue <comando...>
 set -euo pipefail
+export PATH="$HOME/.local/bin:$PATH"      # los servicios systemd no traen ~/.local/bin (yt-dlp et al)
 export TS_SLOTS="${TS_SLOTS:-1}"          # 1 trabajo pesado a la vez -> sin OOM (15 GiB, swap=0)
 TSP="$(command -v tsp || command -v ts || true)"
 [ -n "$TSP" ] || { echo "ERROR: task-spooler no instalado -> sudo apt-get install -y task-spooler" >&2; exit 1; }
