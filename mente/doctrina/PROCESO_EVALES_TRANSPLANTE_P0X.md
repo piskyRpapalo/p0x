@@ -5,6 +5,10 @@ tipo: doctrina
 clase: doctrina
 version: 1.0.0
 editor_autorizado: carbono
+metrica_exito: "coherencia con el suelo; cero enmiendas sin canonización del carbono"
+umbral_reedicion: "solo por propuesta motivada del silicio + firma del carbono"
+presupuesto_kb: 24
+n_medicion: 1
 enlaces:
   - alfabeto-p0x
   - doctrina-protocolo-md-evolutivo

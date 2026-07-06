@@ -5,6 +5,10 @@ tipo: esfera
 clase: operativo
 version: 1.0.0
 editor_autorizado: silicio-telemetria
+metrica_exito: "el Soberano completa cada hito del camino sin bloqueo y sin acción de valor sin su firma; cada afirmación técnica citable a fuente"
+umbral_reedicion: "un hito resulta inejecutable tal como está escrito, o NEAR AI cambia API/preciario/modelo de créditos"
+presupuesto_kb: 8
+n_medicion: 1
 dominio: aprendizaje-nearai
 nivel: nuevo
 enlaces:

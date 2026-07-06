@@ -14,6 +14,8 @@ enlaces:
   - doctrina-ai-interna
   - doctrina-protocolo-md-evolutivo
   - doctrina-evales-transplante
+changelog:
+  - "v1.0.0 (2026-07-06, propuesta #25, firma el Soberano): se añade changelog — único campo §2 ausente; contrato y contenido intocados."
 actualizado: 2026-07-04
 ---
 
