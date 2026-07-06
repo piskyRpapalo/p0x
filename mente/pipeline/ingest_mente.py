@@ -27,7 +27,7 @@ from chunk import chunk_markdown  # noqa: E402
 from embed import embed_batch  # noqa: E402
 from to_qdrant import ensure_collection, get_client, replace_file_points  # noqa: E402
 
-SCOPE_DIRS = ["codice", "corpus", "esferas", "doctrina", "voces", "lengua"]
+SCOPE_DIRS = ["codice", "corpus", "esferas", "doctrina", "voces", "lengua", "manual"]
 
 
 def _iter_md_files():
