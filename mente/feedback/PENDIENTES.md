@@ -126,3 +126,12 @@ actualizado: 2026-07-05
 |---|---|---|---|
 | 30 | **Fijar la hora del RTC del M5** (arranca en 2000-01-01): el DS3231 (`0x68`/`0x57`) ya está en el bus pero sin hora — un `set` una vez desde el-vigia (o al arrancar `p0x-m5-ingest`) y queda con batería. Sin esto los timestamps del sensor son basura si algún día se usan como reloj soberano. | S | propuesta |
 | 31 | **Cota dura de tokens en las síntesis largas del pipeline** (hecho parcial): la sección "## Lo nuevo" de REDUCE reventó `timeout=1800` con el vídeo de 19,7 min (28 claims NUEVO en un solo prompt). Arreglado esta sesión: `nuevos[:30]` + `num_predict=1024` en `render` + `timeout→2400` (`delta_engine.py`). PENDIENTE calibrar si 30/1024 es el punto óptimo con corpus real y si MAP/CLASSIFY necesitan la misma cota en vídeos de >30 min. | S | **hecha-parcial (2026-07-07): fix aplicado; falta calibrar con corpus.** |
+
+### 2026-07-07 · misión LINKS LIMPIOS (dashboard hexelion)
+
+| # | Sugerencia | Coste | Estado |
+|---|---|---|---|
+| 32 | **`tools/audit_links.py` al flujo regular / pre-commit**: el auditor nuevo (read-only) caza links rotos, links a endpoints de datos (`/api/*` navegado) y pageerrors en las 6 páginas. Engancharlo a un pre-commit o al ciclo de auditoría evita que otro `<a href="/api/*">` se vuelva a colar sin que nadie lo note. | S | propuesta |
+| 33 | **`/proof` es página huérfana**: sirve en `/proof` (Proof Marketplace, 200) pero NO está enlazada desde el dashboard ni el Sínodo — nadie llega a ella navegando. Decidir: darle un acceso desde el riel (junto a LIGHTHOUSE, que es su tema) o retirar la ruta. Su back button ya se arregló (`/`→`/dashboard`). | S | propuesta |
+| 34 | **Auditar el resto de llamadas force-graph en `second-brain`**: el pageerror `g.d3AlphaTarget is not a function` era una API inexistente que abortaba `initGraph` en silencio (nadie lo veía salvo la consola). Puede haber más métodos derivados de la librería; una pasada rápida por todas las llamadas `g.d3*()`/`g.*()` confirmaría que no queda otro fallo latente. | M | propuesta |
+| 35 | **¿Vista de cadena navegable propia para el Faro?**: hoy "◇ VIEW CHAIN" revela el JSON de `/api/faro` inline (fetch, no navegación — doctrina cumplida). Si el Soberano quiere una página read-only dedicada de la cadena (como `/proof`), se puede construir; el visor inline cubre la inspección mínima mientras tanto. | M | propuesta |
