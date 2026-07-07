@@ -63,25 +63,35 @@ def esferas_reales() -> list[str]:
     return sorted(p.stem for p in ESFERAS_DIR.glob("*.md"))
 
 
-def _llm(prompt: str, dom: str, op: str, keep_alive="5m") -> tuple[str, dict]:
-    """Llamada LLM con telemetría lengua.jsonl y guard térmico inyectado."""
+def _llm(prompt: str, dom: str, op: str, keep_alive="5m",
+         num_predict: int | None = None) -> tuple[str, dict]:
+    """Llamada LLM con telemetría lengua.jsonl y guard térmico inyectado.
+
+    num_predict acota los tokens generados: sin tope, una síntesis larga en
+    qwen3:4b (CPU fragua) puede correr >30 min y reventar el timeout de abajo
+    (le pasó al vídeo de 19,7 min en REDUCE). Solo se aplica donde se pasa.
+    """
     global _llm_calls
     _llm_calls += 1
     if _pacing_cb:
         _pacing_cb()  # pacing primero: el guard de abajo mide temp ya enfriada
     if _thermal_cb and _llm_calls % 10 == 0:
         _thermal_cb()
+    options = {"temperature": CFG["temperature"], "num_ctx": CFG["num_ctx"]}
+    if num_predict is not None:
+        options["num_predict"] = num_predict
     body = json.dumps({
         "model": CFG["model"],
         "messages": [{"role": "user", "content": prompt}],
         "stream": False, "keep_alive": keep_alive,
-        "options": {"temperature": CFG["temperature"],
-                    "num_ctx": CFG["num_ctx"]},
+        "options": options,
     }).encode()
     t0 = time.time()
     req = urllib.request.Request(OLLAMA, data=body,
                                  headers={"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=1800) as r:
+    # 2400s (40 min): margen sobre el pacing térmico, que ya trocea el reloj;
+    # con num_predict acotado una sola llamada no debería acercarse a esto.
+    with urllib.request.urlopen(req, timeout=2400) as r:
         resp = json.loads(r.read())
     ms = int((time.time() - t0) * 1000)
     content = resp.get("message", {}).get("content", "")
@@ -310,7 +320,11 @@ def reduce_delta(job_id: str, claims: list[dict], foco: str,
 
     cuerpo = "## Lo nuevo\n\nNada nuevo frente a la mente actual.\n\n## Conexiones propuestas\n\nNinguna detectada.\n"
     if nuevos:
-        txt_nuevos = "\n".join(f"- {c['texto']}" for c in nuevos)
+        # Acotar a 30 (como DESTINO acota a 20): un vídeo largo genera decenas
+        # de claims NUEVO y meterlos TODOS en un solo prompt de síntesis hace
+        # la generación interminable. El sidecar guarda los claims completos
+        # para calibrar — aquí solo se acota la prosa, no el registro.
+        txt_nuevos = "\n".join(f"- {c['texto']}" for c in nuevos[:30])
         txt_conex = "\n".join(
             f"- \"{c['texto'][:120]}\" toca: {', '.join(c['conexion'])}"
             for c in conexiones) or "(ninguna)"
@@ -319,7 +333,7 @@ def reduce_delta(job_id: str, claims: list[dict], foco: str,
                                                titulo=destino["titulo"],
                                                nuevos=txt_nuevos,
                                                conexiones=txt_conex),
-                          "ingesta", "render", keep_alive=0)
+                          "ingesta", "render", keep_alive=0, num_predict=1024)
         if content.strip():
             cuerpo = content.strip() + "\n"
 
