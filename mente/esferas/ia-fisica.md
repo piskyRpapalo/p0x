@@ -8,6 +8,11 @@ enlaces:
 nivel: stub
 fuente: "youtube:cGhI8tGY0Gw"
 actualizado: 2026-07-05
+descripcion_niveles:
+  basico: "La inteligencia artificial física permite que un organismo, como un avión o un sistema de tráfico, sienta lo que ve, decida qué hacer y actúe en el mundo real, sin necesidad de intervención humana."
+  medio: "La IA física conecta la percepción (como datos de sensores M5, AIS o ADS-B) con acciones reales en tiempo real, permitiendo a un organismo soberano tomar decisiones autónomas. Esto requiere una arquitectura integrada que combine sensores, toma de decisiones y actuación, y que sea segura, fiable y escalable en entornos cambiantes."
+  experto: "La IA física establece una conexión directa entre percepción y acción mediante sistemas que sensan, deciden y actúan de forma autónoma en tiempo real, utilizando sensores como M5, AIS y ADS-B. Esta integración requiere una arquitectura coherente que combine sensores, toma de decisiones, actuación, plataformas de datos y sistemas empresariales. La seguridad, fiabilidad y escalabilidad son desafíos clave en entornos con datos incompletos y condiciones cambiantes, y se logran mediante validación en simulación, lanzamientos en fases y gobernanza continua de los modelos en condiciones reales."
+generado_por: cc-pendiente-revision
 ---
 
 # IA Física: Conexión Percepción-Acción en Organismos Soberanos
