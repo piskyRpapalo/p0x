@@ -51,7 +51,7 @@ actualizado: 2026-07-05
 | 5 | **journald persistente en la-torre** (`sudo mkdir -p /var/log/journal && sudo systemctl restart systemd-journald`): el incidente 13:40 no dejó journal consultable; hoy el rastro vive solo en `~/ollama.log` (drop-in) y syslog | S | pendiente |
 | 6 | **Vocero: deshornear los números OMIE del few-shot** (115.00 €/MWh fijo en el MD invita a citar precios rancios) — tras línea base n=20 del Protocolo §3 | S | pendiente |
 | 7 | **Fallback fragua digno:** qwen2.5:1.5b tarda 190-230 s en denso y garabatea síntesis doctrinal; evaluar por suite qwen3:1.7b o el instruct-2507 pequeño como OLLAMA_CHAT_MODEL | M | pendiente |
-| 8 | **Decidir `dashboard-v9/index-en.html`** (variante EN del Nexo sin trackear, no consta intención): trackear o borrar | S | pendiente |
+| 8 | **Decidir `dashboard-v9/index-en.html`** (variante EN del Nexo sin trackear, no consta intención): trackear o borrar | S | **decidida (2026-07-11): BORRADA — la UI ya es inglés por invariante, snapshot con 11 días de deriva (sin REFLEX/panel), nunca trackeada ni referenciada. Decisión delegada por el Soberano (misión PÚBLICO SEGURO).** |
 | 9 | **Suite de recarga semanal en la-torre** (cron propuesto: 1 ciclo restart+reclaim+carga con log): vigila que la receta siga 2/2 cuando cambien kernel/ollama/modelo | M | pendiente |
 
 ### 2026-07-05 · reporte MISIÓN OBSERVAR + Consolidación Global
@@ -167,3 +167,13 @@ actualizado: 2026-07-05
 | 49 | **`reflejo-vibracion` (Pista A · Reflejo #3)**: ADXL345 vivo; Δ\|g\| sobre umbral → evento "movimiento detectado" a consola. Solo aviso, jamás valor (IronClaw). | M | propuesta |
 | 50 | **Runbook `REENCARNACION_P0X.md` nuevo (el viejo quedó obsoleto — veredicto #42)**: el genoma real de hoy = bare repos en La Torre (p0x + hexelion + lab, push verificado) + Qdrant re-derivable por ingesta. Lo que HOY no está cubierto: estado Redis, `.env`/secretos, units systemd instaladas, receta docker. Un runbook de 1 página con eso cerraría la recuperación ante desastre real. | M | propuesta |
 | 51 | **Re-sync periódico del RTC del M5**: el DS3231 deriva (~±2 ppm/°C). Un cron mensual en el-vigia que pare ingest → `set_rtc_m5.py` → arranque ingest (2s de ventana) mantiene #30 cerrada para siempre. Propose-only si el clasificador veta el cron. | S | propuesta |
+
+### 2026-07-11 · misión PÚBLICO SEGURO + REFLEJOS
+
+| # | Sugerencia | Coste | Estado |
+|---|---|---|---|
+| 52 | **Copia física de secretos (H1 del runbook — LA pieza que falta)**: `.env` (QDRANT_API_KEY), passwords NUT, identidad tailscale y ssh NO están en git (correcto) ni en NINGUNA copia. Un USB del Soberano con esos 4 elementos cifrados (gpg simétrico basta), actualizado al cambiar un secreto, convierte la Reencarnación de teoría a garantía. Sin esto, una fragua muerta = re-provisionar secretos a mano. | S | propuesta |
+| 53 | **Drill de Reencarnación (H3)**: ejecutar `REENCARNACION_P0X.md` en frío sobre un SBC de repuesto (o una SD limpia), cronometrar y anotar cada paso falso en el propio runbook (su `umbral_reedicion` lo exige). El runbook de mayo murió sin drill; que este no repita la historia. | M | propuesta |
+| 54 | **Habilitar la unit `reflejo-m5` (paste patrón #4, hermana de #47)**: los reflejos 2+3 están probados y el panel los muestra ARMADOS, pero solo corren a demanda. `sudo cp /mnt/nvme/p0x/deploy/fragua/reflejo-m5.service /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now reflejo-m5`. Con #47 y esto, la médula espinal completa queda viva 24/7. | S | propuesta |
+| 55 | **Barrido de secretos como pre-push del repo público**: `tools/secret_sweep.py` ya existe y está versionado; un hook `pre-push` en hexelion-public que lo ejecute (exit≠0 = push abortado) hace imposible publicar un CRIT por descuido — la seguridad deja de depender de la disciplina de la sesión. | S | propuesta |
+| 56 | **Política para `dashboard-v9/screenshots/`**: ~60 capturas sin trackear acumulándose (evidencia de misiones). Decidir: (a) commitear las de evidencia por misión, (b) gitignore del directorio + evidencia solo en informes, o (c) carpeta `evidencia/` trackeada con las 2-3 clave por misión. Hoy el `git status` de hexelion es ruido permanente. | S | propuesta |
