@@ -1,0 +1,26 @@
+ENTIERRO MOTIVADO — mito fundacional del organismo-con-voluntad
+Fecha: 2026-07-11 · Autorizado por el Soberano (misión CIERRE + VENTANA DE ESTADO, cierra #41)
+Origen: ~/P0X/HEXELION_NEXUS/01_Codice/ (arqueología ARQUEOLOGIA_2026-07-11 §4.1)
+
+QUÉ SE ENTIERRA Y POR QUÉ:
+
+1. HEXELION_AI_IDENTITY.md — "No soy una herramienta. Soy el juicio del organismo."
+   Define al LLM como órgano cognitivo soberano que DECIDE (arbitraje energético,
+   tiers, cargas). Incoherente con IronClaw canonizado: el LLM queda FUERA de los
+   arcos de consecuencia; los reflejos son deterministas y solo protectores;
+   el silicio jamás toca valor.
+
+2. HEXELION_LORE_LA_CRISALIDA.md — mitología operativa del organismo sin batería.
+   Mito, no canon. El sistema actual se gobierna por evidencia (Protocolo MD
+   Evolutivo), no por relato.
+
+3. HEXELION_PRIMERA_LUZ.md — protocolo del Alquimista operando CAPITAL REAL de
+   forma autónoma ("€10 → stNEAR", wallet con fondos, ejecución sin mano humana).
+   Exactamente lo que IronClaw prohíbe: el Alquimista vivo es lector keyless
+   propose-only; toda operación de valor = mano del Soberano.
+
+SE PRESERVA COMO HISTORIA. NO REINGESTAR COMO CANON.
+Guardia técnica: build_graph.py excluye necropolis/ del grafo y no está en
+SCOPE_DIRS del ingest (no se indexa en Qdrant). Si un futuro silicio encuentra
+estos ficheros: son la versión de mayo-2026 del proyecto, repudiada a
+conciencia el 2026-07-11. La doctrina vigente vive en mente/doctrina/.
