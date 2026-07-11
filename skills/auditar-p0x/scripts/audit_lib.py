@@ -19,7 +19,7 @@ OUT = MENTE / "auditorias" / "out"
 # Dirs de conocimiento indexado (ingest_mente.SCOPE_DIRS) — el contrato §2
 # rige ahí; feedback/telemetria/auditorias son registro operativo con
 # contrato propio y necropolis es tumba (jamás se audita como vivo).
-SCOPE_DIRS = ("codice", "corpus", "esferas", "doctrina", "voces", "lengua", "manual")
+SCOPE_DIRS = ("codice", "corpus", "esferas", "doctrina", "voces", "lengua", "manual", "reflejos")
 
 TIPOS_VALIDOS = {"doctrina", "operativo", "esfera", "principio", "tecnica",
                  "voz", "observacion"}
