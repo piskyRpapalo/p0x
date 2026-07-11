@@ -24,9 +24,16 @@ import argparse
 import json
 import shutil
 import subprocess
+import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
+
+# Era energética (patrón @sleeping rescatado, arqueología #43): este reflejo es
+# @sun_synchronous de facto — protege la UPS porque HOY no hay batería solar.
+# Cuando P0X_BATTERY_PRESENT=true, sus umbrales se revisan (ver patrón MD).
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from energia_era import ENERGY_ERA  # noqa: E402
 
 # ── Config (honest-sensors: la UPS real del rack) ───────────────────────────
 UPS_NAME = "greencell"
@@ -229,7 +236,7 @@ def main() -> None:
                   f"ol={reflejo.ol_seguidas} evento={tag}")
         return
 
-    print(f"[reflejo-bateria] watch vivo · upsc {UPS_NAME} · poll {args.poll}s · "
+    print(f"[reflejo-bateria] watch vivo · era={ENERGY_ERA} · upsc {UPS_NAME} · poll {args.poll}s · "
           f"rearme {REARME_OL_CONSECUTIVAS} OL consecutivas · upsc={UPSC_BIN} tsp={TSP_BIN}")
     while True:
         t0 = time.monotonic()
