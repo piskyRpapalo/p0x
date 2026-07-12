@@ -12,7 +12,8 @@ descripcion_niveles:
   basico: "Los lenguajes de programación son herramientas que ayudan a las computadoras a entender órdenes, y han evolucionado desde herramientas simples hasta sistemas más avanzados que permiten crear aplicaciones sin necesidad de código."
   medio: "Existen muchos lenguajes de programación, como Python, Java, Lisp y Prolog, cada uno con una filosofía diferente. Algunos, como Lisp y Haskell, se basan en ideas como la homoiconicidad o el cálculo funcional, mientras que otros, como Simula y Smoltalk, introdujeron el concepto de objetos con comportamientos. La evolución ha incluido herramientas que permiten modelar el mundo como entidades vivas, y lenguajes funcionales que influyen en cómo se diseñan los sistemas modernos."
   experto: "La diversidad de lenguajes de programación refleja filosofías distintas: desde la homoiconicidad de Lisp, donde código y datos son indistinguibles, hasta el enfoque orientado a objetos de Smoltalk y Simula, que modelan el mundo como entidades con comportamientos. Haskell, como lenguaje funcional puro, impide modificaciones de valores durante la ejecución, estableciendo bases para el diseño de sistemas modernos. Aunque la web ha abandonado la pureza matemática por escalabilidad y práctica, las ideas de lenguajes funcionales y de modelado dinámico han dejado huella en la evolución de los entornos de programación, especialmente en herramientas como Waka que priorizan la expresión mental sobre la ejecución secuencial."
-generado_por: cc-pendiente-revision
+generado_por: cc-firmado-soberano
+firmado: 2026-07-12
 ---
 
 # Evolución y Diversidad de Lenguajes de Programación
