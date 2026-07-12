@@ -12,7 +12,8 @@ descripcion_niveles:
   basico: "Se puede ejecutar un modelo muy grande en una computadora con solo 12 GB de memoria, usando parte de la memoria en el procesador y otra en la tarjeta gráfica, sin que se ralentice mucho el rendimiento."
   medio: "La optimización permite que los expertos del modelo se carguen mientras se procesan los tokens, reduciendo el tiempo de espera del GPU. Se usan dos canales paralelos: uno para calcular la atención y otro para cargar los expertos. Esto mejora el rendimiento en hasta un 21%, sin afectar la calidad de la salida."
   experto: "La optimización del pipeline en Lama.CPP para MOE reduce el tiempo de inactividad del GPU de un 41.7% a un 2.8% al cargar paralelamente los expertos desde RAM al GPU durante el cálculo de atención, eliminando el bottleneck del bus PCIe. Esta mejora se logra mediante un patrón de dos canales paralelos: uno para atención y otro para carga de expertos. El enfoque permite que el GPU esté siempre ocupado, sin afectar la calidad de salida, y se basa en un fragmento de código inactivo que permite pinar la memoria paged. La mejora en rendimiento alcanza un 21% (de 1143 a 1385 tokens/s), y se mantiene el equilibrio entre CPU y GPU en decodificación alrededor del 50%, aunque el costo de verificación aumenta con más tokens especulados. El código detecta y corrige errores antes de que sean observados, y el uso de MMAP permite una carga instantánea de modelos sin necesidad de transferir pesos por PCIe."
-generado_por: cc-pendiente-revision
+generado_por: cc-firmado-soberano
+firmado: 2026-07-12
 ---
 
 # Optimización del pipeline en Lama.CPP para MOE
