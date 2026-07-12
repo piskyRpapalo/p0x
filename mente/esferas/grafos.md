@@ -12,7 +12,8 @@ descripcion_niveles:
   basico: "Un grafo es una forma de representar conexiones entre cosas, como ciudades o personas, usando puntos (nodos) y líneas (aristas) que muestran cómo están relacionadas."
   medio: "Un grafo está compuesto por nodos, que representan entidades como personas o ciudades, y aristas, que muestran las conexiones entre ellos. Puede ser dirigido o no dirigido, y algunos grafos asignan un peso a las aristas para indicar costes o tiempos."
   experto: "Un grafo se define formalmente como g = (v, e), donde v es el conjunto de vértices y e el conjunto de aristas, cada una siendo un par de vértices. Se clasifican en dirigidos y no dirigidos: en los no dirigidos, la conexión es mutua; en los dirigidos, las aristas tienen un sentido único, por lo que a es b pero no necesariamente b es a. Los grafos ponderados asignan un peso a cada arista, como un coste o tiempo, mientras que los no ponderados solo consideran la existencia de una conexión. Un grafo completo conecta cada nodo con todos los demás, y los grafos bipartitos completos establecen una conexión total entre cada nodo de un grupo y todos los nodos del otro grupo."
-generado_por: cc-pendiente-revision
+generado_por: cc-firmado-soberano
+firmado: 2026-07-12
 ---
 
 # Grafos: estructura matemática para relaciones en redes
