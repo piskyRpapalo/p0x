@@ -207,3 +207,12 @@ actualizado: 2026-07-05
 | 69 | **Captura periódica al conectar la webcam**: cuando exista `/dev/video0`, un timer (tsp o systemd) que llame a `/api/verde/captura` 1-2 veces/día por recipiente — /indoor ya muestra sola la última foto con las medidas encima; sin capturas automáticas la página depende de la mano. | M | **firmada (2026-07-12) vía dashboard** |
 | 70 | **Feed vivo desde El Vigía (Opción B del brief de cámara)**: si David prefiere la cámara junto a las plantas en el Pi, hace falta ustreamer/mjpg-streamer + unit en el Vigía + proxy `/api/indoor/feed` en el gateway; el overlay de /indoor ya está listo para recibirlo sin tocar UI. | L | **firmada (2026-07-12) vía dashboard** |
 | 71 | **Sesión de tono de la voz de /indoor con David y su esposa**: hoy responde el fallback 1.5b (honesto pero algo torpe: "llamar al jardinería"); la torre no carga el modelo (CUDA alloc, residencia pendiente de instalar). Probar 5-6 preguntas reales juntos y ajustar `_INDOOR_VOZ` + few-shots con sus palabras. | S | **firmada (2026-07-12) vía dashboard** |
+
+### 2026-07-12 · misión HARDWARE VIVO + JARDIN
+
+| # | Sugerencia | Coste | Estado |
+|---|-----------|-------|--------|
+| 72 | **Parada limpia del gateway con el relay MJPEG**: MEDIDO que el stop tardó 90s y acabó en SIGKILL (los streams vivos de /api/indoor/feed bloquean el shutdown de uvicorn). Añadir `TimeoutStopSec=15` a la unit o `--timeout-graceful-shutdown 10` a uvicorn. [prio:media] [rev:sí] | S | propuesta |
+| 73 | **Encuadre y aviso de la cámara**: en el primer snapshot sales tú en el plano — la cámara ve la silla, no solo las plantas. Decisión física tuya (girarla/acercarla a las cúpulas) + una línea de aviso en /indoor "la cámara ve el rincón, no solo las plantas". Todo sigue 100% local. [prio:alta] [rev:sí] | S | propuesta |
+| 74 | **Jardin Fase 1 — La Sentinelle**: siguiente sesión del roadmap (SensorSource+sim con jitter, Le Filtre con histéresis/cooldowns/horas silenciosas, Journal, Fenêtre con scanlines, Fantôme 4 estados). La Fenêtre puede nacer ya conectada al feed real del Vigía. [prio:media] [rev:sí] [doc:mente/manual/unidades.md] | M | propuesta |
+| 75 | **Broker MQTT + flasheo de los ESP32 del jardín**: están colocados pero el rack aún no los ve (mosquitto inactivo en el Vigía, sin serie nuevo). Cuando decidas firmware (Arduino vs ESPHome — decisión 5 del roadmap), habilitar mosquitto con listener WS :9001 y flashear; la arquitectura del Jardin los espera en Fase 4. [prio:media] [rev:sí] | M | propuesta |
