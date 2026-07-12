@@ -44,3 +44,9 @@ corpus/**/audio.info.json
 voz/.venv-piper/
 voz/modelos/
 voz/cache/
+
+# diario verde: fotos 100% locales del rack (invariante fotos-locales: jamás
+# se pushean, ni siquiera al bare soberano) + diario.jsonl operativo
+# append-only; se versiona solo el README con el esquema
+verde/fotos/
+verde/diario.jsonl
