@@ -1,0 +1,9 @@
+[Unit]
+Description=captura periodica del diario verde (foto via camara del Vigia + medidas M5)
+After=network-online.target
+
+[Service]
+Type=oneshot
+# --max-time 360: el analisis VLM es sincrono (qwen3.5 CPU); #58 firmada lo movera a async
+ExecStart=/usr/bin/curl -s --max-time 360 -X POST http://localhost:8001/api/verde/captura -H "Content-Type: application/json" -d "{\"grupo\":\"recipiente-1\"}"
+User=ubuntu
