@@ -50,3 +50,7 @@ voz/cache/
 # append-only; se versiona solo el README con el esquema
 verde/fotos/
 verde/diario.jsonl
+
+# cuaderno de /indoor: notas personales de la familia (dato personal, invariante
+# fotos-locales extendido) — backup local en .backups/, jamás versionado
+verde/cuaderno.md
