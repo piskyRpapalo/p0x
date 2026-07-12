@@ -187,3 +187,13 @@ actualizado: 2026-07-05
 | 59 | **Primera sesión de vaciado de bandeja en `/tareas`**: 62 sugerencias abiertas + 13 esferas esperan firma. La herramienta ya existe (SIGN/DEFER/DISCARD con motivo, todo commiteado con backup); 20 minutos de mano del Soberano dejan la bandeja al día sin abrir una terminal. | S | **firmada (2026-07-12) vía dashboard** |
 | 60 | **Retención de `/mnt/nvme/p0x/.backups/`**: cada acción de la bandeja deja un backup del MD tocado (correcto, pero crece sin límite). Una pasada de limpieza simple (conservar últimos 60 días o N=200) evita que el directorio se vuelva un vertedero invisible. | S | aplazada (2026-07-12) vía dashboard |
 | 61 | **`/tareas` y `/verde` en `audit_overlaps.py`** (viewports 768/390): la bandeja de firma se usará desde el móvil del Soberano; hoy solo está auditada en desktop (audit_links 0/0/0). | S | **firmada (2026-07-12) vía dashboard** |
+
+### 2026-07-12 · misión LEGIBILIDAD DE FORTALEZAS
+
+| # | Sugerencia | Coste | Estado |
+|---|-----------|-------|--------|
+| 62 | **OK de David al push público → los badges se encienden**: el repo local lleva CI (`d36a5be`) + ADRs (`9cf98f2`) verificados con AMBOS sweeps a 0; Actions corre en el primer push y los 2 workflows deberían salir verdes a la primera. Verificar badges en GitHub tras el push. | S | propuesta |
+| 63 | **Hook pre-push con el sweep COMPLETO en hexelion-public** (materializa #55): el CI público cubre los patrones genéricos; el diccionario completo (literales del rack) debe correr en local antes de cada push. `cp` de un hook de 3 líneas a `.git/hooks/pre-push`. | S | propuesta |
+| 64 | **Primer pase de modularización del gateway** siguiendo `docs/PLAN_MODULARIZACION_GATEWAY.md` (hexelion `cddac29`): extraer `routers/tareas.py` verbatim con diff de rutas antes/después + audits 0/0/0. Un router por pase; maritime y websockets los últimos. | M | propuesta |
+| 65 | **"ADR al cierre" como paso del rito**: cuando una misión canoniza una decisión mayor, el cierre incluye exportar su ADR saneado a `docs/adr/` del público — la señal de gobernanza se mantiene viva sin misiones especiales. | S | propuesta |
+| 66 | **Sección de atestación en el README público**: `/proof` vive en la tailnet — un reclutador no la ve. Screenshot saneado de la vitrina (con la explicación 'What this page proves') + 3 líneas en el README, tras el checklist de secretos. | S | propuesta |
