@@ -166,7 +166,7 @@ actualizado: 2026-07-05
 | 48 | **`reflejo-termico-m5` (Pista A · Reflejo #2)**: el BME680 late (temp/humedad/gas vivos) y con el RTC ya en hora sus lecturas son fechables. Watcher con el patrón de reflejo-bateria (histéresis + REFLEX + reflejos.jsonl), umbral de temperatura del rack → aviso protector. Declara su Era (`patron-era-energetica`). | M | propuesta |
 | 49 | **`reflejo-vibracion` (Pista A · Reflejo #3)**: ADXL345 vivo; Δ\|g\| sobre umbral → evento "movimiento detectado" a consola. Solo aviso, jamás valor (IronClaw). | M | propuesta |
 | 50 | **Runbook `REENCARNACION_P0X.md` nuevo (el viejo quedó obsoleto — veredicto #42)**: el genoma real de hoy = bare repos en La Torre (p0x + hexelion + lab, push verificado) + Qdrant re-derivable por ingesta. Lo que HOY no está cubierto: estado Redis, `.env`/secretos, units systemd instaladas, receta docker. Un runbook de 1 página con eso cerraría la recuperación ante desastre real. | M | propuesta |
-| 51 | **Re-sync periódico del RTC del M5**: el DS3231 deriva (~±2 ppm/°C). Un cron mensual en el-vigia que pare ingest → `set_rtc_m5.py` → arranque ingest (2s de ventana) mantiene #30 cerrada para siempre. Propose-only si el clasificador veta el cron. | S | propuesta |
+| 51 | **Re-sync periódico del RTC del M5**: el DS3231 deriva (~±2 ppm/°C). Un cron mensual en el-vigia que pare ingest → `set_rtc_m5.py` → arranque ingest (2s de ventana) mantiene #30 cerrada para siempre. Propose-only si el clasificador veta el cron. | S | **firmada (2026-07-12) vía dashboard** |
 
 ### 2026-07-11 · misión PÚBLICO SEGURO + REFLEJOS
 
