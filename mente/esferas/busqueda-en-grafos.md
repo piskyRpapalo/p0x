@@ -12,7 +12,8 @@ descripcion_niveles:
   basico: "DFS y BFS son métodos para encontrar información en una red de nodos, como en un segundo cerebro, siguiendo rutas diferentes: uno va profundamente en una línea, el otro revisa todos los vecinos antes de seguir."
   medio: "La búsqueda por profundidad (DFS) explora nodos siguiendo un camino hasta el final antes de volver, mientras que la búsqueda por anchura (BFS) revisa todos los vecinos inmediatos antes de ir más allá. Ambas son estrategias para navegar en grafos, como en un sistema de conocimiento estructurado."
   experto: "La búsqueda por profundidad (DFS) inspecciona nodos de un nivel antes de explorar los siguientes, comenzando desde un nodo inicial y avanzando hacia vecinos no visitados hasta alcanzar uno sin conexiones, luego retrocediendo para explorar otros caminos. Se utiliza un conjunto para marcar nodos visitados y evitar bucles infinitos, con el valor del nodo o un identificador único como clave. En contraste, la búsqueda por anchura (BFS) inspecciona primero todos los vecinos de un nodo antes de explorar nodos a mayor profundidad, usando una cola para mantener el orden de exploración en capas, asegurando una visita equilibrada a todos los nodos a una distancia dada."
-generado_por: cc-pendiente-revision
+generado_por: cc-firmado-soberano
+firmado: 2026-07-12
 ---
 
 # Búsqueda en Grafos: DFS y BFS para SecondBrain
