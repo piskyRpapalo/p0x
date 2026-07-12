@@ -197,3 +197,13 @@ actualizado: 2026-07-05
 | 64 | **Primer pase de modularización del gateway** siguiendo `docs/PLAN_MODULARIZACION_GATEWAY.md` (hexelion `cddac29`): extraer `routers/tareas.py` verbatim con diff de rutas antes/después + audits 0/0/0. Un router por pase; maritime y websockets los últimos. | M | **firmada (2026-07-12) vía dashboard** |
 | 65 | **"ADR al cierre" como paso del rito**: cuando una misión canoniza una decisión mayor, el cierre incluye exportar su ADR saneado a `docs/adr/` del público — la señal de gobernanza se mantiene viva sin misiones especiales. | S | **firmada (2026-07-12) vía dashboard** |
 | 66 | **Sección de atestación en el README público**: `/proof` vive en la tailnet — un reclutador no la ve. Screenshot saneado de la vitrina (con la explicación 'What this page proves') + 3 líneas en el README, tras el checklist de secretos. | S | **firmada (2026-07-12) vía dashboard** |
+
+### 2026-07-12 · misión PUERTA VERDE
+
+| # | Sugerencia | Coste | Estado |
+|---|-----------|-------|--------|
+| 67 | **Flush del think_filter en el chat del Sínodo v2**: MEDIDO en /indoor que `_make_think_filter` retiene ≤7 chars de cola y jamás los suelta — cada respuesta SSE pierde sus últimos caracteres. El fix (`flush=done`) ya existe en el filtro y /indoor lo usa; falta pasarlo en los 2 streams de `sinodo_v2_chat_stream` (2 líneas). | S | propuesta |
+| 68 | **Adoptar la bandeja de firma explicable (PROPUESTA_27)**: marcadores inline `[prio:] [rev:] [doc:]` en filas NUEVAS de PENDIENTES + titular llano en /tareas (toggle basico/experto). Retrocompatible por construcción (mismo mecanismo que `[aud:]`); el diseño completo con gramática, regex y mock está en `mente/auditorias/PROPUESTA_27_signature_tray_explicable.md`. | S | propuesta |
+| 69 | **Captura periódica al conectar la webcam**: cuando exista `/dev/video0`, un timer (tsp o systemd) que llame a `/api/verde/captura` 1-2 veces/día por recipiente — /indoor ya muestra sola la última foto con las medidas encima; sin capturas automáticas la página depende de la mano. | M | propuesta |
+| 70 | **Feed vivo desde El Vigía (Opción B del brief de cámara)**: si David prefiere la cámara junto a las plantas en el Pi, hace falta ustreamer/mjpg-streamer + unit en el Vigía + proxy `/api/indoor/feed` en el gateway; el overlay de /indoor ya está listo para recibirlo sin tocar UI. | L | propuesta |
+| 71 | **Sesión de tono de la voz de /indoor con David y su esposa**: hoy responde el fallback 1.5b (honesto pero algo torpe: "llamar al jardinería"); la torre no carga el modelo (CUDA alloc, residencia pendiente de instalar). Probar 5-6 preguntas reales juntos y ajustar `_INDOOR_VOZ` + few-shots con sus palabras. | S | propuesta |
