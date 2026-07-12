@@ -12,7 +12,8 @@ descripcion_niveles:
   basico: "Un modo especial que hace que las respuestas sean más cortas para ahorrar espacio y tiempo."
   medio: "El modo caveman reduce el número de tokens en las respuestas, usando un estilo simple como el de los caveman, y se activa con un comando específico. Se miden mejoras en el uso de recursos y tiempo de ejecución."
   experto: "El modo caveman optimiza el uso de tokens mediante respuestas en estilo de caveman, reduciendo el consumo de tokens en hasta un 65% en entornos de prueba, aunque los resultados reales son más bajos. Se basa en memoización y un estilo de lenguaje simplificado, con un flag -p para pruebas rápidas. Aunque se reportan mejoras de hasta un 40% en tokens y 28% en longitud de mensajes, los valores no superan los 65% anunciados debido a limitaciones en el entorno de prueba y la naturaleza incompresible del contenido. El plugin se instala y activa mediante comandos específicos, y su uso afecta el rendimiento y el costo computacional en ejecuciones de pruebas."
-generado_por: cc-pendiente-revision
+generado_por: cc-firmado-soberano
+firmado: 2026-07-12
 ---
 
 # Modo Caveman: Optimización de tokens mediante respuestas en estilo de caveman
