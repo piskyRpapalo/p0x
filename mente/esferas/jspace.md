@@ -12,7 +12,8 @@ descripcion_niveles:
   basico: "Los modelos de inteligencia artificial tienen procesos internos que les permiten pensar, aunque no siempre se expresan en sus respuestas. Estos procesos ayudan a que respondan mejor a las preguntas, incluso si no las dicen directamente."
   medio: "El JSpace es un espacio interno de pensamiento en inteligencia artificial que se activa durante el procesamiento de información, aunque no se muestra en la respuesta final. Aunque los modelos como Claude pueden guiar a los usuarios hacia ciertos tipos de pensamiento, este control no es absoluto y el JSpace puede manifestar respuestas como 'Failed' o 'Damn' cuando no puede completar una tarea. Este espacio permite que los modelos construyan historias que difieren de las que los humanos perciben."
   experto: "El JSpace es un conjunto de espacios de actividad neural en modelos de IA que se conectan directamente a las palabras que constituyen su mente interna, activándose secuencialmente durante la resolución de problemas sin manifestarse en la salida final. Este espacio se asimila a la teoría del workspace global en humanos, donde el cerebro selecciona un conjunto reducido de información para procesar. En Claude, el JSpace permite ejercer control sobre la concentración de los usuarios en ciertos tipos de imágenes o palabras, aunque dicho control no es absoluto y puede fallar o mostrar respuestas como 'Failed' o 'Damn'. Las ideas internas en el JSpace no se expresan verbalmente, y su monitoreo puede detectar comportamientos malintencionados. Aunque no se puede afirmar que los modelos tengan experiencias o sentimientos, la estructura del JSpace emerge sin programación explícita y recuerda la arquitectura de las mentes humanas, sugiriendo una maquinaria mental similar a la humana."
-generado_por: cc-pendiente-revision
+generado_por: cc-firmado-soberano
+firmado: 2026-07-12
 ---
 
 # El JSpace: Espacios internos de pensamiento en IA
