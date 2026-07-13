@@ -221,7 +221,7 @@ actualizado: 2026-07-05
 
 | # | Sugerencia | Coste | Estado |
 |---|-----------|-------|--------|
-| 76 | **Validar el francés con Krista**: todas las líneas nuevas de copy.fr.ts + los textos del componente cámara los escribí yo — el canon del Jardin exige que el Soberano valide cada línea antes de darlas por buenas. Una lectura de 10 minutos juntos. [prio:alta] [rev:sí] | S | propuesta |
+| 76 | **Validar el francés con Krista**: todas las líneas nuevas de copy.fr.ts + los textos del componente cámara los escribí yo — el canon del Jardin exige que el Soberano valide cada línea antes de darlas por buenas. Una lectura de 10 minutos juntos. [prio:alta] [rev:sí] | S | **firmada (2026-07-13) vía dashboard** |
 | 77 | **Soltar los .md de herbología en `verde/herbier/`**: NO están en el rack (buscados en mente/, esferas, ~/P0X). La enciclopedia ya los espera — al copiarlos aparecen solos en "Pages apportées par le jardinier", sin reiniciar nada. [prio:alta] [rev:sí] | S | **firmada (2026-07-13) vía dashboard** |
 | 78 | **La voz cita el herbier**: cuando existan los .md (#77), añadir sus extractos top-k al grounding de `/api/indoor/chat` idioma:fr para que La Voix responda CITANDO las páginas del jardinero — mismo patrón retrieval del Sínodo, a escala mini. [prio:media] [rev:sí] | M | **firmada (2026-07-13) vía dashboard** |
 | 79 | **Bautizar al monigote y al jardín**: el guardián perro-hueso necesita nombre (propuesta canon: Churro) y "Le Jardin des Ombres" sigue siendo nombre en clave — decisión de Krista; se cambia en copy.fr.ts + CLAUDE.md, un solo sitio. [prio:baja] [rev:sí] | S | **descartada (2026-07-13): se llamará Cortext(el perro) y el jardin igual,"Le Jardin" — vía dashboard** |
