@@ -226,3 +226,13 @@ actualizado: 2026-07-05
 | 78 | **La voz cita el herbier**: cuando existan los .md (#77), añadir sus extractos top-k al grounding de `/api/indoor/chat` idioma:fr para que La Voix responda CITANDO las páginas del jardinero — mismo patrón retrieval del Sínodo, a escala mini. [prio:media] [rev:sí] | M | **firmada (2026-07-13) vía dashboard** |
 | 79 | **Bautizar al monigote y al jardín**: el guardián perro-hueso necesita nombre (propuesta canon: Churro) y "Le Jardin des Ombres" sigue siendo nombre en clave — decisión de Krista; se cambia en copy.fr.ts + CLAUDE.md, un solo sitio. [prio:baja] [rev:sí] | S | **descartada (2026-07-13): se llamará Cortext(el perro) y el jardin igual,"Le Jardin" — vía dashboard** |
 | 80 | **Kiosco para Krista**: cuando la Pantalla Soberana esté viva, `chromium --kiosk http://<fragua>:8001/jardin/` convierte el Jardin en el marco permanente de la cocina/salón — cero fricción para una persona no técnica. [prio:media] [rev:sí] | S | **descartada (2026-07-13): no — vía dashboard** |
+
+### 2026-07-13 · misión INVENTARIO TOTAL (widgets + métricas + tareas abiertas)
+
+| # | Sugerencia | Coste | Estado |
+|---|-----------|-------|--------|
+| 81 | **Reconciliación de estados de esta tabla**: hay firmadas que ya están hechas de facto (#70 feed vivo = ustreamer del Vigía; #8 borrada) — una pasada anotando "hecha (evidencia)" donde corresponda, para que el contador del SYSTEM STATE cuente backlog REAL y no ruido. [prio:media] [rev:sí] [doc:mente/auditorias/TAREAS_ABIERTAS_2026-07-13.md] | S | propuesta |
+| 82 | **Unificar #55 y #63**: son el mismo trabajo (hook pre-push con barrido de secretos en hexelion-public) escrito dos veces; fundirlas en una y cerrarla de una vez desbloquea el prerequisito técnico de #62. [prio:media] [rev:sí] | S | propuesta |
+| 83 | **Investigar el eje z del ADXL345 clavado en −2.048 g**: es exactamente el tope de rango — o la escala (±2g vs ±16g) o la orientación están mal, y el reflejo-vibracion está midiendo sobre un sensor saturado. Verificar registro de config en el firmware M5. [prio:alta] [rev:sí] | S | propuesta |
+| 84 | **Paso 0 de la modularización (#64): sacar los ~30 `hexelion_gateway.py.bak*` del working tree** (a `.backups/` fuera del repo, tras verificar que el actual funciona) — el monolito se audita mejor sin 30 fantasmas al lado. [prio:media] [rev:sí] | S | propuesta |
+| 85 | **Badge de frescura uniforme en el rediseño**: casi todos los endpoints ya devuelven `ts`/`fuente` — el rediseño en Claude Design puede pintar "edad del dato" en cada widget con una sola convención, y lo congelado (asesoría 20 días) se delataría solo, sin auditorías. [prio:media] [rev:sí] [doc:mente/auditorias/INVENTARIO_WIDGETS_2026-07-13.md] | M | propuesta |
