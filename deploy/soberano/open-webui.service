@@ -1,0 +1,16 @@
+[Unit]
+Description=OpenWebUI (ventana de los hermanos, F2-alfa) — solo tailnet
+After=network-online.target
+
+[Service]
+Environment="PATH=/home/pisky/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Environment="OLLAMA_BASE_URL=http://127.0.0.1:11434"
+Environment="WEBUI_AUTH=true"
+Environment="ANONYMIZED_TELEMETRY=false"
+Environment="DO_NOT_TRACK=true"
+ExecStart=/home/pisky/.local/bin/open-webui serve --host 100.81.82.34 --port 8080
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
