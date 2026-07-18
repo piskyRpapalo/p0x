@@ -1,0 +1,22 @@
+# Modelfile · soberano-coder
+# Motor local del nodo soberano (Misión G0, 2026-07-18).
+# Tag explícito obligatorio en FROM — un tag pelado en qwen3-coder puede apuntar
+# a una variante Thinking con razonamiento no desactivable (footgun documentado
+# en deploy/soberano/CLAUDE.md).
+FROM qwen3-coder:30b
+
+# num_ctx inicial: 16384, tal y como pide la misión. Demostrado por dato en el
+# reporte G0 (huella de RAM medida con el modelo cargado a este num_ctx) antes
+# de considerar subirlo. NO se usa el default de Ollama (262144): en este
+# hardware (64GB RAM compartida con el resto del sistema) ese default cuelga
+# el runtime sin aviso — footgun documentado.
+PARAMETER num_ctx 16384
+
+# Temperatura baja: uso previsto es coding/tareas deterministas, no creatividad.
+PARAMETER temperature 0.2
+
+# top_p conservador, coherente con temperature baja.
+PARAMETER top_p 0.9
+
+# Penaliza repetición sin castigar código legítimamente repetitivo (boilerplate).
+PARAMETER repeat_penalty 1.1
