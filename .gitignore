@@ -54,3 +54,8 @@ verde/diario.jsonl
 # cuaderno de /indoor: notas personales de la familia (dato personal, invariante
 # fotos-locales extendido) — backup local en .backups/, jamás versionado
 verde/cuaderno.md
+
+# artefactos de sesión de harnesses locales (duelo de la Misión G1)
+.aider.chat.history.md
+.aider.input.history
+.aider.tags.cache.v4/
