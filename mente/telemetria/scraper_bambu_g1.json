@@ -1,0 +1,10 @@
+{
+ "fuente": "https://wiki.bambulab.com/en/a1-mini",
+ "dominio": "wiki.bambulab.com",
+ "paginas_crawleadas": 30,
+ "tope_paginas": 30,
+ "total_chunks": 891,
+ "total_chars_markdown": 337948,
+ "tiempo_crawl_s": 37.13,
+ "ts_utc": "2026-07-18T21:58:23.915059+00:00"
+}
