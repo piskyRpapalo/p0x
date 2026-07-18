@@ -1,0 +1,152 @@
+[
+ {
+  "harness": "aider",
+  "mission": "m1_inventario",
+  "rc": 0,
+  "wall_s": 31.8,
+  "prompt_tokens_approx": 620,
+  "eval_tokens_approx": 723,
+  "ts_start": "2026-07-18T21:23:21",
+  "ts_end": "2026-07-18T21:23:53"
+ },
+ {
+  "harness": "aider",
+  "mission": "m2_doctrina_cita",
+  "rc": 0,
+  "wall_s": 30.0,
+  "prompt_tokens_approx": 620,
+  "eval_tokens_approx": 776,
+  "ts_start": "2026-07-18T21:45:47",
+  "ts_end": "2026-07-18T21:46:17"
+ },
+ {
+  "harness": "aider",
+  "mission": "m3_telemetria",
+  "rc": 0,
+  "wall_s": 35.2,
+  "prompt_tokens_approx": 685,
+  "eval_tokens_approx": 862,
+  "ts_start": "2026-07-18T21:59:13",
+  "ts_end": "2026-07-18T21:59:48"
+ },
+ {
+  "harness": "aider",
+  "mission": "m4_codigo",
+  "rc": 0,
+  "wall_s": 32.3,
+  "prompt_tokens_approx": 628,
+  "eval_tokens_approx": 782,
+  "ts_start": "2026-07-18T22:12:05",
+  "ts_end": "2026-07-18T22:12:37"
+ },
+ {
+  "harness": "aider",
+  "mission": "m5_busqueda",
+  "rc": 0,
+  "wall_s": 30.0,
+  "prompt_tokens_approx": 0,
+  "eval_tokens_approx": 0,
+  "ts_start": "2026-07-18T22:24:20",
+  "ts_end": "2026-07-18T22:24:50"
+ },
+ {
+  "harness": "opencode",
+  "mission": "m1_inventario",
+  "rc": 124,
+  "wall_s": 500.1,
+  "prompt_tokens_approx": 12173,
+  "eval_tokens_approx": 12418,
+  "ts_start": "2026-07-18T21:23:53",
+  "ts_end": "2026-07-18T21:32:13"
+ },
+ {
+  "harness": "opencode",
+  "mission": "m2_doctrina_cita",
+  "rc": 0,
+  "wall_s": 275.6,
+  "prompt_tokens_approx": 11524,
+  "eval_tokens_approx": 11786,
+  "ts_start": "2026-07-18T21:46:17",
+  "ts_end": "2026-07-18T21:50:53"
+ },
+ {
+  "harness": "opencode",
+  "mission": "m3_telemetria",
+  "rc": 0,
+  "wall_s": 236.6,
+  "prompt_tokens_approx": 7749,
+  "eval_tokens_approx": 7808,
+  "ts_start": "2026-07-18T21:59:48",
+  "ts_end": "2026-07-18T22:03:44"
+ },
+ {
+  "harness": "opencode",
+  "mission": "m4_codigo",
+  "rc": 0,
+  "wall_s": 203.4,
+  "prompt_tokens_approx": 7635,
+  "eval_tokens_approx": 7687,
+  "ts_start": "2026-07-18T22:12:37",
+  "ts_end": "2026-07-18T22:16:00"
+ },
+ {
+  "harness": "opencode",
+  "mission": "m5_busqueda",
+  "rc": 0,
+  "wall_s": 159.3,
+  "prompt_tokens_approx": 8668,
+  "eval_tokens_approx": 9029,
+  "ts_start": "2026-07-18T22:24:50",
+  "ts_end": "2026-07-18T22:27:30"
+ },
+ {
+  "harness": "qwen",
+  "mission": "m1_inventario",
+  "rc": 124,
+  "wall_s": 500.1,
+  "prompt_tokens_approx": 250,
+  "eval_tokens_approx": 360,
+  "ts_start": "2026-07-18T21:32:13",
+  "ts_end": "2026-07-18T21:40:33"
+ },
+ {
+  "harness": "qwen",
+  "mission": "m2_doctrina_cita",
+  "rc": 124,
+  "wall_s": 500.1,
+  "prompt_tokens_approx": 250,
+  "eval_tokens_approx": 320,
+  "ts_start": "2026-07-18T21:50:53",
+  "ts_end": "2026-07-18T21:59:13"
+ },
+ {
+  "harness": "qwen",
+  "mission": "m3_telemetria",
+  "rc": 124,
+  "wall_s": 500.1,
+  "prompt_tokens_approx": 3672,
+  "eval_tokens_approx": 3905,
+  "ts_start": "2026-07-18T22:03:44",
+  "ts_end": "2026-07-18T22:12:05"
+ },
+ {
+  "harness": "qwen",
+  "mission": "m4_codigo",
+  "rc": 124,
+  "wall_s": 500.1,
+  "prompt_tokens_approx": 2534,
+  "eval_tokens_approx": 2741,
+  "ts_start": "2026-07-18T22:16:00",
+  "ts_end": "2026-07-18T22:24:20"
+ },
+ {
+  "harness": "qwen",
+  "mission": "m5_busqueda",
+  "rc": 124,
+  "wall_s": 500.1,
+  "prompt_tokens_approx": 965,
+  "eval_tokens_approx": 1202,
+  "ts_start": "2026-07-18T22:27:30",
+  "ts_end": "2026-07-18T22:35:50"
+ }
+]
