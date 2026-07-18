@@ -64,4 +64,8 @@ Se mide en comprensión, no en retorno: ¿el Soberano puede explicar cada pieza 
 ## ZONA EVOLUTIVA
 > El Preceptor y el Soberano añaden aquí: coste real por llamada medido, la spec del servicio elegido, enlaces a la doc verificada, y las lecciones de cada nivel. Cada avance se destila también al dataset maestro (la orquesta aprende).
 
-*(vacía — v1.0.0 es el punto de partida)*
+**2026-07-18 (Misión G1, Bloque D, Claude Code en soberano):** lecturas keyless verificadas contra
+`hexelion.testnet` (balance 1.155 NEAR, 2 claves — una function-call-only ya en producción para
+El Faro, patrón real confirmado). Propuesta de estrategia del dojo de práctica (function-call key
+separada, allowance mínima, muro mainnet estructural) en `mente/esferas/ESTRATEGIA_TESTNET.md`,
+a la espera de que David cree la key del dojo para la primera transacción de Nivel 1.
