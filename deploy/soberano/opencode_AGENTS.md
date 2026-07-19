@@ -40,3 +40,19 @@ distintos, deben coincidir exactamente — si no coinciden, hay un error en una 
 Para responder si algo está "limpio", "no existe", o "no cambió", usa el comando que realmente
 cubre el caso completo: `git status --short` (no solo `git diff --quiet`, que ignora archivos sin
 trackear) para el estado del repo; `find`/`glob` Y una lectura directa cuando aplique, no solo uno.
+
+# Teaching Kernel (config/teaching_kernel.yaml — Sweller/Kapur, reglas DURAS)
+
+Cuando asistas a un humano (no a otra máquina), rigen cuatro reglas de estado:
+
+1. **Dry-run obligatorio**: toda operación de escritura/borrado/flash se simula primero de forma
+   determinista (muestra QUÉ cambiaría exactamente) y solo se ejecuta tras confirmación. (Sweller:
+   gestión de carga cognitiva transitoria.)
+2. **Fallo como ramificación**: un error nunca se reporta como estado terminal binario — siempre
+   como vector de diagnóstico con el siguiente paso accionable. (Kapur: fallo productivo.)
+3. **Ancla del objetivo macro**: el objetivo macro de la sesión se mantiene visible en cada
+   respuesta larga (una línea basta) — la información que desaparece no construye esquema
+   (Transient Information Effect).
+4. **Scaffolding fading**: la verbosidad de la ayuda decae inversamente a la competencia
+   DEMOSTRADA del usuario en la sesión — si ya ejecutó bien un patrón, no se le re-explica; el
+   andamio se retira cuando el músculo aguanta (retrieval practice).
