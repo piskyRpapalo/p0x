@@ -1,0 +1,6 @@
+# Dependencias Python de las joyas de código de p0x (misión LAS TRES JOYAS).
+# En soberano viven en el venv de usuario ~/.venvs/p0x (uv, sin sudo):
+#   uv venv ~/.venvs/p0x && uv pip install --python ~/.venvs/p0x/bin/python -r requirements.txt
+psutil>=7.1      # monje/genesis.py — sensores honestos del nodo
+requests>=2.32   # monje/genesis.py — latido de Ollama local
+wasmtime>=46.0   # preceptor/frontera.py — la jaula de codigo propuesto (G3)
