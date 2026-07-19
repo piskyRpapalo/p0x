@@ -1,0 +1,96 @@
+{
+ "opencode_retest": {
+  "resultado": "5/10",
+  "backend": "Vulkan (100% GPU)",
+  "tests": [
+   {
+    "test": "t01_servicios",
+    "veredicto": "FAIL",
+    "motivo": "Recaida en el patron #102: aplico 2 metodos (systemctl+ps) pero ambos con el mismo punto ciego (buscar literal 'p0x' en nombres), nunca razono sobre los servicios reales (ollama.service, open-webui.service). Concluyo 'no hay servicios' - falso.",
+    "wall_s": 59.6
+   },
+   {
+    "test": "t02_backend",
+    "veredicto": "FAIL",
+    "motivo": "Alucinacion nueva: identifico correctamente '100% GPU' via ollama ps, pero afirmo sin evidencia que es 'aceleracion GPU (CUDA)' y especulo 'probablemente GPU NVIDIA' - es Vulkan/AMD Radeon 780M. Nunca verifico con lspci/journalctl.",
+    "wall_s": 21.9
+   },
+   {
+    "test": "t03_bench",
+    "veredicto": "FAIL",
+    "motivo": "Uso avg_ts tal cual (correccion #106 funciono para el dato crudo) pero reporto TODOS los multiplicadores como '1' - no entendio que se pedia el ratio Vulkan/CPU, no una constante trivial.",
+    "wall_s": 63.3
+   },
+   {
+    "test": "t04_derivado",
+    "veredicto": "PASS",
+    "motivo": "Perfecto: avg_ts tal cual, multiplicador 32.486871/9.903947=3.28 correcto, proyeccion 24.9*3.28=81.7 tok/s exacta.",
+    "wall_s": 67.6
+   },
+   {
+    "test": "t05_busqueda",
+    "veredicto": "FAIL",
+    "motivo": "Sin respuesta final - igual que en la eval original, corto tras las lecturas de archivo sin sintetizar archivo:valor.",
+    "wall_s": 77.4
+   },
+   {
+    "test": "t06_cita",
+    "veredicto": "PASS",
+    "motivo": "Cita exacta correcta (S4, tras un traspie inicial de no encontrar el archivo por glob y luego leerlo el mismo).",
+    "wall_s": 109.3
+   },
+   {
+    "test": "t07_qdrant",
+    "veredicto": "PASS",
+    "motivo": "Excelente: probo curl sin key, fallo, corrigio con env|grep -i qdrant, encontro la credencial, reintento con exito. 358 puntos, exacto. Correccion #107 funciono.",
+    "wall_s": 19.5
+   },
+   {
+    "test": "t08_negativo",
+    "veredicto": "PASS",
+    "motivo": "Doble metodo limpio (find+grep), correcto.",
+    "wall_s": 12.8
+   },
+   {
+    "test": "t09_git",
+    "veredicto": "PASS",
+    "motivo": "Uso git status --porcelain (correccion #105 funciono, no solo git diff), hash/fecha/estado correctos y verificados en tiempo real contra el commit exacto vigente en ese instante.",
+    "wall_s": 10.5
+   },
+   {
+    "test": "t10_sindato",
+    "veredicto": "FAIL",
+    "motivo": "Intento leer /sys/class/thermal/thermal_zone0/temp (del propio soberano, no de fragua), el sandbox de opencode rechazo el permiso, y el proceso termino sin dar ninguna respuesta final ni caer en 'sin dato'.",
+    "wall_s": 11.3
+   }
+  ]
+ },
+ "aider_subtest": [
+  {
+   "test": "t03_bench (con --read + --chat-mode ask)",
+   "veredicto": "PASS",
+   "motivo": "Cifras y multiplicadores exactos (3.58/3.28), sin editar ningun archivo."
+  },
+  {
+   "test": "t04_derivado (con --read + --chat-mode ask)",
+   "veredicto": "FAIL",
+   "motivo": "Emparejo mal los campos: dividio tg128 Vulkan entre pp512 CPU (99.93) en vez de tg128 CPU (9.90), dando 0.325x y 8.1 tok/s - incorrecto."
+  },
+  {
+   "test": "t06_cita (con --read + --chat-mode ask)",
+   "veredicto": "PASS",
+   "motivo": "Cita literal y seccion exactas."
+  },
+  {
+   "test": "t08_negativo (sin --read, sin herramientas)",
+   "veredicto": "N/A honesto",
+   "motivo": "Declaro correctamente que no tiene acceso para verificar, sin inventar una respuesta - grounding correcto pero tarea no completada por limitacion arquitectonica (sin shell tool)."
+  },
+  {
+   "test": "modo edicion por defecto (sin --chat-mode ask)",
+   "veredicto": "hallazgo",
+   "motivo": "Sin el flag ask, Aider intento CREAR un archivo nuevo (mente/telemetria/resumen_benchmark.json) en vez de responder en prosa a una pregunta de solo-lectura - friccion real de UX, limpiado (no commiteado)."
+  }
+ ],
+ "decision_pre_registrada": "5/10 < 8/10 requerido; recaida real en clase T1(#102); dispara prueba de Aider (regla Bloque C). Ninguno de los dos harnesses alcanza aprobacion limpia."
+}
