@@ -1,0 +1,23 @@
+diff --git a/hexelion_gateway.py b/hexelion_gateway.py
+index 2f999dd..e9517a1 100644
+--- a/hexelion_gateway.py
++++ b/hexelion_gateway.py
+@@ -178,10 +178,16 @@ app.add_middleware(
+ app.mount("/assets", StaticFiles(directory="/home/ubuntu/hexelion/assets"), name="assets")
+ # Le Jardin des Ombres (dashboard francés para la esposa de David): build Vite
+ # estático (base '/jardin/') servido aquí mismo — sin puerto ni unit nuevos.
+-# Fuente: ~/jardin-des-ombres (npm run build tras cada fase). check_dir=False:
++# SERVE-FROM-GIT (Fase 0, LAS DOS PIELES): el dist vive versionado en el repo
++# (dashboard/dist, construido en soberano y commiteado) — deploy = git pull +
++# restart. JARDIN_DIST permite apuntar a otro dist sin editar código (p.ej. el
++# legado ~/jardin-des-ombres/dist durante la transición). check_dir=False:
+ # si el dist aún no existe el gateway arranca igual (404 honesto en /jardin).
++JARDIN_DIST = os.environ.get(
++    "JARDIN_DIST",
++    str(Path(__file__).resolve().parent / "dashboard" / "dist"))
+ app.mount("/jardin",
+-          StaticFiles(directory="/home/ubuntu/jardin-des-ombres/dist",
++          StaticFiles(directory=JARDIN_DIST,
+                       html=True, check_dir=False), name="jardin")
+ # second_brain.json se copia (no symlink) a assets/ en cada ingesta —
+ # build_graph.write_graph(); StaticFiles queda con el default estricto (sin
