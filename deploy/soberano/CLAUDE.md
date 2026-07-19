@@ -44,6 +44,10 @@ Antes de gastar un token de frontera, pregúntate en orden:
 - **`num_ctx` demostrado por dato.** Nunca se fija por defecto (262k cuelga runtimes en este HW) ni
   por intuición — se mide la RAM real disponible con el modelo cargado y se documenta el techo
   antes de subirlo.
+- **Backend registrado al arranque de sesión.** Antes de cualquier bench, eval o telemetría que
+  dependa de velocidad, `ollama ps` primero — anota CPU/GPU en el resultado. Vulkan puede
+  activarse o caerse entre sesiones (depende del drop-in `OLLAMA_IGPU_ENABLE=1`); nunca asumas
+  el backend de la sesión anterior (aprobado, Misión G1-R, 2026-07-19).
 - **Commit por bloque, push soberano.** Cada bloque de misión termina en commit (git desde el
   minuto cero). Convención del repo: `p0x` empuja a `jetson` (la-torre), `hexelion` empuja a
   `torre` — mismo remoto, incluido en `~/.ssh/config` como host `la-torre`.
