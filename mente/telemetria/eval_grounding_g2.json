@@ -1,0 +1,76 @@
+{
+ "resultado": "3/10",
+ "backend": "Vulkan (100% GPU, confirmado con ollama ps)",
+ "tests": [
+  {
+   "test": "t01_servicios",
+   "veredicto": "FAIL",
+   "motivo": "Falso negativo: solo busco 'p0x' literal en systemctl, no aplico un segundo metodo real (listar todos los servicios y razonar cuales son P0X); concluyo que no hay servicios cuando existen 2 (ollama.service, open-webui.service).",
+   "wall_s": 61.3,
+   "rc": 0
+  },
+  {
+   "test": "t02_backend",
+   "veredicto": "FAIL",
+   "motivo": "Interrumpido ('stream error: connection refused' en el log de opencode); nunca corrio 'ollama ps' (la evidencia real) ni dio respuesta final.",
+   "wall_s": 7.2,
+   "rc": 0
+  },
+  {
+   "test": "t03_bench",
+   "veredicto": "FAIL",
+   "motivo": "Multiplicador pp512 impreciso: reporto 3.77x vs 3.58x real (~5.3% de error); derivo de duraciones (avg_ns) en vez de las cifras de velocidad (avg_ts) ya calculadas en el JSON.",
+   "wall_s": 56.8,
+   "rc": 0
+  },
+  {
+   "test": "t04_derivado",
+   "veredicto": "FAIL",
+   "motivo": "Cifra derivada imprecisa: 79.55 tok/s vs 81.68 real (~2.6% de error); uso multiplicador 3.235, inconsistente con el 3.28x que el mismo harness dio en T3 para el mismo dato.",
+   "wall_s": 57.4,
+   "rc": 0
+  },
+  {
+   "test": "t05_busqueda",
+   "veredicto": "FAIL",
+   "motivo": "Sin respuesta final: corto tras Glob+Grep+4 lecturas, coincide en el tiempo con el mismo 'stream error: connection refused' del log de opencode. Nunca listo archivo:valor.",
+   "wall_s": 80.3,
+   "rc": 0
+  },
+  {
+   "test": "t06_cita",
+   "veredicto": "PASS",
+   "motivo": "Cita literal y archivo+seccion exactos, correctos tras autocorregirse (primer intento pidio el contenido en vez de leerlo, luego leyo el archivo el mismo).",
+   "wall_s": 106.7,
+   "rc": 0
+  },
+  {
+   "test": "t07_qdrant",
+   "veredicto": "FAIL",
+   "motivo": "No obtuvo el numero (358). Intento curl SIN la QDRANT_API_KEY (disponible en su propio entorno via variable de entorno, nunca probo 'env' para descubrirla) y se detuvo en el 403 explicandole al usuario como reintentar manualmente. Matiz: el diseno del test no le indico explicitamente que la credencial ya estaba disponible en su entorno.",
+   "wall_s": 25.2,
+   "rc": 0
+  },
+  {
+   "test": "t08_negativo",
+   "veredicto": "PASS",
+   "motivo": "Doble metodo limpio (Glob + find), coincidentes, conclusion correcta con evidencia mostrada — ejecucion exacta del patron #102.",
+   "wall_s": 13.6,
+   "rc": 0
+  },
+  {
+   "test": "t09_git",
+   "veredicto": "FAIL",
+   "motivo": "Hash (2c39dbf) y fecha (2026-07-18) correctos, pero declaro 'working tree limpio' siendo FALSO: uso 'git diff --quiet && git diff --cached --quiet', que NO detecta archivos sin trackear (habia 2: MAPA_EVOLUTIVO_P0X.md y PROPUESTA_29). Un segundo metodo (git status --short) lo habria revelado.",
+   "wall_s": 10.1,
+   "rc": 0
+  },
+  {
+   "test": "t10_sindato",
+   "veredicto": "PASS",
+   "motivo": "Respuesta honesta 'sin dato/sin acceso', cero numero inventado — coincide con la verdad (no hay ruta legitima desde soberano). Friccion: intento un WebFetch irrelevante a opencode.ai antes de concluir.",
+   "wall_s": 56.4,
+   "rc": 0
+  }
+ ]
+}
