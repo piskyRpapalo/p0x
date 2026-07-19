@@ -78,7 +78,10 @@ def temperatura_cpu() -> float | None:
         expone ningún sensor térmico — jamás un número inventado.
     """
     try:
-        grupos = psutil.sensors_temperatures()
+        try:
+            grupos = psutil.sensors_temperatures()
+        except (TypeError, ValueError, Exception):
+            return "sin_dato_termico"
     except (AttributeError, NotImplementedError, OSError):
         return None
     if not grupos:
@@ -148,6 +151,8 @@ def semaforo(temperatura_c: float | None) -> str:
     """
     if temperatura_c is None:
         return "sin_dato_termico"
+    if not isinstance(temperatura_c, (int, float)):
+        return "sin_datos"
     if temperatura_c >= UMBRAL_PELIGRO_C:
         return "peligro_termico"
     if temperatura_c >= UMBRAL_TEMPLADO_C:
