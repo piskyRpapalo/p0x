@@ -20,6 +20,14 @@ Antes de gastar un token de frontera, pregúntate en orden:
 3. **Determinista** — ¿es un script/comando fijo sin ambigüedad? Ejecútalo directo, sin LLM.
 4. **Frontera** — solo si lo anterior no basta, sube a Claude en la nube.
 
+## Canon del nodo (registro de decisiones del Soberano)
+
+- **2026-07-20 — Ejecutor por defecto: la AI local.** Desde esta fecha, la AI local
+  del PC Soberano (`soberano-coder`) es la ejecutora por defecto de todo el trabajo
+  sobre el dashboard y los proyectos que antes se hacían con otras herramientas
+  (hexelion-lab incluido). El token de frontera queda para arquitectura y doctrina;
+  el resto lo ejecuta el local bajo supervisión del carbono.
+
 ## Disciplina no negociable
 
 - **Parar-y-reportar.** Todo trabajo termina en reporte: qué se hizo, qué dato salió, qué falló.
