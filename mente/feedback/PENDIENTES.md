@@ -345,3 +345,18 @@ Numeración: salta a #134 — #122–#133 pertenecen a la serie de hallazgos del
 | 146 | **Fixture de grafo para el juez visual del Second Brain**: `vite preview` no sirve `/assets/second_brain.json`, así que el Second Brain (Nexo) y el schéma violeta (Jardin) rinden vacío en las capturas — la Ley LOD (§3.4) queda verificada por lectura de código y unit, no por ojo sobre datos vivos. Versionar un `second_brain.sample.json` que el fetch use como fallback en dev haría la sopa-de-etiquetas (o su ausencia) auditable en Playwright. [prio:media] [doc:hexelion/dashboard/src/nexo/grafo/SecondBrain.tsx] | S | pendiente |
 | 147 | **Tratamiento móvil del header del Nexo (390px)**: hoy el header es una tira `overflow-x:auto` (patrón legítimo, no desborda la página) pero en 390px los relojes y chips de firma quedan fuera de vista, solo alcanzables deslizando el header — la «cara que ve la gente» se lee como texto cortado («HEXELION  RA…»). Considerar ocultar los chips secundarios o envolver bajo un breakpoint móvil. NO se tocó en esta misión: cambiar la cara pública sin blueprint es acto del carbono. [prio:baja] [doc:hexelion/dashboard/src/nexo/header/header.css] | S | pendiente |
 | 148 | **[mano-david] Redactar el contrato de datos de 5 líneas del Chat**: hueco real declarado desde G0 — antes de dar la primera cuenta a un hermano (§FIN paso 2) debe existir el contrato que se pega en su primer login: qué ve/hace, retención de conversaciones, qué NO sale del nodo. Sin él, la puerta del Chat no se abre a terceros aunque el admin ya exista. [prio:alta] [doc:deploy/soberano/OPENWEBUI.md] | S | pendiente de firma — mano-david |
+
+### 2026-07-20 · misión PULIDO FINAL DEL ORGANISMO VIVO
+
+Atendidas en esta misión (commit `7042907` de `hexelion`): **#144** (mecanismo `DATA_DIR`
+externo documentado en `hexelion/chat-p0x/CHAT_P0X.md §4`), **#146** (fixture
+`tests/fixtures/second_brain.json` + `tests/fase-grafo.spec.ts`, vía `page.route`),
+**#147** (header móvil sin desborde, 2 tramos responsive). Jardin violeta-noche
+Opción B aplicado (elección de David). Aurelius nació como repo propio `~/aurelius`.
+
+| # | Sugerencia | Coste | Estado |
+|---|---|---|---|
+| 149 | **Celda "Rack Health" en el Nexo**: el canal `nodes` (`/api/health/nodes`) se sondea cada 30s con dato real pero NINGÚN componente lo consume (poll sin render). No se inventó celda (doctrina: no inventar layouts). Candidato a celda de salud del rack. [prio:baja] [doc:hexelion/dashboard/src/nexo/datos/canales.ts] | S | pendiente |
+| 150 | **Contraste del readout de La Sentinelle**: en el reskin violeta-noche, los sensores sobre la caja de cámara oscura quedan legibles pero tenues (rgba(20,14,8,.55) + tinta). Subir contraste del strip. [prio:baja] [doc:hexelion/dashboard/src/jardin/sentinelle/sentinelle.css] | S | pendiente |
+| 151 | **Arrancar el proxy LiteLLM (:4000) y apuntar OpenWebUI a él**: hoy OpenWebUI va directo al Ollama de soberano; el `litellm_config.yaml` (failover torre→fragua) existe pero `:4000` no responde. Cablear para failover real. [prio:media] [doc:p0x/proxy/litellm_config.yaml] | M | pendiente |
+| 152 | **Extender el fixture #146 a aserciones LOD por estado/pixel**: el fixture ya da grafo estable; falta que el juez pruebe la Ley LOD real (labels por zoom <0.8 / 0.8–1.4 / >1.4). [prio:media] [doc:hexelion/dashboard/tests/fase-grafo.spec.ts] | M | pendiente |
