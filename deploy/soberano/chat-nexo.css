@@ -1,0 +1,91 @@
+/* ============================================================================
+   chat-nexo.css — piel del NEXO para el Chat (OpenWebUI), misión Reparación y
+   Ciudadanía del Chat (2026-07-20). Decisión firmada del carbono: el Chat es
+   la tercera cara y viste identidad del Nexo (brutalismo soberano, EN).
+
+   MECÁNICA (honesta, sin tocar el core): OpenWebUI 0.10.2 carga
+   `/static/custom.css` en su index.html (línea 35, ANTES de su propio CSS),
+   así que sobreescribimos por !important — que gana sin depender del orden.
+   OpenWebUI es Tailwind v4 y expone su paleta como variables `--color-*`,
+   `--font-*` y `--radius-*`; remapearlas recolorea la app entera por su propia
+   indirección, sin pelear clase por clase ni parchear su núcleo.
+
+   LÍMITES DE OPENWEBUI (declarados, no forzados):
+   - IBM Plex Mono NO viene bundleada (solo NotoSans). Se cae a mono del
+     sistema. Para la tipografía exacta hay que meter el woff2 en static/fonts
+     y @font-face — paso opcional documentado en OPENWEBUI.md.
+   - El botón primario de OpenWebUI es `bg-black/bg-white` (monocromo), no una
+     variable de acento tematizable: se recolorea con el fondo pero no toma el
+     fósforo. Aceptado como límite.
+   - custom.css vive dentro del paquete pip; un `open-webui` upgrade lo pisa.
+     La fuente de verdad es este archivo en el repo; re-aplicar tras upgrade.
+   ========================================================================== */
+
+:root {
+  /* ---- Fondos y estructura (grises Tailwind → paleta Nexo §2.2) ---- */
+  --color-gray-950: #060b09 !important; /* --nx-void */
+  --color-gray-900: #0a120e !important; /* --nx-panel */
+  --color-gray-850: #0d1713 !important; /* --nx-panel-2 */
+  --color-gray-800: #12261c !important; /* --nx-border-dim */
+  --color-gray-700: #1e3a2a !important; /* --nx-border */
+  --color-gray-600: #2e8f63 !important; /* --nx-phosphor-dim */
+  --color-gray-500: #55705f !important; /* --nx-text-ghost */
+  --color-gray-400: #6e8a7c !important; /* --nx-text-dim */
+  --color-gray-300: #6e8a7c !important; /* --nx-text-dim */
+  --color-gray-200: #c8e6d5 !important; /* --nx-text */
+  --color-gray-100: #c8e6d5 !important; /* --nx-text */
+  --color-gray-50: #e6f5ec !important;
+
+  /* ---- Acentos "IA verde" → Verde Soberano fósforo (§2.2) ---- */
+  --color-emerald-700: #2e8f63 !important;
+  --color-emerald-600: #2e8f63 !important;
+  --color-emerald-500: #43f5a0 !important;
+  --color-emerald-400: #43f5a0 !important;
+  --color-green-600: #2e8f63 !important;
+  --color-green-500: #43f5a0 !important;
+  --color-green-400: #43f5a0 !important;
+
+  /* ---- Tipografía: todo en mono (IBM Plex Mono, §2.1) ---- */
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace !important;
+  --font-sans: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace !important;
+  --default-font-family: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace !important;
+
+  /* ---- Radios: 0 universal (brutalismo, §2.2) ---- */
+  --radius-xs: 0 !important;
+  --radius-sm: 0 !important;
+  --radius-md: 0 !important;
+  --radius-lg: 0 !important;
+  --radius-xl: 0 !important;
+  --radius-2xl: 0 !important;
+  --radius-3xl: 0 !important;
+  --radius-4xl: 0 !important;
+}
+
+/* La austeridad es literal: fondo carbón y tinta verde por si alguna
+   superficie no pasa por las variables de gris. Forzamos esquema oscuro. */
+html,
+body {
+  background-color: #060b09 !important;
+  color: #c8e6d5 !important;
+  color-scheme: dark !important;
+  font-family: var(--font-mono) !important;
+  letter-spacing: 0.01em;
+}
+
+/* Selección y acentos vivos → fósforo (la única luz permitida). */
+::selection {
+  background: rgba(67, 245, 160, 0.25);
+  color: #c8e6d5;
+}
+a,
+.text-emerald-500,
+.text-green-500 {
+  color: #43f5a0 !important;
+}
+
+/* Anillos de foco de teclado en fósforo, radio 0 (accesibilidad + Nexo). */
+:focus-visible {
+  outline: 1px solid #43f5a0 !important;
+  outline-offset: 2px !important;
+  border-radius: 0 !important;
+}
