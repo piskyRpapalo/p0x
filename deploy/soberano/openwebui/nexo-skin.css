@@ -1,0 +1,77 @@
+/* ============================================================================
+   nexo-skin.css — piel del Nexo para el Chat (OpenWebUI) · misión Reparación
+   y Ciudadanía del Chat (2026-07-20). Decisión firmada del carbono: el Chat
+   viste identidad del Nexo (brutalismo soberano, EN).
+
+   VÍA DE APLICACIÓN (no toca el core): OpenWebUI enlaza <link href=
+   "/static/custom.css"> en su index.html (hook de extensión, vacío por
+   defecto). Esta hoja se sirve por ese hook. NO hay campo de CSS custom en el
+   panel admin de OpenWebUI 0.10.2 — ese es el límite honesto; la vía es el
+   fichero. Ver README.md para los dos caminos (rápido vs. upgrade-safe).
+
+   ALCANCE HONESTO: OpenWebUI es Svelte+Tailwind, no nuestro React. Se
+   re-colorea la escala de grises (superficies), los acentos de marca, el radio
+   y la tipografía — hasta donde las variables de Tailwind alcanzan. Iconos,
+   gradientes internos y estados que no leen estas variables NO se tematizan
+   sin tocar el core, y el core NO se toca. Requiere el modo Dark de OpenWebUI
+   (su defecto). Paleta = tokens del Nexo (§2.2 del Blueprint), literal.
+   ========================================================================== */
+
+/* Tipografía del Nexo. Límite declarado: el @import necesita alcanzar Google
+   Fonts; si el navegador del hermano no tiene salida a internet (tailnet
+   puro), cae a la mono del sistema — la piel sobrevive, sin la Plex Mono. */
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Cinzel:wght@600&display=swap");
+
+/* --- Superficies: la escala de grises de Tailwind → carbón del Nexo ---
+   Se scopea a .dark (Nexo es oscuro) para no romper el modo claro. */
+html.dark,
+.dark {
+  --color-gray-950: #060b09; /* --nx-void   (fondo de página) */
+  --color-gray-900: #0a120e; /* --nx-panel  (celda/superficie) */
+  --color-gray-850: #0d1713; /* --nx-panel-2 (bloque interno) */
+  --color-gray-800: #12261c; /* --nx-border-dim */
+  --color-gray-700: #1e3a2a; /* --nx-border */
+  --color-gray-600: #2e8f63; /* --nx-phosphor-dim */
+  --color-gray-500: #6e8a7c; /* --nx-text-dim */
+  --color-gray-400: #6e8a7c; /* --nx-text-dim (ayudas) */
+  --color-gray-300: #c8e6d5; /* --nx-text */
+  --color-gray-200: #c8e6d5; /* --nx-text */
+  --color-gray-100: #c8e6d5; /* --nx-text */
+
+  /* Acentos de marca → Verde Soberano (phosphor) donde OpenWebUI usa
+     emerald/blue para lo primario (botones, enlaces, foco). */
+  --color-emerald-400: #43f5a0;
+  --color-emerald-500: #43f5a0;
+  --color-emerald-600: #2e8f63;
+  --color-blue-400: #43f5a0;
+  --color-blue-500: #43f5a0;
+  --color-blue-600: #2e8f63;
+}
+
+/* --- Fondo y tinta base al carbón del Nexo (por si algún contenedor no
+   pasa por las utilidades de Tailwind) --- */
+html,
+body {
+  background-color: #060b09 !important; /* --nx-void */
+  color: #c8e6d5 !important; /* --nx-text */
+  font-family: "IBM Plex Mono", ui-monospace, "Cascadia Mono", monospace !important;
+  letter-spacing: 0.01em;
+}
+input,
+textarea,
+button,
+select,
+kbd,
+code,
+pre {
+  font-family: "IBM Plex Mono", ui-monospace, "Cascadia Mono", monospace !important;
+}
+
+/* --- Radio 0 universal (brutalismo §2.2: "la austeridad es literal") ---
+   Mata los rounded de Tailwind. Los avatares circulares se vuelven cuadrados
+   a propósito: el Nexo no redondea. */
+*,
+*::before,
+*::after {
+  border-radius: 0 !important;
+}
