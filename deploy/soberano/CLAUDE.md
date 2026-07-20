@@ -28,6 +28,16 @@ Antes de gastar un token de frontera, pregúntate en orden:
   (hexelion-lab incluido). El token de frontera queda para arquitectura y doctrina;
   el resto lo ejecuta el local bajo supervisión del carbono.
 
+- **2026-07-20 — Tres cosas distintas, jamás confundir (Hexelion ≠ Aurelius ≠ P0X):**
+  - **Hexelion** = la parte física / hardware / atestación: el rack, los sensores, la
+    impresora, el dashboard **Nexo** y **Le Jardin**. Su cara es el dashboard Hexelion.
+    Cuando David dice "Hexelion" → piensa hardware/dashboard.
+  - **Aurelius** = el proyecto de **aprendizaje** enfocado a crear **comunidad**: enseña
+    soberanía técnica con misiones jugables. Bilingüe EN/ES. Su cara es la app Aurelius
+    (repo propio `~/aurelius`, servida en `/aurelius`). "Aurelius" → app de aprendizaje.
+  - **P0X** = la **suma** de todos los proyectos + el Soberano. Es el englobamiento, el
+    organismo entero; **no tiene "cara" propia**. "P0X" → el todo.
+
 ## Disciplina no negociable
 
 - **Parar-y-reportar.** Todo trabajo termina en reporte: qué se hizo, qué dato salió, qué falló.
