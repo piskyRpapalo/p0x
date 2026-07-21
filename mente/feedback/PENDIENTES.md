@@ -360,3 +360,25 @@ Opción B aplicado (elección de David). Aurelius nació como repo propio `~/aur
 | 150 | **Contraste del readout de La Sentinelle**: en el reskin violeta-noche, los sensores sobre la caja de cámara oscura quedan legibles pero tenues (rgba(20,14,8,.55) + tinta). Subir contraste del strip. [prio:baja] [doc:hexelion/dashboard/src/jardin/sentinelle/sentinelle.css] | S | pendiente |
 | 151 | **Arrancar el proxy LiteLLM (:4000) y apuntar OpenWebUI a él**: hoy OpenWebUI va directo al Ollama de soberano; el `litellm_config.yaml` (failover torre→fragua) existe pero `:4000` no responde. Cablear para failover real. [prio:media] [doc:p0x/proxy/litellm_config.yaml] | M | pendiente |
 | 152 | **Extender el fixture #146 a aserciones LOD por estado/pixel**: el fixture ya da grafo estable; falta que el juez pruebe la Ley LOD real (labels por zoom <0.8 / 0.8–1.4 / >1.4). [prio:media] [doc:hexelion/dashboard/tests/fase-grafo.spec.ts] | M | pendiente |
+
+### 2026-07-21 · PROMPT MAESTRO · cierre de deuda técnica (3 misiones)
+
+M0 (verificación): HEAD de `hexelion` estaba en `138ab1a` con todo lo posterior a
+`7042907` **commiteado pero NO desplegado** — fragua sigue sirviendo un dist viejo (el
+swap del runbook `deploy/fragua/paquete-dos-pieles/05-swap.md` nunca corrió). M1
+`729ded4` (ondas Second Brain + mapa direccional + OSINT), M2 `1171337` en `~/aurelius`
+(cara HTML + server 8050), M3 `e4bdeab` (enlace del Puente). 240 tests verdes en cada bloque.
+
+Hallazgo de realidad (M2): **Ollama en soberano escucha SOLO en `127.0.0.1:11434`** — la
+IP del tailnet devuelve `000`. La cara servida en :8050 (tailnet) NO puede alcanzar el
+modelo hasta abrir Ollama a `0.0.0.0` + `OLLAMA_ORIGINS` (requiere sudo del carbono; sin
+sudo interactivo en soberano). OpenWebUI (`:8080`) sí está en el tailnet pero con AUTH y
+sin api-keys → no sirve de endpoint crudo para una página estática.
+
+| # | Sugerencia | Coste | Estado |
+|---|---|---|---|
+| 153 | **Abrir Ollama al tailnet (desbloquea la cara de Aurelius end-to-end)**: `sudo systemctl edit ollama` → `Environment="OLLAMA_HOST=0.0.0.0"` + `Environment="OLLAMA_ORIGINS=*"`, luego `sudo systemctl restart ollama`. Sin esto, `aurelius_face.html` cae siempre a su fallback honesto. Revisar exposición: 0.0.0.0 abre 11434 a TODA interfaz, no solo tailnet — considerar bind a la IP `100.81.82.34` en vez de `0.0.0.0`. [prio:alta] [doc:/etc/systemd/system/ollama.service] | S | pendiente |
+| 154 | **Ejecutar el swap en fragua (todo lo commiteado desde `7042907` sigue sin desplegar)**: `git pull` + restart del gateway según `deploy/fragua/paquete-dos-pieles/05-swap.md`. Hasta entonces el carbono NO ve nada del pulido en el dashboard vivo. [prio:alta] [doc:p0x/deploy/fragua/paquete-dos-pieles/05-swap.md] | S | pendiente |
+| 155 | **Servicio systemd `--user` para la cara de Aurelius (:8050)**: hoy `servir_interfaz.py` se arranca a mano. Unit `aurelius-cara.service` con `Restart=on-failure` y ruta absoluta a python (footgun PATH de systemd). [prio:media] [doc:aurelius/scripts/servir_interfaz.py] | M | pendiente |
+| 156 | **Puente → Aurelius en pestaña nueva**: el enlace navega en la MISMA pestaña (coherente con Nexo/Jardin), pero Aurelius vive en otro puerto/app; un `target="_blank" rel="noopener"` evitaría que el carbono pierda el dashboard al cruzar. Decisión de UX pendiente de David. [prio:baja] [doc:hexelion/dashboard/src/shared/puente/Puente.tsx] | S | pendiente |
+| 157 | **Frames de habla extra para la cara (visemas)**: hoy alterna 2 frames (normal↔boca-abierta) del sheet `stitch_the_solarpunk_emperor`. El sheet tiene 12 expresiones; mapear 3-4 visemas daría un habla menos robótica. [prio:baja] [doc:aurelius/src/assets/] | M | pendiente |
