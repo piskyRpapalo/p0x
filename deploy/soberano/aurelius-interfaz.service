@@ -1,0 +1,18 @@
+[Unit]
+Description=Aurelius — cara del Preceptor (interfaz estatica :8050, tailnet)
+Documentation=file:///home/pisky/aurelius/scripts/servir_interfaz.py
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pisky/aurelius
+# Ruta ABSOLUTA a python (footgun: el PATH de systemd != PATH interactivo, no ve
+# ~/.local/bin). El script usa solo stdlib (http.server) → python3 del sistema basta.
+ExecStart=/usr/bin/python3 /home/pisky/aurelius/scripts/servir_interfaz.py --host 0.0.0.0 --puerto 8050
+Restart=on-failure
+RestartSec=3
+# servir_interfaz.py convierte SIGTERM en cierre limpio (KeyboardInterrupt) → stop ordenado.
+
+[Install]
+WantedBy=default.target
