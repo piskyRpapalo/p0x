@@ -3,7 +3,7 @@ id: blueprint-diseno-soberano
 titulo: BLUEPRINT DE DISEÑO SOBERANO — Biblia Permanente del Preceptor
 tipo: doctrina
 clase: doctrina
-version: 1.2.0
+version: 1.3.0
 estado: propuesta (canon con el commit del Soberano)
 editor_autorizado: preceptor-propone-carbono-canoniza
 dominio: cara-visible
@@ -30,11 +30,13 @@ actualizado: 2026-07-19
 
 El Puente es un elemento fijo, idéntico en posición en ambos mundos, con la piel de cada mundo. Es lo primero que se implementa y lo último que se puede romper.
 
+> **ENMIENDA v1.3 (2026-07-20 · propuesta CC, canoniza el Soberano):** el Puente deja de ser binario (Nexo↔Jardin) y pasa a **CONMUTADOR DE TRES CARAS** — El Nexo · Le Jardin · el Chat. **Motivo:** el Chat (OpenWebUI, la cara que tocan los hermanos y Krista) entra al organismo como tercera cara; un puente de dos destinos no puede alcanzarlo. El Soberano firmó dos decisiones (misión *Reparación y Ciudadanía del Chat*): (1) switcher de 3 caras top-left; (2) el Chat viste **piel del Nexo** (brutalista, EN). **Cada cara lleva la piel de SU destino**, así que el switcher se lee igual desde ambos mundos — solo cambian la cara marcada «actual» (`aria-current`, no navega) y el idioma de la etiqueta. Lo no re-especificado abajo (z-9999, top-left, tab-order, `:focus-visible`, reduced-motion, jamás oculto) se conserva íntegro. **Changelog:** v1.2 puente binario → v1.3 switcher de 3 caras.
+
 **Geometría común (ambos temas):**
-- `position: fixed; top: 12px; left: 12px; width: 40px; height: 40px; z-index: 9999;`
-- Área de click completa (40×40 mínimo táctil). `cursor: pointer;` Elemento `<a id="puente" aria-label="...">`.
-- El header de cada página reserva `padding-left: 64px` para no colisionar jamás con él.
-- Accesible por teclado: primer elemento del tab-order. `:focus-visible` obligatorio (spec por tema abajo).
+- Contenedor `<nav id="puente">` `position: fixed; top: 12px; left: 12px; z-index: 9999;` con tres caras en fila (`display: flex; gap: 4px`).
+- Cada cara es 40×40 mínimo — **44×44 en implementación** (ley de refactor Android, ≥44px táctil). La cara del mundo actual es un `<span aria-current="page">` (marcador, no navega); las otras dos son `<a href>` con `cursor: pointer;`.
+- El header de cada página reserva `padding-left: 160px` para no colisionar jamás con el switcher.
+- Accesible por teclado: el switcher encabeza el tab-order. `:focus-visible` obligatorio por cara (spec por piel abajo).
 
 **El Puente en El Nexo (destino: el Jardin):**
 - Glifo: `⬡` (hexágono outline) en `--nx-phosphor`, 20px, centrado, `stroke-width` visual fino.
@@ -50,6 +52,16 @@ El Puente es un elemento fijo, idéntico en posición en ambos mundos, con la pi
 - `:focus-visible: outline: 2px dashed var(--jd-violet); outline-offset: 3px;`
 - `aria-label="Traverser vers El Nexo"`.
 - `@media (prefers-reduced-motion: reduce)`: sin scale, solo opacity.
+
+**El Chat (tercera cara · piel del Nexo en ambos mundos — decisión firmada):**
+- Glifo: burbuja de diálogo austera en SVG monocromo `--nx-phosphor` (currentColor), ~20px, **sin emoji**. Misma piel brutalista que el Nexo: `opacity: .45` reposo → `1` hover/focus, cero transform.
+- Etiqueta en hover/focus **debajo** de la cara (la fila del switcher no deja sitio a la derecha): `→ CHAT` en IBM Plex Mono 10px, `.2em`, `--nx-text-dim`.
+- `:focus-visible: outline: 1px solid var(--nx-phosphor); outline-offset: 2px;` (radio 0).
+- Destino: `href` al MagicDNS del nodo soberano `http://soberano.tailb9e0f7.ts.net:8080` (constante de build, no IP cruda). El dashboard se sirve desde la-fragua y el Chat vive en soberano: el enlace cruza de nodo por el tailnet a propósito.
+- `aria-label` en EN desde el Nexo, en FR desde el Jardin (ley de idiomas); la **piel** de la cara es Nexo en ambos mundos.
+- **Reciprocidad (Chat → dashboard):** vive en la tematización de OpenWebUI, hasta donde su personalización lo permita — límite honesto declarado, jamás se toca el core de OpenWebUI.
+
+**Nota de la enmienda sobre las etiquetas:** en el switcher las etiquetas de todas las caras aparecen **debajo** (no a la derecha como en el puente binario v1.2), porque la fila de tres caras ocupa el flanco derecho.
 
 **Regla:** el Puente jamás se oculta, jamás se colapsa, jamás queda debajo de un overlay (z-index de overlays ≤ 900; ver escala §2).
 
