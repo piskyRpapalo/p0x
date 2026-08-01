@@ -404,3 +404,38 @@ sin api-keys → no sirve de endpoint crudo para una página estática.
 | 172 | **Aurelius Prompt C sin ejecutar** — i18n 7 idiomas + el Path obedeciendo al selector (168) + header a 1 fila (166) + higiene de hostname visible. Es el mayor hueco de Aurelius; hoy solo en/es y el Path con título FR hardcodeado. [prio:alta] [doc:aurelius/interface] | M | pendiente |
 | 173 | **Vigía SSH pubkey caída (dup de 11) bloquea el AIS distribuido** — sin `authorized_keys` en el Pi, el reset remoto del AIS (`/api/antenna/reset` feed=ais) y el deploy limpio del `ais-catcher` dependen de password. Restaurar la clave antes de cablear el AIS del Vigía. [prio:alta] [doc:deploy/vigia] | S | pendiente |
 | 174 | **READMEs públicos optimizados sin ejecutar** — perfil/Hexelion/Aurelius (higiene dura: cero IPs/claves/rutas internas). El repo `hexelion-public` existe (14/23) pero la pasada de optimización SEO/LLM no se corrió. [prio:media] [doc:hexelion-public] | S | pendiente |
+
+---
+
+## 2026-08-01 · ESTADO CONSOLIDADO (tri-estado) — Ronda Secuencial · C0
+
+Vista tri-estado de todo lo abierto de todas las rondas. El backlog #149–174 sigue
+vigente salvo lo movido a 🟢 CERRADO aquí; los ítems que dependen de fragua / sudo / red
+caen en 🟡 BLOQUEADO. Los 6 ítems nombrados por el Soberano van marcados `[NOMBRADO]`.
+
+### 🟢 CERRADO (con la prueba que lo cierra)
+- **Sprint Assets A1 · scrubber** — `tools/scrub_check.js`, commit hexelion **`4a91c2b`** (4 casos verdes; Modo A DOM + Modo B OCR falla-cerrado).
+- **A2 · modo presentación** — **`cfa5a2d`**; gap OSIRIS/Legión acentuada **`6f02fde`**; present test **10/10**; captura present-mode pasa el scrubber (Modo A y B, 0 CRIT).
+- **A3–A5 · 15 capturas** — `~/linkedin_assets/2026-08-01/`, scrubber **0 CRIT** en los 15 PNG (tabla en reporte del bloque).
+- **A6 · READMEs firmados** — aurelius **`4f1b7e1`**, códice **`0f229da`**, hexelion **`eb918ed`** (imágenes en `docs/img/`, pies firmados por el Soberano).
+- **#153 · Ollama al tailnet** — prueba: `100.81.82.34:11434/api/tags` → **200** (+ CORS).
+- **#155 · servicio aurelius-interfaz (:8050)** — prueba: `systemctl --user is-enabled/is-active` → **enabled/active**, ruta absoluta a python.
+- **aurelius-interfaz crash-loop** (~29 953 reinicios; huérfano `servir_interfaz.py` PID 690249 ocupaba :8050 → `[Errno 98]`) — prueba: huérfano matado, systemd rebindeó fresco (`active`), camino.html + /api/estado 200. *Endurecimiento del servicio → C4.*
+
+### 🟡 BLOQUEADO (depende de algo externo)
+- **Swap/redeploy en fragua** [#154 #165 #170] — depende de: **tu mano** (`git pull` + restart del gateway en fragua, `deploy/fragua/paquete-dos-pieles/05-swap.md`). Es el mayor bloqueo: TODO el pulido commiteado (present mode, observar, mapa, jardin móvil…) sigue sin estar vivo; el UI servido es el viejo.
+- **03_map sin marcadores** — depende de: feeds ADS-B/AIS de **el-vigía** vivos → hoy `/api/antenna/health` da `ais live:false · adsb live:false`. A su vez bloqueado por el RF del Vigía (→ **C2** diagnostica).
+- **Vigía SSH pubkey caída** [#173] — depende de: restaurar `authorized_keys` en el Pi (acceso/clave). Bloquea AIS distribuido + reset remoto.
+- **LiteLLM :4000 failover** [#151] — depende de arrancar el proxy (failover torre→fragua).
+- **Ítems que exigen sudo/red** [#167 npm i, otros] — sudo interactivo NO disponible en soberano; red requerida para instalar deps.
+
+### 🔴 ABIERTO (accionable ya)
+- `[NOMBRADO]` **1 · Bloque 1 · drawer del Camino — NO cerrado.** `aurelius_face.html` carga `camino.html` como **documento separado** vía `<iframe id="au-drawer-frame">`; camino.js/oraculo.js son docs aparte. La recursión (cara→iframe→camino) sigue disponible. → **C1** lo cierra: absorber camino.html como componente del documento único. Evidencia: iframe en aurelius_face.html + camino.html separado.
+- `[NOMBRADO]` **2 · [DERIVADO] en oráculo** — `oraculo.js` (`window.AURELIUS_ORACULO`) entrega un valor **derivado** del hardware/RAM que la cara y el Camino consumen (aurelius_face.html:395, camino.js:226). Verificar que no muestre un `[DERIVADO]` donde debe ir un dato **medido** (honest sensors); si es derivado, etiquetarlo como tal o medirlo.
+- `[NOMBRADO]` **3 · i18n huérfanas** — `i18n.js` define claves (`face.*`) y el Path usa `I.t("path.title")`, pero camino.html/js tienen título/misiones **FR/ES hardcodeados** que no obedecen al selector (liga con #168 #172). Auditar claves definidas-sin-uso y usos-sin-clave.
+- `[NOMBRADO]` **4 · Colisión M3 / sonda-física** — "M3" sobrecargado: Path/README M3 = *The Refuge (offline)*; `firmar_artefacto.py` M3 = generación de clave Ed25519 (*El Pacto*); y `src/missions.ts:115` define una misión de **sonda física** ("fotografía una planta; la sonda la lee sin red"). La cara HTML (camino) y la app Vite (missions.ts, #160 incompleta) **divergen** en qué es M3. Unificar numeración/definición antes de construir M3+.
+- `[NOMBRADO]` **5 · Poller compartido → 4 paneles STALE al mismo segundo** — `canales.ts`: cada fuente tiene su `setInterval(cadaMs)` (l.45), `useCanal` tickea a 1s (l.69), UMBRAL_STALE 30s (`bus.ts`). Si 4 paneles cuelgan del **mismo origen/cadencia**, envejecen a STALE a la vez cuando ese origen cae. Verificar si comparten fuente y si la frescura debe ser por-panel.
+- `[NOMBRADO]` **6 · Agente que aletea 6/6→5/6** — `hexelion_gateway.py:1635/1699` emite "{active}/6 agentes activos"; `active` oscila 6→5 (una voz del Sínodo intermitente). Identificar cuál cae y por qué (el gateway corre en fragua; diagnosticable por curl).
+- **Backlog vivo restante** — #149, #150, #152, #156–#164, #166, #168, #169, #171, #172, #174 siguen ABIERTO (accionables en soberano/repos) salvo los marcados BLOQUEADO arriba.
+
+*Consolidado read-only (grep/systemctl/curl), sin cambios de código. Ronda Secuencial C0.*
