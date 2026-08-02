@@ -481,3 +481,9 @@ sudo systemctl restart hexelion-gateway     # toma gateway (G2) + .env
 Documento de cierre → **`CIERRE_HEXELION.md`** (raíz de `hexelion`). *Pendiente del
 contenido que pasa el Soberano aparte (Ronda G · G6); se añadirá y este puntero se
 actualizará al recibirlo.*
+
+## Backlog de UI/software (autoritativo)
+El trabajo pendiente de **interfaz** (Hexelion · Aurelius · Le Jardin) vive en su
+propio documento: **[`mente/backlog/BACKLOG_UI.md`](../backlog/BACKLOG_UI.md)**
+(bloques atómicos 0–10, formato de reporte, invariantes). Este `PENDIENTES.md`
+sigue siendo el registro de sugerencias/deuda general; el de UI se gestiona allí.
