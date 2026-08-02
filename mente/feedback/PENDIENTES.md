@@ -439,3 +439,45 @@ caen en 🟡 BLOQUEADO. Los 6 ítems nombrados por el Soberano van marcados `[NO
 - **Backlog vivo restante** — #149, #150, #152, #156–#164, #166, #168, #169, #171, #172, #174 siguen ABIERTO (accionables en soberano/repos) salvo los marcados BLOQUEADO arriba.
 
 *Consolidado read-only (grep/systemctl/curl), sin cambios de código. Ronda Secuencial C0.*
+
+---
+
+## 2026-08-02 · DEPLOY · runbook exacto (Ronda G · G5)
+
+Cuarta ronda que el trabajo queda "a un git pull de existir". Comandos, uno por
+línea. Verifica primero la rama que sirve el gateway en el OPi (aquí se asume la de
+trabajo). `git push` lo empuja **el Soberano** (no yo).
+
+```
+# 1 · SOBERANO — push (revisa 'ahead' con ~/hexelion/scripts/preflight.sh):
+git -C ~/hexelion push origin nexo-carbono-dashboard-20260623   # preflight + gateway ADS-B + overlay mapa
+git -C ~/p0x     push                                            # PENDIENTES
+# aurelius: BLOQUEADO (clave GitHub, ver §G4). Registrar clave o pasar a HTTPS + scrubber ANTES.
+
+# 2 · OPi (ubuntu@100.82.94.83) — traer el código:
+cd /home/ubuntu/hexelion && git fetch origin && git checkout nexo-carbono-dashboard-20260623 && git pull
+
+# 3 · OPi — cablear la lectura ADS-B por fichero (G2), una vez:
+grep -q HEX_DUMP1090_JSON .env || echo 'HEX_DUMP1090_JSON=/run/dump1090/aircraft.json' >> .env
+
+# 4 · OPi — reconstruir el dashboard SOLO si cambió dashboard/src (overlay del mapa, G3):
+cd dashboard && npm ci && npm run build && cd ..
+
+# 5 · OPi — reiniciar SOLO lo que cambió:
+sudo systemctl restart hexelion-gateway     # toma gateway (G2) + .env
+#   NO reiniciar dump1090/ais-catcher aquí: su bloqueo es el SERIAL del dongle
+#   (ilegible/mismatch, ver §F1), no el código — eso es ventana de mantenimiento.
+
+# 6 · SOBERANO — verificar:
+~/hexelion/scripts/preflight.sh
+```
+
+> El mapa **no** pintará marcadores tras el deploy: dump1090 recibe 0 mensajes por el
+> mismatch de serial del dongle (§F1). El deploy deja el **cable puesto** (código +
+> overlay honesto); los marcadores llegan cuando se resuelva el serial en ventana de
+> mantenimiento (decisión del Soberano).
+
+## Cierre de capítulo
+Documento de cierre → **`CIERRE_HEXELION.md`** (raíz de `hexelion`). *Pendiente del
+contenido que pasa el Soberano aparte (Ronda G · G6); se añadirá y este puntero se
+actualizará al recibirlo.*
