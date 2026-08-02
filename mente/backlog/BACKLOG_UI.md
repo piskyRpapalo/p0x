@@ -118,7 +118,10 @@ dongle (post-EEPROM), qué banda/antena lleva cada uno, en qué nodo vive, y el
 
 ## BLOQUE 1 · Puente M5Stack → redis
 
-**Estado:** ⬜ pendiente
+**Estado:** 🟢 escrito+probado (CC) · 2026-08-02 · **deploy pendiente del Soberano**
+(IronClaw). `ingest_m5.py` (`216ca9e`) + `deploy/vigia/m5-bridge.service` + check en
+`preflight.sh` (`54a9019`). TTL 30s = STALE≠MISSING. `--self-test` verde. Falta:
+instalar en El Vigía + correr la prueba de honestidad (parar 60s → NO DATA).
 **Coste:** M · **Apalancamiento:** máximo — desbloquea Dashboard **y** Le Jardin
 con una sola pieza de trabajo.
 
