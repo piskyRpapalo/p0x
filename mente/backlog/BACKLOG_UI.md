@@ -317,11 +317,11 @@ fractura que se acaba de limpiar. Requiere decisión del Soberano.
 
 **Estado:** 🟡 mayormente hecho · 2026-08-03 · **6.2 ✅** Restructurer 100% frontend
 (Opción B firmada, sin IA/backend) — hexelion `82eeed6` · **6.3 ✅** verificado: "Jeux"
-= la École con Quiz real (error-boundaried), no placeholder · **6.1 ⚠️** La Sentinelle
-muestra NO DATA HONESTO (verificado); el dato real NO fluye aún: **gap de infra** — el
-puente M5 escribe en el redis LOCAL de El Vigía, pero el gateway (fragua) lee su propio
-redis (127.0.0.1). Propuesta (Soberano/infra): que `telemetry_m5` del gateway lea el
-redis de El Vigía, o sincronizar la clave. · **6.4** roadmap: Le Jardin = Fase 4 del
+= la École con Quiz real (error-boundaried), no placeholder · **6.1 ✅ RESUELTO
+(directriz)**: el gateway SIEMPRE lee su redis local; el **puente en El Vigía publica en
+el redis de La Fragua** (o replicación/pub-sub), no al revés. El Vigía cae → la clave
+caduca en La Fragua → La Sentinelle pasa a NO DATA de forma natural. `ingest_m5.py` ya
+soporta `HEX_REDIS_HOST` → apuntarlo a La Fragua en el deploy. · **6.4** roadmap: Le Jardin = Fase 4 del
 proyecto; su fase interna dentro de las 6 = NO DATA (sin doc de roadmap propio a mano).
 **Coste:** S una vez desbloqueado
 
@@ -346,7 +346,9 @@ declararlo también.
 
 ## BLOQUE 7 · La Pizarra (bandeja) — más adelante
 
-**Estado:** ⬜ diferido por decisión del Soberano
+**Estado:** ❌ CANCELADO · 2026-08-03 (decisión del Soberano) — no se construye un
+sistema de persistencia nuevo. La idea del "artefacto crudo, sin narrar" se integrará
+en el futuro como un **MODO VISUAL del TRAY de Hexelion** (no como bloque propio).
 **Coste:** M
 
 Pipeline visual fuera del chat: artefactos crudos sin voz del Preceptor,
@@ -415,7 +417,17 @@ dashboard antes de que 8.2 esté firmado.
 
 ## BLOQUE 9 · El agente que aletea — diagnóstico
 
-**Estado:** ⬜ pendiente (nuevo, firmado 2026-08-02)
+**Estado:** 🟡 diagnóstico · 2026-08-03 · **9.1 ✅** instrumentación escrita (gateway
+`_instrumentar_sinodo`: por-voz, ts, MINUTO, agente, duración, healthcheck → log +
+Redis `hexelion:sinodo:flaps`; hexelion `68a39a8`, **propose-only, sin desplegar**) ·
+**9.2 ⏳ NO DATA aún**: la bitácora viva tiene 0 transiciones recientes y NO hay timer
+:07/horario EN el gateway (el escritor del pulso `hexelion:sinodo:{rol}:latest` es un
+servicio de voz SEPARADO). Confirmar :07/Alquimista requiere leer `:flaps` tras el
+deploy · **9.3 propuesta (sin aplicar)**: la causa es que la escritura del heartbeat
+va en el MISMO camino que una tarea periódica bloqueante de la voz → se retrasa más
+allá del TTL → stale. Arreglo = **desacoplar el heartbeat** (loop dedicado a cadencia
+fija, independiente de la cosecha/asesoría) en el servicio de la voz. NO un periodo de
+gracia en el gateway (eso suaviza el INDICADOR, prohibido). Coste del arreglo bajo.
 **Coste:** S · **Apalancamiento:** medio · alto valor doctrinal.
 
 `6/6 agentes activos` → `5/6` → `6/6`, aproximadamente cada hora.
