@@ -286,7 +286,11 @@ cae por comando, medido, no por sensación.
 
 ## BLOQUE 5 · Deuda menor de Aurelius
 
-**Estado:** ⬜ pendiente
+**Estado:** 🟡 parcial · 2026-08-03 · **5.1 ✅** densos [DERIVADO] por roofline
+(aurelius `6f9cb98`) · **5.4 ✅ decisión firmada**: la sonda física se queda
+CONGELADA (paso en M3 + M7 horizonte) — sin cambio de código, es el estado
+correcto · **5.2 (i18n huérfanas) y 5.3 (modo presentación en la cara) DIFERIDOS**
+(coste medio; fuera del presupuesto de tokens de esta sesión).
 **Coste:** S cada uno · pueden hacerse sueltos
 
 5.1 · **`[DERIVADO]` en `oraculo.js`.** Los modelos densos siguen marcados
@@ -311,7 +315,14 @@ fractura que se acaba de limpiar. Requiere decisión del Soberano.
 
 ## BLOQUE 6 · Le Jardin des Ombres
 
-**Estado:** 🟡 vivo y desplegado. Bloqueado por el Bloque 1.
+**Estado:** 🟡 mayormente hecho · 2026-08-03 · **6.2 ✅** Restructurer 100% frontend
+(Opción B firmada, sin IA/backend) — hexelion `82eeed6` · **6.3 ✅** verificado: "Jeux"
+= la École con Quiz real (error-boundaried), no placeholder · **6.1 ⚠️** La Sentinelle
+muestra NO DATA HONESTO (verificado); el dato real NO fluye aún: **gap de infra** — el
+puente M5 escribe en el redis LOCAL de El Vigía, pero el gateway (fragua) lee su propio
+redis (127.0.0.1). Propuesta (Soberano/infra): que `telemetry_m5` del gateway lea el
+redis de El Vigía, o sincronizar la clave. · **6.4** roadmap: Le Jardin = Fase 4 del
+proyecto; su fase interna dentro de las 6 = NO DATA (sin doc de roadmap propio a mano).
 **Coste:** S una vez desbloqueado
 
 **Nota:** este proyecto es el único que hace honest sensors **en francés y sin
