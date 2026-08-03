@@ -415,11 +415,39 @@ independiente, cuántas hacen falta, qué se hace con la contradicción (¿el ve
 correcto puede ser `en disputa`?), y cuánto dura un veredicto antes de caducar. Un
 veredicto sin fecha de caducidad es un recuerdo falso con retraso.
 
-### 8.3 · Alchemist Advisory
+### 8.3 · Alchemist Advisory — ✅ HECHO 2026-08-03 · `894cff8` (hexelion@nexo-carbono-dashboard-20260623)
 
 Declarar si es abstención por diseño (el Alquimista se calla cuando no hay margen)
 o feed muerto. Si es abstención, el panel debe decir **`SIN RECOMENDACIÓN`**, no
 `NO DATA`: son estados distintos y confundirlos deshonra al sensor.
+
+**DECLARACIÓN (medido, no recordado):** HOY es **FEED MUERTO**, no abstención.
+`GET /api/alquimista/asesoria` → `{"asesoria": null}`: el asesor (servicio SEPARADO,
+rama `alquimista-asesor`) **no publica dictamen**. La clave redis está ausente → el
+gateway devuelve `null` → el panel rinde **`NO DATA`** honesto. **No existe hoy ninguna
+señal de abstención emitida** — declarar "SIN RECOMENDACIÓN" ahora sería inventar un
+juicio que el sensor no dio. Correcto: NO DATA.
+
+**HECHO (panel, tri-estado):** `Vigilancia.tsx::Asesoria()` distingue ahora TRES estados:
+- `asesoria === null` (clave ausente) → **`NO DATA`** (feed muerto/asesor callado sin decirlo).
+- `asesoria.estado === "abstiene"` (o `"sin_recomendacion"`) → **`SIN RECOMENDACIÓN`** +
+  `motivo` — juicio emitido. Borde SÓLIDO ámbar (`.celda-abstencion`) vs borde discontinuo
+  fantasma del NO DATA: juicio ≠ ausencia.
+- dictamen con recomendación → señal/flujo/consejo/watts (sin cambios).
+- tsc=0 · build ok · fase2 **40/40** (2 tests nuevos §8.3 × 5 viewports). Panel LISTO.
+
+**PROPUESTA (propose-only · IronClaw · rama `alquimista-asesor`, servicio separado —
+NO desplegado por CC):** cuando el asesor decida callar por falta de margen, que **publique
+un dictamen explícito de abstención** en vez de dejar la clave vacía:
+```json
+{ "asesoria": { "estado": "abstiene",
+                "motivo": "sin margen: red plana / precio sin dispersión",
+                "emitido": "<ISO8601>", "caduca": "<ISO8601, TTL finito>" } }
+```
+Con SETEX (TTL ≤ ventana del dato, per CONTRATO_JURADO §4): al caducar sin re-emitir, la
+clave expira → el panel revierte a `NO DATA` (STALE ≠ MISSING). Así "el Alquimista se
+abstiene" deja de confundirse con "el asesor está caído": el primero es un juicio con
+fecha; el segundo, silencio. El panel ya honra ambos; falta que el asesor **hable su silencio**.
 
 ### Suelo aplicable
 
