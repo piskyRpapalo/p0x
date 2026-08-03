@@ -164,7 +164,12 @@ antigüedad. O TTL en la clave, o edad visible en la UI. Preferiblemente ambos.
 
 ## BLOQUE 2 · Second Brain pasivo
 
-**Estado:** ⬜ pendiente (era el Bloque 4 de la ronda C; lo tapó el incendio RF)
+**Estado:** ✅ hecho · 2026-08-03 · opción (a): portada congelada (0 rAF libre) +
+deriva transform CSS (GPU) · pointer-events:none · pausa en visibilitychange ·
+reduced-motion estático · FULL interactivo misma pestaña. Medido (task time hilo
+principal, misma página): 7.76% → 2.73% de un núcleo (~5pp del grafo eliminados;
+residual = resto del Nexo). % por-proceso en la Pantalla Soberana = NO DATA.
+Commits: `e5570e8` (+ `b0c0735` reconcilia test Sentinelle). tsc=0 · 412 verde.
 **Coste:** M
 
 **Objetivo:** en la portada del dashboard, no interactivo, con movimiento suave y
