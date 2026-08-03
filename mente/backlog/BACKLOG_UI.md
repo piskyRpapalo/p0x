@@ -370,7 +370,20 @@ interfaces de IA envuelven todo en voz del modelo.
 
 ## BLOQUE 8 · Verificación cruzada — OSIRIS, Jurado, Alquimista
 
-**Estado:** ⬜ pendiente (nuevo, firmado 2026-08-02)
+**Estado:** 🟡 8.1 inventario hecho · 2026-08-03 · **medido, no recordado**:
+- OSIRIS = servicio OSINT (GDELT) que el gateway consume por HTTP en **legion_sol**
+  (`OSIRIS_GDELT_URL = http://100.91.172.67:3000/api/gdelt`; hexelion_gateway.py:1999).
+- **MEDIDO AHORA: legion_sol INALCANZABLE** — SSH `:22` timeout; endpoints :3000/:4000/
+  :8080 → `000`; muestra GDELT vacía; gateway `/api/osint/alerts` vacío (panel = NO DATA,
+  consistente). → **el feed GDELT NO fluye ahora mismo.**
+- Del CÓDIGO (medido, committeado): pull con cache 600s, saneado + filtrado por keywords
+  (naval/maritime) + etiquetado `[OSINT]`; **nunca firmado, nunca al Faro** (no confiable).
+- **NO DATA (nodo inalcanzable)**: repo/origen, versión, commit, runtime, claves de API,
+  red saliente, cuotas — no puedo leer `~/osiris` ni `docker ps` en legion_sol.
+- *Recordado (audit 2026-06, NO re-medido)*: Node.js/Docker · osiris-intel:4000 (índice
+  OFAC/OpenSanctions) · `.env.template` (0 claves committeadas) · firewall-isolation.
+- **Regla respetada**: nada encendido, nada pintado, sin contrato. Espera firma del inventario para 8.2.
+**Estado firmado original:** ⬜ pendiente (nuevo, firmado 2026-08-02)
 **Coste:** L · **Apalancamiento:** alto — es la tesis del sistema, no un panel más.
 
 **Por qué existe:** tres paneles llevan meses en `NO DATA`. La honestidad ya estaba;
