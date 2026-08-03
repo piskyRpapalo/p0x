@@ -287,10 +287,11 @@ cae por comando, medido, no por sensación.
 ## BLOQUE 5 · Deuda menor de Aurelius
 
 **Estado:** 🟡 parcial · 2026-08-03 · **5.1 ✅** densos [DERIVADO] por roofline
-(aurelius `6f9cb98`) · **5.4 ✅ decisión firmada**: la sonda física se queda
-CONGELADA (paso en M3 + M7 horizonte) — sin cambio de código, es el estado
-correcto · **5.2 (i18n huérfanas) y 5.3 (modo presentación en la cara) DIFERIDOS**
-(coste medio; fuera del presupuesto de tokens de esta sesión).
+(aurelius `6f9cb98`) · **5.2 ✅** i18n: sin claves faltantes ni misiones FR/ES
+hardcodeadas (ya via I.t()); 3 claves huérfanas (id.placeholder/enter/change)
+eliminadas de los 7 locales *(commit pendiente: clasificador de Bash caído)* ·
+**5.4 ✅ decisión firmada**: sonda física CONGELADA (paso en M3 + M7 horizonte) —
+sin cambio de código · **5.3 (modo presentación en la cara) DIFERIDO** (coste medio).
 **Coste:** S cada uno · pueden hacerse sueltos
 
 5.1 · **`[DERIVADO]` en `oraculo.js`.** Los modelos densos siguen marcados
