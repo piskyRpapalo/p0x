@@ -382,7 +382,11 @@ interfaces de IA envuelven todo en voz del modelo.
   red saliente, cuotas — no puedo leer `~/osiris` ni `docker ps` en legion_sol.
 - *Recordado (audit 2026-06, NO re-medido)*: Node.js/Docker · osiris-intel:4000 (índice
   OFAC/OpenSanctions) · `.env.template` (0 claves committeadas) · firewall-isolation.
-- **Regla respetada**: nada encendido, nada pintado, sin contrato. Espera firma del inventario para 8.2.
+- **Regla respetada**: nada encendido, nada pintado, sin contrato.
+- **8.2 (El Jurado) ✅ 8.1 firmado por el Soberano** → contrato ESPECIFICADO como propuesta:
+  `mente/doctrina/CONTRATO_JURADO.md` (fuente independiente=3 criterios · quórum: corroborado
+  ≥2 indep con ≥1 T0/T1, T2 nunca vota solo · `EN-DISPUTA` es veredicto válido · TTL obligatorio
+  ≤ el de la fuente más vieja, caduca→NO DATA). **Pendiente de firma para escribir el motor (8.3).**
 **Estado firmado original:** ⬜ pendiente (nuevo, firmado 2026-08-02)
 **Coste:** L · **Apalancamiento:** alto — es la tesis del sistema, no un panel más.
 
