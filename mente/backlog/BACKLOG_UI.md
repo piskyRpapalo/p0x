@@ -208,7 +208,12 @@ medido o `NO DATA`, nunca estimación maquillada.
 
 ## BLOQUE 3 · Mapa fijo — verificar y completar
 
-**Estado:** 🟡 parcial (bbox de Lisboa aplicado, overlay `NO DATA` en G3)
+**Estado:** ✅ hecho · 2026-08-03 · commit `31dd268`. Verificado con evidencia y
+completado: (1) interacción deshabilitada (drag/scroll/dblclick/touch/box/keyboard)
+— faltaban, ahora `false`; (2) `BBOX_LISBOA`/`LIMITES_LISBOA` exportados + `maxBounds`
++ `fitBounds` (ya no un setView mágico); (3) el chip declara antigüedad del DATO
+(`last_msg_age_s`), no la cadencia del poll. OK sin tocar: FULL=fullscreen misma
+pestaña; solo ADS-B+AIS. tsc=0 · test nuevo verde.
 **Coste:** S
 
 ### Verificar primero, con evidencia
