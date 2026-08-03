@@ -235,7 +235,11 @@ todo está bien — eso también es un resultado.
 
 ## BLOQUE 4 · La Pizarra (terminal) — Aurelius
 
-**Estado:** ⬜ pendiente · **decisión del Soberano: terminal primero**
+**Estado:** ✅ hecho · 2026-08-03 · commit aurelius `d40f0d0`. Modal EN LÍNEA (sin
+iframe/página/ruta), cliente-side, cero endpoint de ejecución. FS ficticio + 12
+comandos; no-impl → "not on the slate yet" (no inventa); badge permanente; chrome
+de slate; COPIAR→terminal real; scaffolding fading (demostrados en localStorage,
+solo si corren sin error → deja de explicar, solo propone). Verificado en vivo.
 **Coste:** L
 
 **Contexto:** el Soberano pidió abrir una shell real del PC del usuario. Se
