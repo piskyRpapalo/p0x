@@ -1,6 +1,6 @@
-# CONTRATO DEL JURADO · verificación cruzada  (PROPUESTA — pendiente de firma del Soberano)
+# CONTRATO DEL JURADO · verificación cruzada  (✅ FIRMADO por el Soberano · 2026-08-03)
 
-**Estado:** ⬜ propuesta · 2026-08-03 · BLOQUE 8.2. **El jurado ANTES que el feed.**
+**Estado:** ✅ FIRMADO · 2026-08-03 · BLOQUE 8.2. **El jurado ANTES que el feed.**
 Un veredicto es un JUICIO con fecha, no una caché. Ante duda o caducidad → **NO DATA**,
 jamás un recuerdo fantasma. El combustible no confiable jamás vota solo, firma ni atesta.
 
@@ -40,5 +40,5 @@ Dos fuentes son independientes **si y solo si** cumplen las tres:
 - Jamás pinta un veredicto sin fuente y sin fecha de caducidad.
 
 ---
-**PROPUESTA. Requiere firma del Soberano antes de escribir el motor del jurado (8.3).**
+**FIRMADO. Autoriza escribir el motor del jurado (8.3) respetando este contrato al pie de la letra.**
 Nada desplegado, ninguna red saliente nueva, ningún dato pintado — solo esta especificación.

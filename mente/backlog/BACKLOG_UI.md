@@ -386,7 +386,7 @@ interfaces de IA envuelven todo en voz del modelo.
 - **8.2 (El Jurado) ✅ 8.1 firmado por el Soberano** → contrato ESPECIFICADO como propuesta:
   `mente/doctrina/CONTRATO_JURADO.md` (fuente independiente=3 criterios · quórum: corroborado
   ≥2 indep con ≥1 T0/T1, T2 nunca vota solo · `EN-DISPUTA` es veredicto válido · TTL obligatorio
-  ≤ el de la fuente más vieja, caduca→NO DATA). **Pendiente de firma para escribir el motor (8.3).**
+  ≤ el de la fuente más vieja, caduca→NO DATA). **✅ FIRMADO 2026-08-03** → habilitado 8.3 (escribir el motor respetando el contrato).
 **Estado firmado original:** ⬜ pendiente (nuevo, firmado 2026-08-02)
 **Coste:** L · **Apalancamiento:** alto — es la tesis del sistema, no un panel más.
 
