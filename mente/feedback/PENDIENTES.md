@@ -482,6 +482,26 @@ Documento de cierre → **`CIERRE_HEXELION.md`** (raíz de `hexelion`). *Pendien
 contenido que pasa el Soberano aparte (Ronda G · G6); se añadirá y este puntero se
 actualizará al recibirlo.*
 
+## Ronda Apéndices (BLOQUE 8.3 + Apéndice B) · 2026-08-03
+
+Sugerencias accionables (coste S/M/L):
+- **(S)** Corregir el fallo PREVIO restante: overflow horizontal de `aurelius_face.html`
+  a 360px (`tests/movil.spec.ts:34`). No es regresión de esta ronda; la suite ya
+  estaba roja en móvil. Aislar el elemento que desborda y acotarlo con `max-width`.
+- **(M)** Consolidar la DUPLICACIÓN de `interface/camino.js` y el `<script>` inline de
+  `interface/camino.html`: hoy son copias casi idénticas del mismo módulo. Cada cambio
+  (como la predicción previa de esta ronda) hay que aplicarlo dos veces → footgun. Que
+  `camino.html` cargue `camino.js` como el resto, o extraer el módulo a un solo sitio.
+- **(S)** `package-lock.json` de Aurelius quedó SIN commitear (lo generó `npm install`
+  local para poder correr tsc/Playwright). Decidir si se versiona (recomendado: sí,
+  fija deps) o se ignora — hoy el repo no traía lock.
+- **(M)** Cuando se implemente el asesor del Alquimista (rama `alquimista-asesor`,
+  servicio separado), que publique el dictamen de abstención explícito con TTL
+  (`estado="abstiene"` + motivo + emitido/caduca) — el panel ya lo honra (§8.3).
+- **(L)** Integrar el temario LLM propiamente en las misiones, atado a
+  `aurelius/docs/TEMARIO_LLM.md`: llevar calibración y el marco correcto de RLHF a una
+  lección temprana; hoy solo existen como canon de fuente, no como misión jugable.
+
 ## Backlog de UI/software (autoritativo)
 El trabajo pendiente de **interfaz** (Hexelion · Aurelius · Le Jardin) vive en su
 propio documento: **[`mente/backlog/BACKLOG_UI.md`](../backlog/BACKLOG_UI.md)**

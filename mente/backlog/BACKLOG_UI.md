@@ -559,16 +559,37 @@ La sonda física vive **solo** en M7. En M3 queda enlace, no paso ejecutable.
    queda referencia, no paso ejecutable. `missions.ts:115` está congelado: CC
    **propone diff**, el Soberano firma.
 5. **Temario LLM** → **cuatro correcciones aprobadas** (Apéndice B), obligatorias
-   antes de integrarlo.
+   antes de integrarlo. **✅ 2026-08-03: canon en disco** (`TEMARIO_LLM.md`) +
+   mecanismo de predicción previa implementado. Ver Apéndice B.
 6. **`~/aurelius-lora/`** → **EN ESPERA** por decisión del Soberano hasta cerrar el
    resto de bloques. No se monta, no se toca, no aparece en reportes.
 
 ---
 
-## APÉNDICE B · Correcciones al temario LLM — APROBADAS 2026-08-02
+## APÉNDICE B · Correcciones al temario LLM — ✅ CANON EN DISCO 2026-08-03
 
 Las cuatro son obligatorias antes de integrar el temario. El Soberano las firmó
 completas: el error doctrinal, el mecanismo que falta y las tres menores.
+
+**HECHO 2026-08-03 (aurelius@main):** las cuatro correcciones dejan de vivir solo
+en el contexto del Preceptor y pasan a disco (nada es canon hasta commiteado):
+- **Canon escrito:** `aurelius/docs/TEMARIO_LLM.md` (`e44560e`) — las cuatro como
+  fuente de enseñanza, enlazando `SAFE_PROMPTS.md` para el error doctrinal. La
+  integración futura del temario queda ATADA a este documento.
+- **Mecanismo implementado (corrección 2, predicción previa):** `96ed27a` — el paso
+  de hardware de M0 RETIENE el análisis del Oráculo hasta que el usuario adivina su
+  RAM; al revelar pinta la desviación firmada. Honest sensors: sin medición no se
+  fabrica marcador. Aplicado en `camino.js` (drawer) **y** el inline de `camino.html`
+  (standalone). i18n EN/ES/FR. `tsc=0` · `prediccion.spec.ts` 4/4 · suite 88 pasan.
+- Las tres menores (LLaMA open-weight/licencia · RLHF ordena→recompensa→RL ·
+  calibración) quedan como canon textual en `TEMARIO_LLM.md §3`, listas para el
+  temario. No requieren código: son correcciones de contenido.
+- **Hallazgo (fuera de alcance):** dos fallos PREVIOS en `tests/movil.spec.ts` a
+  ancho móvil. Uno reparado incidentalmente (`1c2f390`, locator `.au-chemin`
+  ambiguo); el otro (overflow horizontal de la cara a 360px) queda en PENDIENTES.
+- **Duplicación declarada:** `camino.js` y el `<script>` inline de `camino.html`
+  son copias casi idénticas del mismo módulo → footgun de mantenimiento (anexado a
+  PENDIENTES como sugerencia de consolidación).
 
 **Error doctrinal, obligatorio corregir.** El temario dice que la inyección de
 prompts *"se mitiga tratando toda entrada externa estrictamente como texto
