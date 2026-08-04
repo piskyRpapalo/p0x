@@ -33,8 +33,13 @@
 # ---------------------------------------------------------------------------
 set -euo pipefail
 
-# Loopback a propósito: cero IPs/hostnames del nodo en nada versionado.
-BASE="${P0X_LOCAL_URL:-http://127.0.0.1:8080}"
+# Desde 2026-08-04 el cerebro local se expone a la TAILNET (autorizado), en el
+# 8081 — el 8080 del tailnet lo ocupa open-webui. La IP se resuelve en runtime,
+# nunca se escribe aquí: cero IPs en nada versionado. Si no hay tailnet, cae a
+# loopback, que sigue funcionando desde este mismo nodo.
+P0X_PUERTO_LOCAL="${P0X_PUERTO_LOCAL:-8081}"
+_TSIP="$(tailscale ip -4 2>/dev/null | head -1)"
+BASE="${P0X_LOCAL_URL:-http://${_TSIP:-127.0.0.1}:$P0X_PUERTO_LOCAL}"
 MODELO="local"     # no hay registro que consultar; el servidor sirve lo que tiene cargado.
 
 RELANZA="${P0X_ARRANQUE:-$HOME/p0x/deploy/soberano/cerebro-local-arranca.sh}"

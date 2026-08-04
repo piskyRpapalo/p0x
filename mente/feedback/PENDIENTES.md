@@ -502,6 +502,31 @@ Sugerencias accionables (coste S/M/L):
   `aurelius/docs/TEMARIO_LLM.md`: llevar calibración y el marco correcto de RLHF a una
   lección temprana; hoy solo existen como canon de fuente, no como misión jugable.
 
+## Ronda SOBERANO-DECISIONES (ejecución de las 9 decisiones) · 2026-08-04
+
+- **(S)** **Rotar las dos credenciales Titan es lo único que las revoca.** Retiré
+  `DEPIN_INVENTORY.md` y redacté `INFORME_PASADA_MATINAL.md` —que tenía la misma clave y no estaba
+  en tu lista—, así que el árbol de trabajo queda a cero. Pero **siguen en el historial de git de
+  ambos ficheros**. Borrar no revoca: hay que rotarlas en el servicio de origen, y hacerlo aunque
+  además se purgue el historial con `git filter-repo`.
+- **(S)** **El modelo NO estaba expuesto, aunque lo dieras por hecho.** Estaba en `127.0.0.1`. Lo
+  que respondía en el `:8080` del tailnet era open-webui, que además no tiene backend desde que
+  Ollama está parado — un panel que parecía vivo. Ya está expuesto en el **8081** (el 8080 del
+  tailnet lo ocupa open-webui) y **bindeado a la IP de la tailnet, no a `0.0.0.0`**: con `0.0.0.0`
+  el modelo quedaría escuchando en la LAN sin autenticación alguna.
+- **(S)** **La memoria de Titan es irrecuperable si se pierde ese fichero.** Vive en
+  `~/memoria-titan-hp2.txt`, `chmod 600`, fuera de los tres repos. Los directorios de origen ya
+  están borrados, así que **no hay segunda copia**. Si vale algo, respáldalo donde respaldes lo
+  demás. Aviso honesto: dentro hay `agent_id`, `titan.info`, la unidad y el script; **no aparecían
+  wallets `0x` ni las «3 cuentas»** por ningún lado — si existen, están en el panel web de Titan,
+  no en disco.
+- **(S)** **`uptime-kuma` queda documentado como ajeno al rack** en `hexelion/docs/NODOS_EXTERNOS.md`,
+  con su puerto y la nota de que no se gestiona ni entra en el dashboard.
+- **(S)** **Zombis que siguen vivos y no eran de esta ronda:** GagaNode en El Vigía (~22 MB, corre
+  como *root* y comparte IP pública con HP1), el directorio GagaNode en La Fragua (23 MB) y
+  `gaianet_storage` en La Torre (131 MB). Estaban en el inventario retirado; los conservé en el
+  sucesor para que no se pierdan.
+
 ## Ronda HEXELION-CLOSE-1 (deploy del 9 + limpieza de HP-02) · 2026-08-04
 
 - **(S)** **Hay credenciales en claro versionadas desde el 30-may.** `hexelion/DEPIN_INVENTORY.md`

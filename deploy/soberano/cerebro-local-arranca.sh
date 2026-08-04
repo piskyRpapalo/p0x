@@ -29,7 +29,27 @@ set -euo pipefail
 
 OLLAMA_LIB="${P0X_OLLAMA_LIB:-/usr/local/lib/ollama}"
 GGUF="${P0X_GGUF:-$HOME/soberano-bench/models/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf}"
-PUERTO="${P0X_PUERTO:-8080}"
+
+# ---------------------------------------------------------------------------
+# EXPOSICIÓN A LA TAILNET (autorizado por el Soberano, 2026-08-04)
+#
+# Hasta hoy esto bindeaba 127.0.0.1: el modelo NO era alcanzable desde ningún
+# otro nodo, aunque se creyera que sí. Lo que respondía en el :8080 del tailnet
+# era open-webui, que además no tiene backend desde que Ollama está parado.
+#
+# Dos decisiones de diseño, ambas deliberadas:
+#   · PUERTO 8081, no 8080 — el 8080 del tailnet ya lo ocupa open-webui, así que
+#     bindear ahí falla con "address already in use".
+#   · Se bindea la IP DE LA TAILNET, no 0.0.0.0. Con 0.0.0.0 el modelo quedaría
+#     escuchando también en la LAN/WiFi, sin autenticación de ningún tipo. La
+#     tailnet ya tiene identidad y ACL; la LAN no.
+#
+# La IP se RESUELVE EN RUNTIME (`tailscale ip -4`), nunca se escribe aquí:
+# higiene dura — cero IPs en nada versionado.
+# ---------------------------------------------------------------------------
+PUERTO="${P0X_PUERTO:-8081}"
+BIND="${P0X_BIND:-$(tailscale ip -4 2>/dev/null | head -1)}"
+[ -n "$BIND" ] || BIND=127.0.0.1   # sin tailnet, al menos que arranque en local
 NUM_CTX="${P0X_NUM_CTX:-16384}"     # autorizado por el Soberano (Bloque SOBERANO-1)
 NGL="${P0X_NGL:-999}"               # todas las capas a la GPU
 LOG="${P0X_LOG:-$HOME/.cache/p0x/cerebro_local_arranque.log}"
@@ -44,8 +64,8 @@ die() { printf '\n  ABORTA · %s\n\n' "$1" >&2; exit 1; }
 [ -f "$VK" ]   || die "no encuentro el backend Vulkan en $VK (¿instalación de Ollama incompleta?)"
 
 # Un solo cerebro a la vez: dos modelos de 18GB no caben en 57GB de RAM.
-if curl -sf -m 3 "http://127.0.0.1:$PUERTO/health" >/dev/null 2>&1; then
-  die "ya hay algo sirviendo en el puerto $PUERTO. Párralo antes: no caben dos modelos en RAM."
+if curl -sf -m 3 "http://$BIND:$PUERTO/health" >/dev/null 2>&1; then
+  die "ya hay algo sirviendo en $BIND:$PUERTO. Párralo antes: no caben dos modelos en RAM."
 fi
 
 # Comprobar que Vulkan enumera ANTES de cargar 18GB, no después.
@@ -55,17 +75,18 @@ if ! GGML_BACKEND_PATH="$VK" LD_LIBRARY_PATH="$OLLAMA_LIB" \
 fi
 
 mkdir -p "$(dirname "$LOG")"
-printf 'Levantando el cerebro local:\n  modelo  : %s\n  num_ctx : %s\n  ngl     : %s\n  log     : %s\n\n' \
-  "$(basename "$GGUF")" "$NUM_CTX" "$NGL" "$LOG"
+printf 'Levantando el cerebro local:\n  modelo  : %s\n  num_ctx : %s\n  ngl     : %s\n  bind    : %s:%s\n  log     : %s\n\n' \
+  "$(basename "$GGUF")" "$NUM_CTX" "$NGL" "$BIND" "$PUERTO" "$LOG"
 
 nohup env GGML_BACKEND_PATH="$VK" LD_LIBRARY_PATH="$OLLAMA_LIB" \
-  "$BIN" -m "$GGUF" --host 127.0.0.1 --port "$PUERTO" \
+  "$BIN" -m "$GGUF" --host "$BIND" --port "$PUERTO" \
   -c "$NUM_CTX" -ngl "$NGL" > "$LOG" 2>&1 &
 
 # El log de arranque queda en fichero: la vez anterior se perdió por vivir en un pty.
 for _ in $(seq 1 60); do
-  if curl -sf -m 2 "http://127.0.0.1:$PUERTO/health" 2>/dev/null | grep -q ok; then
-    printf 'Listo. /health responde ok. Arranque registrado en %s\n' "$LOG"
+  if curl -sf -m 2 "http://$BIND:$PUERTO/health" 2>/dev/null | grep -q ok; then
+    printf 'Listo. /health responde ok en %s:%s (alcanzable desde la tailnet).\n' "$BIND" "$PUERTO"
+    printf 'Arranque registrado en %s\n' "$LOG"
     exit 0
   fi
   sleep 2
