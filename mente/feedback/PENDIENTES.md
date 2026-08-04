@@ -502,6 +502,37 @@ Sugerencias accionables (coste S/M/L):
   `aurelius/docs/TEMARIO_LLM.md`: llevar calibración y el marco correcto de RLHF a una
   lección temprana; hoy solo existen como canon de fuente, no como misión jugable.
 
+## Ronda HP-HEXELION-1 (reconocimiento de los HP + plan de cierre) · 2026-08-04
+
+Plan completo en [`mente/backlog/PLAN_CIERRE_HEXELION.md`](../backlog/PLAN_CIERRE_HEXELION.md).
+
+- **(S)** **Dos bucles de fallo llevan días comiendo CPU y nadie los miraba.** La Fragua:
+  `hexelion-gateway.service` con **16.026** reinicios (~44 h, ~1.4 s de CPU cada uno). El Vigía:
+  `dump1090.service` con **18.063**. Ambos en nodos con vigilancia térmica declarada, y ambos
+  llenando el journal de ruido que tapa señales reales. El del gateway se resuelve con el deploy
+  del BLOQUE 9; el de dump1090 no tiene bloque asignado.
+- **(S)** **El gateway de producción no lo gobierna systemd.** Lo que sirve el :8001 es un proceso
+  lanzado a mano con `setsid` el 02-ago, fuera de systemd; la unidad lleva desde entonces fallando
+  con `[Errno 98] address already in use`. Mientras siga así, ningún despliegue del gateway surte
+  efecto aunque parezca que sí. Es el mismo patrón que el `llama-server` del soberano: producción
+  sostenida por procesos manuales sin registro.
+- **(M)** **El BLOQUE 1 no es «instalar un puente»: es sustituir uno roto.** El Vigía ya corre
+  `p0x-m5-ingest.service` con **otro** `ingest_m5.py`, cableado a `localhost` y en bucle de
+  `Redis caído: Timeout` desde el 02-ago — cero datos. Deja una clave `:scan` **sin TTL** rancia,
+  justo el antipatrón que la doctrina prohíbe. Los dos puentes se pelean por `/dev/ttyUSB0`, así
+  que hay que parar y deshabilitar el viejo antes de desplegar el bueno.
+- **(S)** **`musculo-hp-02` no es lo que dice el canon.** Es un Chromebook (`Google/Dratini`) con
+  7.6 GiB de RAM, eMMC y sin GPU; no es toolchain de entrenamiento ni puede servir un 30B. Y no
+  aloja OSIRIS. Corrige `CLAUDE.md` («musculo-hp-01/02 (x86) · Toolchain de entrenamiento») o
+  reasigna el rol. Además tiene un contenedor ajeno al rack (`titanhub/earn-sdk`) corriendo.
+- **(S)** **BLOQUE 8: separa 8.3 de 8.1 o el bloque no cierra nunca.** OSIRIS vive en
+  `musculo-hp-01`, offline **10 días** según la propia tailnet. 8.1 exige medirlo y no hay forma
+  desde aquí. El contrato del Jurado (8.2) está firmado y no depende de OSIRIS: 8.3 puede avanzar.
+- **(S)** **El Vigía no acepta mi clave por los usuarios obvios, pero sí por `pi`.** Documentar el
+  usuario de cada nodo en `~/.ssh/config` (hoy solo está la-torre) ahorraría el rastreo a ciegas
+  que costó esta ronda. Y `musculo-hp-02` sigue con **Tailscale SSH** interceptando el 22, pese a
+  darse por desactivado.
+
 ## Ronda SOBERANO-1 (autorización del modelo + auditoría de ramas) · 2026-08-04
 
 - **(S)** **El despliegue del BLOQUE 1 es la piedra angular: lo esperan tres cosas.** `ingest_m5.py`
