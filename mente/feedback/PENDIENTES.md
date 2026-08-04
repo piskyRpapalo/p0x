@@ -502,6 +502,34 @@ Sugerencias accionables (coste S/M/L):
   `aurelius/docs/TEMARIO_LLM.md`: llevar calibración y el marco correcto de RLHF a una
   lección temprana; hoy solo existen como canon de fuente, no como misión jugable.
 
+## Ronda SOBERANO-1 (autorización del modelo + auditoría de ramas) · 2026-08-04
+
+- **(S)** **El despliegue del BLOQUE 1 es la piedra angular: lo esperan tres cosas.** `ingest_m5.py`
+  y `m5-bridge.service` están escritos, comprometidos y con `--self-test` verde desde el 02-ago,
+  sin instalar en El Vigía. Mientras no se despliegue: 6.1 no se puede verificar, la prueba de
+  honestidad de La Sentinelle no se puede correr, y el BLOQUE 6 no cierra. Es el desbloqueo más
+  barato del backlog. IronClaw: lo instalas tú, yo no.
+- **(S)** **Contradicción real entre 5.4 y 10.3 — hay que resolverla antes de tocar misiones.**
+  5.4 dice *«sonda física CONGELADA, sin cambio de código»*; 10.3 dice *«la sonda vive solo en M7,
+  en M3 queda enlace, no paso ejecutable → CC propone diff»*. Una dice no toques, la otra pide
+  diff. Verificado en código: el paso de la sonda **sigue** dentro de M3 y M7 existe, o sea que la
+  duplicación está viva. Firmar una de las dos.
+- **(M)** **BLOQUE 8: decidir si OSIRIS se recupera o se archiva.** El nodo que lo sirve está
+  **inalcanzable** (SSH y endpoints medidos a cero el 03-ago), así que 8.1 no puede completarse por
+  mucho que se insista: repo, versión, runtime y claves siguen NO DATA. El contrato del Jurado (8.2)
+  ya está firmado y no depende de eso. Sugiero separarlos: 8.3 puede avanzar sin el feed.
+- **(S)** **BLOQUE 9 está a un deploy de dejar de ser teoría.** La instrumentación está escrita y
+  comprometida (`68a39a8`, `_instrumentar_sinodo` en el gateway), propose-only. Sin desplegarla, la
+  hipótesis del minuto :07 no es falsable — que era justamente el punto del bloque.
+- **(S)** **`~/aurelius-lora/` lleva en espera desde el 02-ago con condición de salida vaga**
+  («hasta cerrar el resto de bloques»). Como el resto de bloques no cierra, la espera es indefinida.
+  O se archiva o se le pone una condición medible.
+- **(S)** **`ORQUESTA_MODELOS_P0X.md` sigue sin commitear y ya solo acierta a medias.** Tras hoy,
+  `num_ctx 16384` y `backend Vulkan` **sí** son correctos; siguen sin serlo `base qwen3-coder:30b`
+  vía Ollama (Ollama está parado; el modelo se sirve desde un gguf en disco, sin registro) y el
+  harness (el envoltorio entregado es `cc-local`, de Claude Code; OpenCode sigue instalado y el
+  servidor le habla, pero nadie lo ha probado contra este modelo).
+
 ## Ronda BLOQUE 12-bis (cerebro local · metal nuevo) · 2026-08-04
 
 El Soberano movió el metal: Ollama fuera, `llama-server` a mano en su lugar. Esta tanda
