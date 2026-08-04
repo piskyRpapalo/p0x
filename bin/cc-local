@@ -8,13 +8,13 @@
 #
 # EL METAL (medido el 2026-08-04, no decretado):
 #   El cerebro local NO es Ollama — Ollama está parado y deshabilitado. Es un
-#   llama-server lanzado A MANO por el Soberano, con el modelo ya en RAM, que
+#   llama-server levantado por deploy/soberano/cerebro-local-arranca.sh, que
 #   habla la Anthropic Messages API de forma NATIVA (POST /v1/messages). Por eso
 #   no hace falta traductor ni LiteLLM: el arnés apunta ahí directamente.
 #
-#   El servidor es EFÍMERO: si el Soberano cierra ese terminal, el cerebro muere
-#   y este envoltorio abortará en el preflight. El comando que lo relanza está en
-#   el banner de abajo.
+#   El servidor es EFÍMERO: no hay unidad de systemd que lo resucite. Si muere,
+#   este envoltorio aborta en el preflight y apunta al script de arranque
+#   (deploy/soberano/cerebro-local-arranca.sh), que fija la invocación exacta.
 #
 #   No hay registro de modelos: hay UN servidor con UN modelo en RAM. Por eso el
 #   campo "model" del payload es irrelevante y va fijo a "local".
@@ -37,9 +37,7 @@ set -euo pipefail
 BASE="${P0X_LOCAL_URL:-http://127.0.0.1:8080}"
 MODELO="local"     # no hay registro que consultar; el servidor sirve lo que tiene cargado.
 
-RELANZA='/usr/local/lib/ollama/llama-server \
-  -m /usr/share/ollama/.ollama/models/blobs/sha256-78b329e716e7... \
-  --port 8080 --host 127.0.0.1 -c 32768 -ngl 0'
+RELANZA="${P0X_ARRANQUE:-$HOME/p0x/deploy/soberano/cerebro-local-arranca.sh}"
 
 # --- Preflight: UNA sola condición de aborto (honest sensors) --------------
 # El servidor es efímero. Si no responde, se dice AHORA, no después de que la
@@ -47,9 +45,8 @@ RELANZA='/usr/local/lib/ollama/llama-server \
 if ! HEALTH="$(curl -s -f -m 5 "$BASE/health" 2>/dev/null)" \
    || [ "$(printf '%s' "$HEALTH" | jq -r '.status // "?"' 2>/dev/null)" != "ok" ]; then
   printf '\n  ABORTA · el cerebro local no responde en %s/health\n\n' "$BASE" >&2
-  printf '  El servidor es EFÍMERO (lanzado a mano). Relánzalo con:\n\n' >&2
+  printf '  El servidor es EFÍMERO (no hay unidad que lo resucite). Relánzalo con:\n\n' >&2
   printf '    %s\n\n' "$RELANZA" >&2
-  printf '  (el digest va truncado arriba: complétalo con el blob real del almacén)\n\n' >&2
   exit 1
 fi
 
@@ -58,6 +55,23 @@ fi
 META="$(curl -s -m 5 "$BASE/v1/models" 2>/dev/null || true)"
 NUM_CTX="$(printf '%s' "$META" | jq -r '.data[0].meta.n_ctx // empty' 2>/dev/null || true)"
 NPARAM="$(printf '%s' "$META" | jq -r '.data[0].meta.n_params // empty' 2>/dev/null || true)"
+MODELO_REAL="$(printf '%s' "$META" | jq -r '.data[0].id // empty' 2>/dev/null | xargs -r basename 2>/dev/null || true)"
+
+# Backend REAL, leído del proceso que sirve — no una cadena escrita a mano que
+# se queda mintiendo cuando el arranque cambia (pasó: el banner decía "CPU pura"
+# un día después de que el nodo pasara a Vulkan). Honest sensors sobre el arnés.
+BACKEND="NO DATA"
+SRV_PID="$(pgrep -f 'llama-server.*--port' 2>/dev/null | head -1 || true)"
+if [ -n "$SRV_PID" ] && [ -r "/proc/$SRV_PID/cmdline" ]; then
+  SRV_NGL="$(tr '\0' '\n' < "/proc/$SRV_PID/cmdline" | grep -A1 -x -- '-ngl' | tail -1 || true)"
+  if tr '\0' '\n' < "/proc/$SRV_PID/environ" 2>/dev/null | grep -qi 'GGML_BACKEND_PATH=.*vulkan'; then
+    BACKEND="Vulkan (Radeon 780M), ngl=${SRV_NGL:-?}"
+  elif [ "${SRV_NGL:-0}" = "0" ]; then
+    BACKEND="CPU pura (-ngl 0)"
+  else
+    BACKEND="ngl=${SRV_NGL:-?}, backend sin declarar"
+  fi
+fi
 # Sin '·' ni otros multibyte en lo interpolado: printf pad a bytes, no a columnas,
 # y un multibyte descuadra la caja del banner.
 if [ -n "$NUM_CTX" ]; then
@@ -66,7 +80,7 @@ else
   CTX_TXT="NO DATA"
 fi
 if [ -n "$NPARAM" ]; then
-  MODELO_TXT="$(awk -v n="$NPARAM" -v m="$MODELO" 'BEGIN{printf "%s (%.1fB params)", m, n/1e9}')"
+  MODELO_TXT="$(awk -v n="$NPARAM" -v m="${MODELO_REAL:-$MODELO}" 'BEGIN{printf "%.28s (%.1fB)", m, n/1e9}')"
 else
   MODELO_TXT="$MODELO (NO DATA)"
 fi
@@ -92,15 +106,14 @@ printf '  ╠══════════════════════�
 printf '  ║  cerebro   : local (P0X_BRAIN=local)                     ║\n'
 printf '  ║  modelo    : %-44s║\n' "$MODELO_TXT"
 printf '  ║  num_ctx   : %-44s║\n' "$CTX_TXT"
-printf '  ║  backend   : llama-server · CPU pura (-ngl 0)            ║\n'
+printf '  ║  backend   : %-44s║\n' "$BACKEND"
 printf '  ║  endpoint  : POST /v1/messages (Anthropic nativo)        ║\n'
 printf '  ╠══════════════════════════════════════════════════════════╣\n'
 printf '  ║  SIN TOKEN DE FRONTERA                                   ║\n'
 printf '  ╠══════════════════════════════════════════════════════════╣\n'
-printf '  ║  SERVIDOR EFÍMERO: lanzado a mano por el Soberano. Si    ║\n'
-printf '  ║  se cierra ese terminal, el cerebro muere. Relanzar:     ║\n'
-printf '  ║  llama-server -m <blob> --port 8080 --host 127.0.0.1     ║\n'
-printf '  ║                -c 32768 -ngl 0                           ║\n'
+printf '  ║  SERVIDOR EFÍMERO: no hay unidad que lo resucite. Si     ║\n'
+printf '  ║  muere, relanzarlo con:                                  ║\n'
+printf '  ║    deploy/soberano/cerebro-local-arranca.sh              ║\n'
 printf '  ╠══════════════════════════════════════════════════════════╣\n'
 printf '  ║  NO toca canon · NO enmienda doctrina · NO emite         ║\n'
 printf '  ║  veredictos de arquitectura · NO decide pedagogía.       ║\n'

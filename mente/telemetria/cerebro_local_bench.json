@@ -3,7 +3,6 @@
   "fecha": "2026-08-04",
   "nodo": "soberano",
   "estado": "A1/A2/A3 COMPLETADOS · A5 con hallazgo bloqueante resuelto por flag",
-
   "metal": {
     "nota": "El metal cambió a mitad de misión por mano del Soberano. Lo aquí medido es el estado del 2026-08-04 posterior al cambio.",
     "cerebro_local": "llama-server (binario de llama.cpp distribuido con Ollama), lanzado A MANO, efímero",
@@ -12,7 +11,6 @@
     "backend": "CPU pura (-ngl 0). NO hay aceleración activa.",
     "aviso_de_volatilidad": "Durante el bench el Soberano relanzó el servidor: el PID cambió y una petición larga murió a mitad. Las cifras se re-tomaron contra el proceso vivo y COINCIDEN con las del anterior, lo que las refuerza: dos procesos independientes, misma configuración, mismo resultado."
   },
-
   "A1bis_idioma_del_servidor": {
     "veredicto": "CASO (a) · habla Anthropic Messages NATIVO. Sin traductor, sin LiteLLM.",
     "health": "GET /health -> {\"status\":\"ok\"} (HTTP 200)",
@@ -28,7 +26,6 @@
     },
     "log_de_arranque": "NO DATA. stdout y stderr del proceso apuntan a un pty del Soberano (/proc/<pid>/fd/1 -> /dev/pts/2); no es recuperable a posteriori. El equivalente (arquitectura, parámetros y contexto) se obtuvo de /v1/models, arriba."
   },
-
   "A1ter_que_modelo_es": {
     "veredicto": "IDENTIFICADO POR DIGEST",
     "familia": "Qwen3 30B-A3B (MoE), variante instruct-2507",
@@ -39,7 +36,6 @@
     "HALLAZGO_IMPORTANTE": "NO es el modelo que asume el canon. La doctrina del nodo describe `soberano-coder` construido FROM qwen3-coder:30b (modelo especializado en código). Lo que hay en RAM es el qwen3 instruct GENERAL. El gguf del Coder sigue en disco, aparte (soberano-bench/models/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf, 18556689568 bytes — fichero DISTINTO, difiere en 3712 bytes). Cuál de los dos debe ser el cerebro del arnés es decisión del Soberano; se reporta, no se decide.",
     "trampa_evitada": "n_params y `size` que reporta llama-server coinciden con los que el bench G0 midió sobre el gguf del CODER. Los dos variantes son indistinguibles por esas métricas: solo el digest resuelve la identidad."
   },
-
   "A2_bench": {
     "num_ctx": {
       "valor": 32768,
@@ -48,9 +44,30 @@
     },
     "metodo": "3 peticiones idénticas a POST /v1/messages (el endpoint validado en A1-bis), mismo prompt, temperature 0, max_tokens 256. Las tres devolvieron exactamente 54 tokens: determinismo confirmado.",
     "corridas": [
-      {"run": 1, "elapsed_s": 2.675, "input_tokens": 32, "output_tokens": 54, "tok_s": 20.18, "nota": "incluye prompt eval en frío"},
-      {"run": 2, "elapsed_s": 2.251, "input_tokens": 1,  "output_tokens": 54, "tok_s": 23.98, "nota": "prefix cache acertado"},
-      {"run": 3, "elapsed_s": 2.265, "input_tokens": 1,  "output_tokens": 54, "tok_s": 23.83, "nota": "prefix cache acertado"}
+      {
+        "run": 1,
+        "elapsed_s": 2.675,
+        "input_tokens": 32,
+        "output_tokens": 54,
+        "tok_s": 20.18,
+        "nota": "incluye prompt eval en frío"
+      },
+      {
+        "run": 2,
+        "elapsed_s": 2.251,
+        "input_tokens": 1,
+        "output_tokens": 54,
+        "tok_s": 23.98,
+        "nota": "prefix cache acertado"
+      },
+      {
+        "run": 3,
+        "elapsed_s": 2.265,
+        "input_tokens": 1,
+        "output_tokens": 54,
+        "tok_s": 23.83,
+        "nota": "prefix cache acertado"
+      }
     ],
     "sintesis": {
       "generacion_tok_s": "~23.9 (corridas con caché caliente)",
@@ -85,7 +102,6 @@
       "no_se_toca": "El arranque es mano del Soberano. No se ha cambiado."
     }
   },
-
   "A5_smoke": {
     "HALLAZGO_BLOQUEANTE": {
       "sintoma": "Claude Code contra este servidor fallaba en el PRIMER turno, siempre: `API Error: 400 Failed to initialize samplers: failed to parse grammar`.",
@@ -124,12 +140,63 @@
     },
     "nota_de_latencia": "Los 20 minutos no son culpa del modelo pensando: son proceso de prompt en CPU pura. El arnés manda ~78 KB de definiciones de herramientas en cada turno, y el contexto pico llegó a 22.648 tokens de los 32.768 disponibles — el 69% de la ventana consumido por el andamiaje del arnés antes de tocar trabajo real. Aquí es donde el 3.58x de Vulkan en proceso de prompt valdría más que el 3.28x de generación."
   },
-
   "A6_telemetria": {
     "fichero": "mente/telemetria/cerebro_local.jsonl (fuera de git por regla previa del repo; esquema en el README del directorio)",
     "lineas": 2,
     "contenido": "una línea de la sesión local medida y una de la sesión de frontera equivalente, para que la comparación tenga contra qué"
   },
-
-  "higiene": "Ni IPs, ni hostnames, ni usuarios en ruta en este fichero ni en bin/cc-local. El instrumento de captura vivió en el scratchpad y no entra al repo."
+  "higiene": "Ni IPs, ni hostnames, ni usuarios en ruta en este fichero ni en bin/cc-local. El instrumento de captura vivió en el scratchpad y no entra al repo.",
+  "SOBERANO_1_vulkan_coder": {
+    "fecha": "2026-08-04",
+    "autorizado_por": "el Soberano (Bloque SOBERANO-1)",
+    "cambio": "Se sustituye el cerebro local: de qwen3 instruct-2507 en CPU pura (-c 32768, -ngl 0) a Qwen3-Coder-30B-A3B-Instruct con Vulkan (-c 16384, -ngl 999).",
+    "sin_pull": "NO hizo falta descargar nada: el gguf del Coder ya estaba en disco desde el bench G0. Identidad confirmada leyendo la cabecera GGUF: general.name=Qwen3-Coder-30B-A3B-Instruct, arch qwen3moe, 128 expertos / 8 activos, ctx nativo 262144.",
+    "el_paso_tecnico_que_lo_desbloqueo": {
+      "problema": "Los dos binarios parecian excluyentes: el de Ollama tiene /v1/messages pero enumeraba CERO dispositivos Vulkan; el build b10068 de soberano-bench hace Vulkan pero /v1/messages no aparece en NINGUN fichero suyo.",
+      "causa": "GGML_BACKEND_PATH apuntando al DIRECTORIO vulkan/ falla con 'cannot read file data: Is a directory'.",
+      "solucion": "Apuntarlo al FICHERO .so. Con eso el binario de Ollama enumera 'Vulkan0: AMD Radeon 780M Graphics (RADV PHOENIX)' y conserva el endpoint Anthropic. Se queda con las dos cosas.",
+      "fijado_en": "deploy/soberano/cerebro-local-arranca.sh"
+    },
+    "bench_3_corridas": {
+      "metodo": "mismo prompt, temperature 0, 42 tokens de salida las tres",
+      "corridas": [
+        {
+          "run": 1,
+          "elapsed_s": 1.658,
+          "tok_s": 25.33,
+          "nota": "prompt eval en frio"
+        },
+        {
+          "run": 2,
+          "elapsed_s": 1.302,
+          "tok_s": 32.25,
+          "nota": "cache caliente"
+        },
+        {
+          "run": 3,
+          "elapsed_s": 1.285,
+          "tok_s": 32.67,
+          "nota": "cache caliente"
+        }
+      ],
+      "generacion_tok_s": "~32.5"
+    },
+    "proceso_de_prompt": {
+      "medido": "5209 tokens en 21.31s = 244.4 tok/s",
+      "segunda_pasada": "input_tokens=1 en 0.09s: prefix caching intacto",
+      "impacto": "El pico del arnes (22.648 tokens) pasa de ~226s en CPU (~100 tok/s) a ~93s. Es la mitad del dolor, y la caliente ya no se paga."
+    },
+    "CORRECCION_DE_MI_ESTIMACION_PREVIA": {
+      "estime": "75-80 tok/s de generacion, aplicando el 3.28x de G0",
+      "real": "32.5 tok/s. La ganancia real sobre la ruta CPU medida por HTTP es 1.36x, no 3.28x.",
+      "por_que": "Mi cifra Vulkan (32.5) coincide casi exactamente con la de G0 (32.49 tok/s). Lo que fallaba era la BASE: G0 midio la CPU con llama-bench (9.90 tok/s) y la CPU real por HTTP daba 23.9. El ratio 3.28x era un artefacto de esa base baja. La salvedad que deje escrita entonces era la correcta, y ahora esta cuantificada.",
+      "leccion": "Un ratio entre dos mediciones hechas con instrumentos distintos no se traslada a una tercera. Se remide."
+    },
+    "RAM": {
+      "antes_de_parar_el_anterior": "27 GiB disponibles",
+      "tras_parar": "49 GiB",
+      "con_el_coder_en_Vulkan": "33 GiB disponibles, RSS del proceso solo ~240 MiB",
+      "lectura": "Con Vulkan los pesos viven en memoria de GPU (RAM compartida del iGPU) y NO cuentan en el RSS del proceso. Quien mire solo RSS creera que no hay modelo cargado: es un footgun de medicion, no una mejora."
+    }
+  }
 }
