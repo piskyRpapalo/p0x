@@ -535,13 +535,15 @@ El Soberano movió el metal: Ollama fuera, `llama-server` a mano en su lugar. Es
   referencias que no existen. Y el gate habría dado **verde**, porque un inventario no toca
   código. El gate protege refactors, tests y diffs; no protege inventarios ni auditorías. La
   primera delegación real debería ser algo que `tsc` y los tests puedan desmentir.
-- **(S)** **La ventana de 32768 se queda corta para este arnés.** Medido: el contexto pico fue
-  22.648 tokens (**69%**) en una tarea trivial de 5 llamadas a herramienta — el arnés manda ~78 KB
-  de definiciones de herramientas por turno. Con `n_ctx_train` de 262144 hay margen de sobra en el
-  modelo; el techo lo pone la RAM, y eso exige remedir antes de subir `-c`.
-- **(S)** **Prefix caching confirmado** (`input_tokens` 32→1 entre corridas idénticas). O sea que
-  hay caché real que perder: el footgun de `CLAUDE_CODE_ATTRIBUTION_HEADER` es aplicable aquí.
-  Sigue **sin activar**, según tu regla: solo si se mide degradación en sesión real.
+- **(S)** **RAM y ventana: el margen es real pero frágil, y 32768 se queda corto.** Con el modelo
+  residente quedan ~31.8 GiB de 57, y tres corridas costaron solo ~120 MiB — lo caro es tenerlo
+  cargado (~30 GiB de RSS), no usarlo. Pero con escritorio activo el swap llegó a 6.4 GiB y
+  MemAvailable bajó a ~17.8 GiB. Y el arnés se come el **69%** de la ventana (22.648 de 32.768) en
+  una tarea trivial, porque manda ~78 KB de definiciones de herramientas por turno. El modelo da
+  para más (`n_ctx_train` 262144); el techo lo pone la RAM, así que subir `-c` exige remedir.
+  Nota aparte: el prefix caching está **confirmado** (`input_tokens` 32→1), o sea que hay caché
+  real que perder — el footgun de `CLAUDE_CODE_ATTRIBUTION_HEADER` aplica aquí, y sigue sin
+  activar según tu regla: solo si se mide degradación.
 
 ## Ronda BLOQUE 12 (cerebro local para el arnés) · 2026-08-04 — OBSOLETA en su mayor parte
 
