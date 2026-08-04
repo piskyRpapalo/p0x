@@ -502,6 +502,34 @@ Sugerencias accionables (coste S/M/L):
   `aurelius/docs/TEMARIO_LLM.md`: llevar calibración y el marco correcto de RLHF a una
   lección temprana; hoy solo existen como canon de fuente, no como misión jugable.
 
+## Ronda BLOQUE 12 (cerebro local para el arnés) · 2026-08-04
+
+Misión **abortada en A2**: el endpoint existe, el motor local no. Sugerencias (coste S/M/L):
+- **(S)** **Decidir cuál de los dos Ollama manda.** Hoy conviven un `ollama serve` lanzado a mano
+  bajo el usuario interactivo (es el que responde en loopback, y su almacén está **vacío**) y el
+  servicio systemd —parado y `disabled` desde el 04-ago 02:06— que apunta al almacén del usuario de
+  sistema, el que sí tenía modelos. Mientras haya dos, toda misión que dependa del motor local es
+  una lotería según cuál esté vivo. Elegir uno, y que el otro no arranque.
+- **(M)** **Reconstruir el motor local.** No existe manifest de `soberano-coder` en ningún almacén,
+  ni la base `qwen3-coder:30b` que su Modelfile declara en el `FROM`; el único manifest superviviente
+  es `qwen3:30b-a3b-instruct-2507-q4_K_M`. Reconstruirlo exige un pull de ~18GB. No lo he hecho: es
+  mutación de estado no mandatada y sustituto silencioso de lo que la misión daba por existente.
+- **(S)** **Revisar el `llama-server` huérfano.** Proceso ajeno a esta misión ocupando **35 GB RSS**
+  (58% de la RAM), CPU puro (`-ngl 0`), lanzado desde un terminal el 04-ago 02:09. No lo he tocado
+  (IronClaw). Mientras viva, ninguna medición de huella de RAM en este nodo es limpia.
+- **(M)** **Ejecutar A2 de verdad** cuando el motor vuelva: huella, tok/s y tiempo de carga a 16384
+  vs 32768, tres corridas, con `ollama ps` anotando backend CPU/GPU antes de empezar. Solo entonces
+  crear la variante `soberano-coder-cc` con `num_ctx` elegido por dato. **No he creado la variante**:
+  sin medición, elegir contexto sería un decreto por intuición, justo lo que la doctrina prohíbe.
+- **(S)** **Bind del servicio.** El drop-in de systemd fija `OLLAMA_HOST` a la IP del tailnet, así que
+  el servicio **no** escucha en loopback. `bin/cc-local` usa loopback por defecto e higiene dura (cero
+  IPs versionadas): con el servicio activo hay que exportarle `P0X_OLLAMA_URL`. Valorar añadir bind de
+  loopback para que el envoltorio funcione sin variable de entorno.
+- **(S)** **A5 sigue pendiente**: smoke con las i18n huérfanas de Aurelius (Bloque 5.2) y comparación
+  honesta contra el coste en frontera — incluido el caso incómodo de que el local necesite tres
+  pasadas donde la frontera necesita una. Un ahorro que mueve el coste al tiempo del Soberano no es
+  un ahorro, y hasta que se mida no sabemos cuál de los dos es.
+
 ## Backlog de UI/software (autoritativo)
 El trabajo pendiente de **interfaz** (Hexelion · Aurelius · Le Jardin) vive en su
 propio documento: **[`mente/backlog/BACKLOG_UI.md`](../backlog/BACKLOG_UI.md)**

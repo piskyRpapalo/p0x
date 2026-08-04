@@ -20,6 +20,37 @@ Antes de gastar un token de frontera, pregúntate en orden:
 3. **Determinista** — ¿es un script/comando fijo sin ambigüedad? Ejecútalo directo, sin LLM.
 4. **Frontera** — solo si lo anterior no basta, sube a Claude en la nube.
 
+## El reparto de cerebros (`P0X_BRAIN`) — lee esto ANTES de actuar
+
+El reparto vive aquí, en el arnés, no en la memoria del Soberano: una sesión nunca debe poder
+confundirse de cerebro. Comprueba `P0X_BRAIN` en el entorno y obedece la columna que te toque.
+El envoltorio `bin/cc-local` exporta `P0X_BRAIN=local` y lo anuncia en un banner al arrancar.
+
+**Si `P0X_BRAIN=local` (cerebro local, sin token de frontera) — lo que NO haces:**
+
+- **No tocas canon.** Ni esta sección, ni el Canon del nodo, ni `mente/doctrina/`.
+- **No propones enmiendas de doctrina.** Si detectas algo que la merece, lo anotas como hallazgo
+  en el reporte y PARA. La enmienda la redacta una sesión de frontera.
+- **No emites veredictos de arquitectura.** «Deberíamos migrar a X», «este diseño está mal»: fuera
+  de tu alcance. Describe lo que hay; no dictamines lo que debería haber.
+- **No decides mecánica pedagógica** (Aurelius: progresión de misiones, dificultad, qué enseña qué).
+
+**Lo que SÍ produces:** inventarios, tests, refactors mecánicos y diffs. Nada de eso existe hasta
+que **pasa el gate: `tsc --noEmit` = 0 + tests en verde**. Un diff que no pasa el gate no es un
+entregable, es ruido — no lo reportes como hecho.
+
+**Si `P0X_BRAIN` no está puesto (sesión de frontera) — la regla inversa:**
+
+No gastes token de frontera en lo que el local hace igual de bien. Antes de empezar un inventario,
+un renombrado masivo, una tanda de tests de andamiaje o un refactor mecánico y verificable por
+gate: **PARA y propón delegarlo a `cc-local`**. Tu token se reserva para arquitectura, doctrina,
+veredictos con evidencia y lo que exige juicio. Delegar no es pereza: es la Regla de oro aplicada.
+
+**Ambos cerebros anotan.** Toda sesión delegada deja una línea en
+`mente/telemetria/cerebro_local.jsonl` — `{fecha, tarea, cerebro, pasadas, minutos, gate_ok,
+ctx_pico, nota}`. Sin ese fichero no hay forma legítima de re-editar este reparto más adelante:
+se decidiría de memoria, que es exactamente lo que esta sección existe para impedir.
+
 ## Canon del nodo (registro de decisiones del Soberano)
 
 - **2026-07-20 — Ejecutor por defecto: la AI local.** Desde esta fecha, la AI local

@@ -1,0 +1,87 @@
+{
+  "mision": "Bloque 12 · segundo cerebro local para el arnés de Claude Code",
+  "fecha": "2026-08-04",
+  "nodo": "soberano",
+  "estado": "ABORTADO_EN_A2",
+  "resumen": "A1 (capacidad) PASA con evidencia. A2 (bench de num_ctx) y A5 (smoke) quedan BLOQUEADOS: el modelo base no existe en el Ollama vivo de este nodo. No se benchmarkea lo que no está cargado, y no se improvisa un sustituto.",
+
+  "A1_capacidad": {
+    "veredicto": "PASA",
+    "ollama_version": "0.32.1",
+    "fuente_version": "ollama --version + GET /api/version",
+    "afirmacion": "Ollama 0.32.1 expone de forma nativa POST /v1/messages en el esquema Anthropic Messages. No hace falta LiteLLM ni llama-server como traductor.",
+    "pruebas": [
+      {
+        "prueba": "POST /v1/messages con cabeceras Anthropic",
+        "comando": "curl -s -X POST $BASE/v1/messages -H 'content-type: application/json' -H 'x-api-key: placeholder' -H 'anthropic-version: 2023-06-01' -d '{\"model\":\"NOEXISTE\",\"max_tokens\":8,\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}]}'",
+        "http": 404,
+        "salida_verbatim": "{\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model 'NOEXISTE' not found\"},\"request_id\":\"req_832fea263de95160fbca4ecf\"}",
+        "lectura": "Error en ESQUEMA ANTHROPIC (type/error.type/request_id). Un manejador nativo, no el genérico de Ollama."
+      },
+      {
+        "prueba": "CONTROL · ruta inexistente",
+        "comando": "curl -s -X POST $BASE/v1/ruta_inventada -d '{}'",
+        "http": 404,
+        "salida_verbatim": "404 page not found",
+        "lectura": "404 pelado del mux de Go. Así responde una ruta NO registrada — contraste que prueba que /v1/messages sí lo está."
+      },
+      {
+        "prueba": "CONTROL · OpenAI-compat (traductor distinto y conocido)",
+        "comando": "curl -s -X POST $BASE/v1/chat/completions -d '{\"model\":\"NOEXISTE\",\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}]}'",
+        "http": 404,
+        "salida_verbatim": "{\"error\":{\"message\":\"model 'NOEXISTE' not found\",\"type\":\"not_found_error\",\"param\":null,\"code\":null}}",
+        "lectura": "Esquema OpenAI, distinto del anterior. Cada ruta tiene su propio traductor: confirma que el de /v1/messages es específicamente Anthropic."
+      },
+      {
+        "prueba": "GET /v1/messages (método no permitido)",
+        "comando": "curl -s $BASE/v1/messages",
+        "http": 405,
+        "salida_verbatim": "405 method not allowed",
+        "lectura": "405 y no 404: la ruta ESTÁ registrada en el router, solo que exige POST. Prueba definitiva."
+      }
+    ]
+  },
+
+  "A2_contexto": {
+    "veredicto": "BLOQUEADO · no medido",
+    "num_ctx_elegido": null,
+    "variante_creada": null,
+    "motivo": "El modelo 'soberano-coder' no existe en el Ollama que atiende peticiones en este nodo. No se puede medir huella de RAM, tok/s ni tiempo de carga a 16384 vs 32768 de un modelo ausente, ni derivar de ahí un num_ctx 'por dato'.",
+    "hallazgos": [
+      {
+        "hallazgo": "Hay DOS Ollama distintos y el que manda no tiene modelos",
+        "evidencia": "ps: '/usr/local/bin/ollama serve' corriendo bajo el usuario interactivo desde el 28-jul; ss -ltnp: escucha en loopback:11434. Su almacén es ~/.ollama/models, con 0 blobs y 0 manifests (du -sh ~/.ollama = 40K).",
+        "salida_verbatim": "curl -s $BASE/api/tags  ->  {\"models\":[]}     |     ollama list  ->  (cabecera sin filas)"
+      },
+      {
+        "hallazgo": "El servicio systemd que SÍ tenía el almacén con modelos está parado y deshabilitado",
+        "evidencia": "systemctl is-active ollama -> inactive · 'Loaded: ... ; disabled; preset: enabled' · 'ago 04 02:06:29 soberano systemd[1]: Stopped ollama.service'. Su almacén (ruta del usuario de sistema 'ollama', home 700, sin sudo interactivo en este nodo) conserva 5 blobs y UN solo manifest: qwen3:30b-a3b-instruct-2507-q4_K_M.",
+        "consecuencia": "Ni siquiera ahí existe un manifest 'soberano-coder', ni la base 'qwen3-coder:30b' que su Modelfile declara en el FROM. El motor local documentado en la misión G0 no está operativo hoy."
+      },
+      {
+        "hallazgo": "Además, la RAM no estaba en condiciones de dar una medida limpia",
+        "evidencia": "ps: un 'llama-server -c 32768 -ngl 0' ajeno a esta misión, arrancado a las 02:09 desde un terminal, ocupando 35 GB RSS (58% de la RAM). free -h: 57Gi total, 29Gi usados, 27Gi disponibles.",
+        "consecuencia": "Cualquier huella medida ahora estaría contaminada por ese proceso. No se ha tocado ni matado: no es de esta misión (IronClaw)."
+      }
+    ],
+    "por_que_no_se_improvisa": "Restaurar el motor exigiría o bien arrancar el servicio systemd parado (prohibido: no se reinician servicios), o bien un pull de ~18GB para reconstruir la base (mutación de estado no mandatada, y sustituto silencioso de lo que la misión daba por existente). Doctrina: PARA, no improvises un sustituto.",
+    "referencia_historica_NO_reutilizable": {
+      "nota": "MOTOR_LOCAL.md (G0, 2026-07-18) registró a num_ctx=16384: 36.7 GiB en el cgroup del servicio con el modelo cargado, y 24.9 tok/s de generación en CPU. Se cita como contexto, NO como dato de esta misión: es de otra fecha, otro backend y un modelo que hoy no está. No sustituye a la medición pedida."
+    }
+  },
+
+  "A3_envoltorio": {
+    "veredicto": "ENTREGADO (sin ejecutar)",
+    "ruta": "bin/cc-local",
+    "nota": "Escrito y con preflight propio: aborta si no hay Ollama, si el endpoint /v1/messages no responde 405 a GET, o si el modelo no existe. No se ha podido ejecutar de verdad porque el modelo falta — el preflight abortaría, que es exactamente su comportamiento correcto.",
+    "num_ctx_en_banner": "leído en runtime de /api/show, nunca hardcodeado en el script"
+  },
+
+  "A5_smoke": {
+    "veredicto": "BLOQUEADO",
+    "motivo": "Depende de A2. Sin cerebro local no hay sesión delegada que medir, y por tanto no hay comparación honesta contra el coste de frontera.",
+    "tarea_reservada": "i18n huérfanas de Aurelius (Bloque 5.2 del backlog) — sigue siendo buena candidata: mecánica, verificable por gate y desechable."
+  },
+
+  "higiene": "Ni IPs, ni hostnames, ni usuarios en ruta en este fichero ni en bin/cc-local. El bind no-loopback del servicio systemd se pasa por la variable P0X_OLLAMA_URL en el entorno del Soberano, nunca versionado."
+}

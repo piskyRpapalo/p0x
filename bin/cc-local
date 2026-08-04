@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+# cc-local · arranca Claude Code contra el CEREBRO LOCAL del nodo (Ollama).
+#
+# Bloque 12 (2026-08-04). Script y no alias a propósito: un alias no se versiona,
+# no se audita y no puede hacer preflight. Esto sí.
+#
+# El Soberano lo copia a ~/bin/cc-local (el repo no se auto-instala — IronClaw).
+#
+# CONTRATO: cuando este script arranca, NINGUNA ruta interna del arnés puede
+# escaparse a la API de frontera. Se reapuntan la base URL, el token y los TRES
+# alias de modelo (OPUS/SONNET/HAIKU) además de ANTHROPIC_MODEL y del modelo
+# rápido auxiliar — que es la fuga clásica: el arnés usa el "small/fast" para
+# títulos y tareas de fondo, y si se olvida, esa ruta sigue pagando frontera.
+#
+# ---------------------------------------------------------------------------
+# NOTA sobre CLAUDE_CODE_ATTRIBUTION_HEADER (documentada, NO activada):
+#   Algunos backends OSS pierden el prefix caching porque el arnés inyecta por
+#   petición una cabecera con un hash variable; al cambiar el prefijo en cada
+#   llamada, la caché del servidor no acierta nunca y el prompt se reevalúa
+#   entero. En ese caso, desactivarla recupera la caché:
+#       export CLAUDE_CODE_ATTRIBUTION_HEADER=0
+#   NO se activa por defecto en este script: se activa SOLO si el bloque A5
+#   (smoke con tarea real) MIDE degradación de prompt_eval entre turnos.
+#   Decreto sin dato = prohibido. Ver mente/telemetria/cerebro_local_bench.json.
+# ---------------------------------------------------------------------------
+set -euo pipefail
+
+# Loopback a propósito: cero IPs/hostnames del nodo en nada versionado.
+# Si el Ollama que responde es el del servicio systemd, ese bind NO es loopback:
+# exporta P0X_OLLAMA_URL con su URL antes de invocar (y no la escribas al repo).
+OLLAMA_URL="${P0X_OLLAMA_URL:-http://127.0.0.1:11434}"
+MODELO="${P0X_LOCAL_MODEL:-soberano-coder-cc}"
+
+die() { printf '\n  ABORTA · %s\n\n' "$1" >&2; exit 1; }
+
+# --- Preflight (honest sensors: no arrancamos a ciegas) --------------------
+curl -sf -m 5 "$OLLAMA_URL/api/version" >/dev/null 2>&1 \
+  || die "no hay Ollama escuchando en $OLLAMA_URL — arráncalo o exporta P0X_OLLAMA_URL."
+
+OLLAMA_VER="$(curl -s -m 5 "$OLLAMA_URL/api/version" | jq -r '.version // "?"')"
+
+# La ruta Anthropic Messages debe existir: sin ella el arnés no habla con este
+# backend. GET sobre una ruta registrada responde 405; una ruta inexistente, 404.
+CODE="$(curl -s -o /dev/null -w '%{http_code}' -m 5 "$OLLAMA_URL/v1/messages" || true)"
+[ "$CODE" = "405" ] \
+  || die "este Ollama ($OLLAMA_VER) no expone POST /v1/messages (GET devolvió $CODE, se esperaba 405). Sin endpoint nativo Anthropic no se improvisa proxy: es decisión del Soberano."
+
+# El modelo debe existir. Si no, PARA — nada de caer a un modelo cualquiera.
+SHOW="$(curl -s -m 10 -X POST "$OLLAMA_URL/api/show" \
+        -H 'content-type: application/json' -d "{\"model\":\"$MODELO\"}")"
+echo "$SHOW" | jq -e '.parameters? // .model_info?' >/dev/null 2>&1 \
+  || die "el modelo '$MODELO' no existe en $OLLAMA_URL. Créalo desde su Modelfile (deploy/soberano/) — este script NO elige modelo sustituto."
+
+# num_ctx leído del modelo, jamás decretado por el script.
+NUM_CTX="$(echo "$SHOW" | jq -r '.parameters // ""' | awk '$1=="num_ctx"{print $2}')"
+[ -n "$NUM_CTX" ] || NUM_CTX="(no declarado · MÍDELO)"
+
+# --- Reapuntado total del arnés -------------------------------------------
+export ANTHROPIC_BASE_URL="$OLLAMA_URL"
+export ANTHROPIC_AUTH_TOKEN="placeholder-local-no-frontier"   # Ollama no valida; el arnés exige que exista.
+export ANTHROPIC_MODEL="$MODELO"
+export ANTHROPIC_DEFAULT_OPUS_MODEL="$MODELO"
+export ANTHROPIC_DEFAULT_SONNET_MODEL="$MODELO"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="$MODELO"
+export ANTHROPIC_SMALL_FAST_MODEL="$MODELO"                   # la fuga clásica.
+export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1             # desviación aditiva declarada: sin telemetría de fondo.
+
+# Bandera que lee CLAUDE.md para saber qué cerebro manda en esta sesión.
+export P0X_BRAIN=local
+
+# --- Banner inequívoco -----------------------------------------------------
+printf '\n'
+printf '  ╔══════════════════════════════════════════════════════════╗\n'
+printf '  ║  P0X · CEREBRO LOCAL                                     ║\n'
+printf '  ╠══════════════════════════════════════════════════════════╣\n'
+printf '  ║  cerebro   : local (P0X_BRAIN=local)                     ║\n'
+printf '  ║  modelo    : %-44s║\n' "$MODELO"
+printf '  ║  num_ctx   : %-44s║\n' "$NUM_CTX"
+printf '  ║  backend   : Ollama %-37s║\n' "$OLLAMA_VER"
+printf '  ║  endpoint  : POST /v1/messages (Anthropic nativo)        ║\n'
+printf '  ╠══════════════════════════════════════════════════════════╣\n'
+printf '  ║  SIN TOKEN DE FRONTERA                                   ║\n'
+printf '  ╠══════════════════════════════════════════════════════════╣\n'
+printf '  ║  NO toca canon · NO enmienda doctrina · NO emite         ║\n'
+printf '  ║  veredictos de arquitectura · NO decide pedagogía.       ║\n'
+printf '  ║  Inventarios, tests, refactors mecánicos y diffs.        ║\n'
+printf '  ║  Todo pasa el gate (tsc=0 + tests) antes de existir.     ║\n'
+printf '  ╚══════════════════════════════════════════════════════════╝\n'
+printf '\n  Al cerrar: anota la sesión en mente/telemetria/cerebro_local.jsonl\n\n'
+
+exec claude "$@"
