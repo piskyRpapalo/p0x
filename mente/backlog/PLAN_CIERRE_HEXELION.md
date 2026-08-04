@@ -9,6 +9,19 @@ actualizado: 2026-08-04
 
 # Plan de cierre · ronda HP-HEXELION-1 (2026-08-04)
 
+> **ACTUALIZACIÓN · ronda HEXELION-CLOSE-1 (2026-08-04, mismo día).**
+> **BLOQUE 9 DESPLEGADO** en La Fragua y verificado: unidad `active`, `NRestarts` estable en 0 con
+> el mismo PID, `/api/sinodo` sirviendo, dashboard en pie. La trampa del §2 era real y se cumplió
+> tal cual: el `git pull` **no habría entrado** porque `hexelion_gateway.py` estaba modificado sin
+> commitear en La Fragua (dos URLs cableadas sustituidas por `{AIS_BASE}`, trabajo del Soberano
+> nunca commiteado). Se apartó con `stash`, se hizo el `pull` y se **reaplicó**; conviven los dos
+> cambios, sin conflictos y `py_compile` OK. Copia de seguridad previa en `/tmp` del nodo.
+> Ese cambio **sigue sin commitear** y debería commitearse antes de que otro `pull` lo pise.
+> **La clave `hexelion:sinodo:flaps` aún no existe**, y es lo correcto: solo se escribe cuando hay
+> una transición. La prueba de honestidad (§2) sigue pendiente y necesita ≥2 h de ventana.
+> HP-01 queda **inhabilitado**; HP-02 **limpio** y reconvertido a nodo de rack. Detalle de nodos en
+> `hexelion/DEPIN_INVENTORY.md` (sección 2026-08-04).
+
 Todo lo de aquí está **medido hoy**, no recordado. Higiene: sin IPs ni claves; los nodos van por
 nombre y los comandos exactos (con usuario y host) viven en el reporte al Soberano, no versionados.
 

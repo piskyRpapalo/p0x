@@ -111,7 +111,8 @@ se decidiría de memoria, que es exactamente lo que esta sección existe para im
 | **la-torre** (Jetson, user `jetson`) | Host git soberano (`jetson:p0x.git`, `jetson:hexelion.git`), Sínodo v2 con RAG | SSH auth-only vía `~/.ssh/id_ed25519_soberano_git`, host `la-torre` en `~/.ssh/config` |
 | **la-fragua** (RK3588) | Batch/embeddings/Qdrant/Nexo, siempre encolado (`p0x-enqueue`), térmica vigilada | Corre también "El Faro" (servicio HEXELION de atestación AIS, firma ed25519 — fuera de alcance de `soberano`) |
 | **el-vigía** (RPi + SDR) | AIS/ADS-B + M5 | — |
-| **musculo-hp-01/02** (x86) | Toolchain de entrenamiento, puente de conversiones | — |
+| **musculo-hp-01** | ❌ **INHABILITADO** (2026-08-04, decisión del Soberano) | Offline en la tailnet desde hace 10 días. Aloja OSIRIS, **no recuperable por vía remota**. Retirado del canon activo; requiere acceso físico |
+| **musculo-hp-02** | **Nodo de rack** · asume la verificación cruzada que tenía hp-01 | **No es un «músculo»** (medido 2026-08-04): Chromebook `Google/Dratini` con Debian, i5-10310U, **7.6 GiB RAM**, eMMC, **sin GPU**. No sirve para entrenar ni para servir un 30B. Docker y Python sí, Node no. Limpiado de servicios de *earning* ajenos al rack |
 | **Claude Fable 5 / Opus** (fuera del rack) | Doctrina, arquitectura, veredictos con evidencia | Token caro — se reserva, jamás ejecuta en el rack |
 
 ## Footguns conocidos (con cicatriz)

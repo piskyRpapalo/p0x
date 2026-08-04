@@ -502,6 +502,31 @@ Sugerencias accionables (coste S/M/L):
   `aurelius/docs/TEMARIO_LLM.md`: llevar calibración y el marco correcto de RLHF a una
   lección temprana; hoy solo existen como canon de fuente, no como misión jugable.
 
+## Ronda HEXELION-CLOSE-1 (deploy del 9 + limpieza de HP-02) · 2026-08-04
+
+- **(S)** **Hay credenciales en claro versionadas desde el 30-may.** `hexelion/DEPIN_INVENTORY.md`
+  contiene **dos** en la tabla histórica de HP1: un API token del agente Titan y un `appKey` de
+  `earn_sdk`. Viola el invariante «cero contraseñas en ficheros versionados». No las he tocado
+  para no alterar el histórico de auditoría, pero **hay que rotarlas y purgarlas — y rotarlas
+  aunque se purguen**, porque el historial de git ya las contiene. Los 142 MB de restos del agente
+  en `/opt` de HP-02 también llevan su clave en disco.
+- **(S)** **Commitea el cambio de `AIS_BASE` en La Fragua antes de que otro `pull` lo pise.** El
+  deploy del 9 se encontró `hexelion_gateway.py` modificado sin commitear (dos URLs cableadas
+  sustituidas por `{AIS_BASE}`). Lo aparté y lo reapliqué, así que sigue vivo pero **sigue sin
+  commitear**. Es trabajo tuyo que solo existe en ese nodo.
+- **(M)** **El modelo del rack no es alcanzable desde ningún otro nodo.** `llama-server` bindea
+  loopback; lo que responde en el `:8080` del tailnet es open-webui, que además no tiene backend
+  (Ollama está parado). Si HP-02 debe asumir verificación cruzada usando el modelo, hay que
+  exponerlo a la tailnet — decisión tuya, con su coste de superficie.
+- **(S)** **La prueba de honestidad del BLOQUE 9 sigue pendiente y es lo que decide el bloque.**
+  El deploy solo puso el instrumento; `hexelion:sinodo:flaps` está vacío porque aún no ha habido
+  transición. Hacen falta ≥2 h para cruzar dos veces el minuto `:07`. Recuerda el criterio de
+  fallo: si el parpadeo desaparece **porque se suavizó el indicador**, el bloque está fallado.
+- **(S)** **`legion_sol`/`legion_luna` siguen como «DePIN Worker» en el código vivo**
+  (`hexelion_pollers.py:37-38`, `disk_poller.py:47-48`, `hexelion_gateway.py:334,738,2489`), y
+  `OSIRIS_GDELT_URL` apunta a un nodo muerto. No lo he tocado: cambiarlo altera el runtime del
+  dashboard que acabo de desplegar y merece su propio bloque con prueba.
+
 ## Ronda HP-HEXELION-1 (reconocimiento de los HP + plan de cierre) · 2026-08-04
 
 Plan completo en [`mente/backlog/PLAN_CIERRE_HEXELION.md`](../backlog/PLAN_CIERRE_HEXELION.md).
