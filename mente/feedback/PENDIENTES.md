@@ -502,7 +502,38 @@ Sugerencias accionables (coste S/M/L):
   `aurelius/docs/TEMARIO_LLM.md`: llevar calibración y el marco correcto de RLHF a una
   lección temprana; hoy solo existen como canon de fuente, no como misión jugable.
 
-## Ronda BLOQUE 12 (cerebro local para el arnés) · 2026-08-04
+## Ronda BLOQUE 12-bis (cerebro local · metal nuevo) · 2026-08-04
+
+El Soberano movió el metal: Ollama fuera, `llama-server` a mano en su lugar. Esta tanda
+**sustituye** a la de abajo, que quedó obsoleta salvo donde se diga.
+
+- **(S)** **`Workflow` envenena el arnés — vigilar que siga mitigado.** Causa raíz medida: la
+  conversión JSON-Schema→GBNF de llama.cpp expande `maxLength` a gramática de repetición explícita
+  y revienta entre 1024 y 16384; `Workflow.script` declara `524288`. Sin excluir esa herramienta,
+  el cerebro local **no arranca**: falla el primer turno con `400 failed to parse grammar`.
+  `bin/cc-local` ya invoca `--disallowedTools Workflow`. Reevaluar si se actualiza llama.cpp.
+- **(S)** **Decidir qué modelo debe ser el cerebro del arnés.** Lo que hay en RAM es
+  `qwen3:30b-a3b-instruct-2507-q4_K_M` (identificado por digest), el modelo **general**. El canon
+  del nodo describe `soberano-coder` construido `FROM qwen3-coder:30b`, el **especializado en
+  código**, cuyo gguf sigue en disco aparte. Para un arnés de código la diferencia importa. Es
+  decisión tuya: se reporta el hecho, no se elige por ti.
+- **(M)** **Activar aceleración: es el mayor retorno disponible.** El servidor corre `-ngl 0`, CPU
+  pura. Medido hoy: ~23.9 tok/s de generación. El bench G0 de este nodo midió Vulkan **3.28×** en
+  generación y **3.58×** en proceso de prompt. En un arnés context-heavy lo que duele es el
+  segundo. No he tocado el arranque: es tu mano.
+- **(M)** **El servidor es efímero y sin supervisión.** Vive atado a un terminal; ya murió y
+  renació una vez a mitad de esta misión, matando una petición en curso. Mientras siga así,
+  cualquier trabajo delegado puede perderse sin aviso. Una unidad de usuario que lo levante
+  (propose-only, no la instalo) lo volvería reproducible.
+- **(S)** **Margen de RAM: real pero frágil.** Con el modelo residente quedan ~31.8 GiB de 57.
+  Tres corridas costaron solo ~120 MiB: lo caro es tenerlo cargado (~30 GiB de RSS), no usarlo.
+  Pero con actividad de escritorio el swap llegó a 6.4 GiB y MemAvailable bajó a ~17.8 GiB.
+  Conviene decidir si el modelo vive residente siempre o se carga por sesión.
+- **(S)** **Prefix caching confirmado** (`input_tokens` 32→1 entre corridas idénticas). O sea que
+  hay caché real que perder: el footgun de `CLAUDE_CODE_ATTRIBUTION_HEADER` es aplicable aquí.
+  Sigue **sin activar**, según tu regla: solo si se mide degradación en sesión real.
+
+## Ronda BLOQUE 12 (cerebro local para el arnés) · 2026-08-04 — OBSOLETA en su mayor parte
 
 Misión **abortada en A2**: el endpoint existe, el motor local no. Sugerencias (coste S/M/L):
 - **(S)** **Decidir cuál de los dos Ollama manda.** Hoy conviven un `ollama serve` lanzado a mano

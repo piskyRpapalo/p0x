@@ -2,86 +2,105 @@
   "mision": "Bloque 12 · segundo cerebro local para el arnés de Claude Code",
   "fecha": "2026-08-04",
   "nodo": "soberano",
-  "estado": "ABORTADO_EN_A2",
-  "resumen": "A1 (capacidad) PASA con evidencia. A2 (bench de num_ctx) y A5 (smoke) quedan BLOQUEADOS: el modelo base no existe en el Ollama vivo de este nodo. No se benchmarkea lo que no está cargado, y no se improvisa un sustituto.",
+  "estado": "A1/A2/A3 COMPLETADOS · A5 con hallazgo bloqueante resuelto por flag",
 
-  "A1_capacidad": {
-    "veredicto": "PASA",
-    "ollama_version": "0.32.1",
-    "fuente_version": "ollama --version + GET /api/version",
-    "afirmacion": "Ollama 0.32.1 expone de forma nativa POST /v1/messages en el esquema Anthropic Messages. No hace falta LiteLLM ni llama-server como traductor.",
-    "pruebas": [
-      {
-        "prueba": "POST /v1/messages con cabeceras Anthropic",
-        "comando": "curl -s -X POST $BASE/v1/messages -H 'content-type: application/json' -H 'x-api-key: placeholder' -H 'anthropic-version: 2023-06-01' -d '{\"model\":\"NOEXISTE\",\"max_tokens\":8,\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}]}'",
-        "http": 404,
-        "salida_verbatim": "{\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model 'NOEXISTE' not found\"},\"request_id\":\"req_832fea263de95160fbca4ecf\"}",
-        "lectura": "Error en ESQUEMA ANTHROPIC (type/error.type/request_id). Un manejador nativo, no el genérico de Ollama."
-      },
-      {
-        "prueba": "CONTROL · ruta inexistente",
-        "comando": "curl -s -X POST $BASE/v1/ruta_inventada -d '{}'",
-        "http": 404,
-        "salida_verbatim": "404 page not found",
-        "lectura": "404 pelado del mux de Go. Así responde una ruta NO registrada — contraste que prueba que /v1/messages sí lo está."
-      },
-      {
-        "prueba": "CONTROL · OpenAI-compat (traductor distinto y conocido)",
-        "comando": "curl -s -X POST $BASE/v1/chat/completions -d '{\"model\":\"NOEXISTE\",\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}]}'",
-        "http": 404,
-        "salida_verbatim": "{\"error\":{\"message\":\"model 'NOEXISTE' not found\",\"type\":\"not_found_error\",\"param\":null,\"code\":null}}",
-        "lectura": "Esquema OpenAI, distinto del anterior. Cada ruta tiene su propio traductor: confirma que el de /v1/messages es específicamente Anthropic."
-      },
-      {
-        "prueba": "GET /v1/messages (método no permitido)",
-        "comando": "curl -s $BASE/v1/messages",
-        "http": 405,
-        "salida_verbatim": "405 method not allowed",
-        "lectura": "405 y no 404: la ruta ESTÁ registrada en el router, solo que exige POST. Prueba definitiva."
-      }
-    ]
+  "metal": {
+    "nota": "El metal cambió a mitad de misión por mano del Soberano. Lo aquí medido es el estado del 2026-08-04 posterior al cambio.",
+    "cerebro_local": "llama-server (binario de llama.cpp distribuido con Ollama), lanzado A MANO, efímero",
+    "ollama": "parado y deshabilitado — fuera de juego",
+    "arranque_verbatim": "/usr/local/lib/ollama/llama-server -m <blob> --port 8080 --host 127.0.0.1 -c 32768 -ngl 0",
+    "backend": "CPU pura (-ngl 0). NO hay aceleración activa.",
+    "aviso_de_volatilidad": "Durante el bench el Soberano relanzó el servidor: el PID cambió y una petición larga murió a mitad. Las cifras se re-tomaron contra el proceso vivo y COINCIDEN con las del anterior, lo que las refuerza: dos procesos independientes, misma configuración, mismo resultado."
   },
 
-  "A2_contexto": {
-    "veredicto": "BLOQUEADO · no medido",
-    "num_ctx_elegido": null,
-    "variante_creada": null,
-    "motivo": "El modelo 'soberano-coder' no existe en el Ollama que atiende peticiones en este nodo. No se puede medir huella de RAM, tok/s ni tiempo de carga a 16384 vs 32768 de un modelo ausente, ni derivar de ahí un num_ctx 'por dato'.",
-    "hallazgos": [
-      {
-        "hallazgo": "Hay DOS Ollama distintos y el que manda no tiene modelos",
-        "evidencia": "ps: '/usr/local/bin/ollama serve' corriendo bajo el usuario interactivo desde el 28-jul; ss -ltnp: escucha en loopback:11434. Su almacén es ~/.ollama/models, con 0 blobs y 0 manifests (du -sh ~/.ollama = 40K).",
-        "salida_verbatim": "curl -s $BASE/api/tags  ->  {\"models\":[]}     |     ollama list  ->  (cabecera sin filas)"
-      },
-      {
-        "hallazgo": "El servicio systemd que SÍ tenía el almacén con modelos está parado y deshabilitado",
-        "evidencia": "systemctl is-active ollama -> inactive · 'Loaded: ... ; disabled; preset: enabled' · 'ago 04 02:06:29 soberano systemd[1]: Stopped ollama.service'. Su almacén (ruta del usuario de sistema 'ollama', home 700, sin sudo interactivo en este nodo) conserva 5 blobs y UN solo manifest: qwen3:30b-a3b-instruct-2507-q4_K_M.",
-        "consecuencia": "Ni siquiera ahí existe un manifest 'soberano-coder', ni la base 'qwen3-coder:30b' que su Modelfile declara en el FROM. El motor local documentado en la misión G0 no está operativo hoy."
-      },
-      {
-        "hallazgo": "Además, la RAM no estaba en condiciones de dar una medida limpia",
-        "evidencia": "ps: un 'llama-server -c 32768 -ngl 0' ajeno a esta misión, arrancado a las 02:09 desde un terminal, ocupando 35 GB RSS (58% de la RAM). free -h: 57Gi total, 29Gi usados, 27Gi disponibles.",
-        "consecuencia": "Cualquier huella medida ahora estaría contaminada por ese proceso. No se ha tocado ni matado: no es de esta misión (IronClaw)."
-      }
+  "A1bis_idioma_del_servidor": {
+    "veredicto": "CASO (a) · habla Anthropic Messages NATIVO. Sin traductor, sin LiteLLM.",
+    "health": "GET /health -> {\"status\":\"ok\"} (HTTP 200)",
+    "messages": {
+      "comando": "POST /v1/messages -d '{\"model\":\"local\",\"max_tokens\":24,\"messages\":[{\"role\":\"user\",\"content\":\"Di OK y nada mas.\"}]}'",
+      "salida_verbatim": "{\"id\":\"chatcmpl-t1RVlhg1ju2B25bc9u6n75FvioqyRivk\",\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"text\",\"text\":\"OK y nada más.\"}],\"model\":\"...blobs/sha256-78b329e716e7...\",\"stop_reason\":\"end_turn\",\"stop_sequence\":null,\"usage\":{\"cache_read_input_tokens\":0,\"input_tokens\":14,\"output_tokens\":6}}",
+      "lectura": "Esquema Anthropic completo: type/role/content[]/stop_reason/usage. Y soporta tool_use: una petición con `tools` devolvió {\"type\":\"tool_use\",\"name\":\"Read\",\"input\":{\"path\":\"x.txt\"}} con stop_reason=tool_use."
+    },
+    "models": {
+      "comando": "GET /v1/models",
+      "meta_verbatim": "{\"vocab_type\":2,\"n_vocab\":151936,\"n_ctx\":32768,\"n_ctx_train\":262144,\"n_embd\":2048,\"n_params\":30532122624,\"size\":18550716416,\"ftype\":\"Q4_K - Medium\"}",
+      "nota": "Devuelve a la vez forma Ollama (.models[]) y forma OpenAI (.data[]). El `id` es la RUTA del blob, no un nombre de modelo: no hay registro."
+    },
+    "log_de_arranque": "NO DATA. stdout y stderr del proceso apuntan a un pty del Soberano (/proc/<pid>/fd/1 -> /dev/pts/2); no es recuperable a posteriori. El equivalente (arquitectura, parámetros y contexto) se obtuvo de /v1/models, arriba."
+  },
+
+  "A1ter_que_modelo_es": {
+    "veredicto": "IDENTIFICADO POR DIGEST",
+    "familia": "Qwen3 30B-A3B (MoE), variante instruct-2507",
+    "identidad": "qwen3:30b-a3b-instruct-2507-q4_K_M",
+    "prueba": "El blob que sirve llama-server es sha256-78b329e716e7...ba9cc. Ese digest es EXACTAMENTE la capa `application/vnd.ollama.image.model` del manifest registry.ollama.ai/library/qwen3/30b-a3b-instruct-2507-q4_K_M, y el tamaño del fichero (18556685856 bytes) coincide al byte con el que declara el manifest.",
+    "parametros": "30.532.122.624 (30.5B) · Q4_K_M · n_embd 2048 · n_vocab 151936",
+    "contexto": "n_ctx 32768 en ejecución · n_ctx_train 262144 nativo del modelo",
+    "HALLAZGO_IMPORTANTE": "NO es el modelo que asume el canon. La doctrina del nodo describe `soberano-coder` construido FROM qwen3-coder:30b (modelo especializado en código). Lo que hay en RAM es el qwen3 instruct GENERAL. El gguf del Coder sigue en disco, aparte (soberano-bench/models/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf, 18556689568 bytes — fichero DISTINTO, difiere en 3712 bytes). Cuál de los dos debe ser el cerebro del arnés es decisión del Soberano; se reporta, no se decide.",
+    "trampa_evitada": "n_params y `size` que reporta llama-server coinciden con los que el bench G0 midió sobre el gguf del CODER. Los dos variantes son indistinguibles por esas métricas: solo el digest resuelve la identidad."
+  },
+
+  "A2_bench": {
+    "num_ctx": {
+      "valor": 32768,
+      "origen": "DATO MEDIDO del arranque: flag `-c 32768` en la línea de comandos del proceso, confirmado por n_ctx=32768 en /v1/models. No es un decreto ni una variante creada.",
+      "variante_creada": "ninguna, por diseño"
+    },
+    "metodo": "3 peticiones idénticas a POST /v1/messages (el endpoint validado en A1-bis), mismo prompt, temperature 0, max_tokens 256. Las tres devolvieron exactamente 54 tokens: determinismo confirmado.",
+    "corridas": [
+      {"run": 1, "elapsed_s": 2.675, "input_tokens": 32, "output_tokens": 54, "tok_s": 20.18, "nota": "incluye prompt eval en frío"},
+      {"run": 2, "elapsed_s": 2.251, "input_tokens": 1,  "output_tokens": 54, "tok_s": 23.98, "nota": "prefix cache acertado"},
+      {"run": 3, "elapsed_s": 2.265, "input_tokens": 1,  "output_tokens": 54, "tok_s": 23.83, "nota": "prefix cache acertado"}
     ],
-    "por_que_no_se_improvisa": "Restaurar el motor exigiría o bien arrancar el servicio systemd parado (prohibido: no se reinician servicios), o bien un pull de ~18GB para reconstruir la base (mutación de estado no mandatada, y sustituto silencioso de lo que la misión daba por existente). Doctrina: PARA, no improvises un sustituto.",
-    "referencia_historica_NO_reutilizable": {
-      "nota": "MOTOR_LOCAL.md (G0, 2026-07-18) registró a num_ctx=16384: 36.7 GiB en el cgroup del servicio con el modelo cargado, y 24.9 tok/s de generación en CPU. Se cita como contexto, NO como dato de esta misión: es de otra fecha, otro backend y un modelo que hoy no está. No sustituye a la medición pedida."
+    "sintesis": {
+      "generacion_tok_s": "~23.9 (corridas con caché caliente)",
+      "con_prompt_eval_tok_s": "~20.2 (corrida en frío)",
+      "latencia_respuesta_completa_s": "2.25 a 2.68 para 54 tokens",
+      "nota_de_honestidad": "tok/s calculado como output_tokens / tiempo de pared total, así que INCLUYE la sobrecarga HTTP y el prompt eval. Es un suelo, no un techo."
+    },
+    "prefix_caching": {
+      "observado": "input_tokens cayó de 32 (run 1) a 1 (runs 2 y 3) con el mismo prompt",
+      "consecuencia": "El servidor SÍ cachea prefijos. Por tanto el footgun de CLAUDE_CODE_ATTRIBUTION_HEADER es aplicable aquí: hay caché real que perder si el arnés inyecta un hash variable por petición. Sigue SIN activarse: aún no se ha medido degradación en sesión real."
+    },
+    "reproducibilidad": "Las mismas tres corridas se hicieron antes contra un proceso llama-server ANTERIOR con configuración idéntica: 21.16 / 23.79 / 24.00 tok/s. Dos servidores distintos, mismo resultado.",
+    "RAM": {
+      "sistema_total_GiB": 57,
+      "MemAvailable_antes_kB": 33409244,
+      "MemAvailable_despues_kB": 33286696,
+      "MemAvailable_antes_GiB": 31.86,
+      "MemAvailable_despues_GiB": 31.75,
+      "delta_MemAvailable_MiB": -119.7,
+      "RSS_antes_kB": 31296644,
+      "RSS_despues_kB": 31470744,
+      "RSS_GiB": "29.85 -> 30.01",
+      "delta_RSS_MiB": 170.0,
+      "LO_QUE_IMPORTA_margen": "Con el modelo cargado y sirviendo, quedan ~31.8 GiB de MemAvailable sobre 57 GiB totales. El nodo PUEDE hacer otra cosa a la vez. Tres corridas consumieron solo ~120 MiB adicionales, así que el coste marginal por sesión es pequeño: lo caro es tener el modelo residente (~30 GiB de RSS), no usarlo.",
+      "AVISO": "Ese margen no es estable. Durante la misión, con el modelo cargado y actividad de escritorio, el swap llegó a 6.4 GiB usados y MemAvailable bajó a ~17.8 GiB. El margen es real pero se lo come el resto del escritorio."
+    },
+    "SUELO_NO_TECHO": {
+      "aviso": "ESTAS CIFRAS SON UN SUELO. El servidor corre con -ngl 0: CPU pura, cero capas en GPU. No es el rendimiento del nodo, es el rendimiento del nodo con la mano atada.",
+      "dato_G0": "El bench G0 de este mismo nodo (llama-bench, mismo hardware, Radeon 780M / RADV PHOENIX) midió: generación 9.90 tok/s en CPU frente a 32.49 con Vulkan = 3.28x. Proceso de prompt 99.93 tok/s en CPU frente a 357.70 con Vulkan = 3.58x.",
+      "estimacion_con_aceleracion": "Aplicando el 3.28x a los ~23.9 tok/s medidos: del orden de 75-80 tok/s de generación con Vulkan, y proceso de prompt ~3.6x más rápido (que es lo que de verdad duele en un arnés context-heavy).",
+      "salvedad_de_la_estimacion": "La base de CPU de G0 (9.90 tok/s) y la medida aquí (23.9 tok/s) no son la misma medición: G0 usó llama-bench (tg128, lotes) y aquí es una generación corta vía HTTP con caché caliente. Trasladar el ratio es una ESTIMACIÓN razonable, no una medida. Confirmarla exige rebenchear con Vulkan activo.",
+      "no_se_toca": "El arranque es mano del Soberano. No se ha cambiado."
     }
   },
 
-  "A3_envoltorio": {
-    "veredicto": "ENTREGADO (sin ejecutar)",
-    "ruta": "bin/cc-local",
-    "nota": "Escrito y con preflight propio: aborta si no hay Ollama, si el endpoint /v1/messages no responde 405 a GET, o si el modelo no existe. No se ha podido ejecutar de verdad porque el modelo falta — el preflight abortaría, que es exactamente su comportamiento correcto.",
-    "num_ctx_en_banner": "leído en runtime de /api/show, nunca hardcodeado en el script"
-  },
-
   "A5_smoke": {
-    "veredicto": "BLOQUEADO",
-    "motivo": "Depende de A2. Sin cerebro local no hay sesión delegada que medir, y por tanto no hay comparación honesta contra el coste de frontera.",
-    "tarea_reservada": "i18n huérfanas de Aurelius (Bloque 5.2 del backlog) — sigue siendo buena candidata: mecánica, verificable por gate y desechable."
+    "HALLAZGO_BLOQUEANTE": {
+      "sintoma": "Claude Code contra este servidor fallaba en el PRIMER turno, siempre: `API Error: 400 Failed to initialize samplers: failed to parse grammar`.",
+      "diagnostico": "Bisecado con el payload real del arnés (78.814 bytes, 24 herramientas), capturado con un instrumento desechable fuera del repo que solo registra y devuelve error — no traduce nada, no es un adaptador.",
+      "descartado_por_medicion": [
+        "NO son las herramientas en general: una petición con `tools` devuelve tool_use correcto",
+        "NO es el volumen: 30 herramientas sintéticas grandes pasan sin problema",
+        "NO son los campos thinking / output_config / context_management / metadata: quitarlos uno a uno no arregla nada",
+        "NO son construcciones sueltas de JSON Schema: $schema, additionalProperties, pattern, anyOf, propertyNames, exclusiveMinimum y enum pasan todas por separado"
+      ],
+      "causa_raiz": "La conversión JSON-Schema -> GBNF de llama.cpp expande `maxLength` a una gramática de repetición explícita. Umbral medido: maxLength=1024 pasa, maxLength=16384 ya falla. La herramienta `Workflow` del arnés declara `script.maxLength = 524288`, así que envenena el payload entero.",
+      "prueba": "Aislado a una sola herramienta de las 24: quitando `Workflow`, la petición pasa. `--disallowedTools Workflow` la elimina del payload (24 -> 23 herramientas) y con ella la ÚNICA propiedad con maxLength>1024 de todo el conjunto.",
+      "mitigacion_aplicada": "bin/cc-local invoca `claude --disallowedTools Workflow`. Documentado en el script con su medición. Revisar si se actualiza llama.cpp o cambia el esquema de Workflow."
+    }
   },
 
-  "higiene": "Ni IPs, ni hostnames, ni usuarios en ruta en este fichero ni en bin/cc-local. El bind no-loopback del servicio systemd se pasa por la variable P0X_OLLAMA_URL en el entorno del Soberano, nunca versionado."
+  "higiene": "Ni IPs, ni hostnames, ni usuarios en ruta en este fichero ni en bin/cc-local. El instrumento de captura vivió en el scratchpad y no entra al repo."
 }

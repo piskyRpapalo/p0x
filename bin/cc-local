@@ -1,69 +1,85 @@
 #!/usr/bin/env bash
-# cc-local · arranca Claude Code contra el CEREBRO LOCAL del nodo (Ollama).
+# cc-local · arranca Claude Code contra el CEREBRO LOCAL del nodo.
 #
 # Bloque 12 (2026-08-04). Script y no alias a propósito: un alias no se versiona,
 # no se audita y no puede hacer preflight. Esto sí.
 #
 # El Soberano lo copia a ~/bin/cc-local (el repo no se auto-instala — IronClaw).
 #
-# CONTRATO: cuando este script arranca, NINGUNA ruta interna del arnés puede
-# escaparse a la API de frontera. Se reapuntan la base URL, el token y los TRES
-# alias de modelo (OPUS/SONNET/HAIKU) además de ANTHROPIC_MODEL y del modelo
-# rápido auxiliar — que es la fuga clásica: el arnés usa el "small/fast" para
-# títulos y tareas de fondo, y si se olvida, esa ruta sigue pagando frontera.
+# EL METAL (medido el 2026-08-04, no decretado):
+#   El cerebro local NO es Ollama — Ollama está parado y deshabilitado. Es un
+#   llama-server lanzado A MANO por el Soberano, con el modelo ya en RAM, que
+#   habla la Anthropic Messages API de forma NATIVA (POST /v1/messages). Por eso
+#   no hace falta traductor ni LiteLLM: el arnés apunta ahí directamente.
+#
+#   El servidor es EFÍMERO: si el Soberano cierra ese terminal, el cerebro muere
+#   y este envoltorio abortará en el preflight. El comando que lo relanza está en
+#   el banner de abajo.
+#
+#   No hay registro de modelos: hay UN servidor con UN modelo en RAM. Por eso el
+#   campo "model" del payload es irrelevante y va fijo a "local".
 #
 # ---------------------------------------------------------------------------
 # NOTA sobre CLAUDE_CODE_ATTRIBUTION_HEADER (documentada, NO activada):
 #   Algunos backends OSS pierden el prefix caching porque el arnés inyecta por
 #   petición una cabecera con un hash variable; al cambiar el prefijo en cada
 #   llamada, la caché del servidor no acierta nunca y el prompt se reevalúa
-#   entero. En ese caso, desactivarla recupera la caché:
+#   entero. Si eso pasara aquí, se recupera con:
 #       export CLAUDE_CODE_ATTRIBUTION_HEADER=0
-#   NO se activa por defecto en este script: se activa SOLO si el bloque A5
-#   (smoke con tarea real) MIDE degradación de prompt_eval entre turnos.
-#   Decreto sin dato = prohibido. Ver mente/telemetria/cerebro_local_bench.json.
+#   NO se activa por defecto: se activa SOLO si se MIDE degradación.
+#   DATO (2026-08-04): en este servidor el prefix caching FUNCIONA — entre
+#   corridas idénticas, input_tokens cayó de 32 a 1. O sea que hay caché real
+#   que perder: el footgun es aplicable aquí, y merece vigilarse.
 # ---------------------------------------------------------------------------
 set -euo pipefail
 
 # Loopback a propósito: cero IPs/hostnames del nodo en nada versionado.
-# Si el Ollama que responde es el del servicio systemd, ese bind NO es loopback:
-# exporta P0X_OLLAMA_URL con su URL antes de invocar (y no la escribas al repo).
-OLLAMA_URL="${P0X_OLLAMA_URL:-http://127.0.0.1:11434}"
-MODELO="${P0X_LOCAL_MODEL:-soberano-coder-cc}"
+BASE="${P0X_LOCAL_URL:-http://127.0.0.1:8080}"
+MODELO="local"     # no hay registro que consultar; el servidor sirve lo que tiene cargado.
 
-die() { printf '\n  ABORTA · %s\n\n' "$1" >&2; exit 1; }
+RELANZA='/usr/local/lib/ollama/llama-server \
+  -m /usr/share/ollama/.ollama/models/blobs/sha256-78b329e716e7... \
+  --port 8080 --host 127.0.0.1 -c 32768 -ngl 0'
 
-# --- Preflight (honest sensors: no arrancamos a ciegas) --------------------
-curl -sf -m 5 "$OLLAMA_URL/api/version" >/dev/null 2>&1 \
-  || die "no hay Ollama escuchando en $OLLAMA_URL — arráncalo o exporta P0X_OLLAMA_URL."
+# --- Preflight: UNA sola condición de aborto (honest sensors) --------------
+# El servidor es efímero. Si no responde, se dice AHORA, no después de que la
+# sesión haya arrancado y el primer turno falle.
+if ! HEALTH="$(curl -s -f -m 5 "$BASE/health" 2>/dev/null)" \
+   || [ "$(printf '%s' "$HEALTH" | jq -r '.status // "?"' 2>/dev/null)" != "ok" ]; then
+  printf '\n  ABORTA · el cerebro local no responde en %s/health\n\n' "$BASE" >&2
+  printf '  El servidor es EFÍMERO (lanzado a mano). Relánzalo con:\n\n' >&2
+  printf '    %s\n\n' "$RELANZA" >&2
+  printf '  (el digest va truncado arriba: complétalo con el blob real del almacén)\n\n' >&2
+  exit 1
+fi
 
-OLLAMA_VER="$(curl -s -m 5 "$OLLAMA_URL/api/version" | jq -r '.version // "?"')"
-
-# La ruta Anthropic Messages debe existir: sin ella el arnés no habla con este
-# backend. GET sobre una ruta registrada responde 405; una ruta inexistente, 404.
-CODE="$(curl -s -o /dev/null -w '%{http_code}' -m 5 "$OLLAMA_URL/v1/messages" || true)"
-[ "$CODE" = "405" ] \
-  || die "este Ollama ($OLLAMA_VER) no expone POST /v1/messages (GET devolvió $CODE, se esperaba 405). Sin endpoint nativo Anthropic no se improvisa proxy: es decisión del Soberano."
-
-# El modelo debe existir. Si no, PARA — nada de caer a un modelo cualquiera.
-SHOW="$(curl -s -m 10 -X POST "$OLLAMA_URL/api/show" \
-        -H 'content-type: application/json' -d "{\"model\":\"$MODELO\"}")"
-echo "$SHOW" | jq -e '.parameters? // .model_info?' >/dev/null 2>&1 \
-  || die "el modelo '$MODELO' no existe en $OLLAMA_URL. Créalo desde su Modelfile (deploy/soberano/) — este script NO elige modelo sustituto."
-
-# num_ctx leído del modelo, jamás decretado por el script.
-NUM_CTX="$(echo "$SHOW" | jq -r '.parameters // ""' | awk '$1=="num_ctx"{print $2}')"
-[ -n "$NUM_CTX" ] || NUM_CTX="(no declarado · MÍDELO)"
+# Metadatos SOLO informativos para el banner. Nunca abortan: si el servidor no
+# los expone, se muestra NO DATA en vez de inventar una cifra.
+META="$(curl -s -m 5 "$BASE/v1/models" 2>/dev/null || true)"
+NUM_CTX="$(printf '%s' "$META" | jq -r '.data[0].meta.n_ctx // empty' 2>/dev/null || true)"
+NPARAM="$(printf '%s' "$META" | jq -r '.data[0].meta.n_params // empty' 2>/dev/null || true)"
+# Sin '·' ni otros multibyte en lo interpolado: printf pad a bytes, no a columnas,
+# y un multibyte descuadra la caja del banner.
+if [ -n "$NUM_CTX" ]; then
+  CTX_TXT="$NUM_CTX (flag -c del arranque)"
+else
+  CTX_TXT="NO DATA"
+fi
+if [ -n "$NPARAM" ]; then
+  MODELO_TXT="$(awk -v n="$NPARAM" -v m="$MODELO" 'BEGIN{printf "%s (%.1fB params)", m, n/1e9}')"
+else
+  MODELO_TXT="$MODELO (NO DATA)"
+fi
 
 # --- Reapuntado total del arnés -------------------------------------------
-export ANTHROPIC_BASE_URL="$OLLAMA_URL"
-export ANTHROPIC_AUTH_TOKEN="placeholder-local-no-frontier"   # Ollama no valida; el arnés exige que exista.
+export ANTHROPIC_BASE_URL="$BASE"
+export ANTHROPIC_AUTH_TOKEN="placeholder-local-no-frontier"   # el servidor no valida; el arnés exige que exista.
 export ANTHROPIC_MODEL="$MODELO"
 export ANTHROPIC_DEFAULT_OPUS_MODEL="$MODELO"
 export ANTHROPIC_DEFAULT_SONNET_MODEL="$MODELO"
 export ANTHROPIC_DEFAULT_HAIKU_MODEL="$MODELO"
-export ANTHROPIC_SMALL_FAST_MODEL="$MODELO"                   # la fuga clásica.
-export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1             # desviación aditiva declarada: sin telemetría de fondo.
+export ANTHROPIC_SMALL_FAST_MODEL="$MODELO"                   # la fuga clásica: tareas de fondo del arnés.
+export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1             # aprobado por el Soberano (Bloque 12).
 
 # Bandera que lee CLAUDE.md para saber qué cerebro manda en esta sesión.
 export P0X_BRAIN=local
@@ -74,12 +90,17 @@ printf '  ╔══════════════════════�
 printf '  ║  P0X · CEREBRO LOCAL                                     ║\n'
 printf '  ╠══════════════════════════════════════════════════════════╣\n'
 printf '  ║  cerebro   : local (P0X_BRAIN=local)                     ║\n'
-printf '  ║  modelo    : %-44s║\n' "$MODELO"
-printf '  ║  num_ctx   : %-44s║\n' "$NUM_CTX"
-printf '  ║  backend   : Ollama %-37s║\n' "$OLLAMA_VER"
+printf '  ║  modelo    : %-44s║\n' "$MODELO_TXT"
+printf '  ║  num_ctx   : %-44s║\n' "$CTX_TXT"
+printf '  ║  backend   : llama-server · CPU pura (-ngl 0)            ║\n'
 printf '  ║  endpoint  : POST /v1/messages (Anthropic nativo)        ║\n'
 printf '  ╠══════════════════════════════════════════════════════════╣\n'
 printf '  ║  SIN TOKEN DE FRONTERA                                   ║\n'
+printf '  ╠══════════════════════════════════════════════════════════╣\n'
+printf '  ║  SERVIDOR EFÍMERO: lanzado a mano por el Soberano. Si    ║\n'
+printf '  ║  se cierra ese terminal, el cerebro muere. Relanzar:     ║\n'
+printf '  ║  llama-server -m <blob> --port 8080 --host 127.0.0.1     ║\n'
+printf '  ║                -c 32768 -ngl 0                           ║\n'
 printf '  ╠══════════════════════════════════════════════════════════╣\n'
 printf '  ║  NO toca canon · NO enmienda doctrina · NO emite         ║\n'
 printf '  ║  veredictos de arquitectura · NO decide pedagogía.       ║\n'
@@ -88,4 +109,14 @@ printf '  ║  Todo pasa el gate (tsc=0 + tests) antes de existir.     ║\n'
 printf '  ╚══════════════════════════════════════════════════════════╝\n'
 printf '\n  Al cerrar: anota la sesión en mente/telemetria/cerebro_local.jsonl\n\n'
 
-exec claude "$@"
+# --- Herramienta excluida por DATO, no por gusto ---------------------------
+# MEDIDO (2026-08-04): llama-server aborta con
+#   400 "Failed to initialize samplers: failed to parse grammar"
+# ante CUALQUIER petición del arnés. Bisecado hasta la causa raíz: la conversión
+# JSON-Schema→GBNF de llama.cpp expande `maxLength` a una gramática de repetición
+# explícita, y revienta entre 1024 y 16384 (medido: 1024 ok, 16384 falla). La
+# herramienta `Workflow` declara `script.maxLength = 524288`, así que envenena
+# el payload entero: sin excluirla, el cerebro local NO ARRANCA.
+# Excluirla quita la única propiedad con maxLength>1024 de las 24 herramientas.
+# Revisar si se actualiza llama.cpp o cambia el esquema de Workflow.
+exec claude --disallowedTools Workflow "$@"
