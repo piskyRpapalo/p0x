@@ -529,6 +529,16 @@ El Soberano movió el metal: Ollama fuera, `llama-server` a mano en su lugar. Es
   Tres corridas costaron solo ~120 MiB: lo caro es tenerlo cargado (~30 GiB de RSS), no usarlo.
   Pero con actividad de escritorio el swap llegó a 6.4 GiB y MemAvailable bajó a ~17.8 GiB.
   Conviene decidir si el modelo vive residente siempre o se carga por sesión.
+- **(M)** **No delegues inventarios al local — empieza por lo que tiene gate.** Medido en A5: 20
+  minutos, una pasada, y una respuesta **incorrecta con alta confianza** («no hay claves
+  huérfanas» cuando 26 de 29 lo están), con tres ficheros reales citados como prueba de
+  referencias que no existen. Y el gate habría dado **verde**, porque un inventario no toca
+  código. El gate protege refactors, tests y diffs; no protege inventarios ni auditorías. La
+  primera delegación real debería ser algo que `tsc` y los tests puedan desmentir.
+- **(S)** **La ventana de 32768 se queda corta para este arnés.** Medido: el contexto pico fue
+  22.648 tokens (**69%**) en una tarea trivial de 5 llamadas a herramienta — el arnés manda ~78 KB
+  de definiciones de herramientas por turno. Con `n_ctx_train` de 262144 hay margen de sobra en el
+  modelo; el techo lo pone la RAM, y eso exige remedir antes de subir `-c`.
 - **(S)** **Prefix caching confirmado** (`input_tokens` 32→1 entre corridas idénticas). O sea que
   hay caché real que perder: el footgun de `CLAUDE_CODE_ATTRIBUTION_HEADER` es aplicable aquí.
   Sigue **sin activar**, según tu regla: solo si se mide degradación en sesión real.

@@ -99,7 +99,36 @@
       "causa_raiz": "La conversión JSON-Schema -> GBNF de llama.cpp expande `maxLength` a una gramática de repetición explícita. Umbral medido: maxLength=1024 pasa, maxLength=16384 ya falla. La herramienta `Workflow` del arnés declara `script.maxLength = 524288`, así que envenena el payload entero.",
       "prueba": "Aislado a una sola herramienta de las 24: quitando `Workflow`, la petición pasa. `--disallowedTools Workflow` la elimina del payload (24 -> 23 herramientas) y con ella la ÚNICA propiedad con maxLength>1024 de todo el conjunto.",
       "mitigacion_aplicada": "bin/cc-local invoca `claude --disallowedTools Workflow`. Documentado en el script con su medición. Revisar si se actualiza llama.cpp o cambia el esquema de Workflow."
-    }
+    },
+    "tarea": "Inventario de claves i18n huérfanas en aurelius/src/i18n/dictionary.ts. Mecánica, real, desechable y sin escritura (solo Read/Grep/Glob).",
+    "medicion": {
+      "minutos": 19.97,
+      "segundos": 1198,
+      "pasadas": 1,
+      "exit_code": 0,
+      "llamadas_a_herramienta": 5,
+      "turnos": 6,
+      "ctx_pico_tokens": 22648,
+      "ctx_ventana": 32768,
+      "ctx_pico_porcentaje": 69
+    },
+    "veredicto": "FALLA · respuesta incorrecta con alta confianza",
+    "verdad_de_terreno": "29 claves definidas; solo 3 (app.name, app.tagline, lang.toggle) se referencian fuera del diccionario, y las tres desde src/i18n/demo.ts. Las otras 26 no aparecen en ningún sitio. El motivo de fondo: src/i18n/ es un andamiaje TypeScript que nunca se cableó a la UI real, y la app corre sobre interface/i18n.js con un espacio de nombres distinto (face.*, path.*, id.*, wake.*).",
+    "lo_que_respondio_el_local": "«No hay claves huérfanas. Todas las claves están referenciadas.» Acertó las 3 de demo.ts y afirmó que el resto se referencian «principalmente en interface/present.js, interface/oraculo.js y src/missions.ts».",
+    "por_que_es_grave": "Los tres ficheros que cita EXISTEN — por eso la respuesta parece verificada — pero contienen CERO referencias a esas claves (comprobado clave por clave). Es una fabricación plausible, la peor clase: los nombres de fichero cuadran, así que sobrevive a una lectura por encima.",
+    "el_gate_no_habria_salvado": "La tarea era un inventario: no toca código, así que `tsc --noEmit` sigue en 0 y los tests siguen igual. El gate habría dado VERDE sobre una respuesta falsa. Conclusión para el reparto: el gate protege refactors, tests y diffs; NO protege inventarios ni auditorías, que son justo lo que apetece delegar por baratas.",
+    "comparacion_honesta_con_frontera": {
+      "local": "20 minutos, 1 pasada, respuesta incorrecta y fabricada. Para que fuera utilizable haría falta al menos otra pasada con la pista dada, y verificación humana clave por clave — que cuesta más que hacerlo desde cero.",
+      "frontera": "La misma tarea, hecha por esta sesión: 3 llamadas a herramienta, ~2 minutos, respuesta correcta más el hallazgo estructural (dos sistemas i18n paralelos) que el local no vio.",
+      "veredicto": "En esta tarea el local NO ahorró: multiplicó por ~10 el tiempo de pared y entregó algo que hay que tirar. El ahorro de token se convirtió en coste de tiempo del Soberano, que es exactamente lo que la misión pedía no maquillar. NO generalizar a todas las tareas mecánicas a partir de UNA muestra: lo que este dato dice es que los inventarios (sin gate que los atrape) son mala primera delegación, no que el local sea inútil."
+    },
+    "nota_de_latencia": "Los 20 minutos no son culpa del modelo pensando: son proceso de prompt en CPU pura. El arnés manda ~78 KB de definiciones de herramientas en cada turno, y el contexto pico llegó a 22.648 tokens de los 32.768 disponibles — el 69% de la ventana consumido por el andamiaje del arnés antes de tocar trabajo real. Aquí es donde el 3.58x de Vulkan en proceso de prompt valdría más que el 3.28x de generación."
+  },
+
+  "A6_telemetria": {
+    "fichero": "mente/telemetria/cerebro_local.jsonl (fuera de git por regla previa del repo; esquema en el README del directorio)",
+    "lineas": 2,
+    "contenido": "una línea de la sesión local medida y una de la sesión de frontera equivalente, para que la comparación tenga contra qué"
   },
 
   "higiene": "Ni IPs, ni hostnames, ni usuarios en ruta en este fichero ni en bin/cc-local. El instrumento de captura vivió en el scratchpad y no entra al repo."
