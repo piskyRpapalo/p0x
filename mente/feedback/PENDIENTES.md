@@ -732,6 +732,60 @@ Sugerencias accionables (coste S/M/L):
   asignaciones ICAO revisada antes de confiar en el MIL? de aeronaves. La doctrina (nunca
   afirmar, solo inferir con método) ya está; falta cobertura de rangos.
 
+## Ronda METODO-1 (Fase 1 del Método Aurelius) · 2026-08-04
+
+Contexto: se implantó la Fase 1 de `AURELIUS_METODO_v1.txt` en el repo `aurelius`
+(auditoría de conformidad, el Anclaje, la advertencia eléctrica y sus tests). La
+auditoría midió 28 mecanismos: **22 CUMPLE · 6 REESCRIBIBLE · 0 DESCARTAR**.
+
+Sugerencias accionables (coste S/M/L):
+
+- **(M)** **El Camino bloquea el avance, y eso contradice el contrato del Abecedario.**
+  El hallazgo más serio de la auditoría, y está en dos capas: `_avanzar()` en el
+  servidor sólo deja abierto el módulo actual, y `MissionStatus` admite `"locked"`
+  como valor legítimo, así que el tipo permite expresar lo que la doctrina prohíbe
+  (§2.2: «el sistema NUNCA bloquea el avance… el usuario es un adulto»). La
+  conversión ya está escrita en `docs/AUDITORIA_METODO_v1.md`: marcar **sin base
+  medida** y recordarlo al abrir, en vez de cerrar la puerta. Es el `[aur:moratoria]`
+  del arsenal, vivo en el código.
+
+- **(S)** **`camino.html` arrastra una copia inline de `camino.js`.** Casi 400 líneas
+  duplicadas: la página standalone tiene su propia implementación y el drawer de la
+  cara carga el módulo. Pueden divergir en silencio y nadie se enteraría hasta que
+  las dos digan cosas distintas. El Anclaje se construyó evitando esto a propósito
+  (una sola implementación, la página la carga). Arreglarlo es sustituir el bloque
+  inline por un `<script src>`.
+
+- **(S)** **Conectar la autodeclaración de nivel del onboarding con el Anclaje.**
+  En M0 el usuario declara si es principiante/intermedio/avanzado y eso fija la
+  profundidad para siempre, sin contrastarse jamás con nada. Es exactamente la
+  mitad izquierda del Anclaje —una confianza declarada— recogida y tirada. Pasarla
+  como primera entrada del registro no le pide nada nuevo al usuario y le devuelve,
+  cuando haya cinco resultados, cuánto acertó al declararse.
+
+- **(M)** **La advertencia eléctrica está construida pero no tiene tema al que
+  engancharse.** El componente, el registro (`tema-2`, `tema-3`, `mision-2`) y el
+  punto de montaje están listos; ningún tema existe todavía porque la Fase 1 no
+  autoriza construirlos. Queda por decidir dos cosas cuando llegue el TEMA 2: si la
+  vista genérica de tema llama a `montar()` siempre, y si conviene un check de CI
+  que falle cuando un tema del registro se pinte sin advertencia. Hoy la garantía
+  es arquitectónica (no hay interruptor); un check la volvería mecánica.
+
+- **(S)** **Hay un test rojo que el CI no ve.** `movil.spec.ts:34` falla —la cara
+  desborda 12 px en horizontal a 360 px— y falla igual en el HEAD anterior a esta
+  ronda, así que es deuda previa, no regresión. Pasa desapercibido porque el
+  workflow sólo corre `--project=escritorio-1280`. O se arregla el desbordamiento o
+  se amplía el CI a un viewport móvil; dejarlo así es peor que las dos, porque el
+  test existe y nadie lo mira.
+
+- **(S · decisión del Soberano)** **Publicar o no el cementerio de archivados.**
+  `ARSENALAURELIUS_SUGERENCIAS.txt` trae su propio PROMPT BLOQUEADO: la decisión de
+  si el registro de los 31 descartados se publica es tuya y no está tomada. Está
+  commiteado en `docs/` del repo público pero **sin push**, así que todavía no es
+  público. El Preceptor recomienda publicarlo con la cabecera «REGISTRO DE
+  ARCHIVADOS — NADA DE LO QUE SIGUE SE VA A CONSTRUIR» en la primera línea; esa
+  cabecera **no** se ha añadido, porque la tarea prohibía reformatear los documentos.
+
 ## Backlog de UI/software (autoritativo)
 El trabajo pendiente de **interfaz** (Hexelion · Aurelius · Le Jardin) vive en su
 propio documento: **[`mente/backlog/BACKLOG_UI.md`](../backlog/BACKLOG_UI.md)**
