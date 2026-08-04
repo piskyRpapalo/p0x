@@ -525,10 +525,6 @@ El Soberano movió el metal: Ollama fuera, `llama-server` a mano en su lugar. Es
   renació una vez a mitad de esta misión, matando una petición en curso. Mientras siga así,
   cualquier trabajo delegado puede perderse sin aviso. Una unidad de usuario que lo levante
   (propose-only, no la instalo) lo volvería reproducible.
-- **(S)** **Margen de RAM: real pero frágil.** Con el modelo residente quedan ~31.8 GiB de 57.
-  Tres corridas costaron solo ~120 MiB: lo caro es tenerlo cargado (~30 GiB de RSS), no usarlo.
-  Pero con actividad de escritorio el swap llegó a 6.4 GiB y MemAvailable bajó a ~17.8 GiB.
-  Conviene decidir si el modelo vive residente siempre o se carga por sesión.
 - **(M)** **No delegues inventarios al local — empieza por lo que tiene gate.** Medido en A5: 20
   minutos, una pasada, y una respuesta **incorrecta con alta confianza** («no hay claves
   huérfanas» cuando 26 de 29 lo están), con tres ficheros reales citados como prueba de
