@@ -1,0 +1,337 @@
+LA MITOCONDRIA - PROMPTS DE MIGRACION POR CONSUMIDOR v1.0.0
+Texto plano absoluto. Fecha: 2026-08-04.
+Autor: el Preceptor. Canoniza: el Soberano. Ejecuta: CC.
+Companion de MITOCONDRIA_ESPECIFICACION.txt y MISION_MITOCONDRIA_P0X.md.
+
+====================================================================
+0. COMO SE USA ESTE FICHERO
+====================================================================
+
+Contiene cuatro prompts de la fase F3, uno por tipo de consumidor. Cada uno esta
+listo para copiar y pegar sin edicion, y es autocontenido.
+
+ORDEN OBLIGATORIO. De menos acoplado a mas acoplado:
+  F3.1  Trabajos por lotes
+  F3.2  Pasarela (pausa previa a llamada al modelo)
+  F3.3  Temporizador horario
+  F3.4  Comprobaciones de salud
+
+UN CONSUMIDOR POR SESION. Migrar dos a la vez hace imposible saber cual rompio
+que, y el sintoma que perseguimos es precisamente un acoplamiento invisible.
+
+REQUISITO PREVIO PARA LOS CUATRO: la fase F2 debe estar cerrada y la Mitocondria
+publicando veredicto. Ver la nota de bloqueo en la seccion 5.
+
+====================================================================
+1. LA TABLA DE REACCION - EL CONTRATO COMUN
+====================================================================
+
+Vale para los cuatro consumidores. Cada prompt la repite para ser autocontenido.
+
+  LIBRE
+    Comportamiento normal. Se puede iniciar trabajo nuevo de cualquier peso.
+
+  RESTRINGIDO
+    No se INICIA trabajo pesado nuevo. Lo que ya esta en marcha TERMINA.
+    El trabajo ligero sigue.
+    Que cuenta como pesado lo define cada consumidor, y lo declara por escrito.
+
+  EMERGENCIA
+    Solo lo imprescindible para que el sistema siga respondiendo y siga siendo
+    observable. Todo lo demas espera. Nada se aborta a medias.
+
+  NO_DATA
+    Se comporta EXACTAMENTE como RESTRINGIDO. Nunca como LIBRE.
+    Se aplica a los cuatro casos siguientes, sin distinguirlos:
+      - la clave del veredicto no existe;
+      - el formato no se reconoce;
+      - el estado no es uno de los cuatro valores validos;
+      - la edad de lectura supera el limite que el consumidor declare.
+
+REGLAS TRANSVERSALES
+
+  T1. Se decide ANTES de empezar, jamas en mitad. Un cambio de veredicto no
+      interrumpe un trabajo en curso. Abortar a medias deja estado corrupto y es
+      peor que terminar.
+  T2. El consumidor NO mide. Una vez migrado, no vuelve a leer un sensor.
+  T3. El consumidor NO escribe el veredicto. Solo lee.
+  T4. Si el consumidor decide ignorar el veredicto, lo registra con motivo. Un
+      incumplimiento silencioso es indistinguible de un fallo.
+  T5. La espera es con retardo creciente y con tope. Un consumidor que consulta
+      en bucle apretado se convierte el mismo en carga.
+
+====================================================================
+2. PROMPT F3.1 - TRABAJOS POR LOTES
+====================================================================
+
+--- INICIO DEL PROMPT ---
+
+MISION: La Mitocondria, fase F3.1. Migrar el consumidor de TRABAJOS POR LOTES.
+Solo ese consumidor.
+
+CONTEXTO (autocontenido; no necesitas memoria externa):
+El rack tenia varios procesos midiendo los mismos sensores y decidiendo carga
+por su cuenta. Se ha construido un arbitro unico, la Mitocondria, que publica un
+veredicto por nodo en una clave del almacen en memoria. La especificacion del
+formato esta en MITOCONDRIA_ESPECIFICACION.txt, seccion 2; leela entera antes de
+tocar codigo. Tu tarea ahora es que el sistema de trabajos por lotes deje de
+medir y pase a preguntar.
+
+TABLA DE REACCION que debes implementar:
+  LIBRE       - se encola y se ejecuta con normalidad.
+  RESTRINGIDO - no se INICIA trabajo por lotes nuevo; el que corre, termina.
+  EMERGENCIA  - no se inicia nada; lo encolado espera.
+  NO_DATA     - identico a RESTRINGIDO. Nunca como LIBRE.
+                Aplica a: clave ausente, formato irreconocible, estado invalido,
+                o edad de lectura por encima del limite que declares.
+
+TAREAS:
+  1. Localiza la guarda de temperatura actual del sistema de lotes y sustituye
+     su lectura de sensor por una consulta del veredicto. La guarda de
+     temperatura desaparece como medicion; permanece como decision.
+  2. Declara por escrito, en el propio codigo y en el reporte, que trabajo
+     cuentas como pesado y cual como ligero. Sin esa declaracion la tabla de
+     reaccion no es aplicable.
+  3. Implementa la consulta con retardo creciente y tope: si el veredicto no
+     permite iniciar, se espera y se reintenta; no se consulta en bucle apretado.
+  4. La decision se toma ANTES de iniciar el trabajo. Un cambio de veredicto no
+     interrumpe un trabajo en marcha.
+  5. Registra cada decision de aplazamiento con el estado y el motivo que traia
+     el veredicto. Sin ese registro no se puede auditar si la migracion mejoro o
+     empeoro nada.
+  6. NO retires todavia el codigo de lectura de sensor: dejalo inerte y marcado.
+     Su retirada es la fase F4, y solo cuando este consumidor lleve tiempo
+     funcionando por veredicto.
+  7. Tests: veredicto ausente produce comportamiento de RESTRINGIDO; veredicto
+     con edad de lectura excesiva produce comportamiento de RESTRINGIDO; un
+     trabajo en marcha no se aborta cuando el estado empeora.
+
+INVARIANTES:
+  - Propose-only: no despliegues, no reinicies servicios, no hagas git push.
+  - Editar el codigo fuente, nunca artefactos de compilacion.
+  - Backup antes de tocar un consumidor vivo.
+  - Sin dependencias nuevas.
+  - Cero direcciones de red, nombres de maquina o usuarios en ruta en nada que
+    se publique.
+  - Un solo commit, atomico, para este consumidor.
+  - Ante ambiguedad, PARA y pregunta. No adivines.
+
+FORMATO DE REPORTE, obligatorio, maximo 12 lineas:
+  RONDA MITOCONDRIA-F3.1 . <repo>@<rama>
+  HECHO      <hash> . <una linea>
+  DECLARADO  pesado = <...> . ligero = <...>
+  VERIFICADO <resultado de los tests>
+  BLOQUEADO  <item> <- <dependencia exacta>
+  DECIDE     <una pregunta, o "nada">
+
+Cierra con entre 3 y 6 SUGERENCIAS con coste S/M/L anexadas a
+mente/feedback/PENDIENTES.md.
+
+PARA. No migres ningun otro consumidor.
+
+--- FIN DEL PROMPT ---
+
+====================================================================
+3. PROMPT F3.2 - PASARELA
+====================================================================
+
+--- INICIO DEL PROMPT ---
+
+MISION: La Mitocondria, fase F3.2. Migrar el consumidor PASARELA. Solo ese.
+
+CONTEXTO (autocontenido): ver el contexto de F3.1. La pasarela tiene hoy una
+pausa preventiva propia antes de cada llamada al modelo: mide temperatura y, si
+supera un umbral, espera hasta que baje o hasta agotar un tiempo maximo. Esa
+medicion debe desaparecer y convertirse en consulta del veredicto.
+
+Este consumidor es el mas delicado de los cuatro porque esta en el camino de una
+peticion de usuario. Una espera aqui la nota una persona.
+
+TABLA DE REACCION:
+  LIBRE       - llamada al modelo con normalidad.
+  RESTRINGIDO - se atiende la peticion, pero se pospone la llamada al modelo
+                hasta el tope de espera que declares. Agotado el tope, PROCEDE
+                igualmente y lo registra. Motivo: dejar a un humano esperando
+                indefinidamente por temperatura es peor que una llamada caliente,
+                y el tope de espera actual del rack ya reconoce ese principio.
+  EMERGENCIA  - no se inicia llamada nueva al modelo. La respuesta al usuario
+                declara honestamente que el sistema esta limitado por recursos.
+                JAMAS un error generico ni una respuesta vacia que parezca sana.
+  NO_DATA     - identico a RESTRINGIDO. Nunca como LIBRE.
+
+TAREAS:
+  1. Sustituye la lectura de sensor de la pausa preventiva por consulta del
+     veredicto. Conserva el tope de espera existente como tope de la nueva
+     espera y decláralo en configuracion, no incrustado.
+  2. La decision se toma ANTES de iniciar la llamada, nunca en mitad de una
+     generacion en curso.
+  3. En EMERGENCIA, el mensaje al usuario debe ser honesto y especifico. Escribe
+     el texto exacto en el reporte para que el Soberano lo revise.
+  4. Registra cada aplazamiento y cada procedimiento tras agotar el tope, con el
+     estado y el motivo del veredicto.
+  5. NO retires el codigo de lectura de sensor. Dejalo inerte y marcado, para F4.
+  6. Tests: veredicto ausente se comporta como RESTRINGIDO; el tope de espera se
+     respeta y tras agotarlo la llamada procede con registro; en EMERGENCIA la
+     respuesta declara la limitacion y no devuelve un error generico.
+
+INVARIANTES: identicas a F3.1. Ademas: backup obligatorio, este consumidor esta
+en produccion y en el camino de un usuario.
+
+FORMATO DE REPORTE, maximo 12 lineas:
+  RONDA MITOCONDRIA-F3.2 . <repo>@<rama>
+  HECHO      <hash> . <una linea>
+  TEXTO      <el mensaje exacto de EMERGENCIA para revision del Soberano>
+  VERIFICADO <resultado de los tests>
+  BLOQUEADO  <item> <- <dependencia exacta>
+  DECIDE     <una pregunta, o "nada">
+
+Cierra con 3 a 6 SUGERENCIAS con coste S/M/L en PENDIENTES.md. PARA.
+
+--- FIN DEL PROMPT ---
+
+====================================================================
+4. PROMPT F3.3 - TEMPORIZADOR HORARIO
+====================================================================
+
+--- INICIO DEL PROMPT ---
+
+MISION: La Mitocondria, fase F3.3. Migrar el consumidor TEMPORIZADOR HORARIO.
+Solo ese.
+
+CONTEXTO (autocontenido): ver el contexto de F3.1. Existe un temporizador del
+supervisor del sistema que dispara un trabajo aproximadamente cada hora, en un
+minuto fijo. Es el PRINCIPAL SOSPECHOSO del sintoma que motivo toda esta mision:
+un contador de agentes que oscila aproximadamente cada hora.
+
+Antes de migrarlo, este prompt exige comprobar la hipotesis. Es la unica fase de
+la mision con un paso de diagnostico incorporado.
+
+TAREAS:
+  1. DIAGNOSTICO PRIMERO. Correlaciona, con dato, el minuto exacto de las
+     oscilaciones del contador de agentes con el minuto exacto de disparo del
+     temporizador. Pega la evidencia en el reporte.
+     - Si coinciden: la hipotesis se sostiene, anotalo y sigue.
+     - Si no coinciden: la hipotesis CAE. Anotalo con la misma claridad, migra
+       el consumidor igualmente, y deja constancia de que la causa del aleteo
+       sigue sin explicar. Un diagnostico refutado y registrado vale mas que uno
+       confirmado a la fuerza.
+  2. Migracion: el trabajo del temporizador consulta el veredicto antes de
+     arrancar.
+     LIBRE       - se ejecuta.
+     RESTRINGIDO - NO se ejecuta en este ciclo. Se anota el salto con motivo y
+                   se espera al siguiente disparo. Este trabajo es aplazable por
+                   naturaleza; no necesita reintento inmediato.
+     EMERGENCIA  - identico a RESTRINGIDO.
+     NO_DATA     - identico a RESTRINGIDO.
+  3. Anade dispersion al disparo. Un temporizador que arranca siempre en el
+     mismo segundo de la hora garantiza colisionar con cualquier otro proceso
+     horario. Declara el rango de dispersion elegido.
+  4. Registra cada ciclo saltado con estado y motivo, para poder distinguir
+     despues "no corrio porque estaba restringido" de "no corrio porque fallo".
+  5. Tests: con veredicto ausente el ciclo se salta y se registra; el salto no
+     acumula ejecuciones pendientes.
+
+INVARIANTES: identicas a F3.1.
+
+FORMATO DE REPORTE, maximo 12 lineas:
+  RONDA MITOCONDRIA-F3.3 . <repo>@<rama>
+  HIPOTESIS  <confirmada o refutada> . <evidencia en una linea>
+  HECHO      <hash> . <una linea>
+  DECLARADO  dispersion = <...>
+  VERIFICADO <resultado de los tests>
+  DECIDE     <una pregunta, o "nada">
+
+Cierra con 3 a 6 SUGERENCIAS con coste S/M/L en PENDIENTES.md. PARA.
+
+--- FIN DEL PROMPT ---
+
+====================================================================
+5. PROMPT F3.4 - COMPROBACIONES DE SALUD
+====================================================================
+
+--- INICIO DEL PROMPT ---
+
+MISION: La Mitocondria, fase F3.4. Migrar el consumidor COMPROBACIONES DE SALUD.
+Solo ese. Es el ultimo, y el que exige mas cuidado doctrinal.
+
+CONTEXTO (autocontenido): ver el contexto de F3.1. Las comprobaciones de salud
+determinan el contador de agentes activos que hoy oscila. Aqui hay una trampa que
+debes evitar de forma explicita.
+
+LA TRAMPA: la tentacion es suavizar el contador, promediarlo o alargar el tiempo
+de espera hasta que deje de oscilar. ESO ESTA PROHIBIDO. Si el contador deja de
+oscilar porque se ha suavizado el contador, la mision entera esta FALLADA y hay
+que revertirla. El indicador dice la verdad; lo que se corrige es la causa.
+
+EL ARREGLO CORRECTO: distinguir OCUPADO de CAIDO. Un agente que tarda porque el
+nodo esta cargado no es un agente ausente, y hoy el sistema no puede decir la
+diferencia. Esa incapacidad es el defecto real.
+
+TAREAS:
+  1. Anade un tercer estado al modelo de agente. Hoy hay dos (activo, ausente).
+     Debe haber tres: ACTIVO, OCUPADO, AUSENTE.
+     - OCUPADO: no respondio en el tiempo esperado, Y el veredicto de la
+       Mitocondria en ese instante era RESTRINGIDO o EMERGENCIA.
+     - AUSENTE: no respondio, y el veredicto era LIBRE. Entonces si es un fallo.
+     - Con veredicto NO_DATA no se puede distinguir: el estado es OCUPADO y se
+       registra que la distincion no fue posible. Ante la duda, no se acusa.
+  2. La interfaz debe mostrar los tres estados de forma distinguible. El
+     contador de agentes activos deja de ser una fraccion de dos terminos.
+  3. NO alargues ningun tiempo de espera. NO promedies. NO suavices.
+  4. Registra cada transicion con el veredicto vigente en ese instante. Es la
+     evidencia que la fase F5 necesita.
+  5. Tests: con veredicto RESTRINGIDO un agente lento se marca OCUPADO; con
+     veredicto LIBRE el mismo agente lento se marca AUSENTE; con NO_DATA se
+     marca OCUPADO y se registra la ambiguedad.
+
+CRITERIO DE EXITO DE LA MISION COMPLETA, que se verifica en F5 y no aqui:
+el contador deja de aletear SIN que nadie haya tocado el contador. Si tras esta
+migracion el aleteo persiste, la Mitocondria no era la causa, y eso se registra
+como resultado valido en lugar de forzar la conclusion.
+
+INVARIANTES: identicas a F3.1. Ademas: prohibido tocar el mecanismo de conteo
+como tal.
+
+FORMATO DE REPORTE, maximo 12 lineas:
+  RONDA MITOCONDRIA-F3.4 . <repo>@<rama>
+  HECHO      <hash> . <una linea>
+  VERIFICADO <resultado de los tests>
+  DECLARADO  ningun tiempo de espera alargado, ningun valor suavizado
+  BLOQUEADO  <item> <- <dependencia exacta>
+  DECIDE     <una pregunta, o "nada">
+
+Cierra con 3 a 6 SUGERENCIAS con coste S/M/L en PENDIENTES.md. PARA.
+
+--- FIN DEL PROMPT ---
+
+====================================================================
+6. NOTA DE BLOQUEO
+====================================================================
+
+LOS CUATRO PROMPTS DE ESTA SECCION ESTAN LISTOS PARA PEGAR, PERO NO ANTES DE QUE
+LA MITOCONDRIA PUBLIQUE VEREDICTO.
+
+Requisito exacto: fase F2 cerrada, es decir, umbrales y ventana de histeresis
+fijados a partir de siete dias de metabolismo.jsonl, y el servicio publicando.
+Un consumidor migrado contra un veredicto que no existe se comporta como
+NO_DATA de forma permanente, es decir, como RESTRINGIDO para siempre, y el rack
+se queda medio parado sin que nadie entienda por que.
+
+Secuencia completa, para no perder el hilo:
+  F0  censo                                    prompt en la especificacion
+  F1  lector unico y siete dias de linea base  prompt en la especificacion
+  F2  umbrales con cita de telemetria          BLOQUEADO hasta tener F1
+  F3  migracion de consumidores                los cuatro prompts de aqui
+  F4  retirada de mediciones duplicadas        una sesion por consumidor
+  F5  verificacion del criterio de exito       con dato de metabolismo.jsonl
+
+====================================================================
+CHANGELOG
+====================================================================
+
+v1.0.0 (2026-08-04) - Creacion. Cuatro prompts autocontenidos de migracion, uno
+por tipo de consumidor, con orden obligatorio y tabla de reaccion comun. Se
+incorpora al prompt del temporizador el paso de diagnostico de la hipotesis del
+minuto, con instruccion explicita de registrar la refutacion si el dato no la
+sostiene. Se incorpora al prompt de comprobaciones de salud la prohibicion
+expresa de suavizar el indicador.

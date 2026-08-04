@@ -1,0 +1,365 @@
+LA MITOCONDRIA - ESPECIFICACION TECNICA MINIMA VIABLE v1.0.0
+Texto plano absoluto. Fecha: 2026-08-04.
+Autor: el Preceptor. Canoniza: el Soberano. Ejecuta: CC.
+Clase: operativo. Companion de MISION_MITOCONDRIA_P0X.md.
+
+ALCANCE DE ESTE DOCUMENTO
+Contratos, no codigo. Define QUE debe cumplirse, no COMO se escribe. Si una
+seccion se lee como una implementacion, esta mal escrita y hay que corregirla.
+
+====================================================================
+1. FORMA DEL SERVICIO
+====================================================================
+
+1.1 STACK
+
+  Lenguaje: Python 3. Version exacta: NO DATA - la fija CC leyendo el interprete
+  del nodo y la anota en el reporte.
+  Supervision: systemd, unidad de tipo notificacion con perro guardian.
+  Dependencias nuevas: ninguna. Si CC cree necesitar una, PARA y la justifica.
+
+1.2 POR QUE NO ES TIEMPO REAL
+
+  Queda expresamente descartado el planificador de prioridad fija del kernel y
+  todo lo que lo acompana. Aqui no se controla un actuador: se decide si lanzar
+  un trabajo. Un servicio supervisado con perro guardian da practicamente todo
+  el valor con una fraccion del riesgo, y no puede dejar el nodo sin respuesta
+  si entra en bucle.
+
+1.3 CONTRATO CON EL SUPERVISOR
+
+  - El servicio notifica al supervisor que esta listo SOLO cuando ha completado
+    su primera lectura valida de sensores. Antes no. Un servicio que se declara
+    listo sin haber medido nada publicaria un veredicto sin fundamento.
+  - Envia latido al perro guardian UNICAMENTE despues de cada lectura
+    completada. Nunca desde un temporizador independiente.
+    Motivo, y es el punto mas importante de esta seccion: si el latido va por su
+    cuenta, un servicio con el lector muerto sigue pareciendo sano. Eso seria un
+    sensor deshonesto en el corazon del arbitro que existe para impedirlos.
+  - Reinicio automatico ante fallo, con retardo creciente.
+  - Al arrancar tras un reinicio, el estado inicial es NO DATA hasta la primera
+    lectura valida. Nunca se hereda el ultimo veredicto conocido.
+
+1.4 CADENCIA
+
+  Periodo de lectura: NO DATA. Se fija en la fase F1 con datos reales. Punto de
+  partida sugerido para la linea base: una lectura cada 5 segundos, que es
+  suficiente para decisiones de encolado y no castiga al nodo.
+  El periodo se declara en la configuracion, nunca incrustado en el codigo.
+
+====================================================================
+2. EL VEREDICTO - FORMATO EXACTO
+====================================================================
+
+2.1 CAMPOS OBLIGATORIOS
+
+  estado         Cadena. Uno de exactamente cuatro valores:
+                 LIBRE, RESTRINGIDO, EMERGENCIA, NO_DATA.
+                 Cualquier otro valor es un error del productor y el consumidor
+                 debe tratarlo como NO_DATA.
+
+  motivo         Cadena legible por un humano, en espanol, con el dato que
+                 causo el estado y su valor. Ejemplo de forma:
+                 "termica zona0 = 79.4 C (umbral 78.0)".
+                 Cuando el estado es LIBRE, el motivo describe el margen mas
+                 estrecho. Un veredicto sin motivo no es auditable.
+
+  desde          Marca de tiempo con zona horaria explicita, en el momento de
+                 ENTRADA al estado actual. No se actualiza mientras el estado no
+                 cambia. Permite a un consumidor saber cuanto lleva asi.
+
+  edad_lectura   Antiguedad en segundos de la medicion que sostiene el veredicto.
+                 Antiguedad del DATO, jamas del refresco ni del render. Es el
+                 campo que un consumidor debe mirar antes de fiarse.
+
+  nodo           Identificador del nodo al que se refiere el veredicto. El
+                 veredicto es POR NODO. Dos nodos distintos no comparten cuerpo
+                 y no pueden compartir metabolismo.
+
+  version        Version del contrato, para que un consumidor antiguo detecte
+                 que el formato cambio bajo sus pies en vez de leerlo mal.
+
+2.2 CAMPOS OPCIONALES
+
+  recursos       Detalle por recurso vigilado, cada uno con su valor, su umbral
+                 y su propia edad de lectura. Util para diagnostico; nunca
+                 obligatorio para decidir.
+  sugerencia     Texto libre para el consumidor. No vinculante.
+
+2.3 REGLAS DE SERIALIZACION
+
+  - Formato de intercambio con estructura declarada, no texto libre.
+  - Codificacion UTF-8.
+  - Los nombres de estado van en mayusculas y sin acentos, para que ninguna
+    comparacion dependa de la configuracion regional del nodo.
+  - El veredicto completo debe caber holgadamente en una lectura; si crece hasta
+    necesitar paginacion, el diseno se desvio.
+
+2.4 DONDE VIVE
+
+  Clave unica en el almacen en memoria que ya usa el rack, con espacio de
+  nombres propio y nombre que incluya el nodo.
+  Tiempo de vida de la clave: al menos tres veces el periodo de lectura.
+  Motivo: si el servicio muere, la clave debe CADUCAR y desaparecer, de modo que
+  el consumidor encuentre ausencia y aplique la regla de NO_DATA. Un veredicto
+  inmortal de un servicio muerto es exactamente la trampa que este sistema
+  existe para eliminar. La ausencia debe poder ocurrir.
+
+  Ademas, y solo como respaldo de diagnostico, el ultimo veredicto se escribe en
+  un fichero local. Ese fichero NO es fuente de verdad para ningun consumidor.
+
+====================================================================
+3. HISTERESIS ASIMETRICA
+====================================================================
+
+3.1 EL PRINCIPIO
+
+  Degradar rapido, recuperar lento.
+
+  Entrada en un estado peor: INMEDIATA, en la primera lectura que lo justifique.
+  Salida hacia un estado mejor: solo si la condicion sana se mantiene durante una
+  ventana completa de recuperacion.
+
+  Sin esto, el propio arbitro oscila alrededor del umbral, y habriamos
+  reproducido el aleteo un piso mas arriba, con mas autoridad y peor.
+
+3.2 REGLA DE SALTO
+
+  Se puede empeorar saltando estados (de LIBRE a EMERGENCIA en una lectura si el
+  dato lo justifica). Solo se puede mejorar de uno en uno.
+  Motivo: el peligro merece credito inmediato; la seguridad hay que ganarla.
+
+3.3 LOS NUMEROS
+
+  Umbrales de cada recurso: NO DATA.
+  Ventana de recuperacion: NO DATA.
+  Ambos se fijan en la fase F2 a partir de siete dias de metabolismo.jsonl, y
+  cada uno debe citar en un comentario la observacion concreta que lo justifica.
+
+  PROHIBIDO ESCRIBIR UN UMBRAL SIN ESA CITA. Es el motivo entero de que exista
+  esta mision: los umbrales dispersos por el rack se decretaron por intuicion y
+  por eso se pisan entre ellos.
+
+3.4 SEMILLA SOLO PARA LA LINEA BASE
+
+  Durante F1, y unicamente para registrar cuantas veces se habria cruzado cada
+  linea, se usan como referencia los valores que ya existen hoy en el rack:
+  la pausa preventiva termica en 78 grados y el tope de trabajos por lotes en 80.
+  Son referencia de observacion, NO umbrales aprobados. En F2 se sustituyen por
+  los que salgan del dato.
+
+====================================================================
+4. METABOLISMO.JSONL - CONTRATO DE TELEMETRIA
+====================================================================
+
+4.1 QUE ES
+
+  Fichero local de solo anexion, una linea por lectura, un objeto por linea.
+  Es la memoria del arbitro y la unica base legitima para re-editar sus umbrales.
+
+4.2 CAMPOS POR LINEA
+
+  momento          Marca de tiempo con zona horaria.
+  nodo             Identificador del nodo.
+  lecturas         Valor de cada recurso vigilado en esa lectura, y por cada uno
+                   su exito o su fallo de lectura. Un fallo se registra como
+                   fallo, jamas se omite ni se rellena con el valor anterior.
+  estado_calculado El estado que ese conjunto de lecturas produce.
+  estado_publicado El estado que realmente se publico tras aplicar histeresis.
+  cambio           Verdadero solo en la linea donde el estado publicado cambia.
+
+  El par calculado/publicado es lo que hace auditable la histeresis. Sin ambos
+  campos no se puede saber si la ventana de recuperacion esta bien elegida o si
+  esta escondiendo oscilacion.
+
+4.3 ROTACION
+
+  Rotacion por tamano, con un numero acotado de ficheros conservados. Valores
+  exactos: NO DATA, los fija CC segun el espacio del nodo y los declara.
+  El fichero NO se versiona en el repositorio. Solo su esquema, documentado.
+
+4.4 CONSUMIDOR PREVISTO
+
+  La fase F2 de la mision, para fijar umbrales. Y la fase F5, para demostrar con
+  dato que el aleteo desaparecio sin haber tocado el contador.
+
+====================================================================
+5. CONTRATO DEL CONSUMIDOR
+====================================================================
+
+5.1 REGLAS QUE TODO CONSUMIDOR CUMPLE, SIN EXCEPCION
+
+  C1. Pregunta. No mide. Ningun consumidor vuelve a leer un sensor por su cuenta
+      una vez migrado.
+  C2. Ausencia de clave, formato desconocido, estado no reconocido o edad de
+      lectura excesiva se tratan TODOS como NO_DATA.
+  C3. NO_DATA se comporta como RESTRINGIDO. Nunca como LIBRE.
+      Un arbitro ciego que dice "adelante" es peor que ningun arbitro.
+  C4. Un consumidor nunca deja un trabajo a medias por un cambio de veredicto.
+      Se decide ANTES de empezar, no en mitad. Abortar a medias crea estado
+      corrupto y es peor que terminar.
+  C5. Si un consumidor decide ignorar el veredicto, lo registra con motivo. Un
+      incumplimiento silencioso es indistinguible de un fallo.
+  C6. Ningun consumidor escribe el veredicto. Solo la Mitocondria publica.
+
+5.2 CUANTO ES "EDAD EXCESIVA"
+
+  NO DATA. Se fija en F2. Punto de partida sugerido: tres periodos de lectura.
+  Cada consumidor puede endurecerlo, nunca relajarlo.
+
+====================================================================
+6. LO QUE LA MITOCONDRIA NO HACE EN LA VERSION 1
+====================================================================
+
+  - No mata procesos.
+  - No reinicia servicios.
+  - No modifica la frecuencia del procesador ni ningun parametro del sistema.
+  - No encola ni desencola trabajos.
+  - No toca nada relacionado con valor economico. IronClaw integro.
+  - No decide por otro nodo.
+
+  Publica un veredicto. Los consumidores obedecen. Un arbitro con manos es un
+  unico punto de fallo con capacidad de dano, y no hace falta para resolver el
+  problema que tenemos.
+
+====================================================================
+7. CRITERIOS DE ACEPTACION
+====================================================================
+
+  A1. Con el lector de sensores muerto, el servicio NO envia latido y el
+      supervisor lo reinicia. Verificado deteniendo el lector a proposito.
+  A2. Con el servicio detenido, la clave caduca y desaparece, y todo consumidor
+      migrado pasa a comportarse como en RESTRINGIDO. Verificado.
+  A3. Ningun umbral aparece en el codigo sin cita de telemetria.
+  A4. El campo de edad de lectura refleja la antiguedad del dato. Verificado
+      congelando la fuente y comprobando que el numero crece.
+  A5. La histeresis no oscila: en siete dias de linea base, ninguna secuencia de
+      ida y vuelta entre dos estados en menos de una ventana de recuperacion.
+  A6. El contador de agentes deja de aletear SIN que nadie haya tocado el
+      contador. Este es el criterio de exito de la mision entera.
+
+====================================================================
+8. PROMPT PARA CLAUDE CODE - FASES F0 Y F1, LISTO PARA PEGAR
+====================================================================
+
+--- INICIO DEL PROMPT ---
+
+MISION: La Mitocondria, fase F0 (el censo). Solo esa fase.
+
+CONTEXTO (todo lo necesario esta aqui; no necesitas memoria externa):
+El rack tiene varios reflejos que miden los mismos sensores y toman decisiones
+de carga sin coordinarse entre si: pausa preventiva por temperatura antes de
+llamadas al modelo, tope de temperatura en trabajos por lotes, un temporizador
+horario, comprobaciones de salud del servicio de pasarela, y una cola de
+trabajos. El sintoma visible es un contador de agentes que oscila
+aproximadamente cada hora. La Mitocondria es el arbitro unico que va a
+sustituir a todos esos reflejos: un solo lector de sensores, un solo veredicto
+publicado, y todos los demas procesos preguntando en vez de midiendo.
+
+La especificacion completa esta en MITOCONDRIA_ESPECIFICACION.txt y la mision en
+MISION_MITOCONDRIA_P0X.md. Leelos enteros antes de tocar nada.
+
+FASE F0 - EL CENSO. SOLO ESTO. No escribas el servicio todavia.
+
+Produce un inventario MEDIDO de todo lo que hoy, en este nodo, lee un sensor o
+toma una decision de carga. Para cada entrada:
+  - Que proceso o unidad es, y donde vive (fichero y linea, o nombre de unidad).
+  - Que sensor o fuente lee exactamente.
+  - Con que cadencia.
+  - Que decision toma con esa lectura, y sobre que actua.
+  - Que umbral usa, si usa alguno, y si ese umbral esta escrito en el codigo, en
+    configuracion o en una unidad del supervisor.
+
+Cubre obligatoriamente: temporizadores del supervisor del sistema, tareas
+programadas, comprobaciones de salud, guardas embebidas en el codigo de
+servicios, y la cola de trabajos.
+
+METODO: herramientas deterministas. Cada afirmacion va con el comando que la
+produjo. Si algo no se puede determinar con un comando, escribe NO DATA y que
+haria falta para determinarlo. No infieras. No completes por patron.
+
+SALIDA: mente/auditorias/reflejos.md, en texto plano, una tabla y una seccion de
+NO DATA al final.
+
+INVARIANTES:
+  - Propose-only: no despliegues, no reinicies servicios, no hagas git push.
+  - No modifiques ningun reflejo existente. Este trabajo es de censo.
+  - Cero direcciones de red, nombres de maquina o usuarios en ruta en nada que
+    se publique.
+  - Commit atomico con mensaje descriptivo.
+  - Ante ambiguedad, PARA y pregunta.
+
+FORMATO DE REPORTE, obligatorio, maximo 12 lineas:
+  RONDA MITOCONDRIA-F0 . <repo>@<rama>
+  HECHO      <hash> . <una linea>
+  MEDIDO     <numero de reflejos hallados> . <cuantos con umbral incrustado>
+  BLOQUEADO  <item> <- <dependencia exacta>
+  DECIDE     <una pregunta, o "nada">
+  Ultima linea obligatoria: DATOS QUE NO PUDE DETERMINAR: <lista o "ninguno">
+
+Cierra con entre 3 y 6 SUGERENCIAS con coste S/M/L anexadas a
+mente/feedback/PENDIENTES.md.
+
+PARA al terminar F0. NO empieces F1.
+
+--- FIN DEL PROMPT ---
+
+--- INICIO DEL PROMPT F1 (enviar solo cuando F0 este reportado) ---
+
+MISION: La Mitocondria, fase F1 (el lector unico y la linea base). Solo esa fase.
+
+CONTEXTO: ver el prompt de F0, mas el censo ya producido en
+mente/auditorias/reflejos.md. La especificacion de contratos esta en
+MITOCONDRIA_ESPECIFICACION.txt; leela entera, con especial atencion a la seccion
+1.3 (el latido va despues de cada lectura, nunca por temporizador propio) y a la
+seccion 4 (formato de metabolismo.jsonl).
+
+F1 - SOLO ESTO:
+
+1. Escribe el servicio lector: Python 3, unidad del supervisor de tipo
+   notificacion con perro guardian, sin dependencias nuevas. Lee los sensores
+   que el censo identifico y escribe una linea por lectura en
+   mente/telemetria/metabolismo.jsonl con el formato de la seccion 4.2.
+
+2. NO PUBLICA VEREDICTO. Nadie lo consume. Ningun reflejo existente se toca.
+   El servicio corre en paralelo a lo que ya hay, sin interferir.
+
+3. Para poder calcular el campo de estado calculado durante la linea base, usa
+   como REFERENCIA DE OBSERVACION los valores que ya existen hoy en el rack
+   (78 grados para la pausa preventiva, 80 para el tope de lotes). Declaralos en
+   configuracion y marcalos en el codigo como referencia de observacion, NO como
+   umbrales aprobados. Se sustituiran en F2 con datos.
+
+4. Deja el servicio propuesto pero NO lo instales ni lo arranques: la unidad del
+   supervisor es mano del Soberano. Documenta en el reporte los tres comandos
+   exactos que el Soberano debe ejecutar para instalarlo, arrancarlo y pararlo.
+
+5. Escribe la rotacion del fichero y declara los valores elegidos y por que.
+
+6. Tests: que un fallo de lectura se registra como fallo y no se rellena con el
+   valor anterior; que el latido no se envia si la lectura no se completa.
+
+INVARIANTES: identicas a F0.
+
+FORMATO DE REPORTE: identico a F0, con la linea adicional
+  INSTALAR   <los tres comandos exactos para el Soberano>
+
+PARA al terminar F1. La fase F2 no puede empezar hasta que existan siete dias de
+metabolismo.jsonl.
+
+--- FIN DEL PROMPT F1 ---
+
+PROMPT F2 BLOQUEADO: falta la linea base. F2 fija umbrales y ventanas de
+histeresis, y su regla es que cada numero cite la observacion que lo justifica.
+Sin siete dias de metabolismo.jsonl no hay observacion que citar, y escribir el
+prompt ahora invitaria a decretar por intuicion exactamente lo que esta mision
+existe para eliminar.
+
+====================================================================
+CHANGELOG
+====================================================================
+
+v1.0.0 (2026-08-04) - Creacion. Contratos de servicio, veredicto, histeresis,
+telemetria y consumidor. Todos los umbrales quedan como NO DATA hasta la fase
+F2. Descartado explicitamente el planificador de tiempo real del material de
+origen.
