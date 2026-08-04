@@ -502,6 +502,41 @@ Sugerencias accionables (coste S/M/L):
   `aurelius/docs/TEMARIO_LLM.md`: llevar calibración y el marco correcto de RLHF a una
   lección temprana; hoy solo existen como canon de fuente, no como misión jugable.
 
+## Ronda MITOCONDRIA-F0 (el censo de reflejos) · 2026-08-04
+
+- **(S)** **Sin acceso a la-fragua y el-vigía, F1 mediría el nodo equivocado.** Los dos
+  reflejos que la misión señala como principales (pausa preventiva 78 °C y guard de lotes
+  80 °C) corren en la-fragua, y `ssh` desde soberano responde `Permission denied` en ambos
+  nodos. El censo los documenta desde el código versionado, no desde su runtime. Restaurar
+  la pubkey de soberano en los dos (paste de una línea, mano del Soberano) es lo que
+  convierte F1 en una línea base real en vez de una de laboratorio.
+- **(S)** **El contador `n/6` tiene un término que nunca puede subir.** `_SINODO_ROLES`
+  declara 6 roles incluido `enlace`, y en la-torre hay 5 directorios de agente y 5
+  servicios: `enlace` no existe. Su clave está siempre ausente → `stale` permanente.
+  Decidir: se implementa el sexto agente, o sale de la lista. Mientras tanto, cualquier
+  lectura del contador arrastra un fallo fijo que no es aleteo y lo enmascara.
+- **(S)** **El pulso del Sínodo no caduca, y la especificación exige que pueda.**
+  `base_agent.py` publica `hexelion:sinodo:<rol>:latest` con `set` sin TTL; solo el
+  histórico diario recibe `expire`. Un agente muerto conserva su última verdad para
+  siempre — exactamente la trampa que §2.4 de la especificación existe para eliminar.
+  Artefacto propuesto hacia la-torre, no aplicable desde aquí.
+- **(M)** **`thermal_zone0` no es portable entre nodos y F1 tropezará con ello.** Medido en
+  soberano: `thermal_zone0` es `acpitz` y devuelve 20 °C constantes; el sensor real de CPU
+  es `k10temp` y el de iGPU `amdgpu`, ambos por `hwmon`. Cinco reflejos leen `zone0` por
+  convención heredada de la Fragua. El lector único de F1 necesita descubrir su sensor por
+  nodo y declarar cuál eligió, o publicará un veredicto honesto sobre un número falso.
+- **(S)** **Ningún proceso con cadencia horaria fue hallado en los nodos medidos.** No hay
+  `.timer` del Alquimista en la-torre (corre como servicio con tick de 300 s), y el único
+  timer de usuario es el del Monje a 5 min. La hipótesis del minuto `:07` no tiene todavía
+  un proceso al que señalar en lo medible. Dejar correr la instrumentación del Bloque 9 y
+  traerse `hexelion:sinodo:flaps` **antes** de abrir F3.3, para que el diagnóstico llegue
+  con dato y no con teoría.
+- **(S)** **Decidir en qué nodo vive la primera Mitocondria.** El veredicto es por nodo,
+  pero soberano tiene hoy cero reflejos P0X: ni un timer, ni un cron, ni una guarda
+  embebida. Un árbitro instalado aquí en F1 no tendría a quién arbitrar en F3. La Fragua es
+  donde están los consumidores; soberano es donde está el permiso de escribir código.
+  Conviene fijarlo antes de F1, no después.
+
 ## Ronda SOBERANO-DECISIONES (ejecución de las 9 decisiones) · 2026-08-04
 
 - **(S)** **Rotar las dos credenciales Titan es lo único que las revoca.** Retiré
