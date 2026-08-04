@@ -544,12 +544,12 @@ La sonda física vive **solo** en M7. En M3 queda enlace, no paso ejecutable.
 
 ---
 
-## BLOQUE 13 · Barcos con tipo y color + bitácora del día — 🟡 HECHO (color en PARA)
+## BLOQUE 13 · Barcos con tipo y color + bitácora del día — ✅ HECHO
 
-**Estado:** 🟡 2026-08-04 · hexelion@nexo-carbono-dashboard-20260623. Tipo, forma,
-inferencia militar y bitácora HECHOS; **color-por-grupo en PARA** (propuesta firmada
-pendiente). Decisión del Soberano registrada: AIS se queda conviviendo con Mastchain
-en El Vigía; no se tocó El Vigía ni ais-catcher.
+**Estado:** ✅ 2026-08-04 · hexelion@nexo-carbono-dashboard-20260623. Tipo, forma,
+**color por familia**, inferencia militar y bitácora HECHOS. El PARA de color se
+RESOLVIÓ por decisión del Soberano (5 familias, no 8). Decisión registrada: AIS se
+queda conviviendo con Mastchain en El Vigía; no se tocó El Vigía ni ais-catcher.
 
 **MEDIDO (no recordado)** · feed real ais-catcher (La Fragua, 22 buques): el campo de
 tipo es **`shiptype`** (ITU-R M.1371), valores {0,40,52,60,65,68,70,71,79,81}. ADS-B:
@@ -559,11 +559,15 @@ aviones traen `hex`/`flight`/`category`, sin campo "militar".
   exportada, derivada de ITU-R M.1371, contrastada con lo medido. 8 grupos + desconocido.
   **REGLA DURA probada**: valor fuera de tabla → DESCONOCIDO, jamás el más cercano
   (unit test `tests/tiposBuque.test.mjs`, Node `--experimental-strip-types`, 5/5).
-- **C2 · Forma**: glifo de CASCO (rombo sin rumbo / casco orientado con cog) distingue
-  barco de avión sin depender del color (daltonismo, mapa oscuro). Leyenda SOLO en FULL.
-  **Color-por-grupo BLOQUEADO**: §2.2 es restrictiva y reserva los colores de voz
-  ("jamás en fondos"); danger es excepcional → ≈3 tonos para 8 grupos. **PARA + propuesta**
-  de enmienda: `p0x/propuestas/2026-08-04_paleta-maritima-blueprint.md`. Hoy color base único.
+- **C2 · Forma + color por FAMILIA**: glifo de CASCO (rombo sin rumbo / casco orientado)
+  distingue barco de avión sin depender del color (daltonismo). Leyenda SOLO en FULL.
+  **Color = 5 familias visuales** (decisión del Soberano: el ojo no distingue 8 tonos en
+  marcador chico → "el color agrupa, el texto precisa"): comercio(carga+tanque)=cian ·
+  pesca=ámbar · pasaje=verde · autoridad(+militar)=rojo · otros/desconocido=neutro. CERO
+  hex inventado — los 5 tonos más distinguibles salen de tokens EXISTENTES; no hicieron
+  falta tokens nuevos. HSC = **fila de tabla** (tipo fino), familia=otros (no color propio).
+  Desviación §2.2 (voz/danger como relleno) declarada y firmada:
+  `p0x/propuestas/2026-08-04_paleta-maritima-blueprint.md` (✅ RESUELTO).
 - **C3 · Inferencia militar declarada**: la UI NUNCA afirma "MILITARY". `MIL?` + método
   exacto en tooltip ("AIS declared type 35" / "ICAO range heuristic — <rango>"). AIS type
   35 = declaración del propio buque (no hecho); ADS-B = heurística de rango ICAO NO
