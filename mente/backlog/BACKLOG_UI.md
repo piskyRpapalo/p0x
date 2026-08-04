@@ -544,6 +544,50 @@ La sonda física vive **solo** en M7. En M3 queda enlace, no paso ejecutable.
 
 ---
 
+## BLOQUE 13 · Barcos con tipo y color + bitácora del día — 🟡 HECHO (color en PARA)
+
+**Estado:** 🟡 2026-08-04 · hexelion@nexo-carbono-dashboard-20260623. Tipo, forma,
+inferencia militar y bitácora HECHOS; **color-por-grupo en PARA** (propuesta firmada
+pendiente). Decisión del Soberano registrada: AIS se queda conviviendo con Mastchain
+en El Vigía; no se tocó El Vigía ni ais-catcher.
+
+**MEDIDO (no recordado)** · feed real ais-catcher (La Fragua, 22 buques): el campo de
+tipo es **`shiptype`** (ITU-R M.1371), valores {0,40,52,60,65,68,70,71,79,81}. ADS-B:
+aviones traen `hex`/`flight`/`category`, sin campo "militar".
+
+- **C1 · Tabla única** (`dashboard/src/nexo/mapa/tiposBuque.ts`): constante nombrada y
+  exportada, derivada de ITU-R M.1371, contrastada con lo medido. 8 grupos + desconocido.
+  **REGLA DURA probada**: valor fuera de tabla → DESCONOCIDO, jamás el más cercano
+  (unit test `tests/tiposBuque.test.mjs`, Node `--experimental-strip-types`, 5/5).
+- **C2 · Forma**: glifo de CASCO (rombo sin rumbo / casco orientado con cog) distingue
+  barco de avión sin depender del color (daltonismo, mapa oscuro). Leyenda SOLO en FULL.
+  **Color-por-grupo BLOQUEADO**: §2.2 es restrictiva y reserva los colores de voz
+  ("jamás en fondos"); danger es excepcional → ≈3 tonos para 8 grupos. **PARA + propuesta**
+  de enmienda: `p0x/propuestas/2026-08-04_paleta-maritima-blueprint.md`. Hoy color base único.
+- **C3 · Inferencia militar declarada**: la UI NUNCA afirma "MILITARY". `MIL?` + método
+  exacto en tooltip ("AIS declared type 35" / "ICAO range heuristic — <rango>"). AIS type
+  35 = declaración del propio buque (no hecho); ADS-B = heurística de rango ICAO NO
+  exhaustiva. Método documentado en el código (`tiposBuque.ts`).
+- **C4 · Bitácora del día (vista FULL)**: primer avistamiento por contacto, hora local,
+  tipo, id, marca de inferencia. Filtros todo/aeronaves/barcos/solo-militar. Cabecera con
+  antigüedad del DATO (no del render) → NO DATA con feed caído (ausencia ≠ "hoy no pasó
+  nada"). **Retención: EN MEMORIA del cliente** (se pierde al recargar; la cabecera lo
+  declara "in-memory · resets on reload · since HH:MM"). Corte a las 00:00 local. Versión
+  persistente (redis con TTL diario) propuesta en PENDIENTES (infra, propose-only).
+- **C5 · Pruebas**: unit de la tabla (5/5) + integración `tests/fase13-mapa.spec.ts` (tipo/
+  forma/MIL?, feed-cut→NO DATA, bitácora FULL declara el corte, filtro militar). `tsc=0`,
+  suite dashboard **442/442** (5 viewports), 0 pageerrors. Captura FULL en `test-results/
+  fase13-full.png`.
+- **Invariantes**: backup de la cara antes de tocar (retirado tras commit; git = backup).
+  Editado `src/`, no `dist/`. Cero color inventado (todos los tonos salen de tokens). No
+  push, no deploy.
+
+**Desviaciones aditivas declaradas:** (a) los barcos pasan de `path` SVG a glifo divIcon
+(`.mc-barco`) → test `fase-mapa-distribuido` actualizado. (b) la leyenda (con RESTART) pasa
+a ser SOLO-FULL (antes visible en portada) por el requisito C2.
+
+---
+
 ## APÉNDICE A · Decisiones — FIRMADAS 2026-08-02
 
 1. **Tres paneles en `NO DATA` permanente** → **DEUDA, se levanta.** Veredicto del

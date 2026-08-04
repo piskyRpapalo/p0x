@@ -530,6 +530,28 @@ Misión **abortada en A2**: el endpoint existe, el motor local no. Sugerencias (
   pasadas donde la frontera necesita una. Un ahorro que mueve el coste al tiempo del Soberano no es
   un ahorro, y hasta que se mida no sabemos cuál de los dos es.
 
+## Ronda BLOQUE 13 (mapa tipado + bitácora) · 2026-08-04
+
+Sugerencias accionables (coste S/M/L):
+- **(S · FIRMA)** Firmar (o ajustar) la enmienda de paleta marítima:
+  `propuestas/2026-08-04_paleta-maritima-blueprint.md`. Es lo único que bloquea el
+  color-por-grupo del mapa; al firmar, conectar el color es ~1 línea por grupo
+  (`MetaGrupo.tokenPropuesto` ya apunta a los nombres).
+- **(M)** Bitácora del día PERSISTENTE: hoy vive en memoria del cliente (se pierde al
+  recargar; declarado honestamente). Moverla a redis con clave diaria + TTL a 00:00 local
+  la haría sobrevivir a recargas/reinicios. Requiere ingesta/gateway en La Fragua → infra,
+  propose-only (IronClaw): sale como artefacto, no se despliega desde aquí.
+- **(M)** Refinar los rangos ICAO militares (`RANGOS_MIL_ICAO` en `tiposBuque.ts`): hoy
+  es una heurística sembrada y NO exhaustiva (US/UK/FR). Contrastar con una tabla de
+  asignaciones ICAO revisada antes de confiar en el MIL? de aeronaves. La doctrina (nunca
+  afirmar, solo inferir con método) ya está; falta cobertura de rangos.
+- **(S)** HSC (ITU 40-49) hoy cae a DESCONOCIDO (con el decode "high-speed craft" en el
+  tooltip, sin ocultar el dato). Si el Soberano quiere un grupo propio de alta velocidad,
+  es una fila más en la tabla + un token de la paleta marítima.
+- **(S)** El color base de todos los barcos usa `--voz-vocero` (heredado) — un color de
+  voz usado como relleno, que §2.2 desaconseja. La enmienda de paleta lo resuelve
+  limpiamente al dar `--nx-mar-*` propios; hasta entonces queda como deuda declarada.
+
 ## Backlog de UI/software (autoritativo)
 El trabajo pendiente de **interfaz** (Hexelion · Aurelius · Le Jardin) vive en su
 propio documento: **[`mente/backlog/BACKLOG_UI.md`](../backlog/BACKLOG_UI.md)**
