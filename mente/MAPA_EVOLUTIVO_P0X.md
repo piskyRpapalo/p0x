@@ -86,7 +86,7 @@ actualizado: 2026-07-18
 2. **Ingesta:** M5 Fase 4 (pendiente) + los ESP32/BH1750/BME680 nuevos + NPK 8-in-1 cuando llegue (11-19 ago). **El Vigía no se reasigna:** los SDR se quedan donde están; el doc HEXELION proponía otra cosa y se descarta.
 3. **Gradiente de actuación física A0-A2** (separado del invariante de firma: la bomba no firma valor, pero puede inundar la terraza): **A0** propose-only — la AI recomienda, el carbono actúa. **A1** timers aprobados — Shelly/MOSFET con horario firmado por el carbono. **A2** auto acotado — solo tras ≥4 semanas de propuestas A0/A1 validadas, con límites duros de caudal/tiempo, histéresis, y kill-switch físico. El riego automático se gana como el control total: por historial. Los reflejos del jardín heredan el patrón de Reflejos (sensor→umbral→acción protectora, sin LLM en el lazo, el Monje narra post-hoc).
 
-## §6 — VOZ PÚBLICA
+## §6 · F5 — VOZ PÚBLICA
 
 Los agentes Hexelion redactan (posts, LinkedIn, fichas MakerWorld); el carbono edita y publica. Mismo patrón propose→firma de todo P0X, con registro de lo publicado en `mente/`. Puerta previa a cualquier publicación **monetizada**: lectura de la cláusula IP del contrato vigente — diez minutos que aseguran F3 y F5 enteros, porque las cláusulas típicas cubren lo que se **crea y publica durante** el empleo, no solo lo que genera ingresos.
 

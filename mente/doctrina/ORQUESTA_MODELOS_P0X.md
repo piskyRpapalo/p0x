@@ -3,7 +3,7 @@ id: orquesta-modelos-p0x
 titulo: La Orquesta de Modelos — quién hace qué y cómo se ayudan
 tipo: doctrina
 clase: doctrina
-version: 1.0.0
+version: 1.1.0
 editor_autorizado: carbono
 metrica_exito: "coherencia con el suelo; cero enmiendas sin canonización del carbono"
 umbral_reedicion: "solo por propuesta motivada del silicio + firma del carbono"
@@ -14,7 +14,14 @@ enlaces:
   - doctrina-ai-interna
   - alfabeto-p0x
   - doctrina-evales-transplante
-actualizado: 2026-07-04
+changelog:
+  - "v1.1.0 (2026-07-18, propuesta del Preceptor, canoniza el Soberano): alta del nodo soberano
+     con modelo residente soberano-coder y harness OpenCode en estado titular-condicional.
+     Evidencia: bench G0 (Vulkan 3.58x pp512 / 3.28x tg128; smoke 24.9 tok/s CPU) + duelo G1 en
+     CPU (OpenCode 4/5, 2 exactas, 2 errores de grounding; Aider N/A por modo de invocación;
+     Qwen Code no funcional, re-eval #101). Condición de titularidad plena: aprobar
+     EVAL_GROUNDING_G2 (10/10, cero dato inventado)."
+actualizado: 2026-07-18
 ---
 
 # P0X · LA ORQUESTA DE MODELOS
@@ -36,6 +43,7 @@ actualizado: 2026-07-04
 | **AI interna · batch** (La Fragua) | Ingesta, deltas, embeddings, corpus — SIEMPRE encolado (`p0x-enqueue`) | Trabajo pesado asíncrono; tiempo gratis (solar), tokens cero | swap=0 y térmica: un job a la vez; nunca compite con servicios vivos |
 | **Gemini** | Lente de contraste / segunda opinión externa | Cuando el Soberano quiere perspectiva ajena al linaje Claude | **Patrones de deriva documentados**: empuja hacia tooling de ejecución de mercado y lenguaje de aprendizaje lineal — ambos contraindicados. Sus aportes entran como PROPUESTAS a deliberar (espíritu Sínodo), jamás canon directo; sus afirmaciones técnicas se verifican (precedente: claim Gamma-vs-RPC sin verificar) |
 | **NEAR AI** (horizonte) | Agente perimetral serverless (webhooks, gas abstraído) | Solo tras diseño propio bajo IronClaw | Propose-only, sin claves de gasto, activación por webhook, valor siempre legible. Nada se improvisa desde el entusiasmo |
+| **soberano-coder** — nodo `soberano` (Beelink SER9 Max, 64GB) · base `qwen3-coder:30b` Q4_K_M, `num_ctx` 16384 · backend Vulkan (Radeon 780M) · ID Alfabeto: `sobpc` · harness: **OpenCode (titular-condicional)** | Inferencia local pesada: código, drafts de pipelines, misiones de lectura del rack, scrapers, bot de hermanos (OpenWebUI solo-tailnet). Futuro ejecutor delegado bajo supervisión (G2-G4) | Lo que desborda a torre/fragua pero no exige token de frontera. Hoy: lecturas (G1). Tras eval de grounding: propuesta de diffs (G2) | Jamás firma valor · tags explícitos + `num_ctx` demostrado · un job pesado a la vez · lectura entre nodos read-only; escritura solo vía API Observar (propose-only por construcción) · toda búsqueda negativa exige doble verificación antes de declararse definitiva (patrón #102) · gates G2→G4 se cruzan por eval, jamás por decreto · material testnet aislado `*_TESTNET_ONLY`, cero claves mainnet |
 
 ## §2 · REGLAS DE CORRELACIÓN (cómo se ayudan sin pisarse)
 
