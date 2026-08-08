@@ -791,3 +791,12 @@ El trabajo pendiente de **interfaz** (Hexelion · Aurelius · Le Jardin) vive en
 propio documento: **[`mente/backlog/BACKLOG_UI.md`](../backlog/BACKLOG_UI.md)**
 (bloques atómicos 0–10, formato de reporte, invariantes). Este `PENDIENTES.md`
 sigue siendo el registro de sugerencias/deuda general; el de UI se gestiona allí.
+
+### 2026-08-08 · Cierre de CMP (Compose Multiplatform)
+
+| # | Sugerencia | Coste | Estado |
+|---|---|---|---|
+| 175 | **CMP (Compose Multiplatform Desktop/JVM)** | M | **CANCELADO** |
+| *Motivo:* Se canonizó un frente completo antes de escribir una línea de código. El coste fue una ronda de reconciliación. |
+| *Lección:* No canonizar arquitectura sin experimento previo en disco. |
+| *Reemplazo:* React 18 + Vite 6 declarado stack canónico único para dashboards. |

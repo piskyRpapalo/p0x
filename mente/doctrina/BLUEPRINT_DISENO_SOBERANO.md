@@ -253,3 +253,19 @@ Estudio sobre las siete capturas del estado actual (Nexo watchman, Jardin actual
 - Este blueprint es doctrina de FORMA. La mecánica (qué endpoint, qué delta, qué firma) sigue viviendo en su canon. Si forma y mecánica chocan, gana la mecánica y se enmienda la forma — con changelog.
 
 *Firmado: el Preceptor. El Soberano canoniza con su commit. CC construye fase a fase, con Dry-Run y [ACCEPT], sin inventar un píxel.*
+
+---
+
+## §5.1 · Enmienda de Ambiente (2026-08-08)
+
+En superficies de fondo, y solo ahí, se permite movimiento ambiental que cumpla las cuatro condiciones: 
+(a) periodo mayor de 8 segundos y amplitud imperceptible en observación directa; 
+(b) ningún color semántico, ni siquiera atenuado; 
+(c) pausa determinista bajo restricción de recursos; 
+(d) interruptor global de apagado, y el panel sigue siendo completamente legible con todo apagado. 
+Ningún elemento que porte dato se anima si no es por cambio del dato.
+
+**Changelog:**
+- Fecha: 2026-08-08
+- Motivo: Reconciliación ronda Preceptor. Las atmósferas animadas de El Nexo y Le Jardin violaban §5 original.
+- Condición: `prefers-reduced-motion` respetado globalmente. Excepción: Le Cahier (feedback de interacción de usuario, no ambiente).
