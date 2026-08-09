@@ -158,7 +158,10 @@ REGLAS: list[tuple[str, str, re.Pattern]] = [
         "variable con nombre de secreto y valor literal",
         _r(r"\b(?:api[_-]?key|secret(?:_key)?|access[_-]?token|auth[_-]?token"
            r"|password|passwd|contrase[nñ]a|private[_-]?key)\b"
-           r"\s*[:=]\s*[\"']?[^\s\"',;]{12,}"),
+           # El valor debe ser un literal: se descartan llamadas a función
+           # (api_key=_load_api_key()) y lecturas de entorno.
+           r"\s*[:=]\s*(?!os\.|process\.|getenv|_load|load_|None\b|null\b)"
+           r"[\"']?(?![A-Za-z_][A-Za-z0-9_.]*\s*\()[^\s\"',;]{12,}"),
     ),
 ]
 

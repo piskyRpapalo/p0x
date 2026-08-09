@@ -45,6 +45,8 @@ PASAN = [
     "API_KEY=${OPENAI_API_KEY}",
     "token: <TU_TOKEN_AQUI>",
     "IP de ejemplo documental: 203.0.113.7",
+    "QdrantClient(host=_Q['host'], api_key=_load_api_key(), https=False)",
+    "password = os.environ['QDRANT_PASSWORD']",
     "loopback: 127.0.0.1 y ::1",
 ]
 
