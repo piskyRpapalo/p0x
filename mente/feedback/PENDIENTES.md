@@ -800,3 +800,46 @@ sigue siendo el registro de sugerencias/deuda general; el de UI se gestiona all�
 | *Motivo:* Se canonizó un frente completo antes de escribir una línea de código. El coste fue una ronda de reconciliación. |
 | *Lección:* No canonizar arquitectura sin experimento previo en disco. |
 | *Reemplazo:* React 18 + Vite 6 declarado stack canónico único para dashboards. |
+
+### 2026-08-09 · Ronda CARAS-PUBLICAS-1 (frenos de publicación)
+
+Las cinco tareas de la ronda quedaron hechas. Lo que sigue es lo que la ronda
+destapó y no le tocaba resolver.
+
+- **(S · decisión del Soberano, y bloquea a las demás)** **El repositorio
+  público sirve hoy el repo privado entero.** `piskyRpapalo/-hexelion-public`
+  es PUBLIC y su `master` es la punta de `p0x`, `mente/` incluida; la cara
+  sanitizada de 10 commits fue sustituida por empuje forzado y ya no existe
+  como rama. Ninguna otra sugerencia de esta lista tiene sentido antes de
+  decidir esto. Las opciones son tres y son excluyentes: pasar el repo a
+  privado, republicar la cara sanitizada, o declarar la exposición aceptada.
+  Medido en `mente/auditorias/RECONCILIACION_HEXELION_2026-08-09.md`.
+
+- **(S)** **Separar los remotos de `p0x`.** El repo privado tiene `origin` **y**
+  `github` apuntando a la misma URL pública, y ningún remoto al host git del
+  rack — al contrario de lo que dice el canon («`p0x` empuja a la Torre»). Un
+  `git push` sin argumentos publica. Reapuntar `origin` al rack y dejar el
+  remoto público con un nombre que se lea como advertencia.
+
+- **(M)** **Corrección hacia adelante de los 64 hallazgos publicados.** 29
+  ficheros, sobre todo IPs de la red superpuesta (25) y rutas absolutas al
+  directorio del usuario (24). Inventario con fichero y línea en
+  `mente/auditorias/PUBLICADO_2026-08-09.md`. No se hizo aquí porque toca
+  doctrina viva y esta ronda no construía. Depende de la decisión anterior:
+  si el repo pasa a privado, baja de prioridad; si sigue público, es urgente.
+
+- **(S)** **Retirar `mente/test_fuga.md`.** Un fichero de prueba con el nombre
+  del nodo suelto, confirmado, deshecho y recolado por un `pull` la noche del
+  8 al 9 de agosto. Está publicado y no sirve para nada: el corpus de pruebas
+  del guardia vive ahora en `deploy/comun/hooks/test_guardia.py`.
+
+- **(S)** **Enseñar al guardia a leer enlaces simbólicos.** Lee contenido, no
+  `readlink`. `mente/codice/CODICE_david.md` apunta a una ruta absoluta de un
+  nodo anterior, está roto, y esa ruta viaja publicada sin que ninguna regla
+  la vea.
+
+- **(M)** **Llevar el guardia a CI.** El gancho vive en `.git/hooks/`, no se
+  clona, y `--no-verify` no deja rastro. Un job que ejecute
+  `guardia_higiene.py --files` sobre el árbol completo en cada push al
+  repositorio público convierte el freno en algo que no depende de que la
+  máquina de turno lo tenga instalado.
