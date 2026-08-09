@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# Instala el guardia de higiene P0X (pre-commit + pre-push) en uno o varios
+# repositorios. Los ganchos de git no se versionan solos: la fuente vive en
+# p0x/deploy/comun/hooks/ y este script la copia a cada .git/hooks/.
+#
+#   p0x-instalar-ganchos                      # los 4 repos por defecto
+#   p0x-instalar-ganchos ~/hexelion ~/aurelius
+#   p0x-instalar-ganchos --verificar          # solo comprueba, no copia
+set -euo pipefail
+
+FUENTE="$(cd "$(dirname "$0")/../deploy/comun/hooks" && pwd)"
+BASE="$(cd "$(dirname "$0")/../.." && pwd)"
+POR_DEFECTO=("$BASE/p0x" "$BASE/hexelion" "$BASE/aurelius" "$BASE/cinek_automatico")
+
+VERIFICAR=0
+if [ "${1:-}" = "--verificar" ]; then
+    VERIFICAR=1
+    shift
+fi
+
+if [ $# -gt 0 ]; then
+    REPOS=("$@")
+else
+    REPOS=("${POR_DEFECTO[@]}")
+fi
+
+FALLOS=0
+for REPO in "${REPOS[@]}"; do
+    if [ ! -d "$REPO/.git" ]; then
+        echo "⚠  $REPO — no es un repositorio git, se omite"
+        continue
+    fi
+    DESTINO="$(git -C "$REPO" rev-parse --git-path hooks)"
+    DESTINO="$REPO/${DESTINO#./}"
+    mkdir -p "$DESTINO"
+
+    if [ "$VERIFICAR" = "1" ]; then
+        for F in pre-commit pre-push guardia_higiene.py; do
+            if cmp -s "$FUENTE/$F" "$DESTINO/$F"; then
+                echo "✅ $(basename "$REPO")/$F al día"
+            else
+                echo "❌ $(basename "$REPO")/$F ausente o desactualizado"
+                FALLOS=1
+            fi
+        done
+        continue
+    fi
+
+    for F in pre-commit pre-push guardia_higiene.py; do
+        # Preserva un gancho previo no gestionado por nosotros, una sola vez.
+        if [ -f "$DESTINO/$F" ] && ! grep -q "Guardia de higiene P0X" "$DESTINO/$F" \
+           && [ ! -f "$DESTINO/$F.previo" ]; then
+            cp "$DESTINO/$F" "$DESTINO/$F.previo"
+            echo "   ↳ gancho previo guardado como $F.previo"
+        fi
+        install -m 755 "$FUENTE/$F" "$DESTINO/$F"
+    done
+    echo "✅ $(basename "$REPO") — pre-commit + pre-push instalados en $DESTINO"
+done
+
+exit $FALLOS

@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# Guardia de higiene P0X · gancho pre-commit
+# Instalado por bin/p0x-instalar-ganchos. Fuente versionada:
+#   p0x/deploy/comun/hooks/pre-commit
+set -uo pipefail
+
+DIR="$(cd "$(dirname "$0")" && pwd)"
+GUARDIA="$DIR/guardia_higiene.py"
+PY="$(command -v python3 || echo /usr/bin/python3)"
+
+echo "=== GUARDIA DE HIGIENE · pre-commit ==="
+
+if [ ! -f "$GUARDIA" ]; then
+    echo "❌ BLOQUEADO: falta $GUARDIA (reinstala con p0x-instalar-ganchos)"
+    exit 1
+fi
+
+EXIT_CODE=0
+
+# 1. Contenido añadido: direcciones, rutas, dominios, claves.
+SALIDA="$(git diff --cached -U0 --no-color --diff-filter=ACMR \
+          | "$PY" "$GUARDIA" --diff)" || EXIT_CODE=1
+if [ -n "$SALIDA" ]; then
+    echo "❌ BLOQUEADO: fuga de infraestructura en lo staged"
+    echo "$SALIDA"
+    EXIT_CODE=1
+fi
+
+# 2. Doctrina fuera de p0x: mente/ y doctrina/ solo viven en el repo privado.
+REPO="$(basename "$(git rev-parse --show-toplevel)")"
+if [ "$REPO" != "p0x" ]; then
+    RUTAS="$(git diff --cached --name-only --diff-filter=ACMR \
+             | grep -E '(^|/)(mente|doctrina)/' || true)"
+    if [ -n "$RUTAS" ]; then
+        echo "❌ BLOQUEADO: doctrina fuera de p0x (repo: $REPO)"
+        echo "$RUTAS"
+        EXIT_CODE=1
+    fi
+fi
+
+if [ $EXIT_CODE -eq 0 ]; then
+    echo "✅ GUARDIA OK"
+else
+    echo "— Excepción declarada: añade 'guardia:permitir <motivo>' en la línea."
+    echo "— Forzar a ciegas: git commit --no-verify (queda sin registrar)."
+fi
+exit $EXIT_CODE

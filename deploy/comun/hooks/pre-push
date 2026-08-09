@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# Guardia de higiene P0X · gancho pre-push
+# Revisa el RANGO COMPLETO que va a subir, no solo el último commit: ese fue
+# exactamente el caso que se escapó. Fuente versionada:
+#   p0x/deploy/comun/hooks/pre-push
+set -uo pipefail
+
+DIR="$(cd "$(dirname "$0")" && pwd)"
+GUARDIA="$DIR/guardia_higiene.py"
+PY="$(command -v python3 || echo /usr/bin/python3)"
+VACIO=0000000000000000000000000000000000000000
+
+echo "=== GUARDIA DE HIGIENE · pre-push ==="
+
+if [ ! -f "$GUARDIA" ]; then
+    echo "❌ BLOQUEADO: falta $GUARDIA (reinstala con p0x-instalar-ganchos)"
+    exit 1
+fi
+
+EXIT_CODE=0
+
+# stdin: <ref local> <sha local> <ref remota> <sha remoto>
+while read -r LREF LSHA _RREF RSHA; do
+    [ -z "${LSHA:-}" ] && continue
+    [ "$LSHA" = "$VACIO" ] && continue            # borrado de rama
+
+    if [ "$RSHA" = "$VACIO" ]; then
+        # Rama nueva en el remoto: el rango es todo lo aún no publicado en
+        # ningún remoto. La base es el padre del commit más antiguo del rango;
+        # si no lo hay (historia huérfana), el árbol vacío.
+        N="$(git rev-list --count "$LSHA" --not --remotes)"
+        [ "$N" = "0" ] && continue
+        VIEJO="$(git rev-list "$LSHA" --not --remotes | tail -1)"
+        BASE="$(git rev-parse --verify -q "${VIEJO}^" \
+                || git hash-object -t tree /dev/null)"
+    else
+        N="$(git rev-list --count "${RSHA}..${LSHA}")"
+        BASE="$RSHA"
+    fi
+    SALIDA="$(git diff -U0 --no-color "$BASE" "$LSHA" | "$PY" "$GUARDIA" --diff)"
+
+    echo "· ${LREF}: revisando ${N} commit(s) del rango"
+    if [ -n "$SALIDA" ]; then
+        echo "❌ BLOQUEADO: fuga de infraestructura en el rango de ${LREF}"
+        echo "$SALIDA"
+        EXIT_CODE=1
+    fi
+done
+
+if [ $EXIT_CODE -eq 0 ]; then
+    echo "✅ GUARDIA OK"
+else
+    echo "— Excepción declarada: 'guardia:permitir <motivo>' en la línea."
+    echo "— Forzar a ciegas: git push --no-verify (queda sin registrar)."
+fi
+exit $EXIT_CODE
