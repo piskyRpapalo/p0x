@@ -1,0 +1,137 @@
+LISTA DE TAREAS · CARAS PUBLICAS Y DASHBOARD
+Version 1.0 · 2026-08-10
+Autor: el Preceptor. Ejecuta: quien figure en la columna DUENO.
+
+Leyenda de dueno:
+  [S]  Soberano - requiere tu mano. Firma, publicacion, hardware, cuentas.
+  [E]  Ejecutor - Claude Code. Mide, repara, prepara. No publica.
+  [P]  Preceptor - yo. Diseno y validacion.
+
+Regla de orden: nada de la seccion siguiente empieza hasta cerrar la anterior.
+Cada seccion deja el sistema en estado coherente por si es la ultima que se hace
+en semanas.
+
+================================================================================
+SECCION A · LOS FRENOS (bloquea todo lo demas)
+================================================================================
+
+A1. [E] Reparar el falso positivo del gancho de pre-commit.
+    El nombre del nodo principal coincide con lexico doctrinal. Debe bloquear
+    formas de direccion, no palabras sueltas en prosa.
+    Prueba de aceptacion: un documento de doctrina con la palabra en castellano
+    PASA; el mismo documento con una forma de direccion real BLOQUEA.
+
+A2. [E] Versionar el gancho en p0x + script de instalacion.
+    Hoy vive solo en un repositorio y los ganchos no se versionan solos.
+
+A3. [E] Instalar pre-commit y pre-push en hexelion, aurelius y cinek_automatico.
+    Verificar cada uno provocando un bloqueo a proposito.
+
+A4. [E] Escribir la auditoria de la noche del 9 que nunca llego a fichero.
+    Recuperacion del rack, verificacion de la copia del Codice, cuatro hashes.
+
+A5. [S] Restaurar de verdad la copia del pendrive, en un directorio temporal, y
+    comparar hashes contra el original.
+    Motivo: hoy tienes cuatro hashes iguales entre nodos, pero la restauracion
+    completa figura como no verificada. Una copia que nunca se ha restaurado es
+    una hipotesis, no un respaldo. Es media hora y cierra el unico riesgo
+    irreversible del sistema.
+
+================================================================================
+SECCION B · RECONCILIAR Y PUBLICAR
+================================================================================
+
+B1. [E] Medir la relacion entre local y remoto en hexelion. Solo medir.
+
+B2. [S] Decidir la resolucion si las historias han divergido.
+    No la decide el Ejecutor.
+
+B3. [E] Auditar lo ya publicado en la carpeta de doctrina publica de hexelion.
+    Buscar direcciones, hosts como direccion, rutas, claves. Reportar por fichero
+    y linea, o declarar limpio.
+
+B4. [S] Si hay hallazgos: aprobar el commit de correccion hacia adelante.
+    NO se reescribe historial. Lo publicado, publicado esta.
+
+B5. [S] Revisar el diff completo de lo que va a subir, por contenido y por nivel.
+    Nada de Nivel 2 en repositorio publico.
+
+B6. [S] Push de hexelion. Luego cinek_automatico. Luego aurelius.
+    Push normal. Si el gancho frena, se investiga; no se fuerza.
+
+B7. [S] Configurar el email de autor de git para que tus commits te reconozcan.
+    Ahora mismo el unico contribuidor visible de aurelius es el asistente. Para
+    un repositorio que vas a ensenar en una entrevista de arquitectura, esa es
+    una historia equivocada contada por un dato de configuracion.
+    Los commits anteriores no cambian; los futuros si.
+
+B8. [E] Poner CineK_Studio bajo control de versiones, o declarar por escrito que
+    es un directorio de trabajo desechable.
+    Hoy es trabajo sin red de seguridad y sin decision registrada.
+
+================================================================================
+SECCION C · EL DASHBOARD VIVO Y SUS FOTOS
+================================================================================
+
+Objetivo: dashboard nuevo corriendo y capturas para las caras publicas.
+
+C1. [S] Levantar el dashboard nuevo y dejarlo estable.
+
+C2. [E] Verificar el estado de los sensores que alimentan la cara visible antes
+    de fotografiar nada: sensor termico, camara en el nodo vigia, ESP32 en el
+    nodo de la fragua. Cada panel debe declarar honestamente su estado.
+    Motivo: una captura bonita de paneles en estado simulado o sin dato es
+    publicidad, no documentacion. Y si algo no tiene dato, la captura debe
+    mostrarlo diciendo que no lo tiene: eso es precisamente lo que hace este
+    sistema distinto, y es lo que hay que ensenar.
+
+C3. [S] Capturas. Una general y dos o tres de detalle.
+    Antes de subirlas, comprobar que no aparecen en pantalla: direcciones,
+    nombres de host, rutas, pestanas del navegador con URLs internas, ni nada
+    de la barra de tareas.
+    Las capturas son la fuga mas facil de todas porque nadie las revisa como
+    revisa un diff.
+
+C4. [E] README de hexelion-public con la captura, descripcion y estados de dato.
+    Hoy el repositorio no tiene README ninguno.
+
+C5. [S] Actualizar el README de perfil: foco, doctrina, roles, Medallon,
+    Anclaje. Decidir antes si el hardware se publica o se generaliza.
+    Recomendacion: generico. Publicar modelos concretos no anade nada a la
+    historia que quieres contar y anade superficie que no necesitas.
+
+================================================================================
+SECCION D · APARCADO CON MOTIVO (no se toca hasta cerrar A, B y C)
+================================================================================
+
+D1. Aurelius como limpiador de archivos.
+    Estas estudiandolo y va bien. Cuando vuelvas, la pregunta que decide el
+    diseno es esta: la deteccion de duplicados y conflictos la hace un script
+    determinista, y el modelo solo propone la reescritura sobre esos hallazgos.
+    Si el modelo decide que es duplicado, tendras un limpiador que borra cosas
+    por parecido semantico. Determinista primero.
+
+D2. Impresora 3D. Jardin con ESP32 y RS485.
+    Es lo siguiente y va a ser divertido. Es tambien otro frente entero: entra
+    cuando el software este cerrado, no en paralelo. Sabes por que.
+
+D3. Anclaje de Aurelius (modulo canon a medias).
+    Sigue siendo el candidato a "un modulo construido esta semana". Nueve
+    aprobados y cero terminados es la forma que tenia el frente que enterramos.
+
+D4. Mitocondria fase 1. Desbloqueada desde que volvio el acceso al nodo fragua.
+    Necesita siete dias de linea base antes de poder fijar umbrales, asi que
+    cuanto antes arranque, antes sirve.
+
+================================================================================
+NOTA SOBRE EL ORDEN
+================================================================================
+
+Puede parecer que arreglar un gancho antes de fotografiar un dashboard es
+burocracia. No lo es: la unica cosa de esta lista que puede causar dano
+irreversible es publicar algo que no deberia salir, y hoy el freno esta roto en
+un repositorio y ausente en tres.
+
+Todo lo demas se puede rehacer.
+
+================================================================================

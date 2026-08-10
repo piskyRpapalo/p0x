@@ -1,0 +1,205 @@
+PAQUETE DE CONSULTA EXTERNA - NIVEL 3 (LUZ)
+Version 1.0 - 2026-08-09
+Destino: cuenta laboral de la herramienta de consulta en la nube.
+Verificado: sin direcciones, sin nombres de host, sin modelos de hardware, sin
+nombres propios, sin telemetria real, sin rutas de sistema.
+
+================================================================================
+0. COMO SE USA ESTE PAQUETE
+================================================================================
+
+Este fichero es la UNICA fuente que se sube. Contiene el contexto suficiente para
+que una herramienta de consulta externa produzca trabajo util sin conocer nada del
+entorno privado.
+
+Al terminar la sesion: se copia lo valioso a un fichero de texto propio, se borra
+el chat, y ese fichero entra en cuarentena hasta revision. La nube propone en
+cuarentena; el disco canoniza en produccion.
+
+Prohibido escribir en el chat: nombres de maquinas, direcciones, capacidades de
+memoria concretas, temperaturas medidas, nombres de personas, o cualquier detalle
+que identifique un entorno fisico. Si hace falta referirse a una maquina, se dice
+"nodo principal" o "nodo de borde". Sin numeros.
+
+================================================================================
+1. CONTEXTO DEL SISTEMA (anonimizado)
+================================================================================
+
+Un sistema de aprendizaje y monitorizacion local-first, disenado para funcionar
+sin conexion y sobre hardware modesto. Consta de:
+
+  - Un preceptor local: ensena la fisica del computo (magnitudes, electricidad de
+    baja tension, componentes, memoria, modelos de lenguaje, sistemas, redes).
+    Su metodo es siempre el mismo ciclo: el usuario PREDICE, luego MIDE en su
+    propio equipo, luego ve el HUECO entre ambas cosas, y lo firma.
+  - Un conjunto de paneles de estado que muestran datos de sensores reales.
+  - Una capa de persistencia de tres niveles (crudo, validado, firmado).
+
+DOCTRINAS QUE GOBIERNAN TODO EL DISENO:
+
+  D1. El silicio propone, el carbono firma. Ningun proceso automatico cierra un
+      ciclo de valor ni promueve un dato al nivel firmado. La supervision con
+      consecuencia la ejerce siempre una persona.
+
+  D2. Sensores honestos. Si no hay dato, el sistema dice que no hay dato. Jamas
+      interpola, jamas rellena, jamas muestra un valor plausible. Estados
+      obligatorios: en vivo, rancio, estatico, simulado, sin dato, error. La
+      antiguedad del DATO se declara siempre, y no se confunde nunca con la
+      cadencia de refresco de la pantalla.
+
+  D3. Ausencia no es cero. Una medida ausente se declara ausente. Tratarla como
+      cero produce cuadres falsos.
+
+  D4. Nada es canon hasta que existe en disco, comprometido en el control de
+      versiones. Lo que solo vive en una conversacion es una propuesta.
+
+  D5. Regla unica de friccion pedagogica: toda friccion impuesta al usuario debe
+      ser PREDICCION o RECUPERACION. Si solo impone un coste, no entra. Cerrar la
+      sesion de alguien como castigo no le hace recuperar nada: le hace perder
+      trabajo.
+
+  D6. Telemetria antes que opinion. Sin linea base no se reedita un umbral.
+
+  D7. Una comprobacion que detecta y no bloquea no es una comprobacion. Produce
+      la sensacion de proteccion sin la proteccion.
+
+================================================================================
+2. LECCIONES YA APRENDIDAS (no volver a proponerlas)
+================================================================================
+
+Sirven de contexto negativo: son caminos ya recorridos y descartados con motivo.
+
+  L1. Se especifico un frente completo de interfaz -efectos, pruebas visuales,
+      recursos graficos, prohibiciones- antes de escribir una sola linea de
+      codigo. Nunca existio en disco y se cancelo. Leccion: la arquitectura no
+      cuesta nada de escribir, y por eso se escribe demasiada.
+
+  L2. Un guardia de temperatura leia un sensor generico que devolvia un valor
+      constante irreal. Vigilaba, y siempre decia que todo iba bien. Leccion:
+      cada nodo descubre su sensor por NOMBRE; heredar la ruta por convencion es
+      un ciego silencioso. Si el descubrimiento falla, se bloquea, no se permite.
+
+  L3. Una comprobacion previa a publicar detecto un dato sensible y la
+      publicacion salio igualmente, porque la comprobacion informaba y no
+      frenaba. Ver D7.
+
+  L4. Un panel web respondia correctamente sin motor detras. Parecia vivo y no
+      generaba nada. Durante semanas se confundio con el proyecto real.
+
+  L5. Un informe repitio una medida volatil identica a la de la ronda anterior:
+      no se habia vuelto a medir. Leccion: toda cifra volatil va con el comando
+      que la produjo en esa sesion.
+
+  L6. Se descartaron mecanismos punitivos (matar procesos del usuario, retirar
+      permisos por inactividad, bloquear el avance por errores acumulados) por
+      violar D5. Se convirtieron en prediccion: en vez de castigar, se pide al
+      usuario que prediga y luego se le muestra la medida real.
+
+================================================================================
+3. PROMPTS PARA LA SESION DE HOY
+================================================================================
+
+Tres, en orden de valor. Se ejecutan de uno en uno y su salida se copia a
+cuarentena antes de pasar al siguiente.
+
+--------------------------------------------------------------------------------
+PROMPT A - DETECCION DE CONTRADICCIONES EN LA DOCTRINA
+--------------------------------------------------------------------------------
+
+"Actua como auditor de coherencia. Te he dado siete doctrinas (D1 a D7) y seis
+lecciones (L1 a L6) de un sistema local-first.
+
+Tu tarea: encontrar contradicciones internas o tensiones no resueltas ENTRE esas
+doctrinas. No propongas mejoras, no anadas doctrinas nuevas, no elogies el
+diseno.
+
+Para cada tension que encuentres, entrega exactamente:
+  TENSION: [las dos doctrinas implicadas]
+  ESCENARIO: [un caso concreto donde ambas no pueden cumplirse a la vez]
+  QUE FALTA: [la regla de desempate que no esta escrita]
+
+Si no encuentras ninguna tension real, dilo. Una lista vacia honesta vale mas que
+tensiones inventadas para llenar el formato."
+
+--------------------------------------------------------------------------------
+PROMPT B - CRITICA DE UN METODO PEDAGOGICO
+--------------------------------------------------------------------------------
+
+"Actua como investigador critico en psicologia del aprendizaje.
+
+El sistema ensena mediante este ciclo, repetido en cada concepto: el alumno
+PREDICE un valor por escrito, luego lo MIDE en su propio equipo, luego ve el
+HUECO entre prediccion y medida, y lo registra firmado. El sistema nunca corrige
+la prediccion: solo muestra la medida al lado.
+
+Ademas registra un indicador de calibracion: la distancia entre la confianza que
+el alumno declara ANTES de una tarea y su resultado real, promediada sobre las
+ultimas cinco tareas. Ese indicador se muestra como curva historica, la formula
+es visible, y no se toma ninguna decision automatica con el.
+
+Tu tarea, en este orden:
+  1. Que evidencia existe a favor de este diseno? Cita los efectos o fenomenos
+     concretos por su nombre.
+  2. Que evidencia existe EN CONTRA, o que limites conocidos tiene? Se especifico.
+  3. Para que perfil de alumno podria funcionar mal o resultar desmotivador?
+  4. Que se estaria midiendo realmente con ese indicador de calibracion, y que NO
+     se estaria midiendo aunque lo parezca?
+
+Si alguna afirmacion tuya no puede respaldarse con literatura concreta, marcala
+como opinion tuya. No inventes referencias ni nombres de estudios."
+
+--------------------------------------------------------------------------------
+PROMPT C - ORDEN DE CONSTRUCCION BAJO ESCASEZ
+--------------------------------------------------------------------------------
+
+"Actua como director tecnico con experiencia en proyectos personales que mueren
+sin terminarse.
+
+Situacion: un sistema tiene nueve modulos aprobados como construibles y CERO
+construidos. Su historial demuestra un patron claro: produce especificaciones
+mucho mas rapido de lo que produce codigo, porque especificar no cuesta y no
+puede fallar. Un frente entero se especifico al completo y se cancelo sin haber
+existido nunca.
+
+Los nueve modulos son:
+  1. El ciclo de prediccion y medida (base del metodo, parcialmente construido)
+  2. El indicador de calibracion (parcialmente construido)
+  3. Escenarios de diagnostico de fallos en entorno desechable
+  4. Escritura de gramaticas restrictivas por el propio alumno
+  5. Registro de solo anexion de eventos de aprendizaje
+  6. Validador de que la evidencia aportada corresponde al equipo real del alumno
+  7. Lectura en vivo de sensores del equipo, con antiguedad declarada
+  8. Recuperacion espaciada al reabrir un tema
+  9. Confrontacion del alumno con su propio trabajo antiguo
+
+Tu tarea:
+  1. Cual construirias PRIMERO y por que. Solo uno.
+  2. Que criterio verificable indicaria que esta terminado. No una sensacion:
+     algo que se pueda comprobar.
+  3. Que dos de los nueve eliminarias del todo, y con que argumento.
+  4. Que senal temprana indicaria que el patron se esta repitiendo -es decir, que
+     se ha vuelto a especificar en lugar de construir- antes de que sea evidente?
+
+Responde como quien ha visto morir proyectos asi, no como quien quiere quedar
+bien."
+
+================================================================================
+4. QUE HACER CON LA SALIDA
+================================================================================
+
+  1. Copiar el texto completo a un fichero propio, con fecha en el nombre.
+  2. Calcular su hash.
+  3. Estado: cuarentena. No se toca ningun fichero activo del sistema con esto.
+  4. En casa, revisar linea por linea contra el contexto completo. Corregir lo que
+     sea alucinacion.
+  5. Solo lo que sobreviva a esa revision se firma y baja a la capa canonica.
+  6. Borrar el chat.
+
+Nota sobre el prompt B: si la respuesta cita estudios con autor y ano, hay que
+verificar que existen antes de creerla. Es el modo de fallo mas caro de estas
+herramientas, porque una referencia inventada es indistinguible de una real hasta
+que se busca.
+
+================================================================================
+FIN
+================================================================================

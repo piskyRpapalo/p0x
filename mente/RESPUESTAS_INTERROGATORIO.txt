@@ -1,0 +1,275 @@
+RESPUESTAS DEL PRECEPTOR AL INTERROGATORIO DEL ENJAMBRE
+Version 1.0 - 2026-08-09
+Autor: el Preceptor. Canoniza: el Soberano.
+Nivel de informacion: 2 (contiene doctrina interna, no topologia).
+Destino: disco del Soberano y repositorio privado. NO subir a la nube laboral.
+
+================================================================================
+0. LECTURA PREVIA - LA OBJECION QUE VA DELANTE DE TODO
+================================================================================
+
+El interrogatorio tiene sesenta preguntas que sellan el comportamiento de cuatro
+agentes que aun no existen. Es, en forma, el mismo movimiento que costo el frente
+del panel de pared: canonizar un ecosistema completo antes de escribir una linea.
+
+Su lapida dice: "se canonizo un frente completo antes de escribir una linea; el
+coste fue una ronda de reconciliacion".
+
+Por eso este documento hace tres cosas y no una:
+
+  A. Responde las preguntas que YA tienen respuesta en el canon. Son mas de las
+     que parece: veintiuna. No hacia falta preguntarlas; hacia falta buscarlas.
+  B. Marca como NO DECIDIBLE las que exigen una medicion que no existe, y dice
+     que medicion la desbloquea. Contestarlas hoy seria decretar por intuicion.
+  C. Rechaza las que estan mal planteadas, con el motivo.
+
+Un merito que si hay que reconocer: la columna de "firma de certeza 0-10" es el
+Anclaje aplicado al propio interrogatorio. Declarar cuanta confianza tienes en tu
+propia respuesta, antes de que nadie la evalue, es exactamente el mecanismo que
+Aurelius ensena. Que aparezca aqui, aplicado al Soberano y no al usuario, es
+buena senal.
+
+================================================================================
+1. RESPUESTAS DERIVADAS DE CANON (no requieren decision nueva)
+================================================================================
+
+F-2 - CUATRO AGENTES.
+RESPUESTA: no. Certeza 8.
+El numero correcto hoy es UNO. Un enjambre de cuatro agentes que se coordinan
+entre si es un sistema distribuido, y un sistema distribuido con cero nodos
+construidos es un diagrama. Ademas, cuatro agentes de IA supervisandose entre
+ellos rozan IronClaw: la supervision con valor la hace el carbono, no otro
+silicio.
+Lo que si es real hoy: cuatro ROLES que el mismo motor ocupa en momentos
+distintos, y una estructura Medallon que sostiene el traspaso entre ellos. Ver el
+documento del enjambre.
+
+F-3 - EL SOBERANO NO RESPONDE EN 48 HORAS.
+RESPUESTA: (c) degradar a solo lectura. Certeza 9.
+Abortar destruye el contexto que hace falta para retomar. Esperar
+indefinidamente consume recursos y deja procesos colgados - ya ocurrio con dos
+sesiones bloqueadas del Ejecutor. Solo lectura conserva el estado, libera el
+metal y no decide nada. Es la misma forma que el Watchdog: suspender y escalar.
+
+F-4 - DECISION CRITICA VS TRIVIAL.
+RESPUESTA: certeza 10. La frontera no es la importancia; es el efecto.
+Requiere firma: todo lo que entra en Gold, todo lo que sale de la maquina
+(publicacion, push), todo lo que toca valor economico, toda enmienda de doctrina,
+y toda retirada o despliegue de servicio.
+No requiere firma: leer, medir, inventariar, proponer, escribir en Bronze o
+Silver, y cualquier cosa reversible con un comando.
+Regla mnemotecnica: si deshacerlo cuesta mas que hacerlo, se firma.
+
+F-5 - AURELIUS PUBLICO CON GPU.
+RESPUESTA: certeza 9. No hay dos mandatos; hay un contrato de recursos.
+El modelo lo elige el usuario, y el sistema declara honestamente que puede hacer
+con el motor que tiene: cuando la Forja o el calculo determinista degradan por
+falta de recursos, se dice, no se finge. Un modulo que solo funciona con GPU
+dedicada no entra en el canon publico, porque rompe la replicabilidad, que es el
+criterio que separa un proyecto publico de la configuracion personal de alguien.
+
+F-6 - VOLTAJE POR DEBAJO DEL UMBRAL CRITICO.
+RESPUESTA: (b) congelar Gold y esperar, con matiz. Certeza 9.
+Nada se aborta a media escritura: un corte en caliente sobre un fichero maestro
+es como se corrompe un Codice. Se termina la escritura atomica en curso, se cierra
+Gold, y se degrada. Los nodos menores se apagan despues, no antes.
+
+C-1 - SQLITE COMO INDICE, DISCO COMO VERDAD.
+RESPUESTA: aceptable y correcto. Certeza 10. Ver S-11.
+
+C-2 - PAQUETE PERDIDO EN TRANSITO.
+RESPUESTA: (c) encolar en pendiente Y alertar. Certeza 8.
+Reintentar tres veces a ciegas es la definicion del bucle que el Watchdog existe
+para cortar. Abortar pierde trabajo. Encolar conserva y hace visible.
+
+C-4 - CONTRADICCION ENTRE DOS ROLES.
+RESPUESTA: (b) al Soberano, tal cual, sin sintetizar. Certeza 10.
+Una sintesis automatica de dos posiciones incompatibles produce un texto que
+suena razonable y no es de nadie. La contradiccion es informacion; promediarla la
+destruye. Esta ya es doctrina: el silicio propone, el carbono decide.
+
+C-6 - UN PROCESO MUERE POR FALTA DE MEMORIA.
+RESPUESTA: (c) pausar el ciclo y alertar, marcando el paquete. Certeza 8.
+Reintentar en otro nodo propaga el problema a una segunda maquina. Marcar el
+paquete sin pausar deja el ciclo corriendo con una causa desconocida viva.
+
+S-3 - CADENA O ARBOL.
+RESPUESTA: cadena. Certeza 9.
+Un arbol exige resolucion de conflictos entre ramas, y eso solo hace falta cuando
+hay varios escritores concurrentes. Hay un escritor: el carbono. Introducir relojes
+logicos y fusion automatica para un problema que no se tiene es peso muerto que se
+paga en cada lectura y en cada auditoria. Si algun dia hay varios nodos escribiendo,
+se enmienda; hoy, cadena.
+
+S-11 - EL DISCO RECONSTRUYE EL INDICE, NUNCA AL REVES.
+RESPUESTA: confirmado. Certeza 10.
+Los ficheros firmados son la verdad; el indice es un derivado desechable. Si el
+indice se corrompe, se borra y se reconstruye leyendo el disco. Nunca se restaura
+un indice desde copia de seguridad para "recuperar" contenido: eso invertiria la
+jerarquia y convertiria un cache en fuente.
+Condicion practica: la reconstruccion debe probarse borrando el indice a proposito
+y verificando que vuelve identico. Una reconstruccion que nunca se ha ejecutado es
+una hipotesis.
+
+G-1 - CERO CALCULO VECTORIAL EN RENDER.
+RESPUESTA: confirmado. Certeza 10.
+El render pinta lo que ya esta decidido. Cualquier calculo de similitud ocurre
+antes, en proceso por lotes, y su resultado se guarda. Un panel que calcula
+mientras pinta es un panel que se cae en el peor momento.
+
+G-9 - SOLO MODO OSCURO.
+RESPUESTA: aceptado. Certeza 9.
+Dos temas es el doble de superficie de mantenimiento visual para un usuario que
+es uno. Cuando haya usuarios que lo pidan, se enmienda.
+
+I-3 - UNA DECISION FIRMADA CONTRADICE UNA PROPUESTA NUEVA.
+RESPUESTA: (b) alertar al Soberano. JAMAS (c). Certeza 10.
+Archivar automaticamente una decision firmada es que el sistema reescriba el
+pasado del Soberano sin permiso. Es la peor violacion posible del suelo: no es un
+fallo tecnico, es un recuerdo falso instalado por la maquina.
+
+I-5 - QUIEN ARBITRA ENTRE DOS ROLES.
+RESPUESTA: el Soberano. Certeza 10.
+Un agente arbitrando a otro es supervision de silicio sobre silicio con efecto
+real. Lo que si puede haber es una regla predefinida que RESUELVA sin juicio (por
+ejemplo: ante empate, gana la opcion que anade menos dependencias). Regla, no
+arbitro.
+
+D-3 - TOXICIDAD APLICADA AL CODIGO PROPIO.
+RESPUESTA: si, las mismas etiquetas, sin excepcion. Certeza 10.
+Un criterio que solo se aplica a lo ajeno no es un criterio: es una preferencia.
+Aplicarlo al codigo propio es lo unico que lo hace honesto - y probablemente
+descubra que alguna pieza propia puntua peor que un candidato externo.
+
+D-9 - DATOS CRUDOS DE SENSORES INTERPRETADOS COMO LOGICA.
+RESPUESTA: (b) etiquetar y no extraer logica. Certeza 9.
+Una lectura de sensor es una medida, no una instruccion. Confundirlas es como
+tratar el contenido de un fichero de entrada como codigo: es la forma clasica de
+la inyeccion, un piso mas abajo.
+
+R-1 - CUANDO SE REPITE ESTE INTERROGATORIO.
+RESPUESTA: (c) y (d): cuando un rol cambia de mision, y cuando el hardware
+cambia. Certeza 8.
+Repetirlo por calendario produce respuestas rituales. Se repite cuando cambia
+algo que puede invalidar una respuesta.
+
+R-2 - EL SOBERANO CAMBIA DE OPINION SOBRE ALGO FIRMADO.
+RESPUESTA: (b) documento de enmienda separado, con motivo y entrada de
+cambios. Certeza 10.
+Ya es canon: nada se sobrescribe, todo se enmienda hacia adelante. Reescribir una
+firma para que diga otra cosa destruye la unica propiedad util de haber firmado.
+
+R-3 - QUIEN PUEDE PROPONER NUEVAS PREGUNTAS.
+RESPUESTA: cualquiera propone; solo el Soberano canoniza. Certeza 10.
+Externo es dato, no autoridad. Vale para modelos, para colaboradores y para mi.
+
+I-6 - EL HARDWARE CAMBIA Y HAY DECISIONES QUE LO ASUMIAN.
+RESPUESTA: no invalidar automaticamente. Marcar y alertar. Certeza 9.
+Invalidar en cascada puede desmontar medio canon por un nodo desconectado media
+hora. La marca hace visible el riesgo sin destruir trabajo; el Soberano decide si
+degrada. Es la misma logica que STALE frente a NO DATA: dos estados distintos.
+
+================================================================================
+2. NO DECIDIBLE HOY - Y QUE MEDICION LO DESBLOQUEA
+================================================================================
+
+Estas preguntas piden numeros. Contestarlas sin dato es decretar por intuicion, y
+esta casa tiene una regla contra eso: telemetria antes que opinion.
+
+F-1 - MEGABYTES ACEPTABLES DEL BINARIO.
+NO DECIDIBLE. Desbloquea: construir el primer modulo y medir lo que ocupa. La
+pregunta correcta no es cuantos MB toleras, sino si arranca en el equipo mas
+pobre que quieras soportar. Eso se mide, no se acuerda.
+
+C-3 - FRECUENCIA DEL REPORTE DE ESTADO.
+NO DECIDIBLE. Desbloquea: una semana de ciclos reales. Un reporte cada hora sobre
+un sistema que cambia una vez al dia es ruido; el ruido se aprende a ignorar, y
+entonces el reporte deja de existir aunque se siga generando.
+
+S-9 - TAMANO MAXIMO DEL INDICE.
+NO DECIDIBLE, y probablemente mal planteada. El indice es reconstruible y
+desechable: su tamano no es un limite de diseno sino una consecuencia. Si algun
+dia estorba, se poda por antiguedad. Fijar un tope ahora es inventar una
+restriccion.
+
+D-4 - PESO MAXIMO DE UNA UTILIDAD CANDIDATA.
+NO DECIDIBLE por peso. Ver seccion 3: la pregunta esta mal formulada.
+
+G-5 y G-11 - FRECUENCIA DE ACTUALIZACION Y CONSUMO DEL NAVEGADOR.
+NO DECIDIBLE. Desbloquea: medir el consumo real del panel actual con el
+monitor de rendimiento del propio navegador. Existen dos paneles vivos: el dato
+esta a un minuto de distancia y nadie lo ha tomado.
+Nota de diseno que si es canon: la cadencia de refresco NO es la antiguedad del
+dato. Confundirlas ya produjo un sensor deshonesto en este sistema.
+
+PRESUPUESTO DE LLAMADAS DEL WATCHDOG.
+NO DECIDIBLE. Desbloquea: observar tareas reales y contar. Lo mismo que los
+umbrales de la Mitocondria, que estan esperando siete dias de linea base.
+
+================================================================================
+3. PREGUNTAS MAL PLANTEADAS - RECHAZADAS CON MOTIVO
+================================================================================
+
+D-4 - PESO EN MEGABYTES COMO CRITERIO.
+El peso de descarga no predice casi nada. Una herramienta de doscientos
+megabytes que se ejecuta una vez al mes y no arrastra servicios es mas barata que
+una de dos megabytes que exige un demonio permanente, una base de datos y una
+conexion. El criterio correcto es: cuantos procesos deja corriendo, cuanta
+memoria residente ocupa en reposo, y cuantas dependencias nuevas arrastra.
+
+D-6 - DOCKER COMO TOXICIDAD.
+Binaria y por tanto falsa. Docker no es toxico ni sano: es una capa. Toxico es lo
+que EXIGE la capa sin alternativa. La pregunta util es si la herramienta corre sin
+contenedor cuando hace falta.
+
+I-1 - ANIMACION DE 150 MS CONTRA CONSUMO DE CPU.
+Ya resuelta por canon, y por eso no necesita arbitro. La enmienda de ambiente
+fija las condiciones: fuera de superficies de fondo, nada se anima si no es por
+cambio del dato. Una transicion de interfaz que responde a un acto del usuario es
+respuesta a un dato. Una que ocurre sola, no.
+Leccion general: la mitad de los conflictos entre roles desaparecen cuando existe
+una regla previa. Un arbitro es lo que se necesita cuando falta la regla.
+
+I-2 - UNA UTILIDAD QUE SOLO SOPORTA UN NODO.
+Se aprueba solo para ese nodo, y se declara. Certeza 9. Pero eso la excluye
+automaticamente del canon publico de Aurelius, por replicabilidad. Homogeneidad
+del enjambre no es un valor en si; declarar honestamente donde corre cada cosa, si.
+
+I-4 - UNA UTILIDAD MARCADA COMO TOXICA QUE SE PODRIA PARCHEAR.
+El protocolo es que la pregunta ni se plantea: si hay que parchear la herramienta
+para que respete la doctrina, se ha convertido en una dependencia que mantienes
+tu. La regla es: se rechaza, se anota en la Necropolis con el motivo, y si alguien
+quiere rescatarla necesita una propuesta que resuelva el motivo, no que lo tape.
+
+================================================================================
+4. LAS PREGUNTAS QUE FALTAN
+================================================================================
+
+Ninguna de las sesenta pregunta lo unico que decide si esto existe:
+
+  P1. Cual es el UNICO modulo que se va a construir esta semana?
+  P2. Como sabremos que esta terminado? (criterio verificable, no sensacion)
+  P3. Que se deja de hacer para poder construirlo?
+
+Sesenta respuestas selladas y cero modulos construidos es la forma exacta que
+tenia el frente del panel de pared el dia antes de morir.
+
+Mi propuesta para P1: el Anclaje. Ya esta a medias, es el modulo que hace que
+Aurelius no sea un chatbot mas, y se termina en una semana.
+
+================================================================================
+5. NOTA SOBRE EL PROTOCOLO DE CIERRE
+================================================================================
+
+El protocolo pide firmar el interrogatorio completo con Ed25519 antes de que sus
+respuestas se inyecten como configuracion inmutable del enjambre.
+
+Objecion: no firmes configuracion inmutable de un sistema que no existe. Firma lo
+de la seccion 1 - son derivaciones de canon vigente y sobreviviran a cualquier
+implementacion. Lo demas se firma cuando haya dato.
+
+Una firma sobre una decision que no puede sostenerse devalua todas las demas.
+
+================================================================================
+FIN
+================================================================================

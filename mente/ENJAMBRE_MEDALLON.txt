@@ -1,0 +1,192 @@
+EL ENJAMBRE MEDALLON
+Workflow de roles, capas y firma - Version 1.0 - 2026-08-09
+Autor: el Preceptor. Canoniza: el Soberano.
+Nivel de informacion: 2. Destino: disco del Soberano y repositorio privado.
+
+================================================================================
+1. LA CORRECCION DE PARTIDA
+================================================================================
+
+El plan original propone cuatro agentes: Coordinador, Software, Grafico,
+Destilador. Cuatro procesos que se pasan paquetes, se contradicen, y necesitan un
+arbitro.
+
+No son cuatro agentes. Son CUATRO ROLES, y hoy los ocupa el mismo motor en
+momentos distintos.
+
+La diferencia no es semantica:
+
+  Cuatro agentes  -> cola de mensajes, deteccion de fallo entre procesos,
+                     estado compartido, arbitraje, orquestador. Meses.
+  Cuatro roles    -> cuatro plantillas de prompt y una carpeta por capa. Dias.
+
+Y hay una razon doctrinal encima de la practica: cuatro agentes que se supervisan
+entre si es silicio arbitrando silicio con efecto real. IronClaw dice que la
+supervision con consecuencia la hace el carbono. El enjambre puede deliberar; no
+puede resolverse a si mismo.
+
+REGLA: se empieza con UN rol activo. El segundo entra cuando el primero produzca
+trabajo que el Soberano use de verdad, no cuando el diagrama lo pida.
+
+================================================================================
+2. LA MEDALLON COMO SUSTRATO DEL TRASPASO
+================================================================================
+
+La Medallon no es solo para datos. Es el mecanismo que hace que un traspaso entre
+roles no pierda informacion ni gane certeza falsa.
+
+BRONZE - LO QUE LLEGO, TAL CUAL
+  Que entra: salida cruda de cualquier fuente. Nube, modelo local, Preceptor,
+  documento externo, captura de terminal.
+  Reglas: inmutable, con marca de tiempo, con origen declarado, con hash.
+  Nada se corrige aqui. Ni siquiera lo que esta mal - sobre todo lo que esta mal.
+  Estado por defecto: CUARENTENA.
+
+  Lo que llega de la nube entra aqui y en ningun otro sitio. La nube propone en
+  cuarentena; el disco canoniza en produccion.
+
+SILVER - LO QUE PASO LA MAQUINA
+  Que entra: material de Bronze que ha superado validacion DETERMINISTA. Es decir:
+  ejecutada por un script, no juzgada por un modelo.
+    - el hash coincide
+    - el esquema es valido
+    - las afirmaciones verificables se comprobaron con un comando
+    - las citas a fuente existen
+    - los duplicados estan detectados
+  Reglas: cada pieza lleva su estado de calidad y la antiguedad de su dato.
+  Ausencia declarada como ausencia, jamas como cero.
+  Estado: PROPUESTA. Puede vivir aqui indefinidamente sin dano.
+
+  Aqui es donde muere la alucinacion. Un modelo puede escribir que una funcion
+  existe; el script comprueba si el fichero esta. Solo lo segundo cuenta.
+
+GOLD - LO QUE FIRMO EL CARBONO
+  Que entra: lo que el Soberano leyo, entendio y sello.
+  Reglas: cadena de solo anexion, cada entrada referencia el hash de la anterior,
+  firma separada.
+  Firma por lote permitida: veinte propuestas MOSTRADAS y un gesto de intencion.
+  El gesto es de intencion, no de contenido. Si cada entrada exigiera un ritual,
+  el Soberano dejaria de sellar y Gold moriria de friccion.
+  Condicion dura: firmar un lote que no se ha visto es firmar en blanco.
+
+  Ninguna maquina promueve a Gold. Ni por umbral de similitud, ni por antiguedad,
+  ni por consenso entre roles.
+
+================================================================================
+3. LOS CUATRO ROLES Y SU CAPA
+================================================================================
+
+EL ESCRIBA (coordinacion)
+  Capa: Bronze a Silver.
+  Hace: recibe, fecha, hashea, encola, detecta contradicciones entre piezas.
+  No hace: no resuelve las contradicciones. Las presenta juntas al carbono.
+  Salida: un indice de lo que hay y de en que estado esta.
+
+EL DESTILADOR (evaluacion de material externo)
+  Capa: Bronze.
+  Hace: analiza un repositorio, un documento o una propuesta, y produce una ficha.
+  La ficha lleva SIEMPRE tres campos y el tercero es el que importa:
+    - que hace
+    - que arrastra (procesos, dependencias, servicios permanentes)
+    - LO VAS A USAR ESTA SEMANA: si / no
+  Si la respuesta al tercero es no, la ficha va a deliberacion y no se vuelve a
+  mirar hasta que alguien la pida por su nombre.
+  No hace: no decide adopcion.
+
+EL DEFINIDOR (logica)
+  Capa: Silver.
+  Hace: convierte una decision firmada en especificacion ejecutable. Escribe el
+  pseudocodigo, define el contrato, escribe el criterio de aceptacion.
+  No hace: no ejecuta codigo que haya escrito un modelo. Nunca. Ni en entorno que
+  parezca aislado.
+
+EL ARQUITECTO DE PERCEPCION (superficie)
+  Capa: Silver a la interfaz.
+  Hace: decide como se ve un dato ya decidido.
+  Restricciones vigentes por canon: cero calculo de similitud en tiempo de
+  pintado; los colores semanticos son propiedad del dato y de la alerta; el
+  movimiento ambiental solo en superficies de fondo, con apagado global, y el
+  panel debe seguir siendo legible con todo apagado.
+
+EL CRITICO (quinto rol, opcional pero recomendado)
+  Capa: transversal.
+  Hace: una sola pregunta a cada propuesta - "que tiene que ser verdad para que
+  esto funcione, y esta comprobado?".
+  Es el rol mas barato y el que mas ha rendido en este sistema: casi todos los
+  fallos de las ultimas ocho rondas fueron supuestos no comprobados, no errores
+  de ejecucion.
+
+================================================================================
+4. EL CICLO DEL PROMPT - DEL PRECEPTOR AL SOBERANO
+================================================================================
+
+El Soberano pidio que este ciclo quede escrito. Es este:
+
+  1. El Soberano plantea un problema o trae un reporte.
+  2. El Preceptor entrega UN prompt, no una conversacion. El prompt es
+     autocontenido: quien lo reciba no necesita memoria externa.
+  3. El Soberano lo trabaja - lo pega donde toque, mide, vuelve con resultado.
+  4. El Preceptor evalua contra el criterio de aceptacion, no contra su gusto.
+  5. Si no pasa: el Preceptor entrega el prompt corregido, con el motivo de la
+     correccion escrito. Vuelta al 3.
+  6. Si pasa: se declara BUENA RESPUESTA, y solo entonces baja a disco.
+
+CRITERIO DE BUENA RESPUESTA - los cinco, todos, sin excepcion:
+
+  B1. TODA cifra viene con el comando que la produjo, ejecutado en esta sesion.
+      Una cifra volatil repetida entre dos rondas es una cita, no una medida.
+  B2. Lo que no se pudo determinar aparece declarado como no determinado.
+      El silencio sobre una laguna es una afirmacion tacita.
+  B3. Las conclusiones se escriben DESPUES de mirar. Un hallazgo redactado antes
+      de medir es un presentimiento con formato de evidencia.
+  B4. Una sola pregunta abierta. Priorizar es trabajo de quien reporta.
+  B5. El resumen concuerda con el cuerpo. Un campo que dice "sin hallazgos
+      criticos" sobre un texto que describe un riesgo es un sensor deshonesto
+      dentro del propio informe.
+
+  Falla uno, no es buena respuesta. No se negocia por cansancio: los cinco
+  nacieron de fallos reales de este sistema, uno por uno.
+
+REGLA DE PARADA DEL CICLO: tres vueltas sin pasar el criterio significa que el
+problema esta mal planteado, no mal ejecutado. Se para y se replantea. Una cuarta
+vuelta es el mismo bucle que el Watchdog corta en las maquinas.
+
+================================================================================
+5. LA NUBE DENTRO DE LA MEDALLON
+================================================================================
+
+Una herramienta de consulta en la nube es un rol mas, con una restriccion propia:
+solo escribe en Bronze, y siempre en cuarentena.
+
+  Entra a la nube: solo material de Nivel 3, con nombres genericos.
+  Sale de la nube: texto que aterriza en cuarentena, con hash y fecha.
+  Nunca: firma, acceso a maquinas, decisiones, ni memoria historica.
+
+La regla operativa mas importante y la mas facil de olvidar: **la memoria no vive
+en el chat**. Si un hallazgo util no se copio a disco antes de cerrar la sesion,
+no existe. Una conversacion no es un registro; es una pizarra.
+
+Y la fuga no suele estar en los ficheros que se suben. Esta en el contexto que se
+escribe al preguntar. El fichero se revisa; el prompt se teclea con prisa.
+
+================================================================================
+6. QUE SE CONSTRUYE PRIMERO
+================================================================================
+
+Nada de esto necesita construirse como software para empezar a funcionar. Lo que
+hace falta hoy:
+
+  - Tres carpetas: bronze, silver, gold.
+  - Una regla: lo de la nube aterriza en bronze con hash y fecha.
+  - Una regla: nada sube a gold sin firma.
+  - Cuatro plantillas de prompt, una por rol.
+
+Eso es un dia de trabajo y ya es el enjambre. El orquestador, la cola de mensajes
+y el panel del cubo son consecuencia, no requisito. Si se construyen antes, se
+construyen para un uso imaginado - y ya sabemos como termina eso.
+
+  Un modulo construido y usado vale mas que diez especificados.
+
+================================================================================
+FIN
+================================================================================

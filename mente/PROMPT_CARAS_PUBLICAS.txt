@@ -1,0 +1,134 @@
+PROMPT · RONDA CARAS PUBLICAS · FASE 1
+Para pegar en una conversacion NUEVA de Claude Code, en el nodo principal.
+Autocontenido: no necesita memoria de sesiones anteriores.
+
+================================================================================
+
+Hola. Vamos a reparar los frenos de publicacion antes de publicar nada. Esta
+ronda no construye funcionalidad: repara, mide y reconcilia. Es corta y es
+importante.
+
+CONTEXTO (todo lo que necesitas saber esta aqui):
+
+Este sistema tiene cuatro repositorios de trabajo en el directorio del usuario:
+p0x (privado, contiene la doctrina en mente/), hexelion, aurelius y
+cinek_automatico. Tres de ellos tienen cara publica en GitHub.
+
+La regla de higiene del proyecto es que nada que identifique la infraestructura
+sale a un repositorio publico: direcciones de red, nombres de host, usuarios en
+ruta, rutas absolutas del sistema, claves o tokens. Los nodos se nombran por su
+rol en prosa - Soberano, Fragua, Vigia, Torre - y eso es lexico de doctrina, no
+topologia.
+
+Ahi esta el problema de hoy.
+
+BLOQUE 1 · REPARAR EL GANCHO (primero, y bloquea todo lo demas)
+
+Existe un gancho de pre-commit instalado en el repositorio p0x, en la ruta
+habitual de ganchos de git. Funciona: bloquea con codigo de salida distinto de
+cero. Pero tiene un falso positivo grave.
+
+El nombre del nodo principal de este sistema coincide con una palabra central del
+lexico doctrinal del proyecto, que aparece legitimamente en prosa castellana en
+casi todos los documentos. El gancho busca esa palabra suelta, sin distinguir
+mayusculas, y por eso bloquea documentos de doctrina que no contienen ninguna
+fuga.
+
+Un freno con falsos positivos acaba desactivado por costumbre. Eso lo convierte
+en ningun freno.
+
+Tu tarea:
+  a) Lee el gancho y reporta que patrones busca hoy, textualmente.
+  b) Sustituye la busqueda de palabras sueltas por busqueda de FORMAS DE
+     DIRECCION. Es decir, el nombre del nodo solo debe bloquear cuando aparece
+     como direccion, no como sustantivo. Piensa en las formas en que un nombre de
+     maquina aparece de verdad en un fichero: precedido de un usuario y arroba,
+     seguido de dos puntos y una ruta, dentro de un dominio de red, detras de un
+     comando de conexion remota, o dentro de un prompt de terminal copiado.
+  c) Manten y refuerza lo que si debe bloquear siempre: direcciones IP del rango
+     privado de la red superpuesta, rutas absolutas al directorio del usuario,
+     nombres de dominio de la red privada, y cualquier cosa con forma de clave o
+     token.
+  d) Escribe casos de prueba con ejemplos que DEBEN pasar y ejemplos que DEBEN
+     bloquear. Ejecutalos y pega la salida. Sin esa prueba no sabemos si el
+     arreglo funciona: solo que ya no molesta.
+  e) Mueve el gancho a un fichero versionado dentro de p0x, con un script de
+     instalacion que lo copie a cada repositorio. Los ganchos de git no se
+     versionan solos y hoy solo existe en uno de los cuatro.
+
+BLOQUE 2 · RECONCILIAR HEXELION
+
+El repositorio hexelion tiene trabajo local sin publicar desde un commit
+determinado, y su remoto publico apunta a otro commit mas reciente que ese punto
+de partida. Nadie ha medido la relacion entre ambos.
+
+Tu tarea:
+  a) Trae el estado del remoto sin fusionar nada.
+  b) Mide y reporta, con los comandos a la vista: cuantos commits tiene el local
+     que no esten en el remoto, cuantos el remoto que no esten en el local, y si
+     las historias han divergido o solo van desacompasadas.
+  c) NO fusiones, NO rebases, NO publiques. Solo mide y reporta el escenario.
+     Si han divergido, la resolucion la decide el Soberano.
+
+BLOQUE 3 · AUDITAR LO YA PUBLICADO
+
+El repositorio publico de hexelion contiene una carpeta de doctrina que se
+publico antes de que existiera ningun freno.
+
+Tu tarea:
+  a) Recorre esa carpeta en el estado publicado y busca lo mismo que busca el
+     gancho reparado: direcciones, nombres de host como direccion, usuarios en
+     ruta, rutas absolutas, dominios de red privada, claves.
+  b) Reporta CADA hallazgo con fichero y linea. Si no hay ninguno, dilo con la
+     misma claridad: es un resultado igual de valioso.
+  c) NO reescribas el historial. Lo publicado, publicado esta; reescribir no
+     recupera nada y rompe las referencias. Si hay hallazgos, la correccion es
+     hacia adelante: un commit que sustituya los valores por marcadores
+     genericos.
+
+BLOQUE 4 · INSTALAR LOS FRENOS DONDE FALTAN
+
+Con el gancho ya reparado y probado, instalalo en hexelion, aurelius y
+cinek_automatico. Anade tambien un gancho de pre-push que revise el rango
+completo que va a subir, no solo el ultimo commit: el caso que se nos escapo fue
+exactamente ese.
+
+Verifica cada instalacion provocando un bloqueo a proposito con un fichero de
+prueba, y borra el fichero de prueba despues.
+
+BLOQUE 5 · REGISTRAR LA RONDA ANTERIOR
+
+Existe una auditoria de la noche del 9 de agosto - recuperacion del rack y
+verificacion de la copia del Codice, con cuatro hashes coincidentes - que se
+intento comprometer y nunca llego a existir como fichero. El comando fallo porque
+el fichero no estaba escrito.
+
+Escribela ahora en el directorio de auditorias de p0x, con los comandos y sus
+salidas tal como se ejecutaron. Lo que solo vive en una conversacion se pierde.
+
+INVARIANTES DE ESTA RONDA
+
+  - No publiques nada. Ni push, ni tags. Preparas; el Soberano firma.
+  - No fusiones ni rebases ninguna rama.
+  - No reescribas historial de ningun repositorio.
+  - No toques codigo de aplicacion. Esta ronda es de frenos y medicion.
+  - Commits atomicos, uno por bloque, mensaje descriptivo.
+  - Si algo es ambiguo, para y pregunta. Preferimos una pregunta a una
+    suposicion, y no pasa nada por parar.
+
+FORMATO DE REPORTE (maximo 12 lineas)
+
+  RONDA CARAS-PUBLICAS-1 · <repo>@<rama>
+  HECHO       <hash> · <una linea por commit>
+  MEDIDO      <cifras de esta sesion, cada una con su comando>
+  HALLAZGO    <lo encontrado en la auditoria de lo publicado, o "ninguno">
+  BLOQUEADO   <item> ← <dependencia exacta>
+  DECIDE      <una sola pregunta, o "nada">
+  DATOS QUE NO PUDE DETERMINAR: <lista, o "ninguno">
+
+Cierra con entre 3 y 6 sugerencias accionables con coste S/M/L, anexadas al
+fichero de pendientes del proyecto.
+
+Para al terminar los cinco bloques. No encadenes con otra ronda.
+
+================================================================================
