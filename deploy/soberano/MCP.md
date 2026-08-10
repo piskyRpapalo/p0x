@@ -84,3 +84,53 @@ código: `readOnly` en el servidor de ficheros es solo una anotación por
 herramienta, no un modo; y el de sqlite expone `write_query` y `create_table`.
 Hoy esa restricción vive únicamente en este documento. Lo único mecánico es el
 acotado de rutas de `filesystem`, que sí se aplica.
+
+---
+
+## Fragilidad declarada · pin `mcp<2` — 2026-08-10
+
+**Los tres servidores de PyPI mueren en silencio con el SDK `mcp` 2.x.** No dan
+error de instalación ni aviso: arrancan, revientan al importar o al registrar
+sus manejadores, y el arnés solo ve una conexión cerrada. En `claude mcp list`
+aparecen como `✘ Failed to connect — Connection closed`, sin causa a la vista.
+
+Trazas exactas medidas el 2026-08-10 con `mcp` 2.0.0:
+
+```
+mcp-server-git     AttributeError: 'Server' object has no attribute 'list_tools'
+mcp-server-sqlite  AttributeError: 'Server' object has no attribute 'list_resources'
+mcp-server-fetch   ImportError: cannot import name 'McpError' from 'mcp.shared.exceptions'
+```
+
+Causa: los tres declaran la dependencia `mcp` **sin techo de versión**, y `uv`
+resuelve a la última. El SDK 2.0.0 renombró esa superficie.
+
+**Regla operativa, no sugerencia:** toda instalación o reinstalación de estos
+tres lleva el pin, siempre.
+
+```bash
+uv tool install --force --with "mcp<2" mcp-server-git
+uv tool install --force --with "mcp<2" mcp-server-sqlite
+uv tool install --force --with "mcp<2" mcp-server-fetch
+```
+
+Resuelto y verificado con `mcp 1.29.0` en los tres.
+
+**Un `uv tool upgrade` sin el pin los rompe.** También los rompería `uv tool
+install` de un solo paquete sin `--with`, porque el pin no queda grabado en el
+entorno de la herramienta: vive en el comando, no en disco. Esa es exactamente
+la clase de límite que la doctrina llama débil — el que hay que acordarse de
+escribir cada vez.
+
+Comprobación rápida de que el pin sigue en pie:
+
+```bash
+for t in mcp-server-git mcp-server-sqlite mcp-server-fetch; do
+  printf "%-20s mcp=" "$t"
+  "$HOME/.local/share/uv/tools/$t/bin/python" \
+    -c "import importlib.metadata as m; print(m.version('mcp'))"
+done
+```
+
+Cualquier salida que no empiece por `1.` significa que los tres servidores están
+caídos aunque el registro diga que existen.
