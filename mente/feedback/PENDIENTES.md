@@ -843,3 +843,14 @@ destapó y no le tocaba resolver.
   `guardia_higiene.py --files` sobre el árbol completo en cada push al
   repositorio público convierte el freno en algo que no depende de que la
   máquina de turno lo tenga instalado.
+
+### 2026-08-10 · Descarte firmado · MCP de GitHub
+
+- **DESCARTADO por firma del Soberano, 2026-08-10.** **No se instala el MCP de
+  GitHub**, ni con token de solo lectura. Motivo: `mente/EQUIPO_AI_LOOP.md` §1
+  declara que el Ejecutor no puede empujar, y que ese límite es mecánico — «no
+  puede empujar porque el sistema no le deja, no porque se lo pidieran
+  amablemente». Un servidor MCP de GitHub le daría una vía de escritura al
+  remoto que **no pasa por `git push`** y que por tanto los ganchos no frenan.
+  Es doctrina, no preferencia: no se reabre sin enmienda de §1. El resto de la
+  ronda MCP-1 queda en `deploy/soberano/MCP.md`.
