@@ -29,25 +29,68 @@ import re
 import sys
 
 # --- Decisiones firmadas que permiten patrones especificos (D8, D10) ---
+#
+# D18: la exencion se evalua POR REGLA, nunca sobre la linea completa. Antes,
+# un patron de D8 en cualquier parte de la linea eximia la linea ENTERA: un
+# token ghp_ pasaba sin reportarse si la linea mencionaba /home/pisky/. Una
+# comprobacion que detecta y deja pasar no es comprobacion (04_CONTRATO §3.7).
 DECISIONES_FIRMADAS = {
-    'D8': [
-        r'/home/pisky/',
-        r'10\.\d+\.\d+\.\d+',
-        r'192\.168\.\d+\.\d+',
-        r'localhost',
-        r'tailscale',
-        r'soberano\.',
-        r'fragua:',
-    ],
-    'D10': [
-        r'AKIAIOSFODNN7EXAMPLQ',
-        r'ghp_[A-Za-z0-9]+_FIXTURE',
-    ],
+    'D8': {
+        'reglas': frozenset({
+            'IP-RFC1918',
+            'RUTA-HOME',
+            'DOMINIO-PRIVADO',
+            'NODO-URL',
+            'NODO-HOST-PATH',
+        }),
+        'patrones': [
+            r'/home/pisky/',
+            r'10\.\d+\.\d+\.\d+',
+            r'192\.168\.\d+\.\d+',
+            r'localhost',
+            r'tailscale',
+            r'soberano\.',
+            r'fragua:',
+        ],
+    },
+    'D10': {
+        'reglas': frozenset({'TOKEN-PROVEEDOR'}),
+        'patrones': [
+            r'AKIAIOSFODNN7EXAMPLQ',
+            r'ghp_[A-Za-z0-9]+_FIXTURE',
+        ],
+    },
 }
 
-def es_permitido_por_canon(linea):
-    for d_id, patrones in DECISIONES_FIRMADAS.items():
-        for p in patrones:
+# Suelo duro de D8: estas reglas no se eximen por una ruta local ni por una
+# mencion de red. D10 conserva la potestad de eximir TOKEN-PROVEEDOR, pero
+# solo con sus dos patrones literales de fixture.
+D8_JAMAS = frozenset({'TOKEN-PROVEEDOR', 'IP-TAILNET', 'CLAVE-PRIVADA'})
+
+# D23: la exencion documental solo aplica a los entregables donde el Soberano
+# autorizo citar rutas e IPs. Fuera de estas dos carpetas manda
+# 04_CONTRATO_CLAUDE_CODE §3.5: cero rutas de usuario, cero IPs de tailnet.
+# D8 no autoriza commits con rutas o IPs en el resto del arbol.
+RUTAS_CANON_D23 = re.compile(
+    r"(?:^|/)(?:Cuarentena/salida|docs/post_verificacion)/"
+)
+
+assert not (DECISIONES_FIRMADAS['D8']['reglas'] & D8_JAMAS), (
+    'D8 no puede eximir TOKEN-PROVEEDOR, IP-TAILNET ni CLAVE-PRIVADA (D18)'
+)
+
+
+def es_permitido_por_canon(linea, regla_id):
+    """Decision firmada que exime a ESTA regla en ESTA linea, o None.
+
+    `regla_id` es obligatorio a proposito: sin valor por defecto, cualquier
+    llamada al estilo antiguo revienta con TypeError en vez de eximir en
+    silencio. Ver D18.
+    """
+    for d_id, decision in DECISIONES_FIRMADAS.items():
+        if regla_id not in decision['reglas']:
+            continue
+        for p in decision['patrones']:
             if re.search(p, linea):
                 return f'PERMITIDO-POR-{d_id}'
     return None
@@ -194,17 +237,22 @@ def escanear_lineas(ruta: str, lineas: list[tuple[int, str]]) -> list[str]:
     """Devuelve hallazgos `ruta:linea: [REGLA] texto` para las líneas dadas."""
     if EXENTOS.search(ruta):
         return []
+    # La exencion de D8/D10 vive solo en las carpetas de entregable (D23).
+    canon_d23 = bool(RUTAS_CANON_D23.search(ruta))
     hallazgos: list[str] = []
     for num, texto in lineas:
         if PRAGMA.search(texto):
-            continue
-        if es_permitido_por_canon(texto):
             continue
         for rid, _desc, patron in REGLAS:
             m = patron.search(texto)
             if not m:
                 continue
             if PLACEHOLDERS.search(m.group(0)):
+                continue
+            # La exencion se consulta AQUI, con la regla que acaba de saltar.
+            # El `continue` sigue recorriendo REGLAS: una linea con una IP
+            # privada eximida y ademas un token se reporta por el token.
+            if canon_d23 and es_permitido_por_canon(texto, rid):
                 continue
             recorte = texto.strip()
             if len(recorte) > 160:

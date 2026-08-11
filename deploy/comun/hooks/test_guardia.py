@@ -92,6 +92,11 @@ BLOQUEAN = [
     ("aws: AKIAIOSFODNN7EXAMPLQ", "TOKEN-PROVEEDOR"),
     ('api_key: "8f14e45fceea167a5a36dedd4bea2543"', "SECRETO-ASIGNADO"),
     ("password=Tr0ub4dor&3xKw7bHq99", "SECRETO-ASIGNADO"),
+    # D18 · caso rojo: la exencion de D8 por ruta local NO puede tapar
+    # un token. Con el codigo anterior esta linea no daba hallazgo.
+    ("ruta /home/pisky/p0x y token "
+     "ghp_A1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6Q7r8",
+     "TOKEN-PROVEEDOR"),
 ]
 
 # Excepción declarada: el pragma desactiva la línea, con motivo a la vista.

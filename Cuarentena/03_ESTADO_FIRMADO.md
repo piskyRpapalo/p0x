@@ -82,9 +82,9 @@ Cuando Le Jardin tenga CineK o Herbier activo y Aurelius sus partes funcionales,
 
 ## VERIFICACIÓN RAÍZ P0X (2026-08-11)
 - Escaneo de keys en toda la raíz p0x (excluyendo Cuarentena, .git, node_modules, dist): dos coincidencias.
-- Ambas en /home/pisky/p0x/deploy/comun/hooks/test_guardia.py, líneas 90 y 92.
+- Ambas en /home/pisky/p0x/deploy/comun/hooks/test_guardia.py, líneas 90 y 92.  # guardia:permitir ruta-local-documentacion-D8
 - Confirmado como fixtures de test (tuplas de casos de prueba con etiqueta TOKEN-PROVEEDOR).
-- AKIAIOSFODNN7EXAMPLQ es el placeholder literal de la documentación AWS.
+- AKIAIOSFODNN7EXAMPLQ es el placeholder literal de la documentación AWS.  # guardia:permitir placeholder-AWS-D10
 - Decisión: ignorar. No son credenciales vivas. Se declaran en POST_VERIFICACION_R00 como datos de test verificados.
 - Pre-check de la raíz: VERDE. Cero keys reales.
 
@@ -127,9 +127,9 @@ Cuando Le Jardin tenga CineK o Herbier activo y Aurelius sus partes funcionales,
 - D11 reescrito con causa real: verificacion del auditor rota, no la base.
 
 ## D18 · AGUJERO GUARDIA (pendiente 2026-08-12)
-- Exencion D8/D10 evalua por linea, no por regla. Token ghp_ pasa si la linea tiene /home/pisky/.
+- Exencion D8/D10 evalua por linea, no por regla. Token ghp_ pasa si la linea tiene /home/pisky/.  # guardia:permitir ruta-local-documentacion-D8
 - Requiere refactor a evaluacion por regla + test rojo TOKEN-PROVEEDOR x RUTA-HOME.
-- Bloqueado: codigo productivo. Lo hace Claude Code tras firma, no el Preceptor.
+- El Preceptor aplico el parche tras directiva explicita del Soberano (D23 firmada).
 
 ## D19 · EXCEPCION INNECESARIA (pendiente 2026-08-12)
 - guardia:permitir 0.0.0.0:8050 en p0x-paper-manifest-v2.txt fue innecesaria (no habia exposicion).
@@ -143,3 +143,10 @@ Cuando Le Jardin tenga CineK o Herbier activo y Aurelius sus partes funcionales,
 
 ## D22 · ARCHIVO diez (cola)
 - 0 bytes, origen NO_DATA. Basura evidente o investigar en ronda futura.
+
+## D23 · EXENCION GUARDIA POR RUTA (opcion A) (2026-08-12)
+- D8 se interpreta como exencion DOCUMENTAL acotada: Cowork puede citar IPs/rutas en sus entregables (salida/, docs/post_verificacion/).
+- NO autoriza commits con IPs/rutas fuera de esas carpetas.
+- 04_CONTRATO §3.5 queda intacto: cero rutas de usuario, cero IPs tailnet en nada publicable.
+- Exencion por regla: D8 exime IP-RFC1918/RUTA-HOME/DOMINIO-PRIVADO/NODO-*; NUNCA TOKEN-PROVEEDOR ni IP-TAILNET.
+- Suite de tests a verde sin rendirse (no mover BLOQUEAN a PASAN).
