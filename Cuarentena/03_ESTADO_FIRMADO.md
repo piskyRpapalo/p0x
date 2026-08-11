@@ -99,11 +99,12 @@ Cuando Le Jardin tenga CineK o Herbier activo y Aurelius sus partes funcionales,
 - test_fuga.md reconocido por el Soberano: canario antiguo, inofensivo.
 - Enterrado en necropolis/ con motivo; original eliminado tras copia.
 
-## D11 · HASHES_R00 (2026-08-11)
-- Resultado del test sha256sum -c: 5 fallos en la primera linea base; regenerada; segunda verificacion 0 fallos. Roto en necropolis/HASHES_R00_roto_evidencia.txt. Discrepancia Cowork(9) vs test(5) declarada, no resuelta.
-- Si se regeneró, el roto queda en necropolis/HASHES_R00_roto_evidencia.txt.
-- Regla futura: toda línea base se re-ejecuta con sha256sum -c antes de usarse como autoridad.
-
+## D11 · HASHES_R00 (2026-08-11, ENMENDADO 2026-08-11)
+- Causa real: la linea base NUNCA estuvo rota. sha256sum -c separa por doble espacio; el formato era correcto desde el principio.
+- Lo roto fue la verificacion del auditor en R01 (awk '{print $2}'), no el artefacto. D11 se firmo sobre una alarma falsa generada por el Preceptor.
+- La regeneracion fue inocua. La regla se mantiene con motivo corregido: no protege de bases mal escritas; protege de auditores que verifican mal.
+- Regla futura: toda linea base se re-ejecuta con sha256sum -c (herramienta nativa, no awk) antes de usarse como autoridad.
+- Evidencia enterrada conservada en necropolis/HASHES_R00_roto_evidencia.txt.
 ## D12 · TERCER BLUEPRINT v1.2.0 (mente/doctrina)
 - Clasificado borrador histórico sin autoridad. No se mueve hasta que una ronda decida la casa de la doctrina.
 
@@ -121,3 +122,24 @@ Cuando Le Jardin tenga CineK o Herbier activo y Aurelius sus partes funcionales,
 ## D16 · STDERR VISIBLE (2026-08-11)
 - git add con 2>/dev/null oculto el fallo del index.lock; misma familia que el sed de R00.
 - Regla: ningun comando de git o de verificacion se ejecuta con stderr suprimido.
+
+## D17 · ENMIENDA D11 (2026-08-11)
+- D11 reescrito con causa real: verificacion del auditor rota, no la base.
+
+## D18 · AGUJERO GUARDIA (pendiente 2026-08-12)
+- Exencion D8/D10 evalua por linea, no por regla. Token ghp_ pasa si la linea tiene /home/pisky/.
+- Requiere refactor a evaluacion por regla + test rojo TOKEN-PROVEEDOR x RUTA-HOME.
+- Bloqueado: codigo productivo. Lo hace Claude Code tras firma, no el Preceptor.
+
+## D19 · EXCEPCION INNECESARIA (pendiente 2026-08-12)
+- guardia:permitir 0.0.0.0:8050 en p0x-paper-manifest-v2.txt fue innecesaria (no habia exposicion).
+- Quitar excepcion y revisar edicion humana del archivo.
+
+## D20 · DEL BARRIDO ENTERRADO (2026-08-11)
+- Restaurado desde bdf2595 a necropolis/ con tumba. Doctrina absorbida en canon.
+
+## D21 · CRASH-LOOP AURELIUS-INTERFAZ (cola)
+- ~29953 reinicios segun PENDIENTES.md. Hallazgo operativo real. Ronda dedicada futura.
+
+## D22 · ARCHIVO diez (cola)
+- 0 bytes, origen NO_DATA. Basura evidente o investigar en ronda futura.

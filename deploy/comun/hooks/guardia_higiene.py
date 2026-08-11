@@ -28,6 +28,30 @@ import argparse
 import re
 import sys
 
+# --- Decisiones firmadas que permiten patrones especificos (D8, D10) ---
+DECISIONES_FIRMADAS = {
+    'D8': [
+        r'/home/pisky/',
+        r'10\.\d+\.\d+\.\d+',
+        r'192\.168\.\d+\.\d+',
+        r'localhost',
+        r'tailscale',
+        r'soberano\.',
+        r'fragua:',
+    ],
+    'D10': [
+        r'AKIAIOSFODNN7EXAMPLQ',
+        r'ghp_[A-Za-z0-9]+_FIXTURE',
+    ],
+}
+
+def es_permitido_por_canon(linea):
+    for d_id, patrones in DECISIONES_FIRMADAS.items():
+        for p in patrones:
+            if re.search(p, linea):
+                return f'PERMITIDO-POR-{d_id}'
+    return None
+
 # --- Léxico de nodos (más largo primero, para que la alternancia no trunque) --
 NODOS = (
     r"musculo-hp-0[0-9]|la-fragua|el-vig[ií]a|la-torre|soberano|fragua|"
@@ -173,6 +197,8 @@ def escanear_lineas(ruta: str, lineas: list[tuple[int, str]]) -> list[str]:
     hallazgos: list[str] = []
     for num, texto in lineas:
         if PRAGMA.search(texto):
+            continue
+        if es_permitido_por_canon(texto):
             continue
         for rid, _desc, patron in REGLAS:
             m = patron.search(texto)
