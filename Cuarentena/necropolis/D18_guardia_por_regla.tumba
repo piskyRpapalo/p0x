@@ -1,0 +1,3 @@
+Parche D18: aplicado y versionado en 7ce37d4; el diff canonico vive en git (git show 7ce37d4).
+Contiene fixtures del corpus de la guardia (secrets intencionales de test); por eso NO se versiona.
+No re-aplicar. Solo evidencia historica. Enterrado el 2026-08-12.

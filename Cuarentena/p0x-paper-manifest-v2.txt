@@ -80,4 +80,4 @@ La coexistencia de Claude Code (Polo Externo - Silicio Operativo) y Qwen (Polo L
 *   **Qwen como Soberano local**: Realiza la evaluación determinista asíncrona de "La Forja" (Skill P.08) calculando la similitud del coseno local (>0.75) y midiendo la entropía léxica en frío (O(N) > 0.4) para evitar engaños de generación de texto repetitivo en los ensayos [13, 82]. Al procesar peticiones de otros conocidos de la Mesh (límite Dunbar de exactamente 100 nodos de confianza), aisla el contexto en hilos de RAM efímeros para proteger tu diario íntimo y tus datos Gold [14].
 
 ### David actúa como el árbitro último. Claude y Qwen proponen las estructuras, pero la validez lógica solo nace tras la auditoría visual y la firma criptográfica Ed25519 detached del soberano humano [5, 121].
-# guardia:permitir exposicion-temporal-0.0.0.0:8050-hallazgo-R02
+# guardia:permitir ruta-local-documentacion-D8
