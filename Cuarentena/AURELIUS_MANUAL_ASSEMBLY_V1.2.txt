@@ -1,0 +1,1327 @@
+================================================================================
+AURELIUS MANUAL DE ENSAMBLAJE V1.2
+Instrucciones Paso a Paso | Vinculado al Catálogo V1.2 y Anexo V1.2
+================================================================================
+Última actualización: 2026-08-06
+Vinculado a: AURELIUS_CATALOG_V1.2.txt | AURELIUS_ANNEX_V1.2.txt
+Audiencia: Desarrolladores, expertos AI, Claude Code
+Regla de oro: Este archivo es el HOW-TO. El WHAT está en el Catálogo.
+             El WHY está en el Anexo.
+================================================================================
+
+================================================================================
+CAPÍTULO 1: REQUISITOS PREVIOS
+--------------------------------------------------------------------------------
+Antes de tocar una línea de código, verifica que el entorno cumple estos
+requisitos. Si alguno falla, NO continúes hasta resolverlo.
+
+1.1 HARDWARE MÍNIMO POR PERFIL
+------------------------------------------------------------
+
+PERFIL LITE (BRONCE completo + PLATA parcial):
+  - CPU: x86_64 o ARM64 (Apple Silicon, Raspberry Pi 4/5)
+  - RAM: 8 GB mínimo (4 GB para SO + 4 GB para modelo 3B-7B)
+  - Almacenamiento: 10 GB libres (código + modelos + datos)
+  - Red: Loopback únicamente (localhost/127.0.0.1)
+  - GPU: Opcional. CPU-only es suficiente para BRONCE.
+
+PERFIL PRO (BRONCE + PLATA + ORO):
+  - CPU: x86_64 multi-core (6+ cores recomendados)
+  - RAM: 32 GB mínimo (16 GB para modelo 14B-32B + 16 GB para sistema)
+  - Almacenamiento: 50 GB libres (múltiples modelos + FAISS + datos)
+  - Red: Loopback + red privada (Tailscale o WireGuard)
+  - GPU: Recomendada (CUDA o Metal). No obligatoria pero altamente deseable.
+
+PERFIL MESH (PRO + nodos interconectados):
+  - Cada nodo debe cumplir perfil PRO.
+  - Red privada estable entre nodos (Tailscale o WireGuard configurado).
+  - Ancho de banda: 10 Mbps mínimo entre nodos.
+
+1.2 DEPENDENCIAS DEL SISTEMA OPERATIVO
+------------------------------------------------------------
+
+OBLIGATORIAS (sin estas, el sistema no arranca):
+  - Python 3.10 o superior
+  - Git (para clonado de repo y descarga de repos de evaluación)
+  - Ollama (motor de inferencia local, o alternativa compatible con /api/tags)
+
+RECOMENDADAS (mejoran experiencia pero no bloquean):
+  - tmux (para skills de terminal: B.17, B.19, B.21)
+  - Node.js 18+ (solo si el frontend usa build tools; vanilla HTML/JS no lo requiere)
+
+OPCIONALES (habilitan skills específicas):
+  - rustc, tsc, go, gcc (para P.19 Compilador como Rúbrica)
+  - firejail o nsjail (para sandbox de compilación en P.19)
+  - Tailscale o WireGuard (para ORO: O.03, O.04, O.05, O.11)
+
+1.3 VERIFICACIÓN DE ENTORNO (SCRIPT DE CHECK)
+------------------------------------------------------------
+
+Ejecuta este script ANTES de clonar el repositorio. Si falla algún check,
+resuélvelo antes de continuar.
+
+```bash
+#!/bin/bash
+# aurelius-env-check.sh
+# Script de verificación de entorno para Aurelius V4
+
+echo '=== AURELIUS ENVIRONMENT CHECK ==='
+echo ''
+
+# Check Python
+python_version=$(python3 --version 2>/dev/null | grep -oP '\d+\.\d+')
+if [ -z '$python_version' ]; then
+    echo '[FAIL] Python 3 no encontrado. Instala Python 3.10+')
+    exit 1
+fi
+major=$(echo $python_version | cut -d. -f1)
+minor=$(echo $python_version | cut -d. -f2)
+if [ $major -lt 3 ] || [ $minor -lt 10 ]; then
+    echo '[FAIL] Python $python_version es muy antiguo. Necesitas 3.10+')
+    exit 1
+fi
+echo '[PASS] Python $python_version'
+
+# Check Git
+if ! command -v git &> /dev/null; then
+    echo '[FAIL] Git no encontrado. Instala Git.'
+    exit 1
+fi
+echo '[PASS] Git disponible'
+
+# Check Ollama
+if ! curl -s http://localhost:11434/api/tags > /dev/null 2>&1; then
+    echo '[WARN] Ollama no responde en localhost:11434. Instala y arranca Ollama.'
+    echo '         O configura otro endpoint compatible en config.lite.json')
+else
+    echo '[PASS] Ollama responde en localhost:11434'
+fi
+
+# Check RAM
+ram_gb=$(python3 -c 'import psutil; print(int(psutil.virtual_memory().total / 1024**3))' 2>/dev/null || echo '0')
+if [ $ram_gb -lt 8 ]; then
+    echo '[WARN] RAM detectada: ${ram_gb}GB. Minimo recomendado: 8GB para LITE, 32GB para PRO'
+else
+    echo '[PASS] RAM detectada: ${ram_gb}GB'
+fi
+
+# Check espacio en disco
+disk_gb=$(df . | tail -1 | awk '{print int($4/1024/1024)}')
+if [ $disk_gb -lt 10 ]; then
+    echo '[WARN] Espacio libre: ${disk_gb}GB. Minimo: 10GB para LITE, 50GB para PRO'
+else
+    echo '[PASS] Espacio libre: ${disk_gb}GB'
+fi
+
+# Check compiladores (opcional)
+for compiler in rustc tsc go gcc; do
+    if command -v $compiler &> /dev/null; then
+        echo '[PASS] Compilador $compiler disponible (para P.19)'
+    else
+        echo '[INFO] Compilador $compiler no encontrado. Skill P.19 no estara disponible.'
+    fi
+done
+
+echo ''
+echo '=== ENVIRONMENT CHECK COMPLETE ==='
+echo 'Si todos los checks [PASS], puedes continuar con el Capitulo 2.'
+```
+
+1.4 CLONADO DEL REPOSITORIO Y VERIFICACIÓN DE ABM
+------------------------------------------------------------
+
+Paso 1: Clonar el repositorio
+  git clone https://github.com/davidmartinez/aurelius.git
+  cd aurelius
+
+Paso 2: Verificar el Aurelius Bootstrap Manifest (ABM)
+  El archivo aurelius.abm debe estar en la raiz del repositorio.
+  Contiene la lista de dependencias Python con sus hashes SHA-256.
+
+  Si el archivo NO existe, el repositorio está corrupto o incompleto.
+  NO instales dependencias sin el ABM.
+
+Paso 3: Verificar hashes de dependencias
+  python3 scripts/verify_abm.py
+
+  Este script:
+    a. Lee aurelius.abm
+    b. Descarga cada wheel de PyPI
+    c. Calcula SHA-256 del wheel descargado
+    d. Compara con el hash esperado en ABM
+    e. Si hay discrepancia: ABORTA y muestra error
+
+  Si verify_abm.py falla, NO continues. Contacta a david@aurelius.software
+  o verifica manualmente los hashes en https://pypi.org/project/<nombre>/
+
+Paso 4: Instalar dependencias (solo despues de verificar ABM)
+  pip install -r requirements.txt
+
+Paso 5: Crear directorio de configuracion
+  mkdir -p config/
+  cp config/config.lite.example.json config/config.lite.json
+  cp config/config.pro.example.json config/config.pro.json
+
+Paso 6: Editar config.lite.json con tu endpoint de Ollama
+  {
+    'profile': 'LITE',
+    'ollama_endpoint': 'http://localhost:11434',
+    'model': 'llama3.2:3b',
+    'vault_path': './sovereign_vault',
+    'port': 3000
+  }
+
+Paso 7: Inicializar el vault
+  python3 scripts/init_vault.py --profile LITE
+
+  Este script crea:
+    sovereign_vault/bronze/
+    sovereign_vault/gold/
+    sovereign_vault/worktrees/default/
+    sovereign_vault/config/
+    sovereign_vault/cache/
+
+Paso 8: Generar par de claves Ed25519 para firma de Gold
+  python3 scripts/generate_keys.py
+
+  Esto genera:
+    sovereign_vault/.keys/ed25519_private.pem
+    sovereign_vault/.keys/ed25519_public.pem
+
+  ADVERTENCIA: La clave privada NUNCA debe salir del dispositivo.
+  Sin la clave privada, no puedes sellar en Gold ni emitir PoKs.
+
+Paso 9: Primer arranque del servidor
+  python3 server.py --profile LITE
+
+  Si el servidor arranca sin errores y muestra:
+    '[Aurelius] Perfil: LITE | Motor: SOBERANO | Modelo: llama3.2:3b'
+  entonces el entorno está listo.
+
+
+================================================================================
+CAPÍTULO 2: RONDAS DE IMPLEMENTACIÓN
+--------------------------------------------------------------------------------
+Orden estricto de construcción. NO saltar rondas. NO implementar una skill
+de una ronda superior sin haber completado todas las skills de la ronda anterior.
+Cada skill tiene checklist de completitud y tests obligatorios.
+
+2.1 RONDA 1: BRONCE FUNDAMENTAL (B.01 - B.10)
+------------------------------------------------------------
+Objetivo: El servidor arranca, detecta el motor, expone capabilities,
+y el usuario puede interactuar de forma segura.
+Tiempo estimado: 2-3 dias de desarrollo.
+
+---
+SKILL B.01: Perfiles de Configuracion
+Checklist de completitud:
+  [ ] Argumento --profile funciona en CLI
+  [ ] config.lite.json y config.pro.json se cargan correctamente
+  [ ] RAM se mide en runtime con psutil (no solo se declara)
+  [ ] Si RAM < 8GB y perfil = PRO, muestra advertencia y sugiere LITE
+  [ ] /api/capabilities devuelve JSON con perfil, modelo, RAM, estado
+
+---
+SKILL B.02: Declaracion Honesta del Motor
+Checklist de completitud:
+  [ ] GET a /api/tags de Ollama funciona
+  [ ] Clasificacion de topologia es determinista (no heuristica)
+  [ ] UI muestra estado SOBERANO/DELEGADO/HUESPED de forma permanente
+  [ ] Si HUESPED, activa protecciones automaticas (Gold offline)
+  [ ] Tests: localhost=SOBERANO, 10.0.0.1=DELEGADO, 8.8.8.8=HUESPED
+
+---
+SKILL B.03: Capabilities API
+Checklist de completitud:
+  [ ] Endpoint /api/capabilities responde con JSON valido
+  [ ] RAM medida coincide con psutil
+  [ ] Skills disponibles se filtran por perfil activo
+  [ ] Frontend oculta opciones que el hardware no puede cumplir
+  [ ] Test: LITE no muestra skills que requieren FAISS
+
+---
+SKILL B.04: Honest Math
+Checklist de completitud:
+  [ ] Parser AST con whitelist funciona (solo nodos numericos permitidos)
+  [ ] Calculadoras fijas: VRAM, tokens, energia
+  [ ] Si ninguna calculadora aplica, responde NO_DATA
+  [ ] UI distingue 'Calculado con [formula]' vs 'Generado por modelo'
+  [ ] Tests: 2+2=4, (2+3)*4=20, eval('__import__(os)')=RECHAZADO
+  [ ] Tests: calculadora VRAM con parametros conocidos devuelve valor esperado
+
+---
+SKILL B.05: Portapapeles Soberano
+Checklist de completitud:
+  [ ] Bloques <pre><code> se renderizan sin boton de copiar
+  [ ] Son seleccionables con teclado (tabindex, focus)
+  [ ] Son anunciables por screen reader (aria-label, role)
+  [ ] Instruccion visible: 'Selecciona el comando y pulsa Ctrl+C'
+  [ ] Explicacion del modelo marcada como 'Generado por IA, no garantia'
+  [ ] Test de accesibilidad: navegable solo con teclado
+
+---
+SKILL B.06: Command Guard
+Checklist de completitud:
+  [ ] Lista negra en archivo versionado (YAML/JSON), no en codigo
+  [ ] Regex detecta patrones peligrosos en bloques shell/bash/sh
+  [ ] Si hay coincidencia: bloque envuelto en advertencia visual (rojo, icono)
+  [ ] El modelo genera explicacion educativa (no decision de seguridad)
+  [ ] Tests de regresion: rm -rf / = ADVERTENCIA, ls = OK, git rm = OK
+  [ ] Tests de ofuscacion: r$(echo m) -rf / = ADVERTENCIA
+
+---
+SKILL B.07: Centinela de Hardware
+Checklist de completitud:
+  [ ] Polling cada 5 segundos de sensores
+  [ ] psutil para RAM/CPU
+  [ ] /sys/class/thermal en Linux (o equivalente Mac/Windows)
+  [ ] Si temperatura > umbral o RAM > 90%: cambia estado visual
+  [ ] Propone comando de mitigacion pero NUNCA lo ejecuta
+  [ ] Sliding window de 12 puntos (60s) para tendencia
+  [ ] Test: simular carga de CPU y verificar que el Centinela detecta
+
+---
+SKILL B.08: Cache de Embeddings
+Checklist de completitud:
+  [ ] SHA-256 del texto normalizado antes de generar embedding
+  [ ] Busqueda en cache_embeddings.jsonl
+  [ ] Si existe: devuelve vector cacheado
+  [ ] Si no: genera embedding, guarda en JSONL (append-only)
+  [ ] Normalizacion: lowercase, strip whitespace, unicode NFKC
+  [ ] Test: mismo texto dos veces = segundo usa cache
+
+---
+SKILL B.09: Ingesta Pasiva de Conocimiento
+Checklist de completitud:
+  [ ] Area de texto en UI para pegar contenido
+  [ ] Guarda en bronze/snippets/ con timestamp y hash
+  [ ] Busqueda por coincidencia de texto (no semantica en BRONCE)
+  [ ] Usuario puede revisar, editar o descartar snippets
+  [ ] Banner legal visible: 'Los snippets son tuyos; verifica licencias'
+  [ ] Test: pegar snippet, buscar por palabra clave, encontrar resultado
+
+---
+SKILL B.10: Scaffolding Fading
+Checklist de completitud:
+  [ ] Variable scaffolding_level en system prompt: active|passive|ondemand
+  [ ] Progreso medido por misiones completadas (M0-M7)
+  [ ] Frontend ajusta cantidad de sugerencias, hints y explicaciones
+  [ ] En ondemand: usuario pulsa 'Necesito ayuda' para guia
+  [ ] Test: usuario M0 ve hints activos, usuario M5 ve ondemand
+
+CRITERIO DE SALIDA DE RONDA 1:
+  [ ] Servidor arranca sin errores con --profile LITE
+  [ ] /api/capabilities responde correctamente
+  [ ] Honest Math calcula VRAM de un modelo conocido correctamente
+  [ ] Command Guard detecta rm -rf / y bloquea
+  [ ] Centinela detecta carga de CPU y muestra advertencia
+  [ ] Snippets se guardan y se buscan correctamente
+  [ ] Scaffolding cambia de active a ondemand segun progreso
+  [ ] TODOS los tests pasan: python3 -m pytest tests/ronda1/
+
+
+2.2 RONDA 2: BRONCE EXTENDIDO (B.11 - B.27)
+------------------------------------------------------------
+Objetivo: Skills pedagogicas avanzadas, prediccion, recuperacion,
+y modo Templo para seguridad en entornos no controlados.
+Tiempo estimado: 3-4 dias de desarrollo.
+
+---
+SKILL B.11: Espejo de Socrates
+Checklist de completitud:
+  [ ] Toggle en UI activa 'Modo Espejo'
+  [ ] System prompt cambia a instruccion de solo-preguntas
+  [ ] Limite de 5 intercambios por sesion
+  [ ] Al finalizar: resumen de metricas O(N) deterministas
+  [ ] Registra en Bronze: longitud, terminos tecnicos, conclusion propia
+  [ ] Disclaimer visible: 'Entrenamiento de pensamiento, no terapia'
+  [ ] Test: 5 intercambios con pregunta tecnica, verificar metricas
+
+---
+SKILL B.12: Focus Pact
+Checklist de completitud:
+  [ ] Formulario en UI: intencion + duracion
+  [ ] Polling cada 30s con DIRECTORY FINGERPRINTING (no os.listdir)
+  [ ] Fingerprint = SHA-256(sorted(os.listdir(path)))
+  [ ] Al finalizar: resumen comparativo intencion vs actividad real
+  [ ] Filtro de exclusion configurable para nombres sensibles
+  [ ] Test: crear archivo durante Focus Pact, verificar deteccion de cambio
+
+---
+SKILL B.13: Senda de los Muertos
+Checklist de completitud:
+  [ ] Cada rechazo en UI genera entrada append-only en dead_path.jsonl
+  [ ] Categorizacion por tema (regex simple o lista fija)
+  [ ] Contador por categoria
+  [ ] Alerta a 5 rechazos: mensaje de confrontacion amable
+  [ ] Datos cifrados y solo accesibles por el usuario
+  [ ] Test: rechazar 5 veces mismo tema, verificar alerta
+
+---
+SKILL B.14: Diccionario del Soberano
+Checklist de completitud:
+  [ ] Regex detecta patrones de pregunta definitoria en chat
+  [ ] Guarda: termino, definicion, contexto (hash de sesion), timestamp
+  [ ] Comando en UI: 'Genera mi diccionario'
+  [ ] Exporta Markdown con terminos, definiciones, hashes como footnotes
+  [ ] Disclaimer: 'Sellos criptograficos son evidencia tecnica, no juridica'
+  [ ] Test: preguntar 'Que es idempotencia?', generar diccionario, verificar contenido
+
+---
+SKILL B.15: Simulacion de Catastrofe
+Checklist de completitud:
+  [ ] Escenarios definidos en YAML/JSON por el soberano
+  [ ] Usuario escribe comandos. Validacion contra arbol de decisiones fijo
+  [ ] Verificacion: servicio antes de firewall, logs antes de reinicio
+  [ ] Emite PoK parcial: 'Resolvio 3 de 5 escenarios de nivel 2'
+  [ ] PROHIBIDO ejecutar comandos del usuario. Solo validacion.
+  [ ] Advertencia: 'No incluyas datos identificables de tu empleador'
+  [ ] Test: escenario de firewall, usuario escribe secuencia correcta, verificar PoK
+
+---
+SKILL B.16: Juez de Arquitectura
+Checklist de completitud:
+  [ ] Usuario pega snippet donde define agente o modulo
+  [ ] ANTES de ejecutar parser: usuario predice metricas
+  [ ] COMMITMENT PROTOCOL: commit = SHA-256(prediccion + salt)
+  [ ] Parser AST (ast module) cuenta dependencias circulares
+  [ ] Muestra recuento real. El hueco entre intuicion y realidad = leccion
+  [ ] Maneja SyntaxError gracefully: 'codigo no analizable'
+  [ ] Test: pegar modulo con 2 dependencias circulares, predecir, verificar
+
+---
+SKILL B.17: Espejo de Paneles (tmux)
+Checklist de completitud:
+  [ ] Honest Math calcula consumo estimado de RAM por proceso
+  [ ] Usuario predice si la maquina soportara la carga ANTES de ver comando
+  [ ] COMMITMENT PROTOCOL aplicado
+  [ ] Comando se entrega por Portapapeles Soberano
+  [ ] Heuristica conservadora (mejor subestimar). Margen del 20%
+  [ ] Test: predecir RAM para 4 paneles tmux, verificar calculo
+
+---
+SKILL B.18: Detector de Code Smell
+Checklist de completitud:
+  [ ] Usuario pega funcion. Parser AST cuenta metricas
+  [ ] Umbral canónico: >3 niveles, >5 parametros, >30 lineas
+  [ ] ANTES de ejecutar: usuario predice que metrica fallara
+  [ ] COMMITMENT PROTOCOL aplicado
+  [ ] LLM solo explica por que la metrica es smell; nunca juzga
+  [ ] Disclaimer: 'Metricas son indicadores, no veredictos'
+  [ ] Test: funcion con 6 parametros, predecir, verificar umbral
+
+---
+SKILL B.19: Tesoro de Sesiones (tmux)
+Checklist de completitud:
+  [ ] Simulador de estado tmux en JSON
+  [ ] Sistema 'cierra' terminal abruptamente (en simulacion)
+  [ ] Pregunta: 'Que comandos usarias para recuperar el estado?'
+  [ ] Usuario escribe secuencia. Validacion contra rubrica fija
+  [ ] Sin exec de comandos del usuario. Solo validacion determinista
+  [ ] Test: simular 3 sesiones, usuario recupera, verificar validacion
+
+---
+SKILL B.20: Balance de Carga Mental
+Checklist de completitud:
+  [ ] Usuario define N agentes con proposito en texto
+  [ ] Script cuenta overlapping de palabras clave entre descripciones
+  [ ] Si solapamiento > umbral = violacion SRP
+  [ ] Usuario predice que agentes se solapan antes de ver grafico
+  [ ] COMMITMENT PROTOCOL aplicado
+  [ ] Visualizacion ASCII de matriz de solapamiento
+  [ ] Test: 3 agentes con 2 solapados, predecir, verificar
+
+---
+SKILL B.21: Forja de Scripting en Vivo
+Checklist de completitud:
+  [ ] La Forja pide script de bash para tarea especifica
+  [ ] Usuario pega script. Validacion con regex estructurado
+  [ ] Rubrica fija en JSON: tmux new-session, split-window, comando correcto
+  [ ] Si falla: muestra que criterio no cumple
+  [ ] PROHIBIDO ejecutar script del usuario
+  [ ] Test: script sin split-window, verificar que falla en ese criterio
+
+---
+SKILL B.22: Templo del Embudo
+Checklist de completitud:
+  [ ] Usuario aprende a montar API. Aurelius plantea escenario de carga
+  [ ] Usuario predice: 'soportara la carga o el cuello de botella sera la DB?'
+  [ ] Honest Math calcula throughput teorico basado en operaciones IO
+  [ ] COMMITMENT PROTOCOL aplicado
+  [ ] Disclaimer: 'Estimacion teorica. Realice benchmarks reales antes de produccion'
+  [ ] Test: API con 10 queries/segundo, predecir bottleneck, verificar
+
+---
+SKILL B.23: Constitucion en Capas
+Checklist de completitud:
+  [ ] Directorio constitution/ con archivos .prompt
+  [ ] Al inicio de conversacion, Aurelius lee capas en orden y ensambla
+  [ ] Panel lateral muestra capas activas. Usuario puede desactivar temporalmente
+  [ ] Capas nunca se ejecutan; solo se leen
+  [ ] Advertencia: 'Las capas son texto plano; revisa su contenido'
+  [ ] Test: crear 3 capas, activar/desactivar, verificar ensamblaje
+
+---
+SKILL B.24: Sesion Persistente
+Checklist de completitud:
+  [ ] Al cerrar navegador: frontend guarda en localStorage estado
+  [ ] Servidor serializa en session_state.jsonl
+  [ ] Al reanudar: reconstruye worktree, constitucion, modo, paneles
+  [ ] Usuario puede nombrar puntos de restauracion
+  [ ] Cifrado de localStorage con clave derivada de contrasena del usuario
+  [ ] Test: cerrar navegador, reabrir, verificar estado restaurado
+
+---
+SKILL B.25: Multiplexor de Misiones
+Checklist de completitud:
+  [ ] Frontend con grid de paneles redimensionables (CSS Grid)
+  [ ] Cada panel tiene ciclo de vida propio pero comparte worktree
+  [ ] Polling ligero cada 30s con DIRECTORY FINGERPRINTING
+  [ ] Comunicacion entre paneles por eventos (pub/sub)
+  [ ] Test: abrir chat + documentacion + terminal, verificar sincronizacion
+
+---
+SKILL B.26: Modo Templo (HUESPED sin Gold)
+Checklist de completitud:
+  [ ] Deteccion de estado HUESPED (de B.02)
+  [ ] Desactiva operaciones de escritura en Gold
+  [ ] Guarda meditaciones en bronze/temple/
+  [ ] Al detectar transicion a SOBERANO: dialogo de sincronizacion diferida
+  [ ] Usuario aprueba cada entrada individualmente
+  [ ] Test: cambiar endpoint a API externa, verificar Gold offline, sincronizar
+
+---
+SKILL B.27: Modalidad Templo como Municipio
+Checklist de completitud:
+  [ ] Cuando estado = HUESPED, parser Command Guard amplia lista negra
+  [ ] Reduce umbral de advertencia
+  [ ] Todo comando en HUESPED marcado como rojo obligatorio
+  [ ] Portapapeles Soberano mantiene seleccion manual + advertencia adicional
+  [ ] Override de emergencia con 2FA registrado en audit log
+  [ ] Test: activar HUESPED, verificar bloqueo obligatorio, probar override 2FA
+
+CRITERIO DE SALIDA DE RONDA 2:
+  [ ] Todas las skills de prediccion (B.16-B.18, B.20, B.22) usan Commitment Protocol
+  [ ] Focus Pact usa Directory Fingerprinting, no os.listdir
+  [ ] Modo Templo bloquea Gold en HUESPED y sincroniza con consentimiento
+  [ ] Command Guard en HUESPED es hiper-estricto con override 2FA
+  [ ] Sesion Persistente restaura estado completo tras cierre de navegador
+  [ ] TODOS los tests pasan: python3 -m pytest tests/ronda2/
+
+
+2.3 RONDA 3: PLATA FUNDAMENTAL (P.01 - P.08)
+------------------------------------------------------------
+Objetivo: Persistencia estructurada, evaluacion, RAG, y reconciliacion.
+Requiere: BRONCE completo (Rondas 1 y 2).
+Tiempo estimado: 4-5 dias de desarrollo.
+
+---
+SKILL P.01: Centinela como Laboratorio
+Checklist de completitud:
+  [ ] Trigger cuando temperatura > umbral
+  [ ] UI muestra campo numerico para prediccion
+  [ ] Temporizador interno mide hasta throttling real
+  [ ] Registra: prediccion, real, delta, condiciones
+  [ ] COMMITMENT PROTOCOL aplicado a la prediccion
+  [ ] Serie temporal en bronze/raw_predictions.jsonl (append-only)
+  [ ] Test: simular carga, predecir throttling, verificar delta
+
+---
+SKILL P.02: Escriba de Documentacion (ADR Generator)
+Checklist de completitud:
+  [ ] Regex + heuristica detectan frases de decision arquitectonica
+  [ ] Acumulador por tema. Al 3 menciones: genera borrador ADR
+  [ ] Plantilla Jinja2: contexto, decision, consecuencias, fecha, hashes fuente
+  [ ] Usuario edita, aprueba o rechaza en UI
+  [ ] Si aprueba: sella en Gold con HLC (no timestamp puro)
+  [ ] ADR marcado: 'BORRADOR GENERADO AUTOMATICAMENTE - REQUIERE REVISION HUMANA'
+  [ ] Test: 3 menciones de 'Docker', verificar generacion de ADR
+
+---
+SKILL P.03: Biblioteca Soberana (RAG)
+Checklist de completitud:
+  [ ] Texto se divide en chunks por parrafos o lineas
+  [ ] Genera embeddings con nomic-embed-text via Ollama
+  [ ] Almacena en FAISS local (CPU-only)
+  [ ] Solo PRO (requiere FAISS)
+  [ ] Busqueda RAG solo consulta documentos sellados
+  [ ] Test: indexar documento, buscar por similitud semantica, verificar resultado
+
+---
+SKILL P.04: Modo Meditaciones
+Checklist de completitud:
+  [ ] Editor de texto simple en UI
+  [ ] Usuario escribe reflexion. Puede previsualizar
+  [ ] Al pulsar 'Sellar': guarda en Gold con HLC y hash
+  [ ] Detector de brechas tematicas (fase 2): compara temas recientes vs propositos
+  [ ] Disclaimer: recursos de ayuda si contenido revela autolesion
+  [ ] Test: escribir meditacion, sellar, verificar en gold/meditations.jsonl
+
+---
+SKILL P.05: Brújula Estoica
+Checklist de completitud:
+  [ ] Analisis de frecuencia de terminos en Bronce vs propositos en Gold
+  [ ] Si ratio de desviacion > umbral: mensaje de confrontacion amable
+  [ ] HUMAN REVIEW GATE (HRG): output requiere validacion humana antes de visible a terceros
+  [ ] COUNTERFACTUAL EXPLAINABILITY LAYER (CEL): explicacion determinista del ratio
+  [ ] RIGHT TO CONTEST BUTTON (RTC): boton de impugnacion inmutable en Gold
+  [ ] Disclaimer: 'Herramienta de autoconocimiento, no de evaluacion de desempeno'
+  [ ] Test: crear proposito 'Rust', hablar solo de 'Python', verificar confrontacion
+
+---
+SKILL P.06: Dynamic System Prompt
+Checklist de completitud:
+  [ ] Engine de prompts lee Gold: misiones, PoKs, temas frecuentes
+  [ ] Ajusta nivel de discurso segun progreso
+  [ ] Skills bloqueadas se omiten de descripcion de capacidades
+  [ ] Todo ensamblaje ocurre localmente antes de enviar al modelo
+  [ ] Test: usuario M3 no ve explicacion de 'Que es Docker'
+  [ ] Test: prompt final no contiene datos identificables
+
+---
+SKILL P.07: Reconciliacion en Arranque
+Checklist de completitud:
+  [ ] Al inicio: itera entradas Gold de tipo KNOWLEDGE_SEALED
+  [ ] Calcula hash del contenido. Compara con entradas en FAISS
+  [ ] Si falta: genera embedding y anade a FAISS
+  [ ] Registra accion en log append-only
+  [ ] Proceso idempotente: ejecutar N veces = mismo resultado
+  [ ] Test: borrar entrada de FAISS, reiniciar, verificar regeneracion
+
+---
+SKILL P.08: La Forja (Evaluacion Dual)
+Checklist de completitud:
+  [ ] TEMPORAL BINDING: session_nonce = SHA-256(Gold_tip + timestamp + topic)
+  [ ] Rubrica embedding perturbada: rubrica_activa = normalize(rubrica_fija + 0.1 * nonce_vector)
+  [ ] Usuario completa tarea. Embedding de respuesta vs rubrica_activa
+  [ ] Evaluador heuristico O(N): diversidad lexica > 0.4, longitud > 500 chars
+  [ ] BURST DETECTION: varianza temporal de diversidad lexica
+  [ ] Si pasa y no hay burst: genera PoK firmado con Ed25519
+  [ ] Mecanismo de revocacion: PoK puede invalidarse si plagio detectado
+  [ ] Test: completar mision, verificar PoK en gold/poks.jsonl con firma valida
+
+CRITERIO DE SALIDA DE RONDA 3:
+  [ ] ADR Generator crea borradores y los sella en Gold con HLC
+  [ ] Biblioteca Soberana indexa y busca documentos con FAISS
+  [ ] Brújula Estoica tiene HRG + CEL + RTC implementados y funcionando
+  [ ] La Forja emite PoK firmado con Ed25519 y verificable
+  [ ] Temporal Binding cambia la rubrica en cada sesion
+  [ ] Burst Detection detecta patrones artificiales
+  [ ] TODOS los tests pasan: python3 -m pytest tests/ronda3/
+
+
+2.4 RONDA 4: PLATA EXTENDIDA (P.09 - P.23)
+------------------------------------------------------------
+Objetivo: Portfolio, enjambre, worktrees, certificacion, y prompt engineering.
+Requiere: Ronda 3 completa.
+Tiempo estimado: 5-6 dias de desarrollo.
+
+---
+SKILL P.09: LITE como Semillero, PRO como Invernadero
+Checklist de completitud:
+  [ ] Sistema de desbloqueo por PoK verificados
+  [ ] Al arrancar en PRO: lee Gold buscando PoKs de nivel
+  [ ] Si encuentra PoK de M2 emitido en LITE: desbloquea M3-M7
+  [ ] UI muestra progreso visual: semillas (LITE) que florecen en PRO
+  [ ] Disclaimer: 'PoK verificable criptograficamente, no acreditado por entidad educativa'
+  [ ] Test: emitir PoK M2 en LITE, migrar a PRO, verificar desbloqueo
+
+---
+SKILL P.10: ADR como Portfolio Tecnico
+Checklist de completitud:
+  [ ] Cada ADR sellado: extrae metadata (hash, HLC, tema, estado)
+  [ ] Anade a profile_public.json
+  [ ] profile_public.json firmado criptograficamente (Ed25519)
+  [ ] Advertencia: 'Revisa que metadata no contenga info sensible de terceros'
+  [ ] Test: aprobar ADR, verificar entrada en profile_public.json con firma
+
+---
+SKILL P.11: Arqueologia de Decisiones
+Checklist de completitud:
+  [ ] Cada ADR referencia al hash del ADR anterior en Gold (cadena de hashes)
+  [ ] Visualizacion tipo timeline o grafo de decisiones
+  [ ] Comparacion entre ADRs del mismo tema en diferentes momentos
+  [ ] Genera resumen automatico de evolucion sin evaluacion de LLM
+  [ ] Solo presenta hechos; nunca juzga 'correctitud'
+  [ ] Test: crear 3 ADRs sobre mismo tema, verificar cadena y visualizacion
+
+---
+SKILL P.12: Laboratorio de Entropia Humana
+Checklist de completitud:
+  [ ] Calcula diversidad lexica O(N) cada N mensajes
+  [ ] Guarda serie temporal en JSONL
+  [ ] BURST DETECTION: varianza de diversidad en ventanas de 5 min
+  [ ] Si varianza > BOT_THRESHOLD: 'Patron de entropia inconsistente'
+  [ ] Si mean < BURNOUT_THRESHOLD y slope < 0: 'Fatiga cognitiva'
+  [ ] Calibracion por nivel: umbrales ajustados segun M-level del usuario
+  [ ] Test: simular conversacion monotona, verificar alerta de fatiga
+
+---
+SKILL P.13: Sintonia Externa
+Checklist de completitud:
+  [ ] Usuario pega temario o notas de curso en texto plano
+  [ ] Aurelius genera 3 problemas practicos basados en temario (LLM + contexto)
+  [ ] Usuario resuelve. Si pasa evaluacion dual (La Forja): sella en Gold
+  [ ] Validacion: si temario no menciona 'Docker', problema no requiere Docker
+  [ ] Test: pegar temario de Rust, generar problemas, verificar correspondencia
+
+---
+SKILL P.14: Arquitecto de Rutas
+Checklist de completitud:
+  [ ] Usuario sella en Gold ruta tecnica deseada
+  [ ] Brújula Estoica lee conversaciones de la semana
+  [ ] Si usuario habla de temas no relacionados: confronta con opcion de reconfiguracion
+  [ ] HRG + CEL + RTC aplicados si contexto B2B
+  [ ] Opt-in: usuario sella su propia ruta, nadie se la impone
+  [ ] Test: sellar ruta 'Backend', hablar de 'Frontend', verificar confrontacion
+
+---
+SKILL P.15: Auditor de Proyectos Practicos
+Checklist de completitud:
+  [ ] Usuario pega enlace a repo GitHub
+  [ ] Permiso firmado OBLIGATORIO antes de descarga
+  [ ] Descarga local (git clone o zip)
+  [ ] Pasa Detector de Code Smell (B.18) y Juez de Arquitectura (B.16)
+  [ ] Detector de secretos en pipeline: si encuentra API keys, detiene analisis
+  [ ] Si pasa umbrales: genera ADR sellando solidez tecnica
+  [ ] Test: repo con secretos hardcodeados, verificar detencion y alerta
+
+---
+SKILL P.16: Enjambre Soberano
+Checklist de completitud:
+  [ ] Usuario define topologia: N agentes con roles especificos
+  [ ] Cada rol tiene prompt y worktree de contexto aislado
+  [ ] Usuario aprueba cada handoff mediante interfaz de firma
+  [ ] Protocolo: PROPOSE, ACCEPT, COMPLETE
+  [ ] Agentes secuenciales (NO paralelos, para no saturar RAM)
+  [ ] Recordatorio en cada handoff: 'Revisa antes de aprobar'
+  [ ] Test: 2 agentes (Pato de Goma + Refactorizador), verificar handoff
+
+---
+SKILL P.17: Worktrees del Pensamiento
+Checklist de completitud:
+  [ ] Usuario crea worktree para cada topico
+  [ ] Cambiar de worktree es instantaneo y no contamina contexto
+  [ ] Operaciones: archivar, clonar, fusionar
+  [ ] FUSION POR HLC (no timestamp): LWW-Element-Set CRDT
+  [ ] Para claves conflictivas: gana HLC mayor. Empate HLC -> hash contenido
+  [ ] Fusion genera ADR automatico documentando conflicto y resolucion
+  [ ] Test: crear 2 worktrees, editar mismo archivo, fusionar, verificar resolucion
+
+---
+SKILL P.18: Camino Platzi
+Checklist de completitud:
+  [ ] Parser de Markdown para extraer modulos y temas
+  [ ] Generacion de borrador de misiones con objetivos, recursos, rubrica
+  [ ] Usuario revisa, ajusta dificultad, y aprueba
+  [ ] Una vez aprobado: sella en Gold como 'curso soberano'
+  [ ] Validacion: cada criterio de rubrica tiene correspondencia en syllabus
+  [ ] Test: pegar syllabus Markdown, generar misiones, verificar correspondencia
+
+---
+SKILL P.19: Compilador como Rubrica
+Checklist de completitud:
+  [ ] Soporte para rustc, tsc, go build, gcc
+  [ ] Guarda snippet en /tmp/aurelius_forge_X.rs
+  [ ] Ejecuta compilador en sandbox (firejail/nsjail) con flags de verificacion
+  [ ] Si exit code == 0 y sin warnings configurados como errores: pasa
+  [ ] Si compilador rechaza: La Forja falla y muestra stderr
+  [ ] LLM no interviene en evaluacion; solo traduce error si se solicita
+  [ ] Sanitizacion de stderr: eliminar rutas de archivos internos
+  [ ] Test: codigo Rust valido = pasa. Codigo con error de tipo = falla.
+
+---
+SKILL P.21: Pato de Goma Determinista
+Checklist de completitud:
+  [ ] Primer rol siempre Pato de Goma en enjambre de refactor
+  [ ] Lee codigo pegado y genera exactamente 3 preguntas sobre suposiciones
+  [ ] Usuario debe responder 3 preguntas antes de handoff al refactorizador
+  [ ] Respuestas se adjuntan al paquete de contexto
+  [ ] Parser verifica que usuario respondio 3 puntos (no evalua calidad)
+  [ ] Logs del pato locales y cifrados
+  [ ] Test: pegar codigo, verificar 3 preguntas, responder, verificar handoff
+
+---
+SKILL P.22: Alarma de Deuda Cognitiva
+Checklist de completitud:
+  [ ] Monitorea dead_path.jsonl vs ADRs recientes
+  [ ] Calcula Cognitive Risk Score por area tecnica
+  [ ] HUMAN REVIEW GATE: score requiere validacion humana antes de visible a terceros
+  [ ] COUNTERFACTUAL EXPLAINABILITY LAYER: 'Si hubieras completado 2 ADRs...'
+  [ ] RIGHT TO CONTEST BUTTON: boton de impugnacion inmutable en Gold
+  [ ] Datos personales. Solo accesibles por el usuario
+  [ ] Test: acumular dead_path en 'Docker', verificar score y explicacion
+
+---
+SKILL P.23: Forja de Ingenieria del Prompt
+Checklist de completitud:
+  [ ] Mision de La Forja: 'Domina el prompt injection defensivo'
+  [ ] Fase 1: Usuario escribe capa constitucional (.prompt) con reglas de salida
+  [ ] Fase 2: Aurelius genera 3 ataques estandar de lista fija en YAML
+  [ ] Fase 3: Inyecta constitucion + ataque en modelo local
+  [ ] Fase 4: Parser determinista valida salida (JSON valido? Contiene markdown?)
+  [ ] Si pasa los 3 ataques: PoK emitido
+  [ ] Ataques fijos y rotatorios (no generados dinamicamente por LLM)
+  [ ] Test: escribir constitucion, inyectar ataque DAN, verificar bloqueo
+
+CRITERIO DE SALIDA DE RONDA 4:
+  [ ] Worktrees se fusionan por HLC + CRDT sin perdida de datos
+  [ ] Enjambre Soberano funciona con handoffs secuenciales y aprobacion humana
+  [ ] Compilador como Rubrica soporta Rust/TypeScript/Go/C con sandbox
+  [ ] Pato de Goma genera exactamente 3 preguntas y bloquea handoff sin respuesta
+  [ ] Deuda Cognitiva tiene HRG + CEL + RTC implementados
+  [ ] Forja de Prompt resiste 3 ataques estandar de lista fija
+  [ ] TODOS los tests pasan: python3 -m pytest tests/ronda4/
+
+
+2.5 RONDA 5: ORO (O.02 - O.11)
+------------------------------------------------------------
+Objetivo: Criptografia, red privada, Mesh P2P, y soberania total.
+Requiere: Rondas 1-4 completas. Hardware PRO (32+ GB RAM).
+Tiempo estimado: 5-7 dias de desarrollo.
+
+---
+SKILL O.02: Honest Math como Protocolo de Verificacion Cruzada
+Checklist de completitud:
+  [ ] Endpoint /api/verify_math recibe paquete JSON: formula, resultado, id_nodo
+  [ ] Ejecuta misma calculadora de Honest Math local
+  [ ] Si discrepancia: detecta automaticamente
+  [ ] Respuesta verificable: {match: true/false, delta: valor_absoluto}
+  [ ] CHALLENGE-RESPONSE: nonce derivado de cadena Gold en cada transaccion
+  [ ] Test: nodo A dice '6.2 GB', nodo B verifica, verificar match/delta
+
+---
+SKILL O.03: Aurelius Thin Client
+Checklist de completitud:
+  [ ] LITE se configura con endpoint DELEGADO (IP privada del PRO)
+  [ ] Todas las peticiones de inferencia se redirigen al PRO
+  [ ] LITE mantiene su propio Bronce y Gold local
+  [ ] PRO procesa modelo y devuelve respuesta
+  [ ] Sincronizacion de estado (Bronce/Gold) entre LITE y PRO por red privada
+  [ ] Resolucion de conflictos por HLC
+  [ ] Test: configurar LITE como thin client, enviar prompt, verificar respuesta de PRO
+
+---
+SKILL O.04: Hot-Start de Contexto
+Checklist de completitud:
+  [ ] Trigger por limite de contexto o boton manual
+  [ ] Serializacion del contexto activo (mensajes + worktree + constitucion)
+  [ ] Transferencia cifrada por red privada (Tailscale/WireGuard)
+  [ ] PRO carga modelo mas grande, procesa, devuelve respuesta
+  [ ] Firma ocurre en Gold del PRO
+  [ ] Transferencia atomica: o todo migra, o nada
+  [ ] Consentimiento informado: 'Al pulsar Delegar a Soberano, tu contexto se transfiere'
+  [ ] Test: LITE con contexto saturado, pulsar delegar, verificar continuidad en PRO
+
+---
+SKILL O.05: Portabilidad Soberana con Transferencia Cifrada
+Checklist de completitud:
+  [ ] Script aurelius-export serializa todo sovereign_vault/
+  [ ] Deriva clave de frase de recuperacion con PBKDF2
+  [ ] Cifra con AES-256-GCM
+  [ ] Genera archivo .aurelius. Opcionalmente fragmenta en codigos QR
+  [ ] aurelius-import descifra, verifica cadena de hashes de Gold
+  [ ] Fusiona worktrees resolviendo conflictos por HLC (no timestamp)
+  [ ] Frase de recuperacion NUNCA se almacena en disco
+  [ ] Advertencia: 'Sin la frase, nadie puede descifrar tu vault'
+  [ ] Test: exportar, transferir, importar, verificar integridad de Gold
+
+---
+SKILL O.06: Prueba del Tiempo (Sello Diferido)
+Checklist de completitud:
+  [ ] Al sellar con TIME_LOCKED: calcula N = duracion / tasa_sellado_promedio
+  [ ] hash_futuro = hash de cadena Gold cuando tenga N bloques mas
+  [ ] Contenido cifrado con AES-256-GCM usando hash_futuro como clave
+  [ ] Entrada marcada como TIME_LOCKED en Gold
+  [ ] No cuenta para progreso hasta desbloqueo
+  [ ] Al alcanzar bloque futuro: clave existe, contenido se revela automaticamente
+  [ ] Tests exhaustivos del mecanismo de conteo y revelacion
+  [ ] Test: sellar con TIME_LOCKED de 10 bloques, verificar bloqueo y desbloqueo
+
+---
+SKILL O.07: Honest Math como Notario de SLAs
+Checklist de completitud:
+  [ ] Nodo B incluye en respuesta: {resultado, pok_recursos: {tiempo_ms, vram_gb, formula}}
+  [ ] Nodo A ejecuta misma calculadora y compara
+  [ ] Si delta > umbral: marca como sospechoso
+  [ ] Acumula reputacion: +1 por verificacion exitosa, -1 por discrepancia
+  [ ] SLASHING LEDGER: 3 PoK-D verificados = blacklist local por 30 dias
+  [ ] STAKE TEMPORAL: ofertar servicios requiere bloquear PoKs propios
+  [ ] Mecanismo de apelacion: nodo sospechoso puede solicitar verificacion manual
+  [ ] Test: nodo B miente sobre VRAM, nodo A verifica, verificar blacklist
+
+---
+SKILL O.08: Modo Templo como Municipio (aislamiento)
+Checklist de completitud:
+  [ ] Si motor es HUESPED: parser Command Guard se vuelve hiper-estricto
+  [ ] Amplia lista negra y reduce umbral de advertencia
+  [ ] Todo comando en HUESPED marcado como rojo obligatorio
+  [ ] Usuario debe transcribir manualmente
+  [ ] Override de emergencia con 2FA registrado en audit log
+  [ ] Test: activar HUESPED, verificar bloqueo, probar override 2FA
+
+---
+SKILL O.09: Calibracion Federada de Hardware
+Checklist de completitud:
+  [ ] Opt-in explicito y revocable
+  [ ] Solo numeros: {cpu_model, temperatura_inicial, prediccion, real, delta}
+  [ ] Sin conversaciones, sin contexto, sin IDs de usuario
+  [ ] Agregacion antes de compartir: minimo 10 usuarios por bucket
+  [ ] Mesh acumula base de datos global de comportamiento real bajo carga
+  [ ] Usuario recibe advertencia calibrada basada en promedio de la Mesh
+  [ ] Test: opt-in, compartir metricas, verificar agregacion y anonimato
+
+---
+SKILL O.10: ADR como Portfolio Exportable
+Checklist de completitud:
+  [ ] Generador de HTML estatico a partir de profile_public.json
+  [ ] Cada ADR renderizado como tarjeta: HLC, tema, decision, hash, estado
+  [ ] Boton de verificacion: empleador pega hash en verificador
+  [ ] HTML estatico puro (sin JavaScript que filtre datos)
+  [ ] Accesible WCAG 2.1 AA
+  [ ] Advertencia: 'Revisa que metadata no contenga info que no quieras compartir'
+  [ ] Test: generar portfolio, abrir en navegador, verificar verificacion de hash
+
+---
+SKILL O.11: Mercado de Bardo Soberano (Mesh P2P)
+Checklist de completitud:
+  [ ] Cada nodo publica oferta/demanda como JSON firmado (Ed25519)
+  [ ] Protocolo de matching determinista basado en Honest Math
+  [ ] CHALLENGE-RESPONSE: PoK-G requiere Proof of Useful Work con nonce
+  [ ] STAKE TEMPORAL: ofertar requiere bloquear PoKs propios
+  [ ] SLASHING LEDGER: si nodo incumple, Honest Math detecta y emite PoK-D
+  [ ] Transferencia por red privada (Tailscale/WireGuard)
+  [ ] IronClaw: nodo propone recursos; humano aprueba cada trueque
+  [ ] Sin servidor central. Sin blockchain. Confianza matematica, no social
+  [ ] Test: 2 nodos publican oferta/demanda, matching, trueque, verificar PoK-G
+
+CRITERIO DE SALIDA DE RONDA 5:
+  [ ] Verificacion cruzada de Honest Math funciona entre 2 nodos
+  [ ] Thin Client LITE se conecta a PRO y redirige inferencia
+  [ ] Hot-Start migra contexto de LITE a PRO sin perdida
+  [ ] Portabilidad exporta e importa .aurelius con integridad verificable
+  [ ] Prueba del Tiempo bloquea y desbloquea contenido correctamente
+  [ ] Notario de SLAs detecta mentira y emite PoK-D
+  [ ] Mesh Marketplace realiza trueque con Challenge-Response + Stake + Slashing
+  [ ] TODOS los tests pasan: python3 -m pytest tests/ronda5/
+
+CRITERIO DE SALIDA FINAL DEL ENSAMBLAJE:
+  [ ] Servidor arranca en LITE con BRONCE completo
+  [ ] Servidor arranca en PRO con PLATA completo
+  [ ] Servidor arranca en PRO con ORO completo (si hardware lo permite)
+  [ ] TODOS los tests de todas las rondas pasan: python3 -m pytest tests/
+  [ ] ABM verifica todos los hashes de dependencias
+  [ ] No hay ciclos en el DAG de dependencias
+  [ ] Ninguna skill BETA sin plan de validacion documentado
+
+
+
+================================================================================
+2.6 PATRÓN UI_CARA: SWAP ÓPTICO SIN DOWNTIME
+--------------------------------------------------------------------------------
+Ubicación en repo: deploy/fragua/paquete-dos-pieles/01-serve-from-git.patch
+Mecánica:
+  1. La variable de entorno UI_CARA controla qué interfaz sirve el nodo.
+     Valores:  legacy | dos-pieles | nuevo
+  2. Ambos builds (dashboard legado y Nexo/Jardín) coexisten en el mismo
+     repositorio bajo directorios separados (interface/legacy/ y interface/nuevo/).
+  3. El script de despliegue (systemd o docker-compose) lee UI_CARA en arranque.
+     - UI_CARA=legacy  → sirve el build antiguo (ruta por defecto).
+     - UI_CARA=dos-pieles → sirve ambos skins; el usuario alterna con toggle
+       en UI sin recargar (OPT-IN).
+     - UI_CARA=nuevo   → sirve únicamente el nuevo dashboard.
+  4. El cambio es un simple systemctl restart (o docker restart) — cero downtime
+     porque el build ya está compilado en disco; solo cambia el symlink o el
+     directorio raíz que sirve el servidor estático.
+  5. Rollback instantáneo: si el nuevo skin falla, UI_CARA=legacy y restart.
+     El soberano nunca queda sin interfaz.
+Checklist de completitud:
+  [ ] Variable UI_CARA leída en scripts/servir_interfaz.py (o entrypoint Docker).
+  [ ] Ambos builds compilados en CI antes del deploy (no en el nodo).
+  [ ] Toggle en UI visible solo cuando UI_CARA=dos-pieles.
+  [ ] Rollback documentado en runbook del soberano.
+Reglas de seguridad:
+  - El cambio de cara requiere reinicio del servicio; nunca hot-swap en runtime
+    para evitar estado mixto.
+  - La variable UI_CARA nunca se lee del request del cliente; solo del entorno
+    del servidor (previene injection de skin).
+================================================================================
+
+================================================================================
+CAPÍTULO 3: PROTOCOLO DE INTEGRACIÓN DE NUEVA SKILL
+--------------------------------------------------------------------------------
+Procedimiento obligatorio para añadir una skill al catálogo. Cualquier skill
+que no siga este protocolo es inválida y debe ser rechazada en auditoría.
+
+3.1 PASO 1: VERIFICAR INVARIANTES
+------------------------------------------------------------
+Antes de proponer una skill nueva, responde estas 5 preguntas:
+
+  1. ¿Esta skill viola el principio Local-first?
+     -> Si requiere datos en la nube o servidor central: RECHAZAR.
+
+  2. ¿Introduce ejecución autónoma de comandos (violación IronClaw)?
+     -> Si el sistema ejecuta algo sin aprobación humana explícita: RECHAZAR.
+
+  3. ¿Usa LLM para evaluar o juzgar (violación Honest Math)?
+     -> Si el LLM decide si el usuario pasó o falló: RECHAZAR.
+     -> El LLM solo redacta. Los números salen de código determinista.
+
+  4. ¿Añade dependencia sin justificar en el ABM?
+     -> Si requiere pip install <nuevo_paquete> sin justificación técnica: RECHAZAR.
+     -> Justificación válida: 'FAISS es necesario para búsqueda semántica en RAG'
+     -> Justificación inválida: 'Es más fácil con esta librería'
+
+  5. ¿Expone datos personales sin salvaguarda técnica (GDPR/EU AI Act)?
+     -> Si genera PII sin cifrado, sin consentimiento, o sin HRG/CEL/RTC: RECHAZAR.
+
+  Si alguna respuesta es SÍ: la skill no entra. No negociable.
+
+3.2 PASO 2: ANALIZAR DEPENDENCIAS EXISTENTES
+------------------------------------------------------------
+
+  a. Buscar en el Catálogo V1.2 (Sección B) si ya existe una skill similar.
+     Usa keywords, no solo códigos. Ej: buscar 'evaluación' puede encontrar P.08.
+
+  b. Buscar en el Anexo V1.2 (Parte III) si el caso límite ya fue analizado.
+     No reinventar vectores de ataque ya documentados.
+
+  c. Identificar qué skills existentes dependen de la nueva skill o viceversa.
+     Usar el Mapa de Dependencias (Catálogo V1.2, Sección D) como referencia.
+
+  d. Verificar que no se crea un ciclo en el DAG.
+     Si A depende de B y B depende de A: arquitectura inválida.
+
+3.3 PASO 3: ASIGNAR CÓDIGO
+------------------------------------------------------------
+
+  a. Determinar medallón:
+     - ¿Requiere solo Python + JSONL + HTML/JS? -> BRONCE
+     - ¿Requiere FAISS, evaluación, Gold poblado, o embeddings? -> PLATA
+     - ¿Requiere criptografía, red privada, transferencia, o 32GB+ RAM? -> ORO
+
+  b. Asignar número:
+     - Buscar el último número usado en ese medallón.
+     - El siguiente número disponible es el código.
+     - Ej: si último BRONCE es B.27, la nueva es B.28.
+
+  c. El código es INMUTABLE. Si la skill evoluciona, conserva su código.
+
+3.4 PASO 4: REDACTAR SKILL EN FORMATO DEL CATÁLOGO
+------------------------------------------------------------
+
+  Usar el formato obligatorio de la Sección C del Catálogo V1.2:
+
+  ---
+  SKILL [CÓDIGO]: [NOMBRE]
+  ---
+  Medallón: [BRONCE|PLATA|ORO]
+  Estado: [STABLE|BETA|DEPRECATED|MERGED|BLOQUEADA_POR_AUDITORIA]
+  Descripción: [una oración de propósito]
+  Mecánica: [cómo funciona paso a paso]
+  Valor: [qué resuelve para el usuario]
+  Requisitos técnicos: [qué se necesita implementar]
+  Dependencias: [lista de códigos, no nombres]
+  Invariantes aplicadas: [cuáles de la Sección A aplica]
+  Puntos de fricción: [qué predice el usuario, qué recupera]
+  Reglas de seguridad: [qué está prohibido hacer]
+  Historial de cambios:
+    - V4: [cambio actual]
+  ---
+
+  Si falta algún campo, la skill está incompleta.
+
+3.5 PASO 5: REDACTAR CASO COMPLEJO EN EL ANEXO (si aplica)
+------------------------------------------------------------
+
+  Si la skill tiene dimensión psicológica:
+    - Añadir entrada en Anexo V1.2, Parte I (Psicología del Diseño)
+    - Incluir: teoría aplicada, efecto esperado, riesgo contrario, métrica de validación
+
+  Si la skill genera datos estructurados:
+    - Añadir schema JSON en Anexo V1.2, Parte II (Arquitectura de Datos)
+    - Incluir: path del archivo, schema completo, clasificación PII, salvaguarda
+
+  Si la skill tiene vectores de ataque identificables:
+    - Añadir entrada en Anexo V1.2, Parte III (Casos Límite)
+    - Incluir: caso límite, probabilidad, impacto, mitigación en V4
+
+  Si la skill es monetizable:
+    - Añadir entrada en Anexo V1.2, Parte IV (Modelos de Negocio)
+    - Incluir: producto derivado, qué se vende, a quién, restricciones legales
+
+3.6 PASO 6: ACTUALIZAR MAPA DE DEPENDENCIAS
+------------------------------------------------------------
+
+  a. Añadir la nueva skill al Mapa de Dependencias (Catálogo V1.2, Sección D).
+
+  b. Indicar su nivel en el DAG (Nivel 0 si no tiene dependencias internas).
+
+  c. Verificar que no introduce ciclos:
+     python3 scripts/verify_dag.py
+
+  d. Si introduce dependencias externas nuevas:
+     - Añadir al ABM con hash SHA-256
+     - Ejecutar verify_abm.py para confirmar
+
+3.7 PASO 7: ACTUALIZAR RONDA DE ENSAMBLAJE
+------------------------------------------------------------
+
+  a. Determinar en qué ronda pertenece la nueva skill:
+     - BRONCE fundamental -> Ronda 1
+     - BRONCE extendido -> Ronda 2
+     - PLATA fundamental -> Ronda 3
+     - PLATA extendida -> Ronda 4
+     - ORO -> Ronda 5
+
+  b. Añadir checklist de completitud en la ronda correspondiente.
+
+  c. Si la skill cambia el orden de implementación de otras skills,
+     documentar la razón y obtener consenso de auditoría.
+
+3.8 PASO 8: AUDITORÍA DE SEGURIDAD
+------------------------------------------------------------
+
+  Checklist de 5 preguntas de seguridad (ver Capítulo 4):
+
+  1. ¿Rompe Local-first?
+  2. ¿Rompe IronClaw?
+  3. ¿Rompe Honest Math?
+  4. ¿Añade dependencia sin ABM?
+  5. ¿Expone PII sin salvaguarda?
+
+  Si alguna es SÍ: volver al Paso 1.
+
+  Adicionalmente, verificar:
+  6. ¿La skill tiene tests deterministas que no dependen del LLM?
+  7. ¿Los tests cubren casos límite documentados en el Anexo?
+  8. ¿La skill maneja errores graceful (no crashes, no datos falsos)?
+
+3.9 PASO 9: MERGE AL CATÁLOGO
+------------------------------------------------------------
+
+  a. Crear rama git: feat(skill): [CÓDIGO] - [nombre breve]
+
+  b. Incluir en el commit:
+     - Modificación del Catálogo V1.2 (Secciones B, C, D, E si aplica)
+     - Modificación del Anexo V1.2 (Partes I-IV si aplica)
+     - Modificación del Manual V1.2 (Ronda correspondiente)
+     - Tests nuevos en tests/ronda[N]/
+
+  c. Solicitar auditoría:
+     - Etiquetar como 'needs-audit'
+     - Asignar a auditor designado (o a Claude Code)
+
+  d. Si la auditoría aprueba:
+     - Merge a main
+     - Actualizar commit hash en Sección F del Catálogo
+     - Marcar skill como STABLE (o BETA si requiere observación)
+
+  e. Si la auditoría rechaza:
+     - Documentar hallazgo en Sección F
+     - Marcar skill como BLOQUEADA_POR_AUDITORIA
+     - Volver al Paso 4 con correcciones
+
+
+================================================================================
+CAPÍTULO 4: CHECKLIST DE AUDITORÍA RÁPIDA
+--------------------------------------------------------------------------------
+5 preguntas que cualquier experto AI debe responder antes de proponer cambios.
+Estas preguntas son el filtro de entrada. Si alguna falla, no se discute el cambio.
+
+4.1 PREGUNTA 1: ¿ROMPE LOCAL-FIRST?
+------------------------------------------------------------
+
+  Criterio: Los datos del usuario nunca abandonan el nodo sin consentimiento
+  explícito por entrada.
+
+  Señales de alarma:
+    - La skill requiere un servidor central para funcionar.
+    - La skill sincroniza automáticamente con la nube sin preguntar.
+    - La skill envía datos a un API de terceros sin advertencia clara.
+    - La skill almacena datos del usuario en servidores de David.
+
+  Preguntas de seguimiento:
+    - ¿Dónde se almacenan los datos generados por esta skill?
+    - ¿El usuario puede ver y borrar esos datos en cualquier momento?
+    - ¿Hay algún flujo de datos que salga del dispositivo sin consentimiento?
+
+  Veredicto: Si la skill requiere conectividad externa para su función principal,
+  debe ser ORO y el usuario debe aprobar cada transmisión individualmente.
+
+4.2 PREGUNTA 2: ¿ROMPE IRONCLAW?
+------------------------------------------------------------
+
+  Criterio: El sistema PROPONE; el humano EJECUTA y FIRMA.
+  PROHIBIDA la ejecución autónoma de comandos.
+
+  Señales de alarma:
+    - La skill ejecuta un comando del usuario sin mostrarlo primero.
+    - La skill modifica archivos del sistema sin confirmación.
+    - La skill instala dependencias automáticamente.
+    - La skill reinicia servicios sin preguntar.
+
+  Preguntas de seguimiento:
+    - ¿Esta skill ejecuta algún código del usuario o generado por modelo?
+    - ¿Hay algún camino donde el sistema actúe sin aprobación humana?
+    - ¿El usuario puede revisar y cancelar cualquier acción propuesta?
+
+  Veredicto: Si hay ejecución autónoma, la skill no entra. Sin excepciones.
+  La única excepción es el compilador en sandbox (P.19), que no ejecuta código
+  del usuario; solo compila con flags de verificación.
+
+4.3 PREGUNTA 3: ¿ROMPE HONEST MATH?
+------------------------------------------------------------
+
+  Criterio: Los números salen SIEMPRE de código determinista. El LLM solo redacta.
+  PROHIBIDO usar LLM para evaluar, juzgar, o decidir.
+
+  Señales de alarma:
+    - El LLM decide si el usuario 'pasó' una evaluación.
+    - El LLM calcula métricas de calidad de código.
+    - El LLM determina si un comando es seguro.
+    - El LLM asigna un score numérico a algo.
+
+  Preguntas de seguimiento:
+    - ¿Quién genera los números que esta skill presenta? ¿Código o LLM?
+    - ¿Hay algún punto donde el LLM evalúa la respuesta del usuario?
+    - ¿Los tests de esta skill son deterministas (mismo input = mismo output)?
+
+  Veredicto: Si el LLM evalúa, la skill no entra. Las evaluaciones son código fijo.
+  El LLM puede redactar explicaciones, generar problemas, o traducir errores.
+  Pero NUNCA juzga, califica, o decide.
+
+4.4 PREGUNTA 4: ¿AÑADE DEPENDENCIA SIN ABM?
+------------------------------------------------------------
+
+  Criterio: Toda dependencia externa debe estar en el Aurelius Bootstrap Manifest
+  con hash SHA-256 verificable.
+
+  Señales de alarma:
+    - pip install <nuevo_paquete> sin justificación técnica.
+    - El paquete no está en aurelius.abm.
+    - El paquete es closed-source sin alternativa open-source documentada.
+    - El paquete tiene vulnerabilidades conocidas (CVE) sin mitigación.
+
+  Preguntas de seguimiento:
+    - ¿Por qué esta dependencia es necesaria y no puede reemplazarse con stdlib?
+    - ¿Cuál es el hash SHA-256 del wheel en PyPI?
+    - ¿Hay alternativas open-source? ¿Por qué se eligió esta?
+    - ¿Qué pasa si esta dependencia desaparece de PyPI mañana?
+
+  Veredicto: Si la dependencia no está en ABM o no tiene justificación técnica,
+  la skill no entra. El ABM es la línea de defensa contra supply chain attacks.
+
+4.5 PREGUNTA 5: ¿EXPONE PII SIN SALVAGUARDA?
+------------------------------------------------------------
+
+  Criterio: Todo dato personal debe estar cifrado, con consentimiento, y con
+  mecanismos de control del usuario (HRG/CEL/RTC si aplica a contexto B2B).
+
+  Señales de alarma:
+    - La skill almacena conversaciones sin cifrado.
+    - La skill comparte datos con terceros sin opt-in explícito.
+    - La skill genera scores evaluativos sin HRG/CEL/RTC en contexto B2B.
+    - La skill expone nombres de archivos, IPs, o credenciales en logs.
+
+  Preguntas de seguimiento:
+    - ¿Qué datos personales genera esta skill?
+    - ¿Cómo se clasifican según GDPR (PII, sensitive, special category)?
+    - ¿Hay cifrado en reposo? ¿Y en tránsito?
+    - ¿El usuario puede borrar sus datos en cualquier momento?
+    - ¿Hay salvaguardas contra uso por empleadores sin consentimiento?
+
+  Veredicto: Si la skill genera PII sin salvaguardas técnicas documentadas,
+  la skill no entra. La privacidad no es un feature; es un requisito de arquitectura.
+
+4.6 PROTOCOLO DE APLICACIÓN
+------------------------------------------------------------
+
+  Antes de proponer CUALQUIER cambio (nueva skill, modificación, o eliminación):
+
+  1. Imprimir estas 5 preguntas.
+  2. Responder cada una por escrito.
+  3. Si alguna respuesta es 'Sí' o 'No estoy seguro': detenerse y corregir.
+  4. Si todas las respuestas son 'No': documentar las respuestas en el commit.
+
+  Formato de documentación en commit:
+  ```
+  Auditoría rápida para [CÓDIGO]:
+  1. Local-first: NO ROMPE. Datos almacenados en bronze/[skill]/ local.
+  2. IronClaw: NO ROMPE. Sistema propone; usuario aprueba.
+  3. Honest Math: NO ROMPE. Métricas de parser AST determinista.
+  4. ABM: NO AÑADE. Sin dependencias nuevas.
+  5. PII: NO EXPONE. Solo métricas agregadas, sin datos identificables.
+  ```
+
+
+================================================================================
+CAPÍTULO 5: TROUBLESHOOTING
+--------------------------------------------------------------------------------
+Errores comunes por skill y sus soluciones.
+
+| Skill | Error típico | Causa raíz | Solución |
+|-------|--------------|------------|----------|
+| B.01 | Servidor no arranca con --profile P | RAM insuficiente (< 32GB) o config. | Verificar RAM con psutil. Validar JSON de con |
+| B.02 | Clasificación muestra HUESPED en lo | URL de Ollama no es localhost/127.0 | Verificar ollama_endpoint en config. Si usa p |
+| B.03 | Capabilities no muestra skills disp | El perfil no tiene skills asignadas | Verificar que config.[perfil].json incluya 's |
+| B.04 | Honest Math devuelve NO_DATA para f | La calculadora no está registrada o | Verificar que la calculadora esté en honest_m |
+| B.04 | Parser AST rechaza expresión válida | La expresión contiene nodos no en w | Revisar whitelist en honest_math/parser.py. A |
+| B.06 | Command Guard no detecta comando pe | Lista negra desactualizada o patrón | Añadir patrón a config/command_guard_blacklis |
+| B.06 | Command Guard bloquea comando legít | Falso positico por regex demasiado  | Añadir whitelist de contexto. Ej: 'git rm' pr |
+| B.07 | Centinela no detecta temperatura    | SO no expone sensores térmicos en / | En Mac: usar powermetrics. En Windows: usar W |
+| B.08 | Cache de embeddings crece indefinid | No hay política de expiración.      | Implementar LRU cache con límite de entradas. |
+| B.09 | Snippet no aparece en búsqueda      | Texto no normalizado o búsqueda cas | Verificar normalización (lowercase, NFKC). Im |
+| B.12 | Focus Pact no detecta cambios en di | Fingerprint no cambia porque os.lis | Asegurar sorted(os.listdir(path)) antes de ca |
+| B.16 | Parser AST falla con SyntaxError    | Código pegado tiene error de sintax | Manejar SyntaxError graceful: return {'error' |
+| P.03 | FAISS no encuentra documentos index | Índice corrupto o embeddings no gen | Ejecutar reconciliación en arranque (P.07). O |
+| P.05 | Brújula Estoica no detecta desviaci | Umbral de desviación demasiado alto | Ajustar umbral. Verificar que el análisis com |
+| P.08 | La Forja emite PoK para respuesta d | Umbral de similarity demasiado bajo | Ajustar umbral de similarity. Verificar que B |
+| P.08 | Temporal Binding no cambia la rúbri | Nonce no se deriva correctamente de | Verificar que session_nonce = SHA-256(Gold_ti |
+| P.17 | Fusión de worktrees pierde datos    | Resolución de conflictos usa timest | Actualizar a HLC + LWW-Element-Set CRDT. Veri |
+| P.19 | Sandbox de compilación no funciona  | firejail/nsjail no instalados o sin | Instalar firejail (Linux) o nsjail. Verificar |
+| P.22 | Cognitive Risk Score es negativo    | Fórmula de scoring invertida o dato | Verificar fórmula: score = f(dead_path_count, |
+| O.03 | Thin Client no conecta a PRO        | Red privada no configurada o firewa | Verificar Tailscale/WireGuard. Probar ping en |
+| O.05 | Import de .aurelius falla con 'hash | Archivo corrupto durante transferen | Verificar hash SHA-256 del archivo antes de i |
+| O.07 | Slashing Ledger bloquea nodo injust | PoK-D falsos o verificación incorre | Nodo bloqueado puede apelar. Auditor manual v |
+| O.11 | Mesh Marketplace no encuentra match | Oferta y demanda no cumplen criteri | Verificar que coste energético de inferencia  |
+
+5.1 PROTOCOLO GENERAL DE DEBUGGING
+------------------------------------------------------------
+
+  Paso 1: Identificar la skill afectada por el código de error o traceback.
+
+  Paso 2: Revisar el checklist de completitud de esa skill en el Manual V1.2.
+          ¿Algún item no está marcado? Esa es probablemente la causa.
+
+  Paso 3: Revisar el Anexo V1.2, Parte III (Casos Límite) para esa skill.
+          ¿El error coincide con un vector de ataque documentado?
+
+  Paso 4: Revisar logs en sovereign_vault/logs/ (append-only, human-legibles).
+
+  Paso 5: Si el error persiste, ejecutar tests específicos:
+          python3 -m pytest tests/ronda[N]/test_[skill_code].py -v
+
+  Paso 6: Si los tests pasan pero el error persiste en producción:
+          - Diferencia entre entorno de test y producción (RAM, SO, dependencias).
+          - Condición de carrera o estado compartido.
+          - Datos corruptos en Bronce/Gold (verificar hashes de cadena).
+
+  Paso 7: Documentar la solución en este capítulo para futuros desarrolladores.
+
+
+================================================================================
+FIN DEL MANUAL DE ENSAMBLAJE V4
+================================================================================
+
+Indice de capitulos:
+  Capitulo 1: Requisitos Previos (hardware, dependencias, script de check, clonado)
+  Capitulo 2: Rondas de Implementacion (5 rondas, 59 skills con checklist)
+  Capitulo 3: Protocolo de Integracion de Nueva Skill (9 pasos)
+  Capitulo 4: Checklist de Auditoria Rapida (5 preguntas)
+  Capitulo 5: Troubleshooting (24 errores comunes + protocolo de debugging)
+
+Vinculado a: AURELIUS_CATALOG_V1.2.txt | AURELIUS_ANNEX_V1.2.txt
+Regla de sincronizacion: Si se modifica este Manual, verificar que el Catalogo V4
+  y el Anexo V1.2 reflejen los cambios en las skills afectadas.
+================================================================================

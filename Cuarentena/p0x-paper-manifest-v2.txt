@@ -1,0 +1,83 @@
+### ================================================================================
+### p0x: ARQUITECTURA DE SILICIO SOBERANO, VERDAD LOCAL Y EMANCIPACIÓN ÁTOMICA v2
+### AUTOR: David (piskyRpapalo) [1]
+### ENTORNO: Nodo Local-First p0x · Le Jardin [119, 155]
+### FECHA: 2026-08-06 [131]
+### ESTADO: COMPROMISO DE SISTEMA PARALELO Y CENSO F0 DE LISBOA [6, 132]
+### ================================================================================
+
+#### 1. INTRODUCCIÓN Y VISIÓN FILOSÓFICA (LOS CINCO PILARES SOBERANOS)
+El sistema p0x no es simplemente un stack de software; es un manifiesto técnico y existencial hecho silicio: "El silicio es la frontera, la matemática es la ley, el carbono sella la verdad. Ante conflicto, el hardware y las inteligencias artificiales locales ganan siempre." [1, 119]
+
+Esta doctrina se fundamenta en cinco pilares inalterables integrados en el preceptor cognitivo [120]:
+*   **I. Soberanía Digital Absoluta (Digital Sovereignty)**: Tus modelos, tu máquina, tus datos y tu firma [120]. Toda la inferencia de inteligencia artificial (Qwen mediante Ollama) se ejecuta de forma aislada en tu propio hardware, rechazando de raíz cualquier exfiltración de datos o dependencia de APIs corporativas en la nube [20, 120].
+*   **II. Firma Humana Obligatoria (Human-in-the-Loop Signing)**: La máquina es un siervo lógico; el operador humano es la única autoridad de legitimidad [5, 121]. Ninguna alteración lógica, diff de repositorio o ascenso de misión formativa se aplica automáticamente [5, 121]. El sistema propone cambios en estado "spec_ready" (🟡) y calcula su checksum SHA-256 [5, 121]. El operador debe auditar el código y firmar manualmente el hash con su clave Ed25519 offline para generar un archivo de firma detached (.sig), el cual es verificado por el script de arranque verify_pow.sh [5, 121].
+*   **III. Honestidad de los Sensores (Honest Sensors)**: Un valor nulo o ausente es infinitamente más honesto que una aproximación o un dato falso [35, 122]. Ante cualquier fallo físico de hardware, el gateway detiene la simulación y reporta "NO DATA" en monospace rojo parpadeante con el motivo y el timestamp de último avistamiento [8, 35, 122]. Quedan prohibidos los skeletons infinitos, ceros falsos o datos cacheados presentados como frescos [35, 122].
+*   **IV. Fricción Física Pedagógica (Portapapeles Soberano)**: Eliminar la fricción degrada la asimilación del conocimiento [11, 123]. Se prohíben los botones automáticos de "un clic para copiar" [11, 52, 123]. El usuario debe realizar la selección manual y pulsar la combinación física Ctrl+C, obligando al ojo humano a auditar cada carácter antes de que este llegue a la terminal de ejecución [11, 52, 123].
+*   **V. La Brújula Estoica**: La autodisciplina requiere datos de confrontación objetivos [15, 79, 124]. El sistema confronta las intenciones que sellaste en tu capa Gold con las conversaciones reales registradas en tu capa Bronze [15, 79, 124]. Si dedicas tu tiempo a actividades ajenas a tu propósito, la Brújula te expone amablemente: "Has hablado un 80% sobre temas de ocio y un 5% sobre criptografía offline. ¿Actualizamos el rumbo o corregimos tu disciplina?" [15, 79, 124].
+
+--------------------------------------------------------------------------------
+
+#### 2. EL REPOSITORIO CRÍTICO: codice-emancipacion-atomica
+El repositorio github.com/piskyRpapalo/codice-emancipacion-atomica es el contenedor exclusivo de tus scripts de automatización Bash y utilidades del sistema [132]. Aunque se encuentra desactualizado, representa la espina dorsal operativa que gestiona la inicialización física, los demonios del sistema y los reflejos térmicos del nodo [42, 132].
+
+El núcleo de este repositorio es la implementación física de la Constitución de p0x, ejecutada a través de `verify_pow.sh` [5, 112]. Este script de arranque crítico realiza las siguientes validaciones secuenciales obligatorias [5]:
+1. Cálculo del checksum de los binarios del sistema y el núcleo de Aurelius [5].
+2. Verificación de la firma criptográfica detached del manifiesto del nodo (`manifest.json.sig`) utilizando la clave pública `sovereign_ed25519.pub` [5].
+3. Ejecución de un análisis de consistencia de datos relacionales en la base de datos SQLite (`PRAGMA integrity_check`) [5].
+4. En caso de detectarse cualquier discrepancia, corrupción o firma corrupta, el script aborta la secuencia con exit code 1, bloquea la interfaz web y desconecta las APIs de comunicación para salvaguardar el metal [5].
+
+La reestructuración activa del "codice-emancipacion-atomica" busca depurar los scripts antiguos y adecuarlos a las deudas técnicas de hardware e infraestructura halladas en el censo (remediación del sensor térmico mediante k10temp, el enlace huérfano de sínodo y la implementación de la cola de inferencia) [43, 44, 137].
+
+--------------------------------------------------------------------------------
+
+#### 3. EL COMPROMISO ABSOLUTO DEL SISTEMA PARALELO
+Para asegurar una transición inmaculada sin regresiones de software ni riesgos en el runtime activo, la construcción del nuevo entorno se guiará bajo el **Contrato de Sistema Paralelo**:
+*   **Aislamiento de Espacio de Trabajo**: Toda la nueva infraestructura, el nuevo `verify_pow.sh` y las utilidades lógicas vivirán exclusivamente dentro de `~/p0x-soberano/`.
+*   **Inviolabilidad del Entorno Original**: **NUNCA** se escribirá en las rutas activas de producción: `~/aurelius/`, `~/hexelion/`, `~/p0x/`, ni `~/.ollama/`.
+*   **Lectura de Resiliencia**: El sistema paralelo leerá los archivos de configuración o el estado del sistema original si es estrictamente necesario, pero su persistencia, bases de datos y ejecución de red se desplegarán de forma autónoma.
+*   **Verificación en Frío**: Se garantiza la funcionalidad independiente del sistema paralelo manteniendo intactas las deudas, logs y operaciones del original para comparación comparativa antes del merge final de producción.
+
+--------------------------------------------------------------------------------
+
+#### 4. ARQUITECTURA MEDALLÓN EN DISCO (AURELIUS CORE)
+La persistencia local-first de Aurelius Core se asienta sobre tres capas físicas inmutables en disco para mitigar el desgaste de escritura (Write Wear) de las memorias flash y organizar de forma segura la telemetría y el engramaje de aprendizaje [12, 140]:
+*   **CAPA BRONCE (data/bronze/)**: Log incremental JSONL inmutable en disco que registra interacciones de chat crudas, trazas y telemetría de sensores en caliente [12, 141]. La escritura en disco se pausa de manera automática durante las inferencias complejas de Ollama para no asfixiar el bus de E/S del procesador [12, 141].
+*   **CAPA SILVER (proposals_YYYY-MM.jsonl)**: Archivo consolidado mensual de propuestas cursadas por línea [12, 142]. Está optimizado para realizar búsquedas eficientes por bloques o cursores de 10-20 registros en arquitecturas de bajo consumo ARM sin saturar la memoria RAM [12, 142]. Alberga el "Modo Cosecha" (Harvest Mode) para validaciones intermedias [12, 142].
+*   **CAPA GOLD (gold_chain.jsonl)**: El Ledger de la Verdad Firmada [12, 143]. Cada bloque de conocimiento ("engram") estructurado obligatoriamente en 4 campos (What, Why, Where, Learned) se concatena criptográficamente con el hash SHA-256 del bloque anterior utilizando triggers nativos en C dentro de SQLite [12, 22, 111, 143]. La base de datos unificada (~/.aurelius-p0x/db/aurelius_state.db) se deriva de esta cadena [12, 143].
+
+--------------------------------------------------------------------------------
+
+#### 5. ENTORNO FÍSICO Y ADQUISICIÓN DE SEÑAL (HEXELION & LE JARDIN)
+La telemetría y la física del nodo se gobiernan de forma local en Lisboa (Beato) [155]:
+*   **Adquisición de Señal en Silicio Puro**: Se lee el espectro electromagnético local de forma directa utilizando dongles RTL-SDR USB Nooelec v5 (TCXO 0.5 PPM) [8, 157]:
+    *   *Dongle EEPROM 00001090*: Sintoniza a 1090 MHz en La Fragua para decodificación de telemetría aérea ADS-B de aviones comerciales usando el daemon dump1090 de antirez escrito en C99 puro [21, 149, 157].
+    *   *Dongle EEPROM 00000162*: Sintoniza señales de posicionamiento marítimo AIS a 162 MHz en El Vigía usando el binario ligero ais-catcher [8, 157].
+*   **Mapeo del Sensor Térmico Honesto**: El sensor de CPU Ryzen real del Soberano está confirmado mediante `k10temp` expuesto en `/sys/class/hwmon/hwmon3/` (`temp1_input = 40875 raw`, `Tctl = 40.9°C`). La suposición de que `thermal_zone0` lee la CPU del Ryzen queda marcada como **OBSOLETA** (devuelve 20.0°C constantes). En los nodos edge `la-fragua` (RK3588) y `el-vigía` (RPi), `thermal_zone0` sigue siendo el sensor SoC real.
+*   **Presupuesto Energético (Le Jardin)**: Monitorea la generación de tus 2 paneles solares Aiko Neostar3 de 475 Wp (más 1 en standby para un total de 1,425 Wp) y el estado de la batería Anker Solix C1000X (1,800 W) mediante microcontroladores ESP32 de ultra-bajo consumo [108, 113, 156].
+    *   *Inferencia Solar Degradada*: If Le Jardin detecta voltajes inferiores al umbral óptimo, ordena limitar los hilos de CPU asignados a Ollama (mediante el flag -t de llama.cpp) o liberar la VRAM para enfriar el hardware y evitar picos de consumo [9, 115].
+*   **Servicios Activos Mapeados (SSH Confirmado)**:
+    *   `aurelius-interfaz.service` corriendo en `/home/pisky/aurelius/` con `servir_interfaz.py` escuchando en `0.0.0.0:8050` (⚠️ *Exposición temporal detectada*: Debe amarrarse a Tailscale en el sistema paralelo).
+    *   `open-webui.service` corriendo en `~/.local/bin/open-webui` escuchando en `[IP_TAILNET_REDACTADA]:8080` (Tailscale) y consumiendo Ollama de forma local.
+    *   `Ollama` reconfigurado localmente con un override de systemd (`/etc/systemd/system/ollama.service.d/override.conf`) permitiendo host `0.0.0.0` y origins `*` para orquestación fluida.
+*   **Control Remoto y Renderizado**: Se absorbe la arquitectura de TinyPilot (KVM HDMI con WebComponents planos) para el panel stateless de React/Vite en Catppuccin Mocha [23, 151]. Las tramas HID se escriben directamente en `/dev/hidg0` de Linux mediante USB OTG, cifrando la red mediante enlaces TLS 1.3 mTLS amarrados a interfaces privadas de Tailscale o Yggdrasil [14, 23, 117, 151, 158].
+
+--------------------------------------------------------------------------------
+
+#### 6. LA NECRÓPOLIS DE SILICIO: SISTEMAS VETADOS POR LA DOCTRINA
+Para preservar la eficiencia energética, la soberanía de los datos y evitar el desgaste físico de las unidades de almacenamiento, p0x cuenta con un cementerio de tecnologías prohibidas:
+1.  **Electron y Go (de la pila Anytype heredada)** [17, 159]: Vetados por consumo de RAM excesivo (>300MB base) e ineficiencia extrema de hilos sobre procesadores ARM de bajo consumo [17, 159]. Reemplazados por scripts de Python ultraligeros que sincronizan bases de datos SQLite cifradas con AES-CFB [17, 159].
+2.  **Google Coral Dev Board**: Devuelto por limitaciones de rendimiento y hardware [110]. Reemplazado por Yahboom Jetson Orin Nano Super de 8GB (67 TOPS estables) [110].
+3.  **Daemon immudb** [22, 159]: Su colector de basura y procesamiento de hashes generaba picos térmicos agudos en los procesadores ARM de Le Jardin [22, 159]. Reemplazado por la inyección matemática de un trigger en C que calcula los árboles de Merkle internamente en SQLite [22, 159].
+4.  **Servidores Flask monohilo y Puertos TCP Crudos de dump1090** [21, 23, 159]: Eliminados por falta de cifrado, vulnerabilidad ante inyecciones remotas de telemetría aérea falsa e interbloqueos [21, 23, 159]. Reemplazados por el gateway asíncrono de FastAPI restringido a localhost [8, 21, 23, 159].
+5.  **El Retiro de Andamios (Scaffolding Faded)** [11, 26, 154, 161]: Tras la finalización de una misión formativa de Aurelius, verify_pow.sh comprime las plantillas formativas (_scaffold/) en un archivo .tar.gz de solo lectura y las elimina físicamente del espacio de desarrollo (rm -rf), erradicando residuos y forzando la independencia del operador [11, 26, 126, 154, 161].
+
+--------------------------------------------------------------------------------
+
+#### 7. EL EQUILIBRIO DE PRECEPTORES: CLAUDE Y EL MODELO LOCAL
+La coexistencia de Claude Code (Polo Externo - Silicio Operativo) y Qwen (Polo Local - Soberano Cognitivo) se unifica bajo el control absoluto de David:
+*   **Claude Code como Huésped**: Se le detecta y confina en "Modo Templo" (Skill B.26) [73]. Las escrituras directas en la capa Gold se desactivan por seguridad [73]. Las meditaciones se desvían a un almacenamiento transitorio de Bronce local [73]. El cortafuegos determinista "Command Guard" se activa de manera restrictiva, bloqueando ejecuciones de comandos automáticas e inhabilitando el portapapeles [74].
+*   **Qwen como Soberano local**: Realiza la evaluación determinista asíncrona de "La Forja" (Skill P.08) calculando la similitud del coseno local (>0.75) y midiendo la entropía léxica en frío (O(N) > 0.4) para evitar engaños de generación de texto repetitivo en los ensayos [13, 82]. Al procesar peticiones de otros conocidos de la Mesh (límite Dunbar de exactamente 100 nodos de confianza), aisla el contexto en hilos de RAM efímeros para proteger tu diario íntimo y tus datos Gold [14].
+
+### David actúa como el árbitro último. Claude y Qwen proponen las estructuras, pero la validez lógica solo nace tras la auditoría visual y la firma criptográfica Ed25519 detached del soberano humano [5, 121].
+# guardia:permitir exposicion-temporal-0.0.0.0:8050-hallazgo-R02

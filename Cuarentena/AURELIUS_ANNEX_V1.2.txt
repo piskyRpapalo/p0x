@@ -1,0 +1,892 @@
+================================================================================
+AURELIUS ANEXO DE CASOS COMPLEJOS V1.2
+Contexto Extendido | Vinculado al Catálogo V4 | No modificar sin actualizar el Catálogo
+================================================================================
+Última actualización: 2026-08-06
+Vinculado a: AURELIUS_CATALOG_V1.2.txt
+Regla de oro: Este archivo contiene contexto, no contrato técnico.
+             El contrato técnico vive en el Catálogo V4.
+================================================================================
+
+================================================================================
+PARTE I: PSICOLOGÍA DEL DISEÑO
+--------------------------------------------------------------------------------
+Teorías aplicadas, efectos esperados, riesgos de efectos contrarios,
+y métricas de validación propuestas para skills con dimensión psicológica.
+
+I.1 FUNDAMENTOS PSICOLÓGICOS APLICADOS AL ECOSISTEMA
+------------------------------------------------------------
+
+Teoría 1: TEORÍA DEL ANDAMIAJE (Vygotsky, 1978)
+  Aplicación: Scaffolding Fading (B.10). El sistema proporciona soporte estructurado
+  que se retira gradualmente a medida que la competencia del usuario aumenta.
+  Zona de Desarrollo Próximo (ZDP): el usuario no puede resolver el problema solo,
+  pero puede hacerlo con guía. Aurelius se sitúa en la ZDP, no en la zona de
+  confort ni en la zona de frustración.
+  Riesgo contrario: Si el fading es demasiado rápido, el usuario abandona.
+  Si es demasiado lento, genera dependencia del sistema (learned helplessness).
+  Métrica de validación: Tasa de completitud de misiones por nivel de scaffolding.
+  Si tasa < 60% en un nivel, el fading es demasiado rápido.
+
+Teoría 2: TEORÍA DE LA DISONANCIA COGNITIVA (Festinger, 1957)
+  Aplicación: Senda de los Muertos (B.13) y Brújula Estoica (P.05). El usuario
+  se enfrenta a datos que contradicen su autoconcepto ("dije que quería aprender Rust
+  pero rechacé 5 propuestas sobre Rust"). La disonancia genera motivación para
+  cambiar comportamiento o justificarlo.
+  Riesgo contrario: Si la confrontación es demasiado agresiva, el usuario desactiva
+  la skill o abandona el sistema. Si es demasiado suave, no genera cambio.
+  Métrica de validación: Tasa de reconfiguración tras alerta de disonancia.
+  Si > 70% reconfiguran, la confrontación es efectiva. Si < 20%, es demasiado suave.
+
+Teoría 3: TEORÍA DEL FLUJO (Csikszentmihalyi, 1990)
+  Aplicación: Focus Pact (B.12) y Multiplexor de Misiones (B.25). El sistema
+  mide entropía léxica como proxy de estado de flujo. Cuando la diversidad
+  léxica es alta y estable, el usuario está en flujo. Cuando cae monótonamente,
+  está enfatigado.
+  Riesgo contrario: La entropía léxica es un proxy imperfecto. Un usuario puede
+  estar en flujo con vocabulario repetitivo (programación en bucle) o fatigado
+  con vocabulario diverso (multitarea caótica).
+  Métrica de validación: Correlación entre autoinforme de estado de flujo (escala 1-7)
+  y entropía léxica medida. Si correlación < 0.4, el proxy es inválido.
+
+Teoría 4: TEORÍA DE LA AUTODETERMINACIÓN (Deci & Ryan, 1985)
+  Aplicación: Todo el ecosistema. Las tres necesidades psicológicas básicas:
+  Autonomía (el usuario controla sus datos, sus misiones, su constitución),
+  Competencia (La Forja emite PoK verificables de competencia real),
+  Relación (Mercado de Bardo permite intercambio social de recursos).
+  Riesgo contrario: Si el sistema impone misiones sin consentimiento, viola
+  autonomía. Si los PoK son inalcanzables, viola competencia. Si la Mesh
+  es tóxica, viola relación.
+  Métrica de validación: Escala de Satisfacción de Necesidades Básicas (BSNS)
+  aplicada trimestralmente a usuarios activos.
+
+Teoría 5: TEORÍA DEL APRENDIZAJE EXPERIENCIAL (Kolb, 1984)
+  Aplicación: Todos los Caminos (B.11-B.15, B.23-B.25). El ciclo de Kolb:
+  Experiencia concreta (resolver problema) → Observación reflexiva (Espejo de Sócrates)
+  → Conceptualización abstracta (ADR Generator) → Experimentación activa (La Forja).
+  Aurelius cierra el ciclo completo de aprendizaje experiencial.
+  Riesgo contrario: Si falta alguna fase del ciclo, el aprendizaje es incompleto.
+  Métrica de validación: Verificar que cada misión toque al menos 3 de las 4 fases.
+
+Teoría 6: TEORÍA DE LA CARGA COGNITIVA (Sweller, 1988)
+  Aplicación: Multiplexor de Misiones (B.25) y Sesión Persistente (B.24).
+  El sistema reduce carga cognitiva extrínseca (context switching) al mantener
+  múltiples paneles visibles. La Sesión Persistente elimina carga de recuperación
+  de estado mental.
+  Riesgo contrario: Demasiados paneles aumentan carga cognitiva (parálisis por opciones).
+  Métrica de validación: Número óptimo de paneles = 3-4. Si > 5, medir tiempo de
+  recuperación de contexto.
+
+Teoría 7: EFECTO DUNNING-KRUGER (Kruger & Dunning, 1999)
+  Aplicación: Juez de Arquitectura (B.16), Detector de Code Smell (B.18),
+  Templo del Embudo (B.22). El usuario predice antes de ver el resultado real.
+  La discrepancia entre predicción y realidad es el aprendizaje.
+  Riesgo contrario: Si el usuario predice consistentemente mal, puede sentir
+  incompetencia crónica y abandonar. Si predice bien, puede sobreconfianza.
+  Métrica de validación: Serie temporal de delta (predicción - realidad).
+  Tendencia decreciente = aprendizaje. Tendencia creciente = sistema roto o burnout.
+
+Teoría 8: TEORÍA DE LA PERSUASIÓN (Cialdini, 1984)
+  Aplicación: Focus Pact (B.12) y Arquitecto de Rutas (P.14). El compromiso público
+  (declarar intención ante el sistema) aumenta probabilidad de cumplimiento.
+  La constitución en capas (B.23) es un contrato social consigo mismo.
+  Riesgo contrario: El compromiso público puede convertirse en coerción si hay
+  terceros (empleadores) accediendo a los datos. Ver HRG/CEL/RTC.
+  Métrica de validación: Tasa de cumplimiento de intenciones selladas vs no selladas.
+
+Teoría 9: TEORÍA DEL APRENDIZAJE SOCIAL (Bandura, 1977)
+  Aplicación: Enjambre Soberano (P.16) y Mercado de Bardo (O.11). La observación
+  de otros (nodos de la Mesh) realizando tareas similares aumenta autoeficacia.
+  Riesgo contrario: Comparación social negativa (otros tienen mejor hardware,
+  más PoKs) puede reducir autoeficacia. La Mesh debe mostrar progreso relativo,
+  no ranking absoluto.
+  Métrica de validación: Autoeficacia medida antes y después de interacción con Mesh.
+
+Teoría 10: TEORÍA DEL PROCESAMIENTO DUAL (Kahneman, 2011)
+  Aplicación: Command Guard (B.06) y Portapapeles Soberano (B.05). El sistema
+  fuerza al Sistema 2 (pensamiento lento, deliberativo) a intervenir antes de que
+  el Sistema 1 (pensamiento rápido, impulsivo) ejecute un comando peligroso.
+  La fricción física (selección manual) es un interruptor del Sistema 2.
+  Riesgo contrario: Si la fricción es excesiva, el usuario desarrolla atajos
+  (copiar con herramientas externas, bypass de seguridad).
+  Métrica de validación: Tasa de bypass de seguridad. Si > 15%, la fricción es
+  excesiva y requiere ajuste.
+
+I.2 PSICOLOGÍA POR SKILL
+------------------------------------------------------------
+
+---
+SKILL B.10: Scaffolding Fading
+  Teoría aplicada: Vygotsky (ZDP)
+  Efecto esperado: Fading gradual de soporte según progreso en misiones.
+  Riesgo de efecto contrario: Abandono si fading rápido; dependencia si lento.
+  Métrica de validación propuesta: Tasa de completitud por nivel de scaffolding.
+
+---
+SKILL B.11: Espejo de Sócrates
+  Teoría aplicada: Kolb (Observación reflexiva)
+  Efecto esperado: Forzar al usuario a descomponer problemas mediante preguntas.
+  Riesgo de efecto contrario: Frustración si 5 intercambios no son suficientes; superficialidad si son demasiados.
+  Métrica de validación propuesta: Tasa de llegada a conclusión propia dentro de 5 intercambios.
+
+---
+SKILL B.12: Focus Pact
+  Teoría aplicada: Cialdini (Compromiso público) + Csikszentmihalyi (Flujo)
+  Efecto esperado: Compromiso público de intención + medición de entropía como proxy de flujo.
+  Riesgo de efecto contrario: Sentimiento de vigilancia si el empleador accede; falso flujo si el usuario copia/pega.
+  Métrica de validación propuesta: Tasa de cumplimiento de intenciones selladas vs no selladas.
+
+---
+SKILL B.13: Senda de los Muertos
+  Teoría aplicada: Festinger (Disonancia cognitiva)
+  Efecto esperado: Confrontar al usuario con patrones de evasión técnica acumulada.
+  Riesgo de efecto contrario: Shame spiral si la confrontación es agresiva; invisibilidad si es suave.
+  Métrica de validación propuesta: Tasa de reconfiguración tras alerta de disonancia.
+
+---
+SKILL B.16: Juez de Arquitectura
+  Teoría aplicada: Kruger-Dunning
+  Efecto esperado: Predicción de métricas de código antes de ver resultado real.
+  Riesgo de efecto contrario: Incompetencia crónica si delta siempre negativo; sobreconfianza si delta siempre positivo.
+  Métrica de validación propuesta: Tendencia de delta a lo largo del tiempo.
+
+---
+SKILL B.18: Detector de Code Smell
+  Teoría aplicada: Kruger-Dunning
+  Efecto esperado: Predicción de métricas de calidad antes de auditoría AST.
+  Riesgo de efecto contrario: Mismo que B.16. Riesgo adicional: el usuario memoriza umbrales en lugar de entenderlos.
+  Métrica de validación propuesta: Variabilidad de predicciones (si siempre acierta, está memorizando).
+
+---
+SKILL B.20: Balance de Carga Mental
+  Teoría aplicada: Sweller (Carga cognitiva)
+  Efecto esperado: Predicción de solapamiento de responsabilidades antes de ver gráfico.
+  Riesgo de efecto contrario: Parálisis por análisis si el gráfico es demasiado complejo.
+  Métrica de validación propuesta: Tiempo de decisión tras ver gráfico.
+
+---
+SKILL B.22: Templo del Embudo
+  Teoría aplicada: Kruger-Dunning + Kolb (Experimentación)
+  Efecto esperado: Predicción de throughput antes de ver cálculo real.
+  Riesgo de efecto contrario: Desconexión teoría-práctica si la heurística es demasiado simplista.
+  Métrica de validación propuesta: Correlación entre predicciones y benchmarks reales posteriores.
+
+---
+SKILL B.26: Modo Templo
+  Teoría aplicada: Cialdini (Compromiso) + Teoría del apego
+  Efecto esperado: Seguridad de saber que los datos no fugan en entornos no controlados.
+  Riesgo de efecto contrario: Ansiedad de sincronización diferida; sensación de "dos identidades" fragmentadas.
+  Métrica de validación propuesta: Tasa de sincronización exitosa tras regreso a modo SOBERANO.
+
+---
+SKILL P.04: Modo Meditaciones
+  Teoría aplicada: Teoría del apego (Bowlby)
+  Efecto esperado: Espacio seguro para reflexión sin juicio. El sellado en Gold es ritual de contención.
+  Riesgo de efecto contrario: Dependencia emocional del ritual si el usuario no procesa sin el sistema.
+  Métrica de validación propuesta: Ratio de meditaciones que generan acción posterior vs meditaciones puramente catárticas.
+
+---
+SKILL P.05: Brújula Estoica
+  Teoría aplicada: Festinger (Disonancia) + Deci&Ryan (Autonomía)
+  Efecto esperado: Confrontación amable con desviación de propósitos propios.
+  Riesgo de efecto contrario: Micromanagement si usada por empleador sin HRG. Shame si confrontación demasiado directa.
+  Métrica de validación propuesta: Tasa de reconfiguración vs tasa de desactivación de la skill.
+
+---
+SKILL P.08: La Forja
+  Teoría aplicada: Kruger-Dunning + Kolb (Ciclo completo)
+  Efecto esperado: Evaluación dual que cierra el ciclo de aprendizaje experiencial.
+  Riesgo de efecto contrario: Ansiedad de evaluación si el sistema parece juzgar; trampa si el usuario memoriza rúbricas.
+  Métrica de validación propuesta: Variabilidad de scores en evaluaciones consecutivas del mismo tema.
+
+---
+SKILL P.12: Entropía Humana
+  Teoría aplicada: Csikszentmihalyi (Flujo) + Sweller (Carga cognitiva)
+  Efecto esperado: Detección de fatiga cognitiva por proxy de entropía léxica.
+  Riesgo de efecto contrario: Falso positivo de burnout en usuarios con vocabulario técnico limitado.
+  Métrica de validación propuesta: Correlación con autoinforme de fatiga (escala 1-7).
+
+---
+SKILL P.14: Arquitecto de Rutas
+  Teoría aplicada: Cialdini (Compromiso) + Deci&Ryan (Autonomía)
+  Efecto esperado: Compromiso público de ruta técnica + confrontación con desviación.
+  Riesgo de efecto contrario: Rigidez si la ruta no permite pivoteo; abandono si la confrontación es excesiva.
+  Métrica de validación propuesta: Tasa de pivoteo de ruta vs tasa de abandono de ruta.
+
+---
+SKILL P.16: Enjambre Soberano
+  Teoría aplicada: Bandura (Aprendizaje social) + Sweller (Carga cognitiva)
+  Efecto esperado: Colaboración con agentes especializados reduce carga cognitiva individual.
+  Riesgo de efecto contrario: Difusión de responsabilidad ("la IA lo hizo") si el usuario no revisa handoffs.
+  Métrica de validación propuesta: Tasa de aprobación con modificaciones vs aprobación ciega.
+
+---
+SKILL P.22: Alarma de Deuda Cognitiva
+  Teoría aplicada: Festinger (Disonancia) + Kahneman (Sistema 2)
+  Efecto esperado: Confrontación con deuda técnica acumulada forzando deliberación consciente.
+  Riesgo de efecto contrario: Parálisis por deuda si el score es demasiado alto; desactivación si es demasiado bajo.
+  Métrica de validación propuesta: Tasa de reducción de deuda tras alerta.
+
+---
+SKILL O.11: Mercado de Bardo
+  Teoría aplicada: Bandura (Aprendizaje social) + Deci&Ryan (Relación)
+  Efecto esperado: Intercambio social de recursos sin dinero. Reputación como capital social.
+  Riesgo de efecto contrario: Envidia si la Mesh muestra ranking; desconfianza si hay Sybil attacks.
+  Métrica de validación propuesta: Satisfacción con la Mesh medida por escala de comunidad.
+
+
+---
+TEACHING KERNEL (Sweller / Kapur) — Reglas de Estado de la Interfaz
+---
+Teoría aplicada: Sweller (Carga Cognitiva, 1988) + Kapur (Productive Failure, 2008)
+Efecto esperado: La interfaz nunca oculta el objetivo de la sesión; el error es
+  ramificación, no terminal; la ayuda decae con la competencia demostrada.
+Mecánica operativa (4 reglas duras):
+  1. dry_run_obligatorio: Toda escritura o borrado exige simulación determinista
+     previa. El sistema propone; el humano ejecuta. Nunca al revés.
+  2. fallo_como_ramificacion: Un error nunca es terminal. Es un vector de
+     diagnóstico que ramifica el árbol de decisión, no un crash.
+  3. ancla_objetivo_macro: El objetivo de la sesión siempre es visible en UI
+     (mata el Transient Information Effect de Sweller). El soberano nunca pierde
+     de vista para qué está aquí.
+  4. scaffolding_fading: La ayuda decae inversamente a la competencia demostrada.
+     active → passive → ondemand. Ver Skill B.10.
+Riesgo de efecto contrario: Si la ancla es demasiado intrusiva, aumenta carga
+  cognitiva extrínseca. Si el fading es brusco, abandono.
+Métrica de validación propuesta: Tiempo hasta recuperación de contexto tras error;
+  tasa de completitud de misión sin solicitar ayuda explícita.
+---
+
+================================================================================
+PARTE II: ARQUITECTURA DE DATOS PROFUNDA
+--------------------------------------------------------------------------------
+Schema JSON exacto, flujo de datos, decisiones de almacenamiento,
+estrategia de backup/recuperación, y análisis de privacidad por skill.
+
+II.1 DECISIONES ARQUITECTÓNICAS GLOBALES
+------------------------------------------------------------
+
+Formato de almacenamiento: JSONL (JSON Lines) append-only
+  Justificación: Human-readable. Sin schema rígido que impida evolución.
+  Cada línea es un objeto JSON independiente. Permite streaming.
+  No requiere motor de base de datos. Compatible con grep, awk, jq.
+  Desventaja: Sin índices nativos. Mitigación: FAISS para búsqueda semántica (PLATA+).
+
+Estructura de directorios del vault:
+  sovereign_vault/
+    ├── bronze/           # Datos brutos, conversaciones, snippets
+    │   ├── raw_chat/
+    │   ├── snippets/
+    │   ├── temple/       # Modo Templo (HUESPED)
+    │   ├── raw_predictions.jsonl
+    │   └── lexicon.jsonl
+    ├── gold/             # Datos sellados, inmutables, firmados
+    │   ├── meditations.jsonl
+    │   ├── adrs.jsonl
+    │   ├── poks.jsonl
+    │   └── constitution/   # Capas de constitución
+    ├── worktrees/        # Ramas de pensamiento
+    │   ├── default/
+    │   └── [nombre_worktree]/
+    ├── config/           # Configuración no versionada
+    │   ├── config.lite.json
+    │   └── config.pro.json
+    └── cache/            # Cachés regenerables
+        ├── embeddings.jsonl
+        └── faiss_index/
+
+Cifrado:
+  - Bronce: cifrado en reposo con clave derivada de contraseña del usuario (PBKDF2).
+  - Gold: cifrado en reposo + firma Ed25519 de cada entrada.
+  - Worktrees: heredan cifrado de Gold.
+  - Cache: no cifrado (regenerable), pero con hash de integridad.
+
+Backup:
+  - Automático: snapshot diario de bronze/ y gold/ en directorio .aurelius_backup/
+  - Retención: 7 snapshots locales + 1 semanal.
+  - Exportable: aurelius-export (O.05) genera .aurelius portable cifrado.
+  - Sin cloud: el backup es local o transferido por USB/códigos QR.
+
+II.2 SCHEMAS JSON POR SKILL
+------------------------------------------------------------
+
+---
+SKILL B.09 → bronze/snippets/
+Schema JSON:
+  {
+    "hash_sha256": "abc123...",
+    "timestamp_hlc": {"physical": 1690000000000, "logical": 0},
+    "source": "github_gist|man_page|paste",
+    "content": "texto del snippet",
+    "tags": ["docker", "compose"],
+    "worktree": "default"
+  }
+
+---
+SKILL B.13 → bronze/dead_path.jsonl
+Schema JSON:
+  {
+    "hlc": {"physical": 1690000000000, "logical": 0},
+    "topic": "docker_compose",
+    "proposal": "Aprender Docker Compose",
+    "rejection_reason": "no_tiempo",
+    "count": 5,
+    "hash_prev": "def456..."
+  }
+
+---
+SKILL B.14 → bronze/lexicon.jsonl
+Schema JSON:
+  {
+    "hlc": {"physical": 1690000000000, "logical": 0},
+    "term": "idempotencia",
+    "definition": "propiedad de una operación que puede aplicarse múltiples veces...",
+    "context_hash": "ghi789...",
+    "session_bronze_ref": "raw_chat_20240806.jsonl#L42"
+  }
+
+---
+SKILL P.02 → gold/adrs.jsonl
+Schema JSON:
+  {
+    "hlc": {"physical": 1690000000000, "logical": 0},
+    "hash": "jkl012...",
+    "hash_prev_adr": "mno345...",
+    "topic": "migracion_a_rust",
+    "decision": "Migrar el parser de regex a Rust por rendimiento",
+    "consequences": ["+2x velocidad", "-curva de aprendizaje"],
+    "status": "approved|rejected|draft",
+    "source_hashes": ["abc123...", "def456..."],
+    "signature_ed25519": "pqrs..."
+  }
+
+---
+SKILL P.08 → gold/poks.jsonl
+Schema JSON:
+  {
+    "hlc": {"physical": 1690000000000, "logical": 0},
+    "hash": "tuVW...",
+    "level": "M3",
+    "topic": "prompt_engineering_defensivo",
+    "claims": {
+      "semantic_similarity": 0.82,
+      "lexical_diversity": 0.45,
+      "length_chars": 1240,
+      "burst_variance": 0.12,
+      "challenge_response": "xyz789..."
+    },
+    "session_nonce": "nonce_derivado_de_gold",
+    "commitment_hash": "commit_sha256_prediccion",
+    "signature_ed25519": "abcd...",
+    "revoked": false,
+    "revocation_reason": null
+  }
+
+---
+SKILL P.12 → bronze/raw_predictions.jsonl
+Schema JSON:
+  {
+    "hlc": {"physical": 1690000000000, "logical": 0},
+    "session_id": "sess_001",
+    "skill": "P.01",
+    "prediction_seconds": 45,
+    "real_seconds": 52,
+    "delta": -7,
+    "cpu_model": "Intel_i7_12700",
+    "temperature_initial": 65,
+    "shared_to_mesh": false
+  }
+
+---
+SKILL O.05 → gold/transfer_log.jsonl
+Schema JSON:
+  {
+    "hlc": {"physical": 1690000000000, "logical": 0},
+    "operation": "export|import|merge",
+    "source_node": "node_a_pubkey",
+    "target_node": "node_b_pubkey",
+    "worktrees_merged": ["default", "rust_learning"],
+    "conflicts_resolved": 2,
+    "conflict_resolution": "hlc_wins",
+    "hash_integrity": "sha256_del_archivo_aurelius"
+  }
+
+---
+SKILL O.11 → gold/mesh_reputation.jsonl
+Schema JSON:
+  {
+    "hlc": {"physical": 1690000000000, "logical": 0},
+    "node_pubkey": "abcd...",
+    "pok_g_count": 12,
+    "pok_d_count": 1,
+    "stake_locked": 5,
+    "stake_burned": 0,
+    "blacklisted_until": null,
+    "blacklist_reason": null,
+    "appeal_status": null
+  }
+
+II.3 DECISIONES DE ALMACENAMIENTO Y PRIVACIDAD POR SKILL
+------------------------------------------------------------
+
+| Skill | Datos generados                  | Clasificación PII      | Salvaguarda técnica                                      |
+|-------|----------------------------------|------------------------|----------------------------------------------------------|
+| B.09  | Snippets                         | PII potencial          | Cifrado en reposo. Filtro de exclusión configurable.    |
+| B.12  | Focus Pact                       | No PII (hash)          | Nunca nombres de archivo reales. Solo SHA-256 de listado.|
+| B.13  | Dead Path                        | PII psicológica        | Cifrado en reposo. Sin compartir sin consentimiento.     |
+| B.14  | Lexicon                          | PII intelectual        | Cifrado en reposo. Propiedad intelectual del usuario.  |
+| P.04  | Meditaciones                     | PII psicológica alta   | Cifrado + firma. HRG si contexto B2B. Disclaimer.        |
+| P.05  | Brújula Estoica                  | PII psicológica        | HRG + CEL + RTC obligatorios. Sin compartir sin consent. |
+| P.08  | La Forja                         | PII académica          | PoK firmado. Revocable si plagio detectado.              |
+| P.12  | Entropía Humana                  | PII conductual         | Agregación antes de compartir (mínimo 10). Opt-in.       |
+| P.22  | Deuda Cognitiva                  | PII profesional        | HRG + CEL + RTC. Sin compartir sin consentimiento.       |
+| O.09  | Calibración Federada             | No PII (agregado)      | Solo números agregados. Mínimo 10 usuarios por bucket.  |
+| O.11  | Mercado de Bardo                 | PII parcial            | JSON firmado. Sin datos de conversación.                 |
+
+II.4 ESTRATEGIA DE BACKUP Y RECUPERACIÓN
+------------------------------------------------------------
+
+Nivel 1: Snapshot local automático
+  - Frecuencia: diario a las 03:00 AM (hora local del nodo).
+  - Alcance: bronze/ y gold/ completos.
+  - Formato: tarball comprimido con timestamp en nombre.
+  - Retención: 7 días rotativos + 4 semanales.
+  - Ubicación: .aurelius_backup/ dentro del directorio del usuario.
+
+Nivel 2: Exportación portable (O.05)
+  - Trigger: manual por el usuario.
+  - Formato: archivo .aurelius cifrado con AES-256-GCM.
+  - Transporte: USB, códigos QR, o red privada (Tailscale/WireGuard).
+  - Verificación: hash SHA-256 del archivo antes y después de transferencia.
+
+Nivel 3: Recuperación ante corrupción
+  - Gold es append-only e inmutable. Si una entrada está corrupta, se marca como
+    CORRUPT en lugar de eliminarse.
+  - La cadena de hashes permite detectar tampering en cualquier punto.
+  - Si el hash de una entrada no coincide con hash_prev de la siguiente, el sistema
+    alerta: "Cadena Gold comprometida. Restaurar desde backup o reparar manualmente".
+
+Nivel 4: Recuperación ante pérdida total de dispositivo
+  - El usuario debe haber ejecutado aurelius-export previamente.
+  - La frase de recuperación es el único método de descifrado.
+  - Sin frase = sin recuperación. Ni David, ni Aurelius, ni la NSA pueden descifrar.
+
+================================================================================
+PARTE III: CASOS LÍMITE Y VECTORES DE ATAQUE
+--------------------------------------------------------------------------------
+Escenarios edge por skill. Probabilidad, impacto, y mitigación en V4.
+
+III.1 MATRIZ DE RIESGO DETALLADA
+------------------------------------------------------------
+
+| Skill | Caso límite                               | Probabilidad | Impacto | Mitigación en V4                                           |
+|-------|-------------------------------------------|--------------|---------|------------------------------------------------------------|
+| B.06  | Falso negativo en rm -rf /                | Baja         | CRÍTICO | Lista negra extensible. Parser de ofuscación. Disclaimer.    |
+| B.06  | Falso positivo en git rm                  | Media        | MEDIA   | Whitelist de contexto: git rm legítimo.                    |
+| B.12  | Fingerprint collision                     | Despreciable | BAJA    | SHA-256 tiene 2^256 combinaciones.                         |
+| B.12  | Empleador fuerza instalación              | Alta         | ALTA    | Cifrado + HRG + CEL + RTC. Consentimiento revocable.       |
+| B.13  | Usuario manipula dead_path.jsonl          | Media        | MEDIA   | Firma Ed25519. Entrada marcada TAMPERED si firma inválida. |
+| B.15  | Escenario de catástrofe expone datos      | Media        | ALTA    | Validación de escenarios. Advertencia en UI.               |
+| B.16  | SyntaxError en código pegado              | Alta         | BAJA    | Manejo graceful: "código no analizable".                   |
+| P.03  | FAISS index corrupto                      | Baja         | MEDIA   | Reconciliación en arranque (P.07).                         |
+| P.05  | Empleador usa Brújula para micromanagement| Alta         | CRÍTICA | HRG + CEL + RTC obligatorios.                              |
+| P.08  | Adversarial embedding attack              | Baja         | ALTA    | Temporal Binding + Burst Detection + Commitment.           |
+| P.08  | Precomputación de respuestas              | Media        | ALTA    | Temporal Binding con nonce. Rubrica cambia cada sesión.    |
+| P.08  | Diversidad léxica falseable               | Alta         | MEDIA   | Burst Detection: varianza temporal detecta bots.           |
+| P.12  | Falso positivo burnout en principiante    | Alta         | MEDIA   | Calibración por nivel. Umbrales ajustados por M-level.     |
+| P.15  | Repo de GitHub contiene secretos          | Media        | CRÍTICA | Detector de secretos en pipeline. Análisis detenido.        |
+| P.19  | Escape de sandbox en compilador           | Baja         | CRÍTICA | Sandbox restrictivo. Timeout 10s. Sin red. Sin ejecución.  |
+| P.22  | Empleador fuerza baja deuda sin consent.  | Alta         | CRÍTICA | HRG + CEL + RTC. Score no es condición de empleo.          |
+| O.03  | Tailscale comprometido                    | Baja         | CRÍTICA | WireGuard como alternativa soberana.                       |
+| O.05  | Pérdida de frase de recuperación          | Alta         | CRÍTICA | Advertencia explícita. Sin backdoor. Irreversible.         |
+| O.07  | Collusion Sybil en Mesh                   | Media        | ALTA    | Challenge-Response + Stake Temporal + Slashing Ledger.     |
+| O.11  | Nodo ofrece recursos que no tiene         | Alta         | ALTA    | Honest Math como Notario de SLAs. Verificación previa.     |
+
+III.2 RIESGOS CRÍTICOS (atención inmediata antes de producción)
+------------------------------------------------------------
+
+1. B.06: Falso negativo en rm -rf /
+   El parser de Command Guard es el escudo principal contra alucinaciones peligrosas.
+   Un falso negativo en rm -rf / es catastrófico. La mitigación es extensible:
+   - Lista negra versionada en archivo separado (no hardcodeada en código).
+   - Parser de ofuscación básica: elimina $(...), `...`, y variaciones de espaciado.
+   - El usuario puede añadir patrones personalizados a la lista negra.
+   - Disclaimer obligatorio: "Este parser es asistencia, no garantía de seguridad".
+
+2. P.05: Micromanagement B2B con Brújula Estoica
+   El EU AI Act Art. 6.2 clasifica sistemas de evaluación de desempeño como IA de Alto Riesgo.
+   Si un empleador usa el output de confrontación para decisiones laborales, Aurelius
+   entra en categoría de Alto Riesgo con responsabilidad civil directa del proveedor.
+   Mitigación: HRG (output requiere validación del empleado antes de ser visible),
+   CEL (explicación determinista del cálculo), RTC (botón de impugnación inmutable).
+   Sin estos tres, la skill NO debe activarse en contexto B2B.
+
+3. P.08: Adversarial embedding attack en La Forja
+   Si un PoK de Aurelius tiene valor en el mercado laboral, la fabricación de PoKs
+   se convierte en ataque dominante. La mitigación es técnica, no social:
+   - Temporal Binding: La rúbrica cambia en cada sesión (nonce derivado de Gold).
+   - Commitment Protocol: El usuario predice antes de ver el resultado.
+   - Burst Detection: Detecta patrones artificiales de diversidad léxica.
+   Sin estas tres medidas, el sistema de evaluación es teatral, no seguro.
+
+4. P.15: Secretos en repos de GitHub
+   El usuario pega un enlace a un repo que contiene API keys, passwords o tokens.
+   Si el sistema descarga y analiza ese repo, los secretos quedan expuestos en el log.
+   Mitigación: Detector de secretos en pipeline de descarga (regex para patrones comunes).
+   Si se detectan secretos, el análisis se detiene INMEDIATAMENTE y se alerta al usuario.
+   Los secretos detectados NUNCA se escriben en disco ni en log.
+
+5. P.19: Escape de sandbox en compilador
+   firejail/nsjail no son infalibles. Un usuario avanzado puede escribir código que
+   explota una vulnerabilidad del sandbox. Mitigación en capas:
+   - Sandbox con perfiles restrictivos (sin red, sin escritura, sin ejecución).
+   - Timeout de 10 segundos (kill -9 si excede).
+   - Solo flags de verificación (--noEmit, --crate-type lib), nunca ejecución.
+   - Actualización continua de firejail/nsjail.
+   - Disclaimer: "El sandbox es protección adicional, no garantía absoluta".
+
+6. P.22: Coerción laboral con Deuda Cognitiva
+   El Cognitive Risk Score puede convertirse en herramienta de coerción si el empleador
+   lo usa para condicionar promociones, asignaciones o despido. Mitigación:
+   - HRG: El empleado valida el score antes de que sea visible al empleador.
+   - CEL: Explicación determinista del cálculo.
+   - RTC: Botón de impugnación inmutable en Gold.
+   - Documentación legal: "Este score es herramienta de autoconocimiento, no de evaluación
+     de desempeño. Su uso como condición de empleo viola los términos de servicio".
+
+7. O.03: Tailscale comprometido
+   Tailscale es closed-source. Si su infraestructura se ve comprometida, todos los nodos
+   de la Mesh quedan expuestos. Mitigación:
+   - WireGuard (open-source) documentado como alternativa soberana en ABM.
+   - El usuario puede migrar a WireGuard sin perder funcionalidad.
+   - Advertencia en UI: "Tailscale es closed-source. Considera WireGuard para máxima soberanía".
+
+8. O.05: Pérdida de frase de recuperación
+   La frase de recuperación es la única clave del cifrado. Si se pierde, los datos son
+   irrecuperables. Mitigación:
+   - Advertencia explícita y repetida en UI durante exportación.
+   - Sugerencia de guardar la frase en gestor de contraseñas o papel físico seguro.
+   - Sin backdoor por diseño. Ni David, ni Aurelius, ni la NSA pueden recuperar los datos.
+   - Esto es una característica, no un bug. Es el precio de la soberanía total.
+
+9. O.07/O.11: Collusion Sybil en Mesh
+   En un mercado P2P donde la reputación desbloquea acceso a recursos, la fabricación
+   de reputación es el ataque dominante. Mitigación en tres capas:
+   - Challenge-Response: Cada PoK-G requiere Proof of Useful Work con nonce derivado de Gold.
+   - Stake Temporal: Ofertar servicios requiere bloquear PoKs propios como garantía.
+   - Slashing Ledger: 3 PoK-D verificados contra un nodo = blacklist local por 30 días.
+   Sin estas tres medidas, el Mercado de Bardo se llena de nodos fantasmas.
+
+================================================================================
+PARTE IV: MODELOS DE NEGOCIO ASOCIADOS
+--------------------------------------------------------------------------------
+Estructuras de productos derivables de cada skill. Sin cifras monetarias.
+Solo: qué se vende, a quién, bajo qué restricciones legales, y por qué es viable.
+
+IV.1 CLASIFICACIÓN DE SKILLS POR VIABILIDAD COMERCIAL
+------------------------------------------------------------
+
+INFRAESTRUCTURA (no monetizable directa, habilita todo lo demás):
+  - B.01 (Perfiles): Habilita LITE/PRO. Sin valor comercial directo.
+  - B.02 (Declaración Honesta): Transparencia como diferenciador, no producto.
+  - B.03 (Capabilities): API interna. Sin valor comercial directo.
+  - B.04 (Honest Math): Motor de verdad. Sin valor comercial directo.
+  - B.05 (Portapapeles): Fricción de seguridad. Sin valor comercial directo.
+  - B.06 (Command Guard): Seguridad determinista. Producto derivable (ver IV.2).
+  - B.08 (Cache Embeddings): Optimización. Sin valor comercial directo.
+  - B.10 (Scaffolding): Pedagogía. Sin valor comercial directo.
+  - B.23 (Constitución): Transparencia. Sin valor comercial directo.
+  - B.24 (Sesión Persistente): Retención de usuario. Sin valor comercial directo.
+  - B.25 (Multiplexor): UX. Sin valor comercial directo.
+  - P.06 (Dynamic Prompt): Personalización. Sin valor comercial directo.
+  - P.07 (Reconciliación): Resiliencia. Sin valor comercial directo.
+
+MONETIZABLES DIRECTAMENTE (productos con valor de mercado identificable):
+  - B.06 ext. (Command Guard CI/CD): Auditoría determinista de pipelines.
+  - B.06 ext. (Clipboard Guard OS): Watcher pasivo de portapapeles.
+  - B.15 (Chaos Sandbox): Simulacros de fallo para equipos de SRE.
+  - B.18 ext. (Predictive Code Guard): Predicción de métricas de calidad.
+  - P.02 (ADR Generator): Documentación arquitectónica automatizada.
+  - P.08 (La Forja): Evaluación de competencia técnica verificable.
+  - P.10 (ADR Portfolio): Portfolio técnico exportable.
+  - P.19 (Compilador como Rúbrica): Certificación de competencia en lenguaje tipado.
+  - P.22 (Deuda Cognitiva): Métrica de riesgo técnico para equipos.
+  - O.02 (Honest Math Mesh): Verificación cruzada de recursos en red P2P.
+  - O.05 (Portabilidad): Migración de identidad entre dispositivos.
+  - O.07 (Notario SLAs): Auditoría de recursos en cómputo federado.
+  - O.10 (Portfolio Exportable): Sitio estático verificable de portfolio.
+  - O.11 (Mercado de Bardo): Trueque de recursos de cómputo.
+
+SEMI-MONETIZABLES (valor indirecto, requieren packaging):
+  - B.07 (Centinela): Datos de telemetry para optimización de hardware.
+  - B.09 (Snippets): Base de conocimiento personal (freemium como entry point).
+  - B.11 (Espejo de Sócrates): Entrenamiento de pensamiento técnico.
+  - B.12 (Focus Pact): Productividad sin espionaje.
+  - B.13 (Dead Path): Autoconocimiento técnico (B2C puro).
+  - B.14 (Lexicon): Glosario personal sellado.
+  - P.04 (Meditaciones): Diario técnico sellado (B2C puro).
+  - P.05 (Brújula Estoica): Coaching técnico automatizado.
+  - P.12 (Entropía Humana): Detección de burnout (wellness B2B).
+  - P.13 (Sintonía Externa): Validación de cursos externos.
+  - P.14 (Arquitecto de Rutas): Planificación de carrera técnica.
+  - P.16 (Enjambre): Colaboración multi-agente (productividad B2B).
+  - P.21 (Pato de Goma): Revisión de código por agente especializado.
+  - P.23 (Forja de Prompt): Certificación en prompt engineering defensivo.
+  - O.06 (Prueba del Tiempo): Spaced repetition criptográfico.
+  - O.09 (Calibración Federada): Datos agregados de hardware.
+
+IV.2 PRODUCTOS DERIVADOS POR SKILL
+------------------------------------------------------------
+
+| Skill origen | Producto derivado         | Qué se vende                                              | A quién                          | Restricciones legales                                      |
+|--------------|---------------------------|-----------------------------------------------------------|----------------------------------|------------------------------------------------------------|
+| B.06 ext.    | Command Guard CI/CD       | Auditoría determinista de pipelines de integración        | Equipos de desarrollo            | Compliance corporativo. Zero-trust. Ninguna adicional.     |
+| B.06 ext.    | Clipboard Guard OS        | Watcher pasivo de portapapeles                            | Desarrolladores                    | GDPR Art. 25. No almacena contenido.                       |
+| B.15         | Chaos Sandbox Enterprise  | Simulacros de fallo controlados                           | Equipos de infraestructura       | No incluir datos reales del empleador.                   |
+| B.18 ext.    | Predictive Code Guard     | Pre-commit hook de predicción de métricas                 | Desarrolladores                    | Ninguna (métricas deterministas).                          |
+| P.02         | ADR Generator Pro          | Generación automática de ADRs                             | Arquitectos de software          | GDPR si conversaciones con datos de terceros.              |
+| P.08         | Certificación Aurelius     | Evaluación dual con PoK firmado                            | Profesionales y reclutadores     | EU AI Act Art. 6.2. Requiere HRG/CEL/RTC.                |
+| P.10         | Portfolio Técnico          | Exportación de ADRs sellados                              | Profesionales técnicos           | GDPR si metadata personal.                               |
+| P.19         | Certificación Lenguaje Tip.| Evaluación basada en compilador                           | Desarrolladores                    | Ninguna (compilador es el juez).                           |
+| P.22         | Cognitive Debt Monitor     | Métrica de riesgo técnico acumulado                       | Equipos de ingeniería            | EU AI Act Art. 6.2. HRG+CEL+RTC obligatorios.            |
+| O.02         | Mesh Verifier              | Verificación cruzada de recursos P2P                      | Nodos de la Mesh                 | Ninguna (verificación matemática).                         |
+| O.05         | Aurelius Export            | Migración cifrada de identidad                            | Usuarios multi-dispositivo       | GDPR Art. 20 (portabilidad).                               |
+| O.07         | SLA Notary                 | Notario de Acuerdos de Nivel de Servicio                  | Redes DePIN                      | Ninguna (números agregados).                               |
+| O.10         | Portfolio Site Generator   | Generador de sitio estático verificable                   | Profesionales técnicos           | GDPR si datos personales.                                |
+| O.11         | Mesh Marketplace           | Mercado P2P de trueque de recursos                        | Comunidad Aurelius               | Regulación de trueque local. Sin AML/KYC directo.          |
+
+IV.3 RESTRICCIONES LEGALES POR JURISDICCIÓN
+------------------------------------------------------------
+
+Unión Europea (EU AI Act 2026, GDPR):
+  - P.05, P.22: Si se usan para evaluación de desempeño laboral, son IA de Alto Riesgo.
+    Requieren: registro en autoridad nacional, evaluación de conformidad,
+    explicabilidad, derecho a intervención humana, responsabilidad civil del proveedor.
+    Mitigación: HRG + CEL + RTC técnicos que IMPIDAN el uso como evaluador automatizado.
+  - O.09: Datos agregados de hardware. GDPR Art. 25 (protección desde el diseño).
+    Opt-in explícito. Agregación mínima de 10 usuarios por bucket.
+  - O.05: Derecho a la portabilidad (GDPR Art. 20). El formato .aurelius cumple.
+
+Estados Unidos (CCPA, state privacy laws):
+  - B.12, B.13, P.04, P.05: Datos de comportamiento y psicológicos.
+    CCPA requiere opt-out de venta de datos. Aurelius no vende datos (local-first).
+    Pero si el empleador es el que paga la suscripción, el empleado tiene derecho a saber
+    qué datos se recopilan y cómo se usan. Requiere política de privacidad transparente.
+
+Latinoamérica (LGPD Brasil, Ley de Protección de Datos Personales Argentina):
+  - Principios de finalidad, necesidad y proporcionalidad.
+  - B.12 (Focus Pact): El fingerprint de directorio es dato personal si se puede
+    reidentificar. Mitigación: hash irreversible, sin nombres de archivo.
+
+Jurisdicciones sin regulación específica de IA:
+  - Aurelius aplica estándar EU como mínimo (privacy by design).
+  - No reducir salvaguardas por ausencia de ley local.
+
+================================================================================
+PARTE V: GLOSARIO DE TÉRMINOS AURELIUS
+--------------------------------------------------------------------------------
+Definiciones propias del proyecto que un experto externo necesita entender.
+Ordenado alfabéticamente. Referencias cruzadas al Catálogo V4.
+
+---
+ABM (Aurelius Bootstrap Manifest)
+  Archivo que lista TODAS las dependencias externas con sus hashes SHA-256 exactos.
+  El servidor NO arranca si un hash no coincide. Protocolo de arranque de confianza.
+  Referencia: Catálogo V4, Sección A.9
+
+---
+ADR (Architecture Decision Record)
+  Documento que registra una decisión arquitectónica con contexto, decisión, consecuencias,
+  y referencias a conversaciones fuente. Sellado en Gold con HLC y firma.
+  Referencia: Catálogo V4, Skills P.02, P.10, P.11, O.10
+
+---
+Bronce
+  Nivel de almacenamiento para datos brutos: conversaciones, snippets, predicciones.
+  Mutable, cifrado en reposo, propiedad del usuario. No es inmutable.
+  Referencia: Catálogo V4, Sección II.1
+
+---
+Burst Detection
+  Mecanismo de detección de patrones artificiales en series temporales de métricas.
+  Calcula varianza de diversidad léxica en ventanas deslizantes. Detecta bots.
+  Referencia: Catálogo V4, Protocolo A.7; Skills P.08, P.12
+
+---
+CEL (Counterfactual Explainability Layer)
+  Capa de explicabilidad determinista que genera explicaciones counterfactual:
+  "Si hubieras hecho X, tu score sería Y en lugar de Z". Obligatorio para scoring cognitivo.
+  Referencia: Catálogo V4, Protocolo A.10; Skills P.05, P.22
+
+---
+Challenge-Response
+  Protocolo criptográfico donde el nodo proveedor debe demostrar trabajo útil
+  sobre un problema generado determinísticamente a partir de un nonce. Previene Sybil.
+  Referencia: Catálogo V4, Protocolo A.8; Skills O.02, O.07, O.11
+
+---
+Commitment Protocol
+  Protocolo de compromiso criptográfico: el usuario escribe predicción + salt,
+  sistema almacena commit = SHA-256(predicción + salt), luego revela resultado.
+  Previene fraude en predicciones.
+  Referencia: Catálogo V4, Protocolo A.7; Skills B.16, B.17, B.18, B.20, B.22, P.01, P.08
+
+---
+CRDT (Conflict-free Replicated Data Type)
+  Estructura de datos que permite fusionar réplicas sin coordinación central.
+  Aurelius usa LWW-Element-Set CRDT para fusión de worktrees.
+  Referencia: Catálogo V4, Protocolo A.6; Skills P.17, O.05
+
+---
+Dead Path
+  Archivo JSONL que registra propuestas rechazadas por el usuario con motivo y timestamp.
+  Al acumular 5 rechazos del mismo tema, alerta sobre patrón de evasión.
+  Referencia: Catálogo V4, Skill B.13
+
+---
+FAISS
+  Biblioteca de Facebook para búsqueda de similitud en vectores densos.
+  Usada en Aurelius para RAG (Biblioteca Soberana). Solo en PRO.
+  Referencia: Catálogo V4, Skills P.03, P.07
+
+---
+Fingerprinting de Directorio
+  Técnica de privacidad: SHA-256(sorted(os.listdir(path))) en lugar de nombres reales.
+  Permite detectar cambios en directorio sin exponer PII.
+  Referencia: Catálogo V4, Skills B.12, B.25; Anexo Parte III
+
+---
+Gold
+  Nivel de almacenamiento para datos sellados, inmutables y firmados criptográficamente.
+  Append-only. Cada entrada referencia al hash de la anterior. Propiedad del usuario.
+  Referencia: Catálogo V4, Sección II.1
+
+---
+HLC (Hybrid Logical Clock)
+  Reloj lógico híbrido: {physical: unix_ms, logical: counter}. Preserva causalidad
+  en escenarios offline. Reemplaza timestamp puro en V4.
+  Referencia: Catálogo V4, Protocolo A.6; Skills P.17, O.05
+
+---
+Honest Math
+  Capa de servicio de verdad numérica. Parser AST con whitelist + calculadoras fijas.
+  PROHIBIDO ejecutar código generado por modelo. El LLM solo redacta.
+  Referencia: Catálogo V4, Skill B.04; Protocolo A.1(3)
+
+---
+HRG (Human Review Gate)
+  Barrera técnica de intervención humana. El output de scoring cognitivo requiere
+  validación del usuario antes de ser accionable por terceros.
+  Referencia: Catálogo V4, Protocolo A.10; Skills P.05, P.22
+
+---
+IronClaw
+  Principio de no ejecución autónoma. El sistema PROPONE; el humano EJECUTA y FIRMA.
+  PROHIBIDA la ejecución autónoma de comandos por parte del sistema.
+  Referencia: Catálogo V4, Protocolo A.1(2)
+
+---
+La Forja
+  Sistema de evaluación dual (semántica + heurística) que emite PoK firmado.
+  Incluye Temporal Binding, Commitment Protocol y Burst Detection.
+  Referencia: Catálogo V4, Skill P.08
+
+---
+LITE
+  Perfil de configuración para hardware modesto (8 GB RAM). Barrera cero.
+  Disponible en BRONCE. Sin FAISS, sin criptografía, sin red privada.
+  Referencia: Catálogo V4, Skill B.01; Protocolo A.2
+
+---
+Local-first
+  Principio arquitectónico: los datos del usuario nunca abandonan el nodo sin
+  consentimiento explícito por entrada.
+  Referencia: Catálogo V4, Protocolo A.1(1)
+
+---
+Mesh
+  Red P2P de nodos Aurelius interconectados por red privada (Tailscale/WireGuard).
+  Permite trueque de recursos y verificación cruzada.
+  Referencia: Catálogo V4, Skill O.11; Protocolo A.8
+
+---
+Modo Templo
+  Modo de operación cuando el motor es HUESPED (API de terceros). Gold está offline.
+  Las meditaciones se registran en Bronce local efímero.
+  Referencia: Catálogo V4, Skills B.26, B.27, O.08
+
+---
+PoK (Proof of Knowledge)
+  Prueba verificable de competencia técnica. JSON firmado con Ed25519 que incluye
+  nivel, tema, métricas, HLC, y hash de prueba.
+  Referencia: Catálogo V4, Skill P.08; Protocolo A.7
+
+---
+PoK-D (Proof of Knowledge - Discrepancia)
+  Prueba de discrepancia emitida cuando Honest Math detecta mentira en la Mesh.
+  3 PoK-D verificados contra un nodo = blacklist local por 30 días.
+  Referencia: Catálogo V4, Protocolo A.8; Skill O.07
+
+---
+PoK-G (Proof of Knowledge - Gratitud)
+  Prueba de gratitud emitida tras trueque exitoso en la Mesh.
+  Requiere Challenge-Response y Proof of Useful Work.
+  Referencia: Catálogo V4, Protocolo A.8; Skill O.11
+
+---
+PRO
+  Perfil de configuración para hardware avanzado (32+ GB RAM). Incluye FAISS,
+  criptografía, red privada, y skills ORO.
+  Referencia: Catálogo V4, Skill B.01; Protocolo A.2
+
+---
+RTC (Right to Contest Button)
+  Botón técnico de impugnación inmutable en Gold. Para todo output evaluativo,
+  el usuario puede generar una entrada de disputa que pausa el uso del score.
+  Referencia: Catálogo V4, Protocolo A.10; Skills P.05, P.22
+
+---
+Scaffolding Fading
+  Política de retiro gradual de soporte pedagógico a medida que sube la competencia.
+  Nivel active → passive → ondemand según progreso en misiones.
+  Referencia: Catálogo V4, Skill B.10
+
+---
+Slashing Ledger
+  Registro local append-only de penalizaciones por discrepancia verificada.
+  3 PoK-D contra un nodo = blacklist local por 30 días.
+  Referencia: Catálogo V4, Protocolo A.8; Skills O.07, O.11
+
+---
+Stake Temporal
+  Mecanismo de costo de oportunidad: ofertar servicios en la Mesh requiere bloquear
+  PoKs propios como garantía. Si se detecta fraude, los PoKs se queman.
+  Referencia: Catálogo V4, Protocolo A.8; Skill O.11
+
+---
+Temporal Binding
+  Mecanismo anti-trampa: cada sesión de evaluación usa rúbrica perturbada por nonce
+  derivado de Gold_tip + session_timestamp + topic. Previene precomputación.
+  Referencia: Catálogo V4, Protocolo A.7; Skill P.08
+
+---
+Worktree
+  Rama aislada de pensamiento con su propio Bronce y Gold. Permite experimentación
+  sin contaminar el contexto principal. Fusión por HLC + CRDT.
+  Referencia: Catálogo V4, Skill P.17; Protocolo A.6
+
+================================================================================
+FIN DEL ANEXO DE CASOS COMPLEJOS V4
+================================================================================
+
+Índice de partes:
+  Parte I: Psicología del Diseño (10 teorías, 17 skills con dimensión psicológica)
+  Parte II: Arquitectura de Datos Profunda (8 schemas JSON, flujos, backup, privacidad)
+  Parte III: Casos Límite y Vectores de Ataque (20 vectores, 9 críticos)
+  Parte IV: Modelos de Negocio Asociados (14 productos derivados, restricciones legales)
+  Parte V: Glosario de Términos Aurelius (31 términos definidos)
+
+Vinculado a: AURELIUS_CATALOG_V1.2.txt
+Regla de sincronización: Si se modifica este Anexo, verificar que el Catálogo V4
+  refleje los cambios en las skills afectadas.
+================================================================================

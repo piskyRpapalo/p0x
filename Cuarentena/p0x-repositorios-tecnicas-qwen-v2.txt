@@ -1,0 +1,186 @@
+ÍNDICE MAESTRO Y COMPENDIO DE DESTILACIONES TÉCNICAS PARA QWEN 3.7 CODER 30B (VERSIÓN 2)
+NODO SOBERANO P0X — PROYECTO MERGE — ENCICLOPEDIA DE INGENIERÍA DE BAJO NIVEL
+================================================================================
+SINOPSIS: 
+Este documento contiene la disección técnica exhaustiva de los 11 repositorios de 
+GitHub que dan forma a la ingeniería de p0x y Aurelius. Se enfoca de forma absoluta
+en patrones de silicio de bajo nivel, gestión de memoria libre de malloc, protocolos
+de red local-first asíncronos y robustez de bases de datos.
+================================================================================
+
+================================================================================
+REPOSITORIO I: ggerganov/llama.cpp (El Límite del Silicio Local)
+================================================================================
+
+1.1 ARQUITECTURA DE GRAFO DE CÓMPUTO ESTÁTICO (ggml)
+- La biblioteca de tensores 'ggml' rechaza el despacho de ejecución dinámico en caliente.
+- Divide la inferencia en dos fases discretas:
+  * Fase de Construcción: Construye el grafo de operaciones secuenciales `ggml_cgraph` 
+    (mediante `ggml_build_forward_expand`). El grafo mapea nodos (operaciones matemáticas como 
+    multiplicación de matrices `ggml_mul_mat`, funciones de activación `ggml_gelu`) y leafs 
+    (pesos tensores, activaciones de entrada).
+  * Fase de Ejecución: El grafo precalculado se despacha a los backends de hardware (CPU NEON, GPU Metal/CUDA).
+- Ventaja: Se calcula de forma global el tamaño de memoria temporal exacta requerido para todas las
+  capas intermedias antes de realizar el primer cálculo, logrando la máxima eficiencia de caché L1/L2/L3.
+
+1.2 ALOCACIÓN ESTÁTICA Y EVITACIÓN DE FRAGMENTACIÓN DE HEAP (ggml_gallocr)
+- En hardware de bajo consumo, el OOM Killer y la fragmentación de la RAM son enemigos fatales.
+- llama.cpp utiliza un alocador estático de memoria de grafo (`ggml_gallocr` o Graph Allocator):
+  * Al iniciar, recorre el grafo de cómputo completo en frío para medir el tamaño máximo de los buffers intermedios de activations.
+  * Reserva un único búfer de memoria estático gigante y contiguo en el heap.
+  * Durante el bucle de inferencia de tokens en caliente, **existe cero llamadas a `malloc()` o `free()`**.
+  * Reutiliza offsets de memoria previamente reservados de forma secuencial, garantizando que el uso de RAM sea plano, predecible e inquebrantable de principio a fin.
+
+1.3 OPTIMIZACIÓN DE MEMORIA Y COMPRESIÓN BINARIA (GGUF, K-Quants e IQ-Quants)
+- Formato unificado GGUF: Archivo binario con cabecera de metadatos tipada y alineación de bytes fija (por defecto, alineación a 32 bytes para optimizar lecturas SIMD). Evita el uso de formatos JSON o Protobuf que exigen parsing de strings pesados en CPU.
+- Memory Mapping (mmap): Mapea el archivo GGUF directamente en el espacio de direcciones de memoria virtual del sistema operativo. Los pesos no se copian a RAM al arrancar; se cargan página por página bajo demanda física de la CPU (page faults), reduciendo instantáneamente la memoria física activa necesaria para el arranque.
+- Estrategias de Cuantización de Precisión Mixta:
+  * K-quants (Precisión mixta por superbloques de 256 coeficientes): Agrupa capas críticamente tolerantes y sensibles de forma diferenciada. Las capas de atención de consulta y clave se preservan en mayor bits (ej: Q6_K), mientras que los pesos de las capas feed-forward (FFN) se reducen a menor bits (ej: Q4_K_M).
+  * IQ-quants (Importance Matrix): Utiliza una matriz de peso semántico calculada externamente mediante la convergencia de gradientes de texto. Permite aplicar cuantizaciones mixtas por debajo de los 2 bits por peso (como IQ2_XXS, IQ3_K) con un impacto mínimo en la perplejidad del modelo local.
+
+1.4 MITIGACIÓN DE VULNERABILIDADES DEL PARSER EN C NATIVO
+- Los archivos de pesos de modelos GGUF descargados de internet actúan en la práctica como ejecutables en caliente. 
+- exploits detectados (CVE-2026-33298, CVE-2026-27940): Desbordamiento de enteros (Integer Overflow) en el parser de lectura de metadatos de tensores en C, provocando escrituras fuera de límites en el buffer del heap si un archivo GGUF malicioso tiene campos de nombres de tensores falsificados.
+- p0x implementa la contención obligatoria: `verify_pow.sh` audita la versión mínima del build de llama.cpp (versión b8146+) y realiza un cálculo estricto de SHA-256 de los pesos locales y su firma detached Ed25519 antes de cargarlos en memoria.
+
+================================================================================
+REPOSITORIO II: karpathy/llama2.c (Inferencia Minimalista e Hilos C99)
+================================================================================
+
+2.1 SIMPLICIDAD ABSOLUTA EN C99
+- Demuestra que el hardware se gobierna con minimalismo de código. Inferencia completa en menos de 1000 líneas de C99 estándar sin dependencias de CMake, librerías de terceros o pesados instaladores de compilación.
+- Compilación ultra-optimizada y directa:
+  `gcc -O3 -Ofast -march=native -ffast-math run.c -lm -o run`
+
+2.2 ALOCACIÓN DE ESTADO EN UN ÚNICO BLOQUE Y MAPEO DE PESOS (mmap)
+- Define tres estructuras de memoria alineadas y contiguas en el heap:
+  * Config: Un bloque entero de 28 bytes que lee el header binario de 7 variables (dim, hidden_dim, n_layers, n_heads, n_kv_heads, vocab_size, seq_len).
+  * TransformerWeights: Punteros directos float* que apuntan a posiciones relativas aplanadas en un array 1D del archivo del modelo.
+  * RunState: El búfer mutable donde se almacenan temporalmente las activaciones de capas (key, value, query, feed-forward layers).
+- El arranque se realiza mediante un `mmap` directo del archivo binario del modelo a un descriptor de archivos virtual del kernel de Linux. Los punteros de los pesos de la estructura `TransformerWeights` apuntan directamente a la dirección de memoria que mapea el disco, logrando un tiempo de carga cero de modelo y un consumo nulo de memoria RAM para deserializaciones.
+
+================================================================================
+REPOSITORIO III: anyproto/anytype-ts (Identidad Local y Sincronización P2P)
+================================================================================
+
+3.1 TOPOLOGÍA P2P LOCAL-FIRST CON ANY-SYNC
+- El protocolo `any-sync` opera de forma puramente descentralizada y local-first.
+- No utiliza bases de datos de identidad centrales. La identidad digital completa se genera localmente mediante la derivación matemática y criptográfica de una semilla mnemónica de 12 palabras.
+
+3.2 CRIPTOGRAFÍA EN EL ÁRBOL DE CAMBIOS Y CIFRADO DE BLOQUES
+- Cada cambio o documento se representa como un árbol de Merkle de modificaciones inmutables.
+- Las modificaciones locales se firman criptográficamente mediante curvas elípticas asimétricas Ed25519.
+- El contenido de los bloques del documento se encripta de forma simétrica mediante AES-CFB, permitiendo que la información viaje por redes no seguras de forma totalmente protegida ante atacantes locales.
+
+3.3 DESACOPLAMIENTO DE PROCESOS MEDIANTE gRPC LOCAL
+- Para evitar sobrecargar la memoria del frontend, anytype delega la persistencia física en un middleware ligero escrito en Go (anytypeHelper).
+- El frontend en React se comunica asíncronamente con el helper local de Go mediante llamadas de gRPC sobre sockets locales, respondiendo instantáneamente a cambios de estados sin bloquear el hilo principal de renderizado de la interfaz de usuario.
+
+================================================================================
+REPOSITORIO IV: syncthing/syncthing (Sincronización por Deltas y SQLite WAL)
+================================================================================
+
+4.1 PROTOCOLO DE INTERCAMBIO DE BLOQUES POR DELTAS (BEP)
+- El Block Exchange Protocol (BEP) optimiza el uso de la subred local fragmentando cada archivo en bloques lógicos calculados mediante hashes SHA-256.
+- Cuando dos nodos se concilian de forma offline, intercambian únicamente las firmas de los hashes de los bloques.
+- El nodo receptor realiza la descarga exclusiva de los bloques que faltan (delta sync), previniendo picos de uso del CPU y el sobrecalentamiento del disco físico del nodo de borde ARM.
+
+4.2 MIGRACIÓN A SQLite WAL PARA PERSISTENCIA DE LÍNEA DE CRÉDITO
+- Reemplazó el uso de bases de datos de bajo nivel clave-valor (como LevelDB) por SQLite para garantizar la máxima integridad transaccional ACID en hardware propenso a cortes repentinos de energía solar.
+- Inicializa la base de datos bajo journal_mode=WAL (Write-Ahead Logging), permitiendo lecturas concurrentes rápidas sin bloquear los subprocesos de escritura física de la cola de red.
+
+================================================================================
+REPOSITORIO V: automerge/automerge (CRDT y Compresión Columnar)
+================================================================================
+
+5.1 CRDT COLUMNAR COMPRIMIDO EN RUST Y WASM
+- El motor matemático de colaboración local-first de Automerge está desarrollado en Rust puro para el silicio y se expone a TypeScript mediante compilación WebAssembly (WASM).
+- En su arquitectura v3.0, el almacenamiento del documento en memoria de trabajo utiliza el mismo formato comprimido binario columnar que se escribe a disco (similar a Apache Parquet). 
+- Organiza los arrays de identificadores de actores, marcas de tiempo relativas y bytes de operaciones en posiciones contiguas de memoria, optimizando la caché de hardware del CPU y reduciendo el footprint de RAM activa en más del 95% frente a representaciones de grafos JSON estándar.
+
+5.2 PERSISTENCIA DIFERENCIAL INCREMENTAL
+- Provee dos primitivas fundamentales:
+  * `save()`: Exporta un snapshot completo e idempotente del grafo inmutable del documento.
+  * `save_incremental()`: Escribe únicamente las transacciones y deltas agregados desde el último guardado en un log append-only rápido, previniendo el desgaste prematuro de la memoria física de almacenamiento (write wear) de tarjetas SD del nodo de borde.
+
+================================================================================
+REPOSITORIO VI: simonw/llm (Orquestación CLI en Python y Logs SQLite)
+================================================================================
+
+6.1 LOG RELACIONAL INMUTABLE DE CONVERSACIONES
+- Registra cada prompt enviado, respuesta generada de la IA, identificador del modelo, timestamps, y configuraciones (temperatura, límite de tokens) en una base de datos local relacional SQLite (`~/.config/io.datasette.llm/logs.db`).
+- Ventaja: Se erradica la dependencia de mantener historiales infinitos de conversaciones en la memoria RAM volátil, y permite analizar, filtrar y extraer mediante consultas SQL directas el conocimiento del nodo.
+
+6.2 SISTEMA MODULAR DE ORQUESTACIÓN DESACOPLADO
+- Estructurado en Python puro utilizando el patrón de plugins dinámicos basados en "entry points". Esto permite que el motor de ejecución se desacople por completo del backend de inferencia (Ollama, llama.cpp local).
+- Facilita la adición de nuevas capacidades de hardware de manera modular sin tener que alterar el núcleo del código de control.
+
+================================================================================
+REPOSITORIO VII: antirez/dump1090 (Ingesta de Radiofrecuencia en C Puro)
+================================================================================
+
+7.1 INGESTA DIRECTA DESDE EL BUS USB MEDIANTE BUFFER CIRCULAR ESTÁTICO
+- El decodificador Mode S escrito por el creador de Redis (*antirez*) interactúa directamente con el puerto USB de los dongles RTL-SDR usando llamadas de la librería de bajo nivel `librtlsdr`.
+- Reserva un buffer circular estático prealocado durante el arranque de sistema. Las muestras físicas de radio crudas I/Q se inyectan continuamente en el buffer mediante llamadas asíncronas con acceso directo a memoria (DMA) para evitar llamadas de red intermedias.
+
+7.2 OPTIMIZACIÓN TRIGONOMÉTRICA POR LOOKUP TABLES
+- Para calcular la magnitud de las señales complejas sin consumir recursos del microprocesador, antirez precalcula todas las amplitudes trigonométricas posibles en una tabla estática en frío (Lookup Table o `mag_lut`).
+- El cálculo de amplitud se resume en una lectura de índice de array directa en el heap en hardware:
+  `magnitude = mag_lut[I_sample_byte][Q_sample_byte]`
+  Esto elimina el cómputo de la raíz cuadrada y sumas trigonométricas complejas a alta velocidad en hardware ARM, manteniendo el consumo de CPU por debajo del 5% de un hilo del microcontrolador.
+
+================================================================================
+REPOSITORIO VIII: codenotary/immudb (Inmutabilidad por Árboles de Merkle)
+================================================================================
+
+8.1 LOG TAMPER-PROOF APEND-ONLY
+- immudb garantiza la irrevocable consistencia de las transacciones inyectando cada nuevo registro de datos en un log append-only protegido por un Árbol de Merkle.
+- Cada nueva inserción de datos genera un nodo matemático criptográfico de hash que se concatena con el hash del nodo anterior.
+
+8.2 PRUEBAS CRIPTOGRÁFICAS DE CONSISTENCIA E INCLUSIÓN
+- El sistema expone APIs lógicas para computar de forma offline:
+  * Consistency Proofs: Prueban matemáticamente que el ledger histórico de datos no ha sido borrado o modificado en el disco físico.
+  * Inclusion Proofs: Demuestran criptográficamente en tiempo de lectura que un dato exacto reside en un bloque del árbol de Merkle sin necesidad de recorrer secuencialmente todo el archivo de base de datos.
+
+================================================================================
+REPOSITORIO IX: mtlynch/tinypilot (Renderizado de Interfaz sin Latencia)
+================================================================================
+
+9.1 ADQUISICIÓN DE VIDEO SIN CAPAS DE SOBREINGENIERÍA
+- TinyPilot logra un control remoto de ultra-bajo consumo y baja latencia en Raspberry Pi adquiriendo el video físico de captura HDMI por hardware directo a través del controlador del kernel de Linux `v4l2`.
+- Transmite las imágenes codificadas en MJPEG/H.264 directamente al navegador del usuario a través de un canal WebSockets ligero de solo lectura.
+
+9.2 INTERFAZ STATELESS SIN NODE.JS
+- El frontend prescinde por completo de Webpack, Node.js, npm, o librerías dinámicas de renderizado reactivo de terceros.
+- Utiliza únicamente HTML vanilla estructurado mediante Web Components nativos y scripts de JavaScript plano. El backend levanta comandos administrativos inyectando las pulsaciones de teclado directamente en el driver OTG del host (`/dev/hidg0`), anulando cualquier intermediario.
+
+================================================================================
+REPOSITORIO X: betta-tech (Agentes en Disco y Sintaxis EARS)
+================================================================================
+
+10.1 PERSISTENCIA OPERATIVA DIRECTA EN DISCO
+- Los estados intermedios de los agentes, colas de subtareas, y buffers de red se escriben directamente de forma transaccional en el disco físico antes de procesarse lógicamente en memoria activa.
+- Ventaja: Ante cualquier corte repentino de energía solar del rack local, la máquina se levanta cargando la última transacción de disco, evitando la pérdida de contexto en la memoria RAM volátil.
+
+10.2 REQUISITOS BAJO SINTAXIS EARS
+- Para evitar las alucinaciones de código e interpretaciones libres en los prompts de los agentes locales, betta-tech estandariza todos los requisitos operativos bajo la sintaxis estricta EARS:
+  `WHEN [Condición] / IF [Precondición] / THEN [Sistema] / SHALL [Acción]`
+
+================================================================================
+REPOSITORIO XI: Gentleman-Programming (Engrams y SQLite FTS5)
+================================================================================
+
+11.1 MEMORIA EPISTÉMICA BASADA EN ENGRAMAS
+- Estructura las lecciones aprendidas en caliente en registros atómicos llamados "engrams".
+- Cada engrama de conocimiento se desglosa en cuatro metadatos tipados estrictos:
+  * What: La descripción técnica exacta del cambio o evento realizado en el nodo.
+  * Why: La justificación racional de la decisión de arquitectura adoptada.
+  * Where: La ruta del archivo físico de configuración o código fuente local.
+  * Learned: La regla conceptual de diseño o lección inalterable para el futuro.
+
+11.2 BÚSQUEDA RÁPIDA VIRTUAL LOCAL (FTS5)
+- Mapea la base de datos de engramas a una tabla virtual SQLite FTS5 con un índice optimizado de búsqueda de texto de bajo nivel, permitiendo indexaciones y consultas de lecciones de forma instantánea de forma totalmente desconectada.
+
+================================================================================
+FIN DEL COMPENDIO TÉCNICO SOBERANO - PREPARADO PARA EL DESPLIEGUE OFFLINE
+================================================================================

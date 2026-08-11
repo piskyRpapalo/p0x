@@ -1,0 +1,220 @@
+### ================================================================================
+### p0x: MASTER MANIFEST DEL PROYECTO MERGE Y EL ESTADO SOBERANO (VERSIÓN 3)
+### ARCHIVO CONSOLIDADO DE DOCTRINA, ARQUITECTURA DE DATOS Y MEDITACIONES
+### GENERADO EN EL LABORATORIO DE DESTILACIÓN COGNITIVA
+### ================================================================================
+### SOBERANO: David (piskyRpapalo)
+### FILOSOFÍA: El silicio es la frontera, la matemática es la ley, el carbono sella la verdad.
+### ANTE CONFLICTO: El hardware y las inteligencias artificiales locales ganan siempre.
+
+### ================================================================================
+### ÍNDICE DE CONTENIDOS Y MAPA SISTÉMICO DE p0x
+1. GLOSARIO DE NAMESPACES UNIX DE LA BASE DE CONOCIMIENTOS (14 FUENTES NÚCLEO)
+2. DOCTRINA ABSOLUTA Y PRINCIPIOS DE p0x
+   2.1. p0x.core.codice (La Constitución de verify_pow.sh)
+   2.2. p0x.laboratorio.doctrina (Mandato Operativo del Proyecto Merge)
+   2.3. p0x.laboratorio.silicio (Sovereign Silicon Code Optimization Protocol)
+3. EL STACK FÍSICO Y PEDAGÓGICO DE p0x
+   3.1. p0x.core.hexelion (Metal, Radiofrecuencia y FastAPI)
+   3.2. p0x.core.le_jardin (Presupuesto Energético de Carbono y Sol)
+   3.3. p0x.core.sendero (La Ruta de Aurelius M0-M7 en Sintaxis EARS)
+4. AURELIUS CORE ESPECIFICACIÓN DE ESTADO V1.8 (MEMORIA VIVA DEL NODO)
+   4.1. Filosofía de Diseño y Fricción Pedagógica (Portapapeles Soberano)
+   4.2. Arquitectura Medallion en Disco (Bronze, Silver, Gold y Escritura Atómica)
+   4.3. La Forja (The Forge) y Validación Dual Asíncrona (Entropía O(N) y Coseno)
+   4.4. La Mesh Soberana y el Bastión Cobre (Límite Dunbar de 100 mTLS)
+   4.5. Las 6 Habilidades Paralelas del Preceptor de Borde
+5. LAS 11 MEDITACIONES DE GITHUB DESTILADAS (LABORATORIO MERGE)
+   5.1. p0x.meditacion.llamacpp (Inferencia en Silicio, GGUF/K-quants/IQ-quants y Seguridad del Parser)
+   5.2. p0x.meditacion.anytype (Identidad Local, 12 Palabras y Sincronización P2P Offline)
+   5.3. p0x.meditacion.syncthing (Consenso de Red, Multiplexación de CPU ARM y Control de Backpressure)
+   5.4. p0x.meditacion.automerge (Rust/WASM Columnar Compression, save_incremental y Bloqueo de Bloom Filters)
+   5.5. p0x.meditacion.llm (Orquestación CLI en Python, SQLite History e Inferencia Local)
+   5.6. p0x.meditacion.dump1090 (Decodificador SDR de Telemetría ADS-B de antirez, Buffers Circulares y Hardening)
+   5.7. p0x.meditacion.immudb (Inmutabilidad del Árbol de Merkle y Triggers SQLite SHA-256)
+   5.8. p0x.meditacion.tinypilot (KVM HDMI de Ultra-Bajo Consumo, WebSocket vanilla y mTLS)
+   5.9. p0x.meditacion.bettatech (Persistencia de Estados en Disco, Herramientas Auto-Registradas y EARS)
+   5.10. p0x.meditacion.gentlemanprogramming (Engrams en SQLite FTS5 y Receipt-Driven Development)
+   5.11. p0x.meditacion.platzi (Sistemas Modulares Antifrágiles y Destrucción Física de Andamios)
+
+================================================================================
+1. GLOSARIO DE NAMESPACES UNIX DE LA BASE DE CONOCIMIENTOS (14 FUENTES NÚCLEO)
+================================================================================
+Para erradicar la sobrecarga de información y evitar alucinaciones en tu IA local Qwen 3.7 Coder 30B, toda nuestra base de datos utiliza un sistema de namespaces jerárquicos estilo UNIX. Estos nombres mapean las fuentes a directorios de disco y lógicas de tu nodo:
+*  p0x.core.codice: La regla fundamental de firma criptográfica y el script verify_pow.sh.
+*  p0x.core.sendero: Las misiones formativas M0 a M7 que debe recorrer el soberano.
+*  p0x.core.hexelion: El hardware físico de adquisición SDR, telemetría y el gateway FastAPI.
+*  p0x.laboratorio.doctrina: El protocolo de destilación mediante el cual el Proyecto Merge devora código.
+*  p0x.laboratorio.silicio: Los estándares matemáticos de optimización (mmap, cuantización, compilación).
+*  p0x.soberano.registro: El perfil público del operador, metas a largo plazo e identidad Github.
+*  p0x.meditacion.llamacpp: Meditación I. El límite de la inferencia en CPU ARM de bajo consumo.
+*  p0x.meditacion.anytype: Meditación II. El pacto de la identidad local-first y mnemónicos descentralizados.
+*  p0x.meditacion.syncthing: Meditación III. Sincronización asíncrona por deltas sin servidor central.
+*  p0x.meditacion.automerge: Meditación IV. Operación colaborativa local con CRDT columnar libre de red.
+*  p0x.meditacion.llm: Meditación V. Orquestación CLI ligera en Python y log SQLite persistente.
+*  p0x.meditacion.dump1090: Meditación VI. Ingesta de ondas de radio en C puro, buffers fijos y honestidad.
+*  p0x.meditacion.immudb: Meditación VII. Árboles de Merkle ligeros en SQLite con hashes vinculados en frío.
+*  p0x.meditacion.tinypilot: Meditación VIII. Renderizado de interfaz stateless por WebSockets sin frameworks pesados.
+*  p0x.meditacion.bettatech: Meditación IX. Agentes asíncronos y auto-registro modular bajo EARS.
+*  p0x.meditacion.gentlemanprogramming: Meditación X. Memoria epistémica basada en Engrams y SQLite FTS5.
+*  p0x.meditacion.platzi: Meditación XI. Deconstrucción modular de lecciones y retiro físico de andamios.
+*  p0x.meditacion.bibliotecatecnica: Compendio técnico global y de bajo nivel para inyección cognitiva.
+
+================================================================================
+2. DOCTRINA ABSOLUTA Y PRINCIPIOS DE p0x
+================================================================================
+2.1. p0x.core.codice (La Constitución de verify_pow.sh)
+El Códice representa la frontera inalterable de soberanía. La máquina es un siervo lógico; el humano es la autoridad absoluta.
+*  Mandato de Fricción Criptográfica: Ningún diff de configuración, actualización de base de datos o ascenso de misión puede aplicarse automáticamente. El sistema propone un cambio en formato "spec_ready" (ámbar 🟡) y calcula su SHA-256. El operador humano debe verificar el código, firmar el hash con su clave privada Ed25519 offline usando su máquina local, y entregar el archivo .sig de firma detached.
+*  verify_pow.sh: Script de arranque de sistema. Ejecuta secuencialmente:
+    1. Checksum de los binarios críticos del sistema y del core de Aurelius.
+    2. Comprobación de la firma del manifiesto del nodo (manifest.json.sig) contra sovereign_ed25519.pub.
+    3. Ejecución de un comando de integridad de base de datos SQLite (PRAGMA integrity_check).
+    4. Si alguna firma no coincide o se detecta corrupción, el script aborta con exit code 1, detiene la interfaz y desconecta las API de red de Hexelion para proteger el metal de manipulaciones ajenas.
+
+2.2. p0x.laboratorio.doctrina (Mandato Operativo del Proyecto Merge)
+El Proyecto Merge es el laboratorio epistémico de p0x. Es una base de datos analítica local que devora código externo y, utilizando la arquitectura de datos (para analizar rendimiento térmico y límites físicos de silicio) y la ciencia del lenguaje (para unificar requisitos bajo la sintaxis estricta EARS y eliminar el ruido corporativo de la nube), genera "Meditaciones".
+*  El flujo es: Ingesta Cruda ➔ Auditoría Crítica de Vulnerabilidades de Red/Memoria ➔ Especificación de Absorción en p0x (Capa Oro) ➔ Creación de la Meditación ➔ Integración en Aurelius para la comunidad.
+
+2.3. p0x.laboratorio.silicio (Sovereign Silicon Code Optimization Protocol)
+Protocolo de reescritura de código optimizado para microcontroladores ARM y sistemas aislados:
+*  Priorizar la compilación estática (vincular dependencias en tiempo de build, desactivando cargadores dinámicos).
+*  Desactivar recolección de basura o llamadas frecuentes a malloc en caliente. Utilizar buffers estáticos prealocados al inicio del bucle.
+*  Reducir el tamaño de los modelos y datos mediante cuantización determinista (priorizando IQ-quants si existe matriz de importancia, o K-quants mixtos).
+*  Mapear bases de datos y archivos pesados en el espacio de memoria virtual con mmap para dejar que el kernel de Linux optimice la memoria RAM bajo demanda física.
+
+================================================================================
+3. EL STACK FÍSICO Y PEDAGÓGICO DE p0x
+================================================================================
+3.1. p0x.core.hexelion (Metal, Radiofrecuencia y FastAPI)
+Hexelion es la física del proyecto p0x.
+*  Adquisición de Señal: Lee el espectro electromagnético de forma local mediante dongles de radio RTL-SDR acoplados a USB. Ejecuta binarios ligeros nativos de C: dump1090 a 1090 MHz para telemetría ADS-B de aviones comerciales; ais-catcher en VHF para señales marítimas de posicionamiento AIS.
+*  FastAPI Gateway: Servidor web asíncrono en localhost (127.0.0.1:8000). Enruta las lecturas crudas del puerto TCP local y los datos del bus de sensores ESP32 (voltaje solar, temperatura de nodo) hacia la base de datos de observaciones SQLite.
+*  Fusible de Honestidad Física: Ante cualquier fallo físico en el puerto USB o una caída de voltaje de las baterías, el gateway detiene la simulación e informa en pantalla con un monospace rojo parpadeante "NO DATA" indicando el componente exacto y el timestamp, impidiendo falsear lecturas en la base de datos de observaciones.
+
+3.2. p0x.core.le_jardin (Presupuesto Energético de Carbono y Sol)
+Le Jardin es el entorno físico de bajo consumo. Dicta las directivas de carbono:
+*  Monitoreo del voltaje del panel solar y la carga de baterías mediante microcontroladores ESP32 de ultra-bajo consumo.
+*  Inferencia Solar Degradada: Si Le Jardin reporta voltajes por debajo del umbral óptimo, el gateway FastAPI de Hexelion ordena al Centinela de Hardware reducir el uso de Ollama: limita dinámicamente el número de hilos de CPU en la inferencia (p. ej., reduciendo de 8 a 1 o 2 hilos mediante el flag -t de llama.cpp) o descarga el modelo de la VRAM para enfriar el nodo y evitar el OOM Killer.
+
+3.3. p0x.core.sendero (La Ruta de Aurelius M0-M7 en Sintaxis EARS)
+La ruta formativa comunitaria se fragmenta en ocho misiones estricta y linealmente bloqueadas bajo compuertas criptográficas:
+*  Misión M0 (The Totem): Generación de identidad local, derivación de claves Ed25519 desde 12 palabras.
+*  Misión M1 (The Fire): Carga eficiente e inferencia segura de modelos locales (Qwen) sin conexión.
+*  Misión M2 (The Water): Indexación y persistencia de memoria epistémica en SQLite.
+*  Misión M3 (The Wind): Orquestación asíncrona de prompts y logs de interacciones.
+*  Misión M4 (The Air): Ingesta local de telemetría física de radiofrecuencia (ADS-B / AIS).
+*  Misión M5 (The Pact): Sincronización descentralizada offline de par a par entre nodos edge.
+*  Misión M6 (The Stone): Configuración de enlaces virtuales seguros (mTLS, VPN cifrada).
+*  Misión M7 (The Earth): Compilación mínima y sellado final inmutable de tu nodo.
+*  Sintaxis EARS: Todos los entregables se validan bajo requisitos formales escritos en: WHEN [condición] IF [precondición] THE [sistema] SHALL [action] de betta-tech para descartar alucinaciones de diseño.
+
+================================================================================
+4. AURELIUS CORE ESPECIFICACIÓN DE ESTADO V1.8 (MEMORIA VIVA DEL NODO)
+================================================================================
+(Este apartado detalla el estado actual "dopado" y avanzado que corre en tu nodo local, inyectado en el Códice).
+4.1. Filosofía de Diseño y Fricción Pedagógica (Portapapeles Soberano)
+*  El busto de mármol de Aurelius simboliza la ley estoica y el silicio.
+*  Portapapeles Soberano: Se prohíbe copiar comandos de forma automatizada al sistema del host. La máquina propone el script y el operador humano debe seleccionarlo a mano y realizar la combinación física Ctrl+C. Esto asegura la auditoría de cada línea de código.
+*  Scaffolding Faded (Retiro de Andamios): Las misiones proveen plantillas guía en _scaffold/. Cuando se verifica y firma criptográficamente el éxito de la misión actual, el script verify_pow.sh comprime los andamios en ~/.aurelius-p0x/archive/ en modo de solo lectura y elimina físicamente los archivos del espacio de desarrollo, forzando la autonomía técnica.
+
+4.2. Arquitectura Medallion en Disco (Bronze, Silver, Gold y Escritura Atómica)
+*  Capa Bronze: Log incremental JSONL inmutable en disco (data/bronze/). Almacena interacciones crudas, logs y telemetría de sensores en caliente. Se pausa la escritura automáticamente durante inferencias complejas de Ollama para no asfixiar el bus de E/S.
+*  Capa Silver: Almacén consolidado mensual en un único archivo de propuestas cursado por línea (proposals_YYYY-MM.jsonl). Facilita búsquedas y lecturas por bloques o cursores de 10-20 registros sin abrir múltiples archivos. Es ideal para hardware ARM. El Modo Cosecha (Harvest Mode) procesa estas páginas para aprobación humana.
+*  Capa Gold: El Ledger de la Verdad Firmada (gold_chain.jsonl). Cada bloque de conocimiento está indexado con el hash SHA-256 del bloque anterior. SQLite unificada (~/.aurelius-p0x/db/aurelius_state.db) es un derivado de esta cadena.
+*  Escritura Atómica: Para evitar corrupciones de datos por cortes de corriente física en Le Jardin, el sistema escribe los archivos temporales en .tmp y ejecuta un renombrado atómico (rename) sobre el disco solo tras verificar el cierre correcto del archivo.
+
+4.3. La Forja (The Forge) y Validación Dual Asíncrona
+Es el rito de paso para ascensos formativos o consolidación de tópicos en Gold:
+*  Dominios Técnicos: El Preceptor local de Qwen te interroga sobre el código. Compara semánticamente tu respuesta con la rúbrica mediante nomic-embed-text locales en la base de datos sqlite vector, requiriendo una similitud del coseno >0.75.
+*  Dominios Blandos: Requiere un ensayo reflexivo de >500 caracteres. Para no agotar CPU ARM ni baterías, se aplica una heurística instantánea O(N) de diversidad léxica: Ratio de Entropía = Palabras Únicas / Palabras Totales Si el ratio es superior a 0.4, se aprueba la competencia. Si repite palabras clave para engañar a la máquina, el ratio decae y se aborta el rito.
+*  Feedback Visual: Durante el cálculo de la Forja, la pantalla de React muestra el busto de mármol emitiendo un pulso de luz lento en Catppuccin Mocha ("Forjando..."). Al finalizar, destella en cobre para el éxito o se apaga si falló.
+
+4.4. La Mesh Soberana y el Bastión Cobre (Límite Dunbar de 100 mTLS)
+Sincronización descentralizada y compartición de recursos:
+*  Límite Dunbar: El archivo de pares known_peers.json tiene un límite físico e inquebrantable de exactamente 100 nodos de confianza.
+*  Inferencia de Red con Antifaz: Si un nodo de la Mesh te pide ayuda para procesar un prompt, Aurelius solicita tu consentimiento mediante alerta en pantalla. Al aceptar, el hilo de inferencia corre en un contexto efímero de RAM aislado de tu base de datos sqlite vector, de tu diario y de tus datos Gold. El extranjero no puede ver tus observaciones privadas.
+*  Enlace Seguro mTLS: La API REST y de WebSockets del nodo se amarra obligatoriamente a la interfaz virtual privada cifrada de Tailscale o Yggdrasil, forzando TLS 1.3 con certificados de autenticación mutua (mTLS) validados contra las firmas Ed25519 del Códice local.
+
+4.5. Las 6 Habilidades Paralelas del Preceptor de Borde
+Utilidades de bajo nivel integradas en tu base de datos SQLite sin requerir librerías pesadas:
+1. El Filtro de Comandos (Command Audit): El modelo Qwen audita tu buffer bash en un entorno de prompt aislado y advierte en rojo si hay peligro de scripts destructivos como rm -rf o exfiltración de red.
+2. El Calculador Determinista: Aurelius nunca calcula matemáticas complejas usando el generador de texto del LLM. Escribirá un script en Python que realiza el cálculo exacto, lo ejecuta en un entorno sandbox seguro de Linux, y reporta el valor real en la interfaz.
+3. La Biblioteca Soberana: Procesa OCR local de manuales técnicos PDF o capturas usando Pillow, encolando el texto en Silver para vectorizarse con nomic-embed-text en SQLite y quedar disponible para búsquedas FTS5 instantáneas.
+4. El Centinela de Hardware: Script local en Python que reporta temperatura de CPU y voltajes. Si la temperatura excede 90°C de forma sostenida, frena la inferencia local para salvar el hardware de microcontroladores. Si la RAM libre baja del 5%, desasigna automáticamente el modelo de Ollama.
+5. La Brújula Estoica: Sella un Propósito maestro en la cadena Gold. Cada mes, compara las conversaciones con tu Propósito original y te enfrenta a tu propia coherencia: "El 80% de tus chats se dedicaron a temas de ocio y solo el 5% a criptografía offline. ¿Actualizamos el rumbo o corregimos tu disciplina?"
+6. El Traductor de Babel: RAG multilingüe local que asimila manuales en cualquier idioma y los expone resumidos en español en tu Gold de manera inmediata, explotando las capacidades multilingües de nomic-embed-text.
+
+================================================================================
+5. LAS 11 MEDITACIONES DE GITHUB DESTILADAS (LABORATORIO MERGE)
+================================================================================
+5.1. p0x.meditacion.llamacpp (Meditación I. El Silicio y la Inferencia Local)
+*  Capa Bronce: ggml in C puro, grafos estáticos, optimización SIMD ARM NEON en registros físicos. Carga de pesos GGUF mediante mmap en disco bajo demanda. ggml_gallocr para offsets precalculados estáticamente al inicio de la inferencia, evitando malloc/free en caliente.
+*  Capa Plata: Alertas críticas sobre desbordamiento de enteros (Integer Overflow) en el parser en C (CVE-2026-33298, CVE-2026-27940) en la lectura nativa de cabeceras GGUF, lo que permite ejecución remota de comandos en el host si cargas un archivo de modelo malicioso de internet sin verificar. Criptografía de red plana y sin cifrar en conexiones distribuidas RPC.
+*  Capa Oro: verify_pow.sh calculará obligatoriamente el hash SHA-256 del modelo local .gguf y validará su firma detached .sig contra sovereign_ed25519.pub antes de levantar llama-server. Integración de la telemetría de batería solar: si el voltaje decae, FastAPI limitará la CPU en la inferencia mediante el flag -t o suspenderá temporalmente el servicio.
+
+5.2. p0x.meditacion.anytype (Meditación II. La Identidad y la Sincronización P2P Offline)
+*  Capa Bronce: Protocolo local-first any-sync de topología pura peer-to-peer (P2P). Identidad criptográfica derivada de mnemónico de 12 palabras. Firmas Ed25519 en el árbol de cambios de documentos y cifrado simétrico AES-CFB de bloques. Interfaz en React 18 con MobX y backend local de Go mediante gRPC.
+*  Capa Plata: Rechazo absoluto a Electron por consumo excesivo de RAM (300MB base) e ineficiencia extrema de hilos en CPU ARM. Vulnerabilidad en el sandbox del proceso principal de Electron (sandbox: false). Falta de control de presupuesto térmico e inexistencia de destrucción de andamios pedagógicos.
+*  Capa Oro: Aurelius asimila la identidad de 12 palabras en la Misión M0 para derivar sovereign_ed25519.pub de forma local y offline. Descartamos por completo Electron y Go. La Misión M5 (The Pact) de Aurelius adaptará el protocolo matemático de any-sync con scripts Python ligeros para intercambiar bases de datos SQLite clases cifradas con AES-CFB por enlaces físicos de radio LoRa o WiFi directo.
+
+5.3. p0x.meditacion.syncthing (Meditación III. Consenso de Red y Control de Backpressure)
+*  Capa Bronce: Sincronización de par a par en Go con compilación estática. Migración en v2.0 a SQLite local con journal_mode=WAL para transacciones concurrentes robustas. Configuración estricta de consumo: reducir GOMAXPROCS a 1 núcleo de hardware; dilatar el rescanIntervalS para mitigar el write wear en discos y tarjetas SD del nodo de borde.
+*  Capa Plata: Límite estricto e inflexible de 500MB por mensaje en el Block Exchange Protocol (BEP). Clave pública de actualización de versiones hardcodeada inmutablemente en el código, forzando la confianza en mantenedores externos.
+*  Capa Oro: Hexelion adopta el protocolo de descubrimiento UDP broadcast local de Syncthing en el puerto 21027 para auto-registro de sensores en caliente. Misión M5 implementará sincronización delta-sync asíncrona sobre mTLS (TLS 1.3). Si la red local decae, la telemetría de radio dump1090 se almacena localmente en SQLite, enviando solo las diferencias (deltas) cuando la conexión retorne, mitigando picos térmicos en la CPU ARM. En caso de conflictos lógicos de concurrencia, el sistema no automatiza: congela ambas ramas y exige firma Ed25519 del soberano humano.
+
+5.4. p0x.meditacion.automerge (Meditación IV. CRDT y Compresión Columnar)
+*  Capa Bronce: Núcleo en Rust puro compilado a WebAssembly (WASM) para TypeScript. Automerge 3.0 unifica la estructura de memoria con la compresión columnar binaria de disco (similar a Apache Parquet), reduciendo el footprint de RAM en documentos extensos de 700MB a solo 1.3MB en microcontroladores ARM. save() para snapshots completos y save_incremental() para transacciones incrementales (WAL).
+*  Capa Plata: Seguridad por oscuridad ("Swiss Number"): cualquiera que conozca el identificador de documento (docId) puede escribir de forma maliciosa sobre el CRDT. Vulnerabilidad de envenenamiento de Filtros Bloom (Bloom Filter Poisoning) que permite inyectar falsos positivos para provocar denegación de servicio de sincronización (DoS). Falta de paginación o lazy-loading (carga forzosa monolítica en RAM).
+*  Capa Oro: Misión M2 modelará la memoria colaborativa de Aurelius como un JSON gestionado por Automerge compilado en Rust de forma estática en local, guardado recursivamente mediante SQLite WAL. El gateway FastAPI interceptará cada cambio entrante por red, calculará su hash, y rechazará la fusión del CRDT si el cambio no cuenta con tu firma Ed25519 detached. Al completar Misión M7, se ejecutará una poda de historial física de Automerge guardando solo el snapshot neto y firmándolo criptográficamente para vaciar la memoria RAM de andamios.
+
+5.5. p0x.meditacion.llm (Meditación V. Orquestación CLI Ligera y Persistencia SQLite)
+*  Capa Bronce: CLI minimalista en Python de Simon Willison. Interactúa directamente con Ollama mediante llamadas locales HTTP y almacena un log inmutable de cada prompt enviado y respuesta generada en una base de datos SQLite local (templates.db y logs.db). Arquitectura de plugins en Python ligera para autodescubrimiento de nuevos backend de modelos locales.
+*  Capa Plata: Ausencia total de encriptación en la base de datos local de logs, exponiendo conversaciones en texto plano en el disco físico. Inexistencia de firmas de integridad en los prompts, permitiendo ataques de inyección de prompt (Indirect Prompt Injection) que pueden exfiltrar datos del sistema operativo a través del parser de plugins del CLI. Dependencia por defecto de APIs de red en la nube en su configuración inicial.
+*  Capa Oro: Aurelius adopta el diseño de base de datos relacional de logs de llm, unificándolo en aurelius_state.db en la tabla bronze_logs protegida por cifrado local AES-256. El prompt de aislamiento se sella bajo firma criptográfica Ed25519. Cualquier script matemático generado por Qwen se forzará a evaluarse de manera determinista antes de su paso a la terminal mediante exit codes y un sandbox aislado de Linux sin red.
+
+5.6. p0x.meditacion.dump1090 (Meditación VI. Ingesta de Radiofrecuencia en Silicio Puro)
+*  Capa Bronce: Decodificador Mode S escrito por antirez en C99 puro. Interactúa directamente con el puerto USB de los dongles RTL-SDR usando librtlsdr. Gestiona la adquisición de señales aéreas de 1090 MHz mediante un buffer circular estático prealocado al arranque y tablas de búsqueda estáticas (lookup tables) para cálculos trigonométricos. Consumo menor al 5% de un hilo de CPU ARM.
+*  Capa Plata: Vulnerabilidades críticas de red en sockets TCP locales (puertos 30002/30003 crudos) que carecen de cifrado y autenticación de clientes, lo que permite inyectar telemetría de vuelo falsa mediante sockets TCP desde la subred. Arquitectura síncrona monohilo: la demora en el procesamiento del socket de red bloquea temporariamente el buffer USB, perdiendo tramas físicas del espectro electromagnético.
+*  Capa Oro: Hexelion aislará dump1090 de la red abierta. FastAPI asíncrono actuará como el único cliente local autorizado para leer el puerto 30003 en localhost. En la Misión M4 (The Air), se enseñará a la comunidad a compilar el daemon de antirez con optimización de registros estricta (-O3 -march=native -ffast-math) y a retirar físicamente todo andamiaje de servidor web embebido antiguo, dejando un binario de telemetría inmaculado de solo 150KB en disco.
+
+5.7. p0x.meditacion.immudb (Meditación VII. Inmutabilidad de Árboles de Merkle en SQLite)
+*  Capa Bronce: Almacenamiento seguro, inmutable e irrevocable clave-valor en Go mediante Árboles de Merkle. Cada inserción de datos se concatena con el hash matemático de la transacción anterior, lo que permite realizar pruebas de inclusión e integridad históricas totalmente offline, detectando de inmediato si un registro antiguo fue alterado o borrado en el disco.
+*  Capa Plata: El recolector de basura de Go y la sobrecarga del cálculo continuo de hashes Merkle de immudb provocan picos térmicos y consumen ciclos críticos de CPU y RAM en microcontroladores ARM limitados. La arquitectura append-only infinita sin poda dinámica acelera el desgaste de escritura física (write wear) de las tarjetas SD o eMMC de los nodos edge de Le Jardin.
+*  Capa Oro: Se descarta levantar el daemon pesado de immudb en tus nodos edge. En su lugar, absorbemos su principio matemático y lo inyectamos directamente en tu SQLite unificada (~/.aurelius-p0x/db/aurelius_state.db). Implementamos un trigger nativo en C sobre la tabla virtual de observaciones: cada nueva fila de engrama (What/Why/Where/Learned) se insertará concatenando su SHA-256 con el hash Merkle de la fila previa. Tu script verify_pow.sh auditará esta consistencia en frío en el arranque diario antes de habilitar el nodo.
+
+5.8. p0x.meditacion.tinypilot (Meditación VIII. KVM HDMI y WebSocket Minimalista)
+*  Capa Bronce: Control remoto de servidores KVM sobre IP en Python puro sobre Raspberry Pi. Adquiere video HDMI mediante chips de captura física interactuando directamente con el kernel de Linux (v4l2) y transmitiendo MJPEG de baja latencia (<100ms) por WebSockets locales. Interfaz de usuario ultraligera construida sin Node.js o empaquetadores, utilizando únicamente HTML vanilla, CSS minimalista y Web Components en JS plano.
+*  Capa Plata: El servidor Flask integrado corre por defecto monohilo y sin soporte de cifrado SSL nativo. Si la tasa de refresco del video satura la red de banda estrecha, la pila TCP bloquea el canal web e impide la llegada de comandos de teclado del operador. Carece de firmas digitales en los comandos de control administrativo, permitiendo inyecciones de comandos directas si el socket web se expone a la red WiFi local de Le Jardin.
+*  Capa Oro: Adoptamos el diseño de renderizado stateless sin dependencias pesadas de TinyPilot para tu panel de React y Vite en Hexelion. El dashboard en Catppuccin Mocha se comunicará con FastAPI utilizando WebSockets cifrados localmente bajo TLS 1.3 de autenticación mutua (mTLS). El gateway de FastAPI validará la firma criptográfica Ed25519 del comando de control en verify_pow.sh antes de interactuar con el bus de hardware. En la Misión M7, se automatizará el retiro de andamios de desarrollo (limpieza de sourcemaps, emuladores visuales y componentes de depuración), dejando la interfaz pura compilada de solo lectura en el silicio.
+
+5.9. p0x.meditacion.bettatech (Meditación IX. Agentes en Disco y Sintaxis EARS)
+*  Capa Bronce: Orquestación de agentes locales con persistencia de estados directamente en disco físico en lugar de almacenar memoria contextual en la RAM volátil. Registro dinámico de herramientas y autodescubrimiento de capacidades del host en caliente.
+*  Capa Plata: Ausencia de controles criptográficos de integridad en el registro de herramientas, lo que permite que un script malicioso reemplace un comando válido y tome control de la terminal del host. Ceguera ante el presupuesto de carbono de la máquina, ejecutando bucles de agentes pesados infinitos en caliente.
+*  Capa Oro: Misión M3 de Aurelius implementará la sintaxis estricta EARS para auditar las herramientas auto-registradas en el gateway de FastAPI. Los estados de los agentes locales se persistirán como transacciones JSON en SQLite. Toda acción propuesta por el agente de IA local (Qwen) requiere la confirmación humana mediante la pulsación física de Ctrl+C sobre el comando propuesto en el portapapeles soberano.
+
+5.10. p0x.meditacion.gentlemanprogramming (Meditación X. Engrams y SQLite FTS5)
+*  Capa Bronce: Estructuración del conocimiento de desarrollo en unidades atómicas de aprendizaje llamadas "engrams". Cada engrama de memoria epistémica debe clasificar obligatoriamente la observación en cuatro campos fijos (What, Why, Where, Learned), persistidos en una base de datos relacional local SQLite optimizada con el motor virtual de búsqueda de texto completo FTS5 para búsquedas semánticas y léxicas instantáneas offline.
+*  Capa Plata: Dependencia inicial de frameworks pesados de TypeScript y Node.js en la pila de renderizado de logs. Falta de validación criptográfica en caliente de los engrams registrados, exponiendo el ledger de aprendizaje a manipulaciones maliciosas de scripts locales en el host.
+*  Capa Oro: Tu base de datos unificada aurelius_state.db adopta el diseño de base de datos relacional de engrams de Gentleman-Programming en la tabla virtual fts_observations usando FTS5 local. Cada registro requiere la firma criptográfica Ed25519 de confirmación de tu preceptor en el arranque antes de ser marcado como VALIDATED en el dashboard.
+
+5.11. p0x.meditacion.platzi (Meditación XI. Sistemas Fragmentados y Scaffolding Faded)
+*  Capa Bronce: Descomposición de la ruta pedagógica de aprendizaje en misiones aisladas y autocontenidas para garantizar resiliencia física de hardware (la caída de un microcontrolador o sensor en una lección no interrumpe el entorno global de desarrollo).
+*  Capa Plata: Mantiene los andamiajes educativos activos indefinidamente dentro del espacio de trabajo de producción, creando una dependencia crónica del usuario ante las plantillas guías del preceptor.
+*  Capa Oro: Aurelius automatiza de forma estricta el rito de paso Scaffolding Faded en su núcleo en la Misión M7. Cuando completes tu progreso de aprendizaje, el script verify_pow.sh comprimirá físicamente las carpetas transitorias de guías y ejemplos en un tar.gz de solo lectura, eliminándolos físicamente de tu espacio de desarrollo en tu Beelink Ryzen, sellando un binario estático inmutable y forzando tu competencia técnica individual.
+
+## Notas de Auditoría Medallion
+La ruta de persistencia propuesta (~/.aurelius-p0x/) no fue verificada en el nodo activo. El sistema original opera con otra estructura de directorios.
+
+--------------------------------------------------------------------------------
+
+METADATOS MEDALLION:
+*  Tipo: REEMPLAZO_ORIGINAL
+*  Archivo que sustituye: p0x-master-manifest-merge-v2.txt
+*  Versión: 1.0-Medallion
+*  Fuentes base: p0x-master-manifest-merge-v2.txt, p0x-paper-manifest-v2.txt, FASE 2 REVISADA: APROBADA ✅, inventario-necropolis-v2.md, aurelius_estado_bronze.txt
+*  Conflictos resueltos: Saneamiento de las suposiciones físicas sobre la ruta de persistencia ~/.aurelius-p0x/ y la unificación de los namespaces jerárquicos estilo UNIX que incorporan el namespace de biblioteca técnica consolidado.
+*  Ambigüedades pendientes: NINGUNA
+*  Descartes principales: NINGUNO
+*  Notas de auditoría: Se documenta formalmente mediante nota de auditoría que la ruta ~/.aurelius-p0x/ no existe físicamente en el nodo Beato, garantizando consistencia inmutable con el terreno medido.
+--------------------------------------------------------------------------------

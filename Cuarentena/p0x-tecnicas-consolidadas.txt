@@ -1,0 +1,182 @@
+# ================================================================================
+# COMPENDIO SISTÉMICO DE TÉCNICAS E INGENIERÍA DE BAJO NIVEL PARA p0x / AURELIUS
+# RECOPILACIÓN PARA DEPLOY CON QWEN 3.7 CODER 30B - NODO DOMÉSTICO SOBERANO
+# ================================================================================
+# FILOSOFÍA: El silicio es la frontera, la matemática es la ley, la firma humana es la verdad.
+# ANTE CONFLICTO: El hardware físico y las inteligencias artificiales locales dominan.
+# ================================================================================
+
+Este documento actúa como la especificación técnica definitiva que cataloga, numera y describe todas las técnicas y buenas prácticas extraídas del análisis arquitectónico de los 11 repositorios de referencia (llama.cpp, llama2.c, anytype, syncthing, automerge, llm, dump1090, immudb, tinypilot, betta-tech, Gentleman-Programming y Platzi). Su estructura está diseñada específicamente para que un modelo de lenguaje local especializado en desarrollo (Qwen 3.7 Coder) pueda asimilar estos patrones y escribir código de producción inmaculado para tu nodo soberano.
+
+================================================================================
+PILAR I: OPTIMIZACIÓN EXTREMA DE SILICIO Y MEMORIA (BAJO NIVEL EN C/RUST/GO)
+================================================================================
+
+1. ARQUITECTURA DE GRAFO ESTÁTICO (ggml / llama.cpp)
+   - Técnica: En lugar de realizar despachos dinámicos o ejecución inmediata de operaciones matemáticas, se construyen grafos computacionales estáticos (ggml_cgraph).
+   - Implementación: El sistema define todas las capas de inferencia como nodos (nodes) contiguos y las entradas como hojas (leafs) en el arranque mediante DFS con la función `ggml_build_forward_expand`. El planificador calcula los buffers intermedios estáticamente una única vez, anulando por completo el overhead de llamadas al sistema durante el cálculo tensorial continuo.
+
+2. ASIGNACIÓN ESTÁTICA DE MEMORIA SIN FRAGMENTACIÓN DEL HEAP (ggml_gallocr / llama2.c)
+   - Técnica: Erradicación absoluta de las llamadas al sistema `malloc` y `free` en caliente en el hilo de ejecución crítica.
+   - Implementación: En la fase de inicialización, se calcula el offset exacto de memoria que requerirá el grafo de cómputo y se reserva un bloque de memoria contiguo en el heap mediante una asignación única (`calloc` para inicializar a cero). Durante el ciclo de vida del proceso de inferencia de Ollama/llama.cpp, la memoria intermedia se reutiliza in-place, eliminando fallos de memoria por fragmentación de heap (Out Of Memory) en procesadores ARM de bajo consumo.
+
+3. COPIA CERO Y CARGA DIFERIDA MEDIANTE MAPEO DE ARCHIVOS (mmap / llama.cpp / llama2.c)
+   - Técnica: Acceso directo a los pesos del modelo alojados en disco sin cargarlos de manera secuencial a la memoria RAM activa.
+   - Implementación: Mapear el archivo binario cuantizado (GGUF o checkpoints contiguos .bin) al espacio de direcciones virtuales del sistema operativo utilizando `mmap()` (MAP_PRIVATE, PROT_READ). Los punteros de los pesos apuntan directamente a la memoria virtual gestionada por el kernel de Linux. El sistema operativo maneja las lecturas físicas bajo demanda de páginas (page faults), liberando de forma automática las secciones "frías" cuando Ollama experimenta presión de RAM.
+
+4. VECTORIZACIÓN SIMD MANUAL POR REGISTROS (llama.cpp)
+   - Técnica: Optimización directa para el hardware del nodo doméstico, exprimiendo las unidades aritméticas integradas de la CPU.
+   - Implementación: Implementación de kernels de multiplicación matricial (matmul) optimizados mediante intrínsecos de ensamblador o flags estrictos de compilador:
+     * Arquitecturas ARM64 (Orange Pi, Raspberry Pi, Apple Silicon): Vectorización a través de instrucciones ARM NEON.
+     * Arquitecturas x86_64 (Beelink Ryzen): Instrucciones AVX, AVX2, AVX-512 y extensiones de matriz AMX para memoria unificada.
+     * Compilación en modo estricto de optimización matemática: `-O3 -Ofast -march=native -ffast-math`.
+
+5. FUSIÓN DE OPERACIONES Y DECUANTIZACIÓN EN CALIENTE (llama.cpp)
+   - Técnica: Evitar el tráfico masivo de datos entre los registros de CPU/GPU y la RAM activa, superando el cuello de botella del bus físico del hardware.
+   - Implementación: Los kernels matemáticos realizan el desempaquetado de los pesos cuantizados a FP32 y la multiplicación vectorial en un único barrido de memoria de la caché (L1/L2/L3 aware), eliminando la creación de buffers temporales en RAM para las activaciones intermedias.
+
+6. CUANTIZACIÓN DE PRECISIÓN MIXTA EN SUPERBLOQUES (K-quants / llama.cpp)
+   - Técnica: Comprimir el modelo disminuyendo la profundidad de bits pero preservando la fidelidad de las estructuras críticas.
+   - Implementación: Agrupamiento de pesos en superbloques. El sistema evalúa la sensibilidad de cada capa del transformer: las capas de atención altamente sensibles se preservan en mayor bits (ej. Q6_K) mientras que las capas feed-forward (FFN) más tolerantes se comprimen de forma agresiva (ej. Q4_K), maximizando el throughput (tokens/seg) con menor consumo energético.
+
+7. INTERFACE DE ADQUISICIÓN DE HARDWARE SIN MALLOC (dump1090 / antirez)
+   - Técnica: Lectura y procesamiento en tiempo real del bus físico USB sin interrupciones del hilo de control principal.
+   - Implementación: dump1090 lee las muestras crudas de fase y cuadratura (I/Q) sintonizando los dongles de radio RTL-SDR mediante la librería `librtlsdr`. Utiliza un buffer circular estático prealocado al arranque y cálculos de amplitud mediante tablas de búsqueda estáticas (lookup tables - `mag_lut`), consumiendo menos del 5% de un solo núcleo de hardware ARM.
+
+================================================================================
+PILAR II: ARQUITECTURA DE BASE DE DATOS Y PERSISTENCIA (SOPORTE DE LA VERDAD)
+================================================================================
+
+8. CAPA INTERMEDIA DE PROPUESTAS MENSUALES PAGINADAS (Silver Medallion)
+   - Técnica: Optimización de escrituras recurrentes de telemetría y logs para mitigar el desgaste de disco (write wear) de las tarjetas SD de nodos edge.
+   - Implementación: Las interacciones temporales, keywords, tags sugeridos y propuestas de la IA no se guardan en múltiples ficheros JSON. Se consolidan en un único archivo JSONL mensual ordenado secuencialmente: `proposals_YYYY-MM.jsonl`. El Modo Cosecha (Harvest Mode) lee este archivo empleando cursores y bloques de paginación pequeños (10-20 ítems), cargando únicamente las líneas requeridas en memoria.
+
+9. TRANSACCIONALIDAD RELACIONAL CON WRITE-AHEAD LOGGING (SQLite WAL)
+   - Técnica: Garantizar la atomicidad y robustez de los registros de observaciones epistémicas, previniendo corrupciones de base de datos ante cortes de energía solar.
+   - Implementación: Tu base de datos unificada SQLite (`~/.aurelius-p0x/db/aurelius_state.db`) se configura con los siguientes pragmas de optimización transaccional:
+     `PRAGMA journal_mode = WAL;`
+     `PRAGMA synchronous = NORMAL;`
+     `PRAGMA cache_size = -2000; (2MB de caché local)`
+     Esto permite lecturas y escrituras concurrentes de background sin bloquear las colas de interacción de los agentes.
+
+10. BÚSQUEDA CONCEPTUAL LOCAL MEDIANTE ÍNDICE VIRTUAL FTS5 (Gentleman-Programming)
+    - Técnica: Búsqueda indexada instantánea de lecciones aprendidas libres de nube y sin latencias de red.
+    - Implementación: Sincronización automática de la tabla de engramas mediante triggers de SQLite nativos en C:
+      ```sql
+      CREATE VIRTUAL TABLE engrams_fts USING fts5(log_id, what, why, where_ref, learned);
+      CREATE TRIGGER engrams_ai AFTER INSERT ON engrams BEGIN
+        INSERT INTO engrams_fts(log_id, what, why, where_ref, learned)
+        VALUES (new.log_id, new.what, new.why, new.where_ref, new.learned);
+      END;
+      ```
+
+11. MEMORIA EPISTÉMICA ESTRUCTURADA EN ENGRAMAS ATÓMICOS
+    - Técnica: Formatear cada aprendizaje técnico para aislar el contexto de Ollama de historiales amorfos propensos a la alucinación.
+    - Implementación: Cada inserción de conocimiento se procesa estrictamente bajo cuatro campos obligatorios y fuertemente tipados:
+      * What: El cambio de hardware o configuración exacto.
+      * Why: La justificación técnica basada en la doctrina del silicio.
+      * Where_Ref: La ruta del archivo físico o módulo del Códice alterado.
+      * Learned: La regla de diseño inmutable que heredarán futuras sesiones de la IA.
+
+12. ESCRITURA ATÓMICA CON SNAPSHOT TEMPORAL (Aurelius Gold Snapshots)
+    - Técnica: Blindaje de los archivos de configuración y perfil personal ante cierres inesperados (baterías de Le Jardin descargadas).
+    - Implementación: El sistema nunca edita archivos JSON directamente en caliente. Escribe el nuevo estado en un archivo temporal con extensión `.tmp`. Ejecuta una validación lógica de integridad del archivo temporal. Al validarse, realiza una llamada atómica al sistema operativo `rename()` para reemplazar el archivo original, garantizando que el archivo anterior no sufra corrupción si la máquina se apaga a mitad de la operación.
+
+================================================================================
+PILAR III: CRIPTOGRAFÍA, ÁRBOLES DE MERKLE Y VERIFICACIÓN DETACHED
+================================================================================
+
+13. EL SCRIPT DE ARRANQUE Y CERRADURA INTEGRAL (verify_pow.sh)
+    - Técnica: Bloqueo físico del Códice ante inyecciones de código o alteraciones no autorizadas del sistema operativo.
+    - Implementación: El script detiene el inicio de la API local y las interfaces visuales si se violan los candados lógicos. El script:
+      1. Calcula el SHA-256 de los diffs o configuraciones propuestas en Silver.
+      2. Extrae la firma detached `.sig` aportada por el soberano.
+      3. Ejecuta una validación de criptografía asimétrica Ed25519 offline usando OpenSSL contra la clave pública unívoca del nodo (`sovereign_ed25519.pub`):
+         `openssl pkeyutl -verify -pubin -inkey ~/.keys/sovereign_ed25519.pub -sigfile <firma_detached> -in <hash_calculado>`
+      4. Corre un PRAGMA integrity_check en SQLite.
+      5. Si el exit code es 0, abre el merge gate y aplica la actualización. En caso contrario, aborta de forma ruidosa en consola.
+
+14. ÁRBOLES DE MERKLE INTEGRADOS EN SQLite (immudb-in-sqlite)
+    - Técnica: Log de auditoría histórico e inalterable que expone de inmediato si un script local o un modelo de IA alteró registros históricos.
+    - Implementación: La tabla de observaciones cuenta con una columna `merkle_hash`. Antes de cada inserción, un trigger en SQLite calcula el hash concatenando los campos actuales de la fila con el hash Merkle de la fila inmediatamente anterior:
+      `new.merkle_hash = sha256(new.what || new.why || new.where_ref || new.learned || old.merkle_hash)`
+      Cualquier alteración en una fila del pasado desmorona la consistencia matemática de todo el árbol en frío.
+
+15. PRUEBAS DE CONOCIMIENTO CRIPTOGRÁFICO DE PAR A PAR (Proof of Knowledge - PoK)
+    - Técnica: Certificar de forma anónima y descentralizada que un nodo edge ha superado misiones y ritos de paso sin fugar información personal.
+    - Implementación: Al superar un rito en la Forja, el preceptor genera un archivo público `pok_forge_[ID].json` que almacena: hashes SHA-256 de la pregunta planteada, de tu respuesta y de la rúbrica de nivel, el timestamp relativo al bloque de la cadena Gold, y la firma asimétrica detached del nodo. Otro nodo edge de la Mesh puede verificar matemáticamente las firmas del test sin ver jamás el texto del diario o la conversación real.
+
+16. IDENTIDAD DERIVADA DE SEMILLA MNEMÓNICA DE DOCE PALABRAS (anytype / Misión M0)
+    - Técnica: Autenticación e inicio de nodo 100% desconectado, anulando registros de cuentas centralizadas.
+    - Implementación: Al arrancar por primera vez en la Misión M0 (The Totem), el sistema genera una semilla a partir de un mnemónico físico de doce palabras locales. Deriva de forma determinista la clave pública `sovereign_ed25519.pub`, la cual actuará como el identificador maestro del nodo inalterable ante reinstalaciones.
+
+================================================================================
+PILAR IV: PROTOCOLOS LOCAL-FIRST Y REDES ASÍNCRONAS DESCONECTADAS
+================================================================================
+
+17. SINCRONIZACIÓN POR DELTAS SIN SERVIDOR CENTRAL (BEP / Syncthing)
+    - Técnica: Replicación eficiente entre nodos domésticos, limitando el ancho de banda y previniendo picos térmicos en hilos CPU.
+    - Implementación: Adaptación del Block Exchange Protocol (BEP). Divide los archivos y la base de datos local en bloques lógicos hashes SHA-256. Al establecer el canal físico, los nodos intercambian únicamente la lista de hashes e inyectan exclusivamente los deltas de cambios (delta sync), evitando transferir bases de datos masivas.
+
+18. DESCUBRIMIENTO LOCAL PASIVO POR BROADCAST UDP (Syncthing)
+    - Técnica: Auto-registro de sensores físicos de Hexelion en caliente sin brokers centralizados de mensajería (como MQTT o nubes externas).
+    - Implementación: El script del receptor SDR transmite ráfagas periódicas de presencia local mediante broadcast UDP en la dirección de subred `255.255.255.255` por el puerto `21027`. El gateway FastAPI de Hexelion escucha el puerto asíncronamente en background e inyecta la antena en el store de React de forma transparente.
+
+19. CONEXIONES RESTRINGIDAS A INTERFAZ VIRTUAL PRIVADA (tinypilot / Syncthing)
+    - Técnica: Blindaje de los endpoints de control administrativo de p0x contra intrusos en la red LAN.
+    - Implementación: El servidor Uvicorn/FastAPI de Hexelion y los servicios de red de Aurelius tienen prohibido escuchar en la interfaz de red abierta general (`0.0.0.0`). Se configuran de manera estricta para realizar el bind exclusivamente en la dirección virtual de Tailscale (`100.x.x.x`) o de la red mesh Yggdrasil (`200::/7`).
+
+20. ENLACES CIFRADOS CON AUTENTICACIÓN MUTUA DE CLIENTE (mTLS / TLS 1.3)
+    - Técnica: Impedir inyecciones de comandos administrativos falsos en la Mesh soberana mediante criptografía simétrica de red.
+    - Implementación: Toda comunicación P2P o consumo del dashboard web local se encapsula obligatoriamente en túneles HTTPS locales con TLS 1.3. La conexión exige certificados mutuos de cliente (mTLS), validando las claves públicas de los peers contra el árbol inmutable del archivo `known_peers.json`.
+
+21. LA INFERENCIA DE RED CON ANTIFAZ (Air-Gapped Network Context)
+    - Técnica: Permitir la compartición opcional de recursos de cómputo (enjambre federado) sin comprometer la privacidad individual.
+    - Implementación: Si un peer remoto te solicita inferencia local bajo el comando de red `WHO_HAS_COMPUTE?`, FastAPI detiene la pila TCP local y lanza una alerta visual. Al autorizarse por el humano, el hilo de procesamiento de Ollama se levanta en un Contexto Aislado con memoria efímera de RAM, bloqueando por completo el acceso a tu índice FAISS, tu base de datos SQLite vector y tu diario de observaciones privados.
+
+22. COLA DE TELEMETRÍA Y CONTROL DE BACKPRESSURE SENSORIAL
+    - Técnica: Evitar el colapso del sistema y la saturación del bus I/O ante la pérdida de conectividad física en Le Jardin.
+    - Implementación: Si la red local falla, los decodificadores de Hexelion no reintentan handshakes indefinidamente. Persisten los paquetes decodificados en la tabla de colas SQLite de disco. Al restablecerse el enlace, se liberan los paquetes de forma controlada y asíncrona, mitigando picos térmicos en el nodo receptor.
+
+================================================================================
+PILAR V: GOBERNANZA DOCTRINAL, HARDENING Y ANDAMIOS RETIRADOS
+================================================================================
+
+23. EL RETIRO FÍSICO SISTEMÁTICO DE ANDAMIAJES (Scaffolding Faded)
+    - Técnica: Erradicar la dependencia crónica de herramientas de asistencia y liberar RAM y disco del nodo edge.
+    - Implementación: Las misiones de Aurelius contienen templates interactivos en la carpeta temporal `_scaffold/`. Cuando el soberano sella y firma criptográficamente el éxito de la misión actual en verify_pow.sh, el sistema empaqueta y archiva el scaffolding en un `.tar.gz` de solo lectura (`~/.aurelius-p0x/archive/`), calcula su hash SHA-256 de auditoría, y ejecuta un comando de borrado físico (`rm -rf`) sobre la carpeta de trabajo, obligando al usuario a operar con total competencia.
+
+24. EVALUACIÓN STRUCTURAL DE DOMINIOS BLANDOS MEDIANTE ENTROPÍA LÉXICA O(N)
+    - Técnica: Validar la integridad y el esfuerzo cognitivo en los ensayos filosóficos de Aurelius de forma instantánea sin gastar ciclos de CPU ARM ni baterías solares.
+    - Implementación: En lugar de invocar modelos locales de inferencia pesados para evaluar reflexiones subjetivas, el backend ejecuta una heurística rápida O(N) de diversidad de vocabulario:
+      `Ratio de Entropía = Palabras Únicas / Palabras Totales`
+      Si el usuario ingresa caracteres repetitivos ("ok ok ok"), el ratio decae por debajo de 0.4 y el rito de la Forja se aborta automáticamente en la capa de código básico, protegiendo al metal de procesar datos basura.
+
+25. EL PORTAPAPELES SOBERANO (Pedagogía de Fricción No Negociable)
+    - Técnica: Evitar la ejecución ciega de comandos en la terminal mitigando alucinaciones del modelo o inyecciones de prompt.
+    - Implementación: Se prohíbe explícitamente cualquier botón o script de UI que automatice la copia directa de instrucciones bash al portapapeles del sistema del host. Aurelius prepara el comando y lo expone en un bloque inerte en la pantalla. El operador humano debe seleccionarlo físicamente con el ratón y pulsar la combinación de teclas Ctrl+C para llevarlo a su terminal, obligando a su ojo a auditar visualmente el código de control administrativo antes de que impacte en su sistema.
+
+26. EL FUSIBLE DE HONESTIDAD FÍSICA (Honest Sensors)
+    - Técnica: Transparencia total de recursos y mitigación de alucinaciones en tiempo de telemetría.
+    - Implementación: Si los sensores físicos de Hexelion se desconectan térmicamente o el voltaje solar cae por debajo de la especificación límite, FastAPI bloquea de forma inmediata el endpoint respectivo y devuelve de forma literal monospace la advertencia **NO DATA**, detallando el bus de hardware afectado y el timestamp inmutable del último ciclo correcto, erradicando lecturas estimadas o simulaciones por software.
+
+27. EMULACIÓN HID USB DE BAJO NIVEL (tinypilot)
+    - Técnica: Enviar acciones del teclado y ratón sin la necesidad de instalar middlewares pesados de emulación web.
+    - Implementación: Traducir los eventos capturados en el frontend de TypeScript a paquetes crudos de datos HID USB de 8 bytes, escribiendo directamente en los controladores del kernel de Linux `/dev/hidg0` (teclado) y `/dev/hidg1` (ratón) a través del bus OTG.
+
+28. AUDITORÍA COGNITIVA EN ENTORNO AISLADO (Filtro de Comandos)
+    - Técnica: Firewall de terminal local mediante la orquestación modular de prompts.
+    - Implementación: El gateway FastAPI procesa los comandos que el usuario tiene intención de pegar en su terminal en un hilo aislado y sin permisos de red. El modelo Qwen local analiza sintácticamente las instrucciones bash bajo una plantilla YAML pre-firmada: si detecta comandos destructivos (`rm -rf`), escaladas de privilegios inesperadas o redirecciones a puertos web locales sospechosos, los marca en rojo de peligro en la interfaz de Catppuccin Mocha.
+
+29. SISTEMA DE PLUGINS DESACOPLADO BASADO EN ENTRY POINTS (simonw/llm)
+    - Técnica: Permitir la expansión modular de capacidades y backends de Ollama sin modificar una sola línea del motor de control administrativo principal.
+    - Implementación: Definición de plugins en Python empleando la especificación nativa de *entry points*. Los nuevos subprocesos, parsers de PDF locales o backends de inferencia se registran escribiendo su configuración en un directorio aislado; FastAPI mapea en caliente los plugins durante la fase de inicialización.
+
+30. SINTAXIS EARS ESTRICTA PARA REQUISITOS DE AGENTES (betta-tech)
+    - Técnica: Anular por completo el margen de alucinación e interpretación libre en el procesamiento de tareas por parte de tus agentes locales de Qwen.
+    - Implementación: Todas las directivas operativas de los agentes se redactan y validan exclusivamente bajo los operadores lógicos inmutables de la sintaxis EARS:
+      `WHEN [Condición de Red/Entorno] / IF [Precondición de Batería] / THEN [Sujeto Local] / SHALL [Acción sobre el Silicio]`
+
+================================================================================
+FIN DEL COMPENDIO DE TÉCNICAS SOBERANAS - PROYECTO MERGE
+# ================================================================================
