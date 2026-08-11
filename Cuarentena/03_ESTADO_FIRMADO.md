@@ -175,3 +175,8 @@ Cuando Le Jardin tenga CineK o Herbier activo y Aurelius sus partes funcionales,
 - Identificado con ps/cmdline y matado por el Soberano; ss confirma PUERTO_LIBRE.
 - Exposicion activa eliminada. Exposicion latente permanece en la unit (D27, spec CC pendiente).
 - Precedente aplicado: dump1090 murio por la misma doctrina (Red de Confianza, necropolis 3.1).
+
+## D30 · CAUSA ESTRUCTURAL DE LOS HUERFANOS (2026-08-12)
+- Padre del pid 2411: systemd --user (2314), con la unit en inactive: patron de daemonizacion (el PID principal sale; systemd pierde al hijo).
+- Explica el crash-loop de 2026-08-01 y el huerfano de hoy: cada stop/restart deja un servidor huerfano en :8050.
+- El fix D27 debe incluir rastreo del proceso real (foreground o Type=forking+PIDFile), ademas del bind acotado y el StartLimit.
