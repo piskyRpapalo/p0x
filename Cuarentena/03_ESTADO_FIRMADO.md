@@ -169,3 +169,9 @@ Cuando Le Jardin tenga CineK o Herbier activo y Aurelius sus partes funcionales,
 - Toda cita de documento tri-estado (PENDIENTES.md u otro con ABIERTO/CERRADO) incluye el encabezado de seccion de la linea.
 - Cita sin seccion = NO_DATA. Regla mecanica, no atencional.
 - Barridos de higiene: sin filtro de extension (la forma del error de R02/R04).
+
+## D29 · HUERFANO_8050 ELIMINADO (2026-08-12)
+- pid 2411: servir_interfaz.py --host 0.0.0.0 --puerto 8050; iniciado 2026-08-11 06:54; ppid 2314.
+- Identificado con ps/cmdline y matado por el Soberano; ss confirma PUERTO_LIBRE.
+- Exposicion activa eliminada. Exposicion latente permanece en la unit (D27, spec CC pendiente).
+- Precedente aplicado: dump1090 murio por la misma doctrina (Red de Confianza, necropolis 3.1).
