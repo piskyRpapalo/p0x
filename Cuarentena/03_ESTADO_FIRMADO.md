@@ -150,3 +150,22 @@ Cuando Le Jardin tenga CineK o Herbier activo y Aurelius sus partes funcionales,
 - 04_CONTRATO §3.5 queda intacto: cero rutas de usuario, cero IPs tailnet en nada publicable.
 - Exencion por regla: D8 exime IP-RFC1918/RUTA-HOME/DOMINIO-PRIVADO/NODO-*; NUNCA TOKEN-PROVEEDOR ni IP-TAILNET.
 - Suite de tests a verde sin rendirse (no mover BLOQUEAN a PASAN).
+
+## D25 · ENMIENDA D21 (2026-08-12)
+- Crash-loop de aurelius-interfaz CERRADO el 2026-08-01 con prueba en PENDIENTES.md (seccion CERRADO, 416-423).
+- D21 se firmo sobre cita sin seccion. Ver D28.
+
+## D26 · ENMIENDA D19 (2026-08-12)
+- Premisa de D19 falsa: exposicion 0.0.0.0:8050 real en deploy/soberano/aurelius-interfaz.service (ExecStart, linea 12).
+- El grep de R02 no incluia *.service. Afirmo "no hay bind" sobre barrido incompleto.
+
+## D27 · ENDURECIMIENTO AURELIUS-INTERFAZ (abierto 2026-08-12)
+- Item abierto: bind a 0.0.0.0:8050 contra doctrina de Red de Confianza (tailnet/mTLS), y unidad sin StartLimitBurst/StartLimitIntervalSec.  # guardia:permitir exposicion-documentada-D27
+- Severidad: activa si ss en soberano muestra LISTEN hoy; latente si inactivo.
+- La sesion Cowork no tiene runtime de soberano (sandbox bwrap); datos de runtime los aporta el Soberano o CC en maquina real.
+- Remedio via spec de Claude Code tras firma: bind a tailnet/loopback + limite de arranques.
+
+## D28 · CITA CON SECCION (2026-08-12)
+- Toda cita de documento tri-estado (PENDIENTES.md u otro con ABIERTO/CERRADO) incluye el encabezado de seccion de la linea.
+- Cita sin seccion = NO_DATA. Regla mecanica, no atencional.
+- Barridos de higiene: sin filtro de extension (la forma del error de R02/R04).
