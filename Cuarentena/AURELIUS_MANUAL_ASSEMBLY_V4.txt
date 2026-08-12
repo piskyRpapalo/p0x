@@ -228,7 +228,7 @@ Checklist de completitud:
   [ ] Clasificacion de topologia es determinista (no heuristica)
   [ ] UI muestra estado SOBERANO/DELEGADO/HUESPED de forma permanente
   [ ] Si HUESPED, activa protecciones automaticas (Gold offline)
-  [ ] Tests: localhost=SOBERANO, 10.0.0.1=DELEGADO, 8.8.8.8=HUESPED
+  [ ] Tests: localhost=SOBERANO, 10.0.0.1=DELEGADO, 8.8.8.8=HUESPED  # guardia:permitir valores-de-test-de-clasificacion-de-origen-no-son-red-real
 
 ---
 SKILL B.03: Capabilities API

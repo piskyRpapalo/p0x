@@ -24,7 +24,7 @@ Para garantizar que todo el tráfico interactivo o de datos transite exclusivame
 El sistema paralelo no interactuará ni responderá a peticiones HTTP o WebSockets que provengan de interfaces de hardware de red física locales conectadas al host. Estas interfaces incluyen de forma explícita:
 *   Interfaces Ethernet cableadas (e.g., `eth0`, `enp2s0`, etc.).
 *   Interfaces de red inalámbricas (e.g., `wlan0`, `wlo1`, etc.).
-*   Cualquier otra interfaz que no corresponda al adaptador de red virtual de Tailscale (`tailscale0`).
+*   Cualquier otra interfaz que no corresponda al adaptador de red virtual de Tailscale (`tailscale0`).  <!-- guardia:permitir nombre-de-interfaz-tailscale0-no-es-dominio-privado -->
 
 ### 2.2. Bloqueo de Peticiones Fuera del Túnel
 Las peticiones que se intenten realizar de forma directa a través de la IP física asignada al nodo Beelink Ryzen por el enrutador de la subred local de Beato (ej. `192.168.x.x` o similar) serán ignoradas y descartadas en la pila TCP/IP, bloqueando el establecimiento del canal antes de procesar cabeceras HTTP.

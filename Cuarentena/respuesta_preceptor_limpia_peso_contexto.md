@@ -11,7 +11,7 @@ He ejecutado las verificaciones que pediste antes de tocar código. Los datos so
 | **Temperatura k10temp** | `38250` → **38.25 °C** | Variabilidad confirmada. El bloque `MEDIDO` copiado de la ronda anterior queda como evidencia de la deriva que detectaste. |
 | **Puertos vivos** | 8050 (Aurelius), 8080 (Open-WebUI), 22, 53, 631 | 5173, 8188, 9000, 11434 no responden. Nodo idle. |
 | **Bifurcación rutas** | `~/p0x`: master@`4d4130e`, GitHub remote vivo. `~/p0x-soberano`: `NO_GIT`. | Sin riesgo de divergencia. Runtime separado del registro. |
-| **Endpoint Le Cahier** | `POST localhost:8050/api/jardin/notes` → **404** | El servidor en 8050 es Aurelius (`SimpleHTTP/0.6`), no el gateway de Hexelion. Según `vite.config.ts`, el proxy apunta a `fragua:8001`. Construir en 8050 sería error de arquitectura. |
+| **Endpoint Le Cahier** | `POST localhost:8050/api/jardin/notes` → **404** | El servidor en 8050 es Aurelius (`SimpleHTTP/0.6`), no el gateway de Hexelion. Según `vite.config.ts`, el proxy apunta a `fragua:8001`. Construir en 8050 sería error de arquitectura. |  <!-- guardia:permitir endpoint-documentado-en-debate-de-arquitectura -->
 | **localStorage** | 5 hits en `notas.ts` (líneas 5, 22, 34, 87, 101) | No purgado. Pendiente. |
 | **`--nx-green`** | Renombre intentado, errores de sintaxis | Necesita limpieza antes de ser funcional. |
 | **CMP** | Cero archivos Kotlin/Compose en disco | Muerto confirmado. Lápida con lección sigue válida. |
@@ -85,7 +85,7 @@ No es conocimiento externo por vanidad. Es **flujo externo → interno**, filtra
 
 | Orden | Tarea | Estado | Bloqueo |
 |-------|-------|--------|---------|
-| 1 | Endpoint gateway a disco | **PENDIENTE** | 404 confirmado. Debe vivir en `fragua:8001`, no en `soberano:8050`. Requiere decisión de arquitectura antes de código. |
+| 1 | Endpoint gateway a disco | **PENDIENTE** | 404 confirmado. Debe vivir en `fragua:8001`, no en `soberano:8050`. Requiere decisión de arquitectura antes de código. |  <!-- guardia:permitir endpoint-documentado-en-debate-de-arquitectura -->
 | 2 | Cola memoria + `SIN GUARDAR` | **PENDIENTE** | Depende del endpoint. |
 | 3 | Purga `localStorage` | **PENDIENTE** | Delegado a Claude Code. Depende de 1 y 2. |
 | 4 | Sensor dinámico `k10temp` | **PENDIENTE** | `hwmon3` sigue hardcodeado. Primero en riesgo. |
@@ -111,9 +111,9 @@ No es conocimiento externo por vanidad. Es **flujo externo → interno**, filtra
 
 ## V. DECIDE · Una sola pregunta
 
-> **¿Se autoriza a Claude Code a construir el endpoint `/api/jardin/notes` en el gateway de Hexelion (`fragua:8001`) como paso 1 del ciclo, o se resuelve primero la arquitectura de dónde vive el endpoint (soberano vs fragua) antes de delegar código?**
+> **¿Se autoriza a Claude Code a construir el endpoint `/api/jardin/notes` en el gateway de Hexelion (`fragua:8001`) como paso 1 del ciclo, o se resuelve primero la arquitectura de dónde vive el endpoint (soberano vs fragua) antes de delegar código?**  <!-- guardia:permitir endpoint-documentado-en-debate-de-arquitectura -->
 
-Es decir: ¿empezamos a construir en `fragua` asumiendo que es el gateway correcto, o detenemos todo hasta confirmar que `fragua:8001` es accesible desde Soberano para despliegue?
+Es decir: ¿empezamos a construir en `fragua` asumiendo que es el gateway correcto, o detenemos todo hasta confirmar que `fragua:8001` es accesible desde Soberano para despliegue?  <!-- guardia:permitir endpoint-documentado-en-debate-de-arquitectura -->
 
 ---
 
@@ -131,14 +131,14 @@ MEDIDO      38.25°C (k10temp, variabilidad confirmada) · 2 dashboards vivos (N
 CRITICO     hwmon3 hardcodeado — protección térmica real pero frágil ante reorden de índice
 BLOQUEADO   NINGUNO
 CERRADO     CMP — lápida con lección: "canonización previa a código"
-PENDIENTE   Endpoint gateway fragua:8001 ← decisión de arquitectura pendiente
+PENDIENTE   Endpoint gateway fragua:8001 ← decisión de arquitectura pendiente  <!-- guardia:permitir endpoint-documentado-en-debate-de-arquitectura -->
             Sensor dinámico por nombre ← prioridad 1 por riesgo de degradación silenciosa
             §5.1 formal al Blueprint ← redacción cerrada, falta commit
             Purga localStorage ← depende de endpoint + cola memoria
             Renombre --nx-green ← errores de sintaxis, necesita limpieza
             Push GitHub con verificaciones ← depende de cierre de ciclo
-DECIDE      ¿Construir endpoint en fragua:8001 primero, o resolver arquitectura antes?
-DATOS QUE NO PUDE DETERMINAR: Accesibilidad de fragua:8001 desde Soberano para despliegue,
+DECIDE      ¿Construir endpoint en fragua:8001 primero, o resolver arquitectura antes?  <!-- guardia:permitir endpoint-documentado-en-debate-de-arquitectura -->
+DATOS QUE NO PUDE DETERMINAR: Accesibilidad de fragua:8001 desde Soberano para despliegue,  <!-- guardia:permitir endpoint-documentado-en-debate-de-arquitectura -->
             estado del cableado solar Shelly→Solix, motivo exacto de caída de 4 servicios.
 ```
 

@@ -55,7 +55,7 @@ Para evitar colisiones operativas, fallos en caliente o corrupción de los datos
 *   **Bloqueo de Peticiones Fuera del Túnel**: Las peticiones que se intenten realizar de forma directa a través de la IP física asignada al nodo Beelink Ryzen por el enrutador de la subred local de Beato (ej. `192.168.x.x`) serán ignoradas y descartadas en la pila TCP/IP, bloqueando el establecimiento del canal antes de procesar cabeceras HTTP [277].
 
 #### 3. Filtrado de Seguridad en Aplicación (FastAPI/Python) [278, 280]
-*   **Validación de Socket Pre-Arranque**: Antes de inicializar el bucle de eventos del servidor web (FastAPI/Uvicorn), un módulo interceptor del bootstrap paralelo verificará la presencia activa de la dirección IP `[IP_TAILNET_REDACTADA]` asociada a la interfaz virtual `tailscale0` [278, 279]. Si no está disponible, la aplicación abortará de forma inmediata la secuencia con un código de salida `rc=1` [279].
+*   **Validación de Socket Pre-Arranque**: Antes de inicializar el bucle de eventos del servidor web (FastAPI/Uvicorn), un módulo interceptor del bootstrap paralelo verificará la presencia activa de la dirección IP `[IP_TAILNET_REDACTADA]` asociada a la interfaz virtual `tailscale0` [278, 279]. Si no está disponible, la aplicación abortará de forma inmediata la secuencia con un código de salida `rc=1` [279].  <!-- guardia:permitir nombre-de-interfaz-tailscale0-no-es-dominio-privado -->
 *   **Middleware de Filtrado de Cabeceras IP (Sintaxis EARS)** [280]:
     *   *WHEN an HTTP request is received by the parallel API IF the client origin IP address does not match the Tailscale range [IP_TAILNET_REDACTADA]/10 THE system SHALL reject the connection immediately with HTTP 403 Forbidden and close the socket.*
 
@@ -234,13 +234,13 @@ OLLAMA_DEBUG=0
 Redirección de los directorios de logs volátiles de Bronze a RAM para mitigar el write-wear del silicio:
 
 ```fstab
-tmpfs   /home/pisky/p0x-soberano/logs   tmpfs   nodev,nosuid,noatime,size=128M   0   0
+tmpfs   /home/pisky/p0x-soberano/logs   tmpfs   nodev,nosuid,noatime,size=128M   0   0  <!-- guardia:permitir ruta-de-ejemplo-en-montaje-tmpfs -->
 ```
 
 #### 3. Rotado Agresivo de Bitácoras (`/etc/logrotate.d/p0x-soberano`) [234]
 
 ```logrotate
-/home/pisky/p0x-soberano/logs/*.jsonl {
+/home/pisky/p0x-soberano/logs/*.jsonl {  <!-- guardia:permitir ruta-de-ejemplo-en-regla-logrotate -->
     size 10M
     rotate 3
     compress

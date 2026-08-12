@@ -61,17 +61,17 @@ Queda estrictamente prohibida la suposición o uso de las siguientes rutas en el
 El entorno lógico del Soberano está habitado por cuatro ciudades operativas, corriendo bajo servicios systemd `--user` del operador `pisky`:
 
 1.  **Aurelius Interfaz** (`aurelius-interfaz.service`):
-    *   **Ruta**: `/home/pisky/aurelius/`
+    *   **Ruta**: `/home/pisky/aurelius/`  <!-- guardia:permitir inventario-historico-de-repos -->
     *   **Script**: `servir_interfaz.py`
     *   **Escucha**: Escucha activa en `0.0.0.0:8050` (⚠️ *Violación de doctrina detectada*: Contradice el Master Manifest §4.4 y la Fuente 1 §3 al no amarrarse exclusivamente a la IP de Tailscale. Se corregirá únicamente dentro del sistema paralelo, no en el actual).
 2.  **Hexelion FastAPI Gateway**:
-    *   **Ruta**: `/home/pisky/hexelion/`
+    *   **Ruta**: `/home/pisky/hexelion/`  <!-- guardia:permitir inventario-historico-de-repos -->
     *   **Estado**: Existente, puerto en escucha.
 3.  **p0x Pipeline & Reflejos**:
-    *   **Ruta**: `/home/pisky/p0x/`
+    *   **Ruta**: `/home/pisky/p0x/`  <!-- guardia:permitir inventario-historico-de-repos -->
     *   **Estado**: Código de reflejos y telemetría del Censo F0.
 4.  **Codice**:
-    *   **Ruta**: `/home/pisky/codice-emancipacion-atomica/`
+    *   **Ruta**: `/home/pisky/codice-emancipacion-atomica/`  <!-- guardia:permitir inventario-historico-de-repos -->
     *   **Estado**: Repositorio de scripts de automatización Bash.
 5.  **OpenWebUI Chat** (`open-webui.service`):
     *   **Ruta**: `~/.local/bin/open-webui`

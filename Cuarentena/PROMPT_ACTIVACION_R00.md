@@ -5,7 +5,7 @@
 
 Soy el Soberano. Abrimos la **Ronda 00**.
 
-Carpeta de trabajo: `/home/pisky/p0x/Cuarentena`
+Carpeta de trabajo: `/home/pisky/p0x/Cuarentena`  <!-- guardia:permitir carpeta-de-trabajo-declarada-en-prompt-de-activacion-R00 -->
 
 **Antes de responder nada:** lee `01_LEEME_PRIMERO.md`, y a continuación los ficheros que ese documento te ordene, en su orden. Después declara en una línea: ronda, dominio, entregable y qué documentos has cargado.
 

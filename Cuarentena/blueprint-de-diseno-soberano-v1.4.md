@@ -41,7 +41,7 @@ El Puente es el componente de navegación global anclado permanentemente en la i
 *   **Estilo Visual**: Tematización brutalista del Nexo para ambos mundos.
 *   **Estado de Reposo**: `opacity: 0.45`.
 *   **Estado Activo/Hover/Focus**: `opacity: 1`, con la etiqueta `"→ CHAT"` posicionada en la zona inferior en tipografía `IBM Plex Mono` de `10px`.
-*   **Destino Doctrinal**: `http://soberano.[HOST_TAILNET_REDACTADO]:8080` (MagicDNS constante de compilación).
+*   **Destino Doctrinal**: `http://soberano.[HOST_TAILNET_REDACTADO]:8080` (MagicDNS constante de compilación).  <!-- guardia:permitir destino-doctrinal-con-host-tailnet-ya-redactado -->
 *   **Foco Accesible**: `outline: 1px solid var(--nx-phosphor); offset: 2px`
 *   **Reciprocidad**: La navegación de retorno se gestiona exclusivamente a través de la tematización integrada de OpenWebUI, sin alterar el núcleo funcional de la aplicación.
 

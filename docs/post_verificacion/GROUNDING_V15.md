@@ -217,7 +217,7 @@ El borrador resuelve la tensión de la única forma que no destruye nada: **v1.5
 **A.3 — estado de git sobre montaje de solo lectura:**
 
 `git status --porcelain`
-`warning: unable to unlink '/sessions/<sandbox>/mnt/p0x/.git/index.lock': Operation not permitted`
+`warning: unable to unlink '/sessions/<sandbox>/mnt/p0x/.git/index.lock': Operation not permitted`  <!-- guardia:permitir mensaje-de-error-verbatim-de-git-en-sandbox -->
 
 El comando devolvió las 12 entradas pese al aviso. El aviso es del montaje del sandbox, no del repositorio: git intentó refrescar su índice y no pudo escribir. **No se modificó nada en `.git/`.** La ruta del sandbox se ofusca aquí por higiene (`02 §6`).
 

@@ -15,7 +15,7 @@
 Navegación global anclada en la interfaz (`fixed; top: 12px; left: 12px; z-index: 9999`) con tamaño táctil mínimo de 44×44 px [137]:
 *   **Cara 1: El Nexo (Jardín)**: SVG hexagonal con stroke fino en color phosphor (#43F5A0). Opacidad reposo: 0.45; activo/hover: opacidad 1 con transición lineal de 120ms [138].
 *   **Cara 2: Le Jardin (El Nexo)**: SVG de hoja o vegetal. Botón circular con fondo pergamino (`--jd-parchemin`), borde amatista y border-radius 50%. Opacidad reposo: 0.55; activo/hover: escala scale(1.06) en 240ms cubic-bezier(.34,1.56,.64,1) y halo box-shadow [139].
-*   **Cara 3: El Chat (Sínodo)**: SVG de burbuja de diálogo monocromo. Opacidad reposo: 0.45; activo/hover: opacidad 1. Redirecciona estrictamente a `http://soberano.[HOST_TAILNET_REDACTADO]:8080` [140].
+*   **Cara 3: El Chat (Sínodo)**: SVG de burbuja de diálogo monocromo. Opacidad reposo: 0.45; activo/hover: opacidad 1. Redirecciona estrictamente a `http://soberano.[HOST_TAILNET_REDACTADO]:8080` [140].  <!-- guardia:permitir destino-doctrinal-con-host-tailnet-ya-redactado -->
 
 ### 2. Estilo Atmosférico y Regla Muro-Papel (`escena.css`) [104]
 El archivo unificado `escena.css` importa `muro.css` (Nexo) y `laboratorio.css` (Jardin) [104]:
