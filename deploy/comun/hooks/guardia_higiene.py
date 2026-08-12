@@ -20,6 +20,13 @@ si hay hallazgos, 0 si no.
 
 Escape declarado: una línea que contenga `guardia:permitir <motivo>` se ignora.
 Es desviación mínima aditiva declarada, no un silenciador genérico.
+
+revisar_antes_de: 2026-09-12
+
+Un test en verde es una medición del pasado. Pasada esa fecha, esta guardia
+deja de acreditar cobertura: sus reglas se releen contra el árbol real y se
+vuelve a fijar la fecha. Caducar es crítico aquí — la guardia bloquea, luego
+su caducidad bloquea, no informa (D35).
 """
 
 from __future__ import annotations
@@ -147,11 +154,24 @@ REGLAS: list[tuple[str, str, re.Pattern]] = [
     # -------------------------------------------------- rutas y usuarios ----
     (
         "RUTA-HOME",
-        "ruta absoluta al directorio del usuario",
+        "ruta absoluta del sistema de ficheros (seis prefijos · D34)",
+        # D34 · PUNTO CIEGO: la regla cubría /home y nada más. Un árbol que
+        # viva en /srv, /opt o /mnt salía entero sin un solo hallazgo. Los seis
+        # prefijos van en UNA alternancia para que añadir el séptimo sea una
+        # palabra y no una regla nueva que alguien olvide testear.
+        #
+        # /tmp queda FUERA por decisión firmada (falsos positivos); se revisa
+        # en R02 con datos. No se añade por simetría estética.
+        #
+        # El id sigue siendo RUTA-HOME aunque ya no hable solo del home:
+        # DECISIONES_FIRMADAS['D8'] y D8_JAMAS lo referencian por ese nombre, y
+        # renombrarlo aquí rompería la exención de D23 en silencio. El nombre
+        # es una clave, no una descripción.
+        #
         # Los placeholders (/home/USUARIO, /home/$USER) los filtra PLACEHOLDERS
         # sobre el texto capturado; no van en un lookahead porque IGNORECASE
         # haría que `[A-Z]{3,}` casara también con minúsculas reales.
-        _r(r"/home/(?![<$\{])[A-Za-z0-9._-]+"
+        _r(r"/(?:home|mnt|srv|opt|var|media)/(?![<$\{])[A-Za-z0-9._-]+"
            r"|~(?:" + USUARIOS + r")\b"
            r"|[A-Z]:\\Users\\[A-Za-z0-9._-]+"),
     ),

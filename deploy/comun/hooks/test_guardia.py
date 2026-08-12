@@ -37,7 +37,6 @@ PASAN = [
     "export OLLAMA_IGPU_ENABLE=1  # backend Vulkan del Soberano",
     "ssh es el transporte; la Torre es el destino habitual.",  # prosa, no comando
     "Versión del kernel: 6.14.0-29-generic",
-    "Usa el árbol /srv/p0x en el nodo remoto.",
     "Puerto 11434 para Ollama, 8080 para el dashboard.",
     "La clave privada de firma jamás entra a este nodo.",
     "ruta de ejemplo: /home/USUARIO/p0x  # placeholder genérico",
@@ -48,6 +47,14 @@ PASAN = [
     "QdrantClient(host=_Q['host'], api_key=_load_api_key(), https=False)",
     "password = os.environ['QDRANT_PASSWORD']",
     "loopback: 127.0.0.1 y ::1",
+    # D34 · el loopback NO es infraestructura identificable: no dice nada de
+    # que maquina es ni de que red forma parte. Casos explicitos y separados,
+    # no una sola linea que los mezcle. Son guardas de regresion: ninguna
+    # regla los ha capturado nunca, asi que no pueden salir en rojo antes del
+    # arreglo; existen para que una futura ampliacion de las reglas de red no
+    # se los lleve por delante en silencio.
+    "bind 127.0.0.1 para el dashboard local",
+    "escucha en ::1 (loopback IPv6)",
 ]
 
 # --------------------------------------------------------------------------
@@ -97,6 +104,22 @@ BLOQUEAN = [
     ("ruta /home/pisky/p0x y token "
      "ghp_A1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6Q7r8",
      "TOKEN-PROVEEDOR"),
+    # D34 · PUNTO CIEGO DE RUTAS ABSOLUTAS · UN CASO ROJO POR PREFIJO.
+    # La regla cubria /home y nada mas: los otros cinco prefijos salian del
+    # arbol sin un solo hallazgo. Un prefijo sin su caso rojo es un prefijo
+    # que nadie ha demostrado que la regla cubra.
+    # /tmp queda FUERA por decision firmada (falsos positivos); se revisa en
+    # R02 con datos. No se anade aqui por simetria estetica.
+    ("cat /home/pisky/p0x/mente/doctrina/ORQUESTA.md", "RUTA-HOME"),
+    ("respaldo montado en /mnt/nvme-1tb/p0x", "RUTA-HOME"),
+    # Este caso vivia en PASAN hasta 2026-08-12. La enmienda de D34 lo
+    # convierte en bloqueo: es una ruta absoluta del sistema, y que la frase
+    # que la rodea sea prosa no la hace menos ruta. Movido PASAN -> BLOQUEAN
+    # (endurecer). D23 prohibe el movimiento inverso, no este.
+    ("Usa el árbol /srv/p0x en el nodo remoto.", "RUTA-HOME"),
+    ("binario instalado en /opt/ollama/bin/ollama", "RUTA-HOME"),
+    ("logs en /var/log/aurelius-interfaz.log", "RUTA-HOME"),
+    ("usb del Soberano montado en /media/pisky/RESPALDO", "RUTA-HOME"),
 ]
 
 # Excepción declarada: el pragma desactiva la línea, con motivo a la vista.

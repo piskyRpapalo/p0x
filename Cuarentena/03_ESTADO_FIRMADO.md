@@ -180,3 +180,99 @@ Cuando Le Jardin tenga CineK o Herbier activo y Aurelius sus partes funcionales,
 - Padre del pid 2411: systemd --user (2314), con la unit en inactive: patron de daemonizacion (el PID principal sale; systemd pierde al hijo).
 - Explica el crash-loop de 2026-08-01 y el huerfano de hoy: cada stop/restart deja un servidor huerfano en :8050.
 - El fix D27 debe incluir rastreo del proceso real (foreground o Type=forking+PIDFile), ademas del bind acotado y el StartLimit.
+
+## D31 · CANON DE ENFOQUE ARQUITECTONICO (2026-08-12)
+- Todo documento nuevo declara `sistema:` con uno de cinco valores: MVP, PRECEPTOR, HEXELION, P0X-CORE, COMPARTIDO. Sin etiqueta = propuesta incompleta.
+- Clausula de alcance: la convencion rige para documentos nuevos; el canon existente se cualifica cuando se toque por otro motivo. Un documento firmado no queda en falta por una regla posterior a su firma.
+- "Aurelius" solo no identifica nada: se escribe Aurelius-MVP o Aurelius-Preceptor.
+- Vocabulario por audiencia: MVP en ingles de industria (su lector es cualquiera); Preceptor en espanol concreto (su lector es el Soberano). Ningun termino cruza; dos nombres para un componente es traduccion, no duplicacion.
+- Los identificadores citados por un expediente firmado no se renombran: romperia una prueba sellada por hash o exigiria tabla de traduccion permanente.
+- La lista solarpunk queda ARCHIVADA: no es canon, no es cola, no tiene fecha.
+- Medido: los 9 terminos del MVP tienen cero colisiones en el arbol; 6 nombres del Preceptor colisionaban, 4 contra canon visual firmado. Reemplazos verificados antes de proponerse.
+
+## D32 · TRANSITO · NADA CONSERVA SU VERDAD AL CAMBIAR DE SITIO (2026-08-12)
+- Enmienda del principio de reutilizacion: "un modulo usado vale mas que diez especificados, siempre que se reaudite su politica al cambiarlo de sitio". El lexico es parte de la politica.
+- Aplica tambien al cambio de modo de invocacion dentro del mismo fichero, no solo al cambio de repositorio.
+- Todo transito declara origen, destino y verificacion; la verificacion se ejecuta EN EL DESTINO.
+- Todo POST_VERIFICACION lleva seccion TRANSITOS con tabla origen/destino/verificacion.
+- Los hashes cubren una region delimitada por marcadores; las firmas van fuera, para que firmar no invalide el sello.
+- Rondas paralelas: las lecciones que cruzan viven en un anexo de sitio unico, leido no transcrito, con test en destino. Ningun agente escribe en el anexo ni en el repo del otro. Hallazgo cruzado = PARO y reporte, no parche.
+- Anexo de la ronda VERSIONES1+FASE0: `Cuarentena/salida/ANEXO_LECCIONES_CRUZADAS.md`, sha256 del cuerpo entre marcadores = 0939b9ea1568df12407c7808cf469ee803d08dfcaeaa0da14cfb0ab01cfcb5d3.
+- Regla de desbloqueo: divergencia de hash exige diff contra la fuente. Diferencia entre marcadores = PARO. Diferencia fuera de marcadores o de extraccion = re-ejecutar el comando literal, registrar incidente y CONTINUAR. Un PARO falso ensena a desactivar el freno.
+- Origen: nueve correcciones propias en la serie; ninguna fue mentira, todas fueron cambio de contexto sin reauditar.
+
+## D33 · ANTICIPACION · MECANISMOS, NO FALLOS (2026-08-12)
+- Nunca anticipar fallos especificos: una regla no ganada por colision es especulacion.
+- Si anticipar mecanismos de respuesta: la Ley de Desobediencia Verificable y la clausula de revision son de esta clase.
+- Matiz: se puede anticipar un fallo concreto cuando ya se sufrio en un contexto vecino. No es especulacion, es generalizacion de una colision medida.
+- El canon de P0X crece por colision, no por reflexion. Cada regla tiene una herida detras.
+
+## D34 · PUNTO CIEGO DE RUTAS ABSOLUTAS (2026-08-12)
+- La regla de ruta de la guardia cubria /home/<usuario>, ~<usuario> y rutas de Windows. NO cubria /mnt, /srv, /opt, /var, /media.
+- Reproducido: tres lineas con rutas bajo /mnt, /srv y /home; solo detecta la de /home.
+- Enmienda: extender la regla a los cinco prefijos, con un caso rojo por prefijo en la suite.
+- ::1 y 127.0.0.1 quedan como casos PASAN explicitos con test: loopback no es dato sensible y ya estaba en verde por casualidad.
+- Rangos del verificador de publicacion: incluir fc00::/7, que cubre el rango IPv6 de la red superpuesta. ::1 fuera de prohibidos.
+- Medido: 13 rutas absolutas distintas invisibles para la guardia en el arbol; 3 de ellas en skills/auditar-p0x.
+
+## D35 · CADUCIDAD DE CONFIANZA (2026-08-12)
+- Todo mecanismo critico declara `revisar_antes_de:` con fecha literal. Un test verde es una medicion pasada, no presente.
+- Mecanismo critico que caduca: BLOQUEA. Mecanismo no critico que caduca: informa.
+- Lista firmada de criticos: la guardia, los ganchos pre-commit y pre-push, el auditor de transitos, y los hashes del registro sellado.
+- Primer `revisar_antes_de:` critico: la guardia, 2026-09-12.
+- Registro de puntos ciegos conocidos: fichero con lo que la guardia NO cubre, de revision obligatoria al tocarla. "64/64 verde" dice lo que hay; el registro dice lo que falta.
+- Metatest: bateria roja de agujeros ya cerrados, ejecutada al modificar la guardia. Regresion de atencion, no solo de codigo.
+- Origen: el punto ciego de D34 llevaba ahi desde el origen de la guardia y se uso como criterio de publicabilidad sin dudarlo, precisamente porque estaba probada.
+
+## D36 · ARCHIVO DE CINEK-AUTOMATICO (2026-08-12)
+- D1 firmo que cinek_automatico queda archivado y CineK_Studio es el repositorio oficial. El repo seguia activo como privado.
+- Accion: Archived con motivo en el README, no description nueva. Archivar, no borrar.
+- NO_DATA: CineK_Studio no aparece entre los seis repos del perfil. Su ausencia se declara y queda por resolver.
+
+## D37 · AUDITORIA EXTERNA CON CADUCIDAD (2026-08-12)
+- Cada estacion, o en cada publicacion, se audita hacia afuera: repositorios publicos, puertos en escucha, unidades activas y sus enlaces, ACLs efectivas.
+- Motivo: el rigor de la serie miraba hacia dentro. Un candado nuevo en una puerta interior se instala y se verifica en una tarde; comprobar la puerta de la calle exige mirar algo ya dado por hecho.
+- Inventario de puertas sin revisar al firmar: el repositorio espejo (contenido), ocho unidades de servicio con enlaces desconocidos, una caza interrumpida en un arbol antiguo, y la validez de unas credenciales citadas en documentos viejos.
+- El auditor externo entra en el roadmap de La Lupa.
+- Auditor chat->disco: toda decision firmada que no conste en disco es hallazgo. Forma minima: lista de D-ids esperados frente a presentes.
+
+## D38 · DIFERIMIENTO DEL REPOSITORIO ESPEJO (2026-08-12)
+- Estado: PRIVADO. Exposicion detenida. El borrado y la recreacion limpia quedan DIFERIDOS, no abandonados.
+- Disparador de reapertura: cuando exista el export curado ejecutable, o la revision del 2026-09-12, lo que ocurra primero.
+- Medido: el arbol publicado coincidia entrada por entrada con el privado (19 de 19); 27 hallazgos de guardia en 15 ficheros mas 13 rutas absolutas invisibles; el mayor deposito no era deploy/ sino mente/, con 30 hallazgos y 15 rutas.
+- Confirmado: cero credenciales reales publicadas. Nada criptografico que rotar.
+- Causa estructural: un espejo de un arbol privado no puede ser seguro, porque su proposito es copiar. La correccion es export curado con lista blanca y guardia en la ruta de destino.
+- Hallazgo: el repositorio nacio como cara publica escrita a mano y un push de arbol completo la sobrescribio. La correccion es volver a lo que era su primer commit.
+- NO_DATA: numero de commits y coincidencias del historial publicado. Nunca medido. La cifra de 3680 corresponde al arbol privado, no al publicado.
+- Rescate de capturas: cancelado por el Soberano, que posee copias en otro lugar.
+
+## D39 · NO SE ROTAN LAS DIRECCIONES · RIESGO RESIDUAL ACEPTADO (2026-08-12)
+- Decision: no se rota el rack. Se acepta el riesgo residual, con motivo escrito.
+- Motivo 1: cero forks y una estrella; probabilidad de clon hostil baja.
+- Motivo 2: una direccion de la red superpuesta sin identidad autorizada no abre la malla. Lo expuesto es inventario, no acceso.
+- Motivo 3: el inventario no es rotable, solo despublicable.
+- Motivo 4: coste operativo de rotar el rack mayor que el riesgo residual.
+- Revision: 2026-09-12. Si para entonces existe el export curado ejecutable, la decision pasa a borrar y recrear, y la rotacion queda sin objeto.
+- Se registra la decision de NO actuar con su razon, para que en la revision se discuta y no se descubra.
+
+## D40 · PODA ESTACIONAL (2026-08-12)
+- Cada estacion se revisan los mecanismos. Lo que nadie pueda explicar de memoria, o que nunca haya disparado, es candidato a fusion o archivo.
+- La estructura crece por colision y se poda por estacion.
+- Indicador firmado: una regla que no se puede explicar de memoria existe en disco pero no en el sistema.
+- Criterio operativo: leer en voz alta las veinte reglas de `ANEXO_VEINTE_REGLAS.md` y anotar las que no salgan. Lo que falle dos estaciones seguidas se fusiona o se archiva.
+- Primera poda: 2026-09-12, misma fecha que la caducidad de la guardia y la revision de D38 y D39.
+
+## D41 · ARCHIVO DE RAZONAMIENTO Y PARTIDA GUARDADA (2026-08-12)
+- Nace un archivo de razonamiento fuera de git con cabecera "memoria, no canon". Su existencia no depende de rellenarlo.
+- Primer contenido: la lista de D-ids esperados, que es el artefacto del que lee el auditor chat->disco.
+- `ANEXO_PARTIDA_GUARDADA.md` queda firmado como mapa de memoria del sistema. Sus nueve autocorrecciones no se editan ni se suavizan: son el argumento del documento.
+- Sera el contenido inicial del repositorio de doctrina cuando se publique, no un texto nuevo escrito para la ocasion.
+- `ANEXO_VEINTE_REGLAS.md`, una pagina, es el instrumento de relectura semanal y el criterio de la poda de D40.
+
+
+## D43 · FALSOS POSITIVOS EN PROSA (2026-08-12)
+- Extender la regla de rutas a /mnt /srv /opt /var /media (D34) crea
+  falsos positivos inmediatos en prosa que cita esos prefijos. Todo
+  entregable que los mencione requiere guardia:permitir declarado con
+  motivo. La lección viaja fuera del anexo sellado (D32) para no
+  invalidar el hash de las lecciones compartidas.
