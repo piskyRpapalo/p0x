@@ -276,3 +276,143 @@ Cuando Le Jardin tenga CineK o Herbier activo y Aurelius sus partes funcionales,
   entregable que los mencione requiere guardia:permitir declarado con
   motivo. La lección viaja fuera del anexo sellado (D32) para no
   invalidar el hash de las lecciones compartidas.
+
+## D44 · BUCLE ROJO-SABOTAJE-VERDE COMO PROTOCOLO OBLIGATORIO (2026-08-12)
+- Protocolo obligatorio, no opcional: primero todos los tests fallan; despues se rompen A PROPOSITO tres invariantes propias y se comprueba que la suite lo detecta; solo entonces verde.
+- El sabotaje es un MODO PERMANENTE del propio codigo, ejecutable por bandera, no un gesto manual hecho una vez. Convierte "12/12 verde" en una afirmacion con contenido en lugar de un numero.
+- Regla que lo sostiene: un test que pasa desde el principio es un test que no fue disenado para detectar una rotura especifica. Candidata a `ANEXO_VEINTE_REGLAS.md`.
+- Si una invariante rota NO es detectada, ESE es el fallo, y el fallo es del test: se reescribe el test, no se toca el modulo. El sabotaje trabaja siempre sobre copia.
+- Procedencia doble e independiente: el bucle ejecutado a mano sobre la memoria de M2 (0/12 esqueleto vacio -> 12/12 implementado -> 3/12 saboteando tres invariantes -> 12/12 restaurado) y el documento externo del Prompt Maestro. Se adopta por la coincidencia de dos procedencias, no por la autoridad de la fuente (D46).
+- Texto de origen: `Cuarentena/salida/VEREDICTO_PROMPT_MAESTRO.md` §1 y §5.1.
+
+## D45 · DEPENDENCIA FINA · UNA SALIDA NO SE CONSUME HASTA QUE EL AUDITOR LA VALIDA (2026-08-12)
+- Los agentes de una ronda corren en paralelo, pero ninguna salida entra como entrada de otro hasta que el auditor la valida.
+- Refina la regla vigente de D32 ("hallazgo cruzado = PARO"), que solo cubria el caso de conflicto. Esta cubre el caso normal, que es el frecuente.
+- El grano es la salida, no la ronda: no se espera a que todo termine, se espera a que este validado lo que se va a consumir.
+- Origen: seccion 4 del Prompt Maestro AI-AI. Se adopta la regla; su aparato de citas se descarta entero (D46).
+- Texto de origen: `Cuarentena/salida/VEREDICTO_PROMPT_MAESTRO.md` §1 (cierre) y §5.3.
+
+## D46 · VEREDICTO DEL PROMPT MAESTRO AI-AI · ESTRUCTURA SI, AUTORIDAD NO (2026-08-12)
+- Clasificacion R00: `EXTERNO_NO_VERIFICADO` en su grado mas severo. Se aprovecha la ESTRUCTURA y se descarta la CITA, como manda `02 §3`.
+- DECLARADOS INEXISTENTES, medido: `NVIDIA OpenShell` (30 menciones entre variantes) no es un producto de NVIDIA — la casa tiene Container Toolkit, Triton, NIM y TensorRT. `NVIDIA NemoClaw` (4 menciones) tampoco existe. Toda la seccion de ejecucion en el borde se apoya en una plataforma inventada, y sobre ella el documento declara una "obligacion etica": la forma retorica mas peligrosa del texto, un supuesto no verificado convertido en deber.
+- Citas de empresas homonimas, no de este proyecto: `docs.hexagonppm.com` x12 es Hexagon PPM, software industrial; `nexo.com` x7 es una plataforma de criptoprestamos. Coinciden con HEXELION y el Nexo en la silaba y en nada mas. Con 33 enlaces de YouTube y 17 de LinkedIn en el resto, el aparato de 66 paginas no aporta ninguna autoridad.
+- NIVELES N0-N4: **DECLARADOS NO FIRMADOS.** El documento los presenta como "una escala ya definida y acordada". Cero apariciones en las decisiones firmadas al medirlo. Citarlos como canon es un error de categoria.
+- Medallon Bronze/Silver/Gold: el documento se ancla a el como cimiento existente; los tres directorios no estaban en el arbol al medirlo.
+- RECHAZADO: "sin depender de decisiones externas para tareas que los agentes pueden resolver de forma autonoma". El Soberano no es una dependencia externa: es quien firma el valor. Un documento que lo llama externo ha invertido el suelo.
+- RECHAZADO: siete agentes en paralelo. Coordinar dos costo hoy un anexo con sello, una regla de desbloqueo y un PARO real; siete son veintiun pares de posible interferencia.
+- ADOPTADO ademas de D44 y D45: `AG-*` como convencion de identificador de agente en un prompt. Util y sin colision.
+- Texto de origen: `Cuarentena/salida/VEREDICTO_PROMPT_MAESTRO.md` §2, §4 y §5.
+
+## D47 · HUECO D42 · REVERSION DELIBERADA (2026-08-12)
+- D42 fue `PODA ESTACIONAL`, anexado por orden literal y revertido la misma tarde, en la ronda VERSIONES1.
+- Motivo de la reversion: duplicaba D40, que ya se titula igual y contiene lo mismo MAS el indicador firmado, el criterio operativo de relectura y la fecha de la primera poda. D42 era un restatement estrictamente mas pobre de canon existente.
+- Como se revirtio: restauracion del respaldo previo. `diff` contra el estado post-D41: IDENTICO. D40 nunca se toco.
+- El numero NO se reutiliza. Reciclar un D-id retirado rompe toda cita futura y hace que dos decisiones distintas compartan identidad. La numeracion salta de D41 a D43 a proposito.
+- Diferencia con D24, y por que importa: D24 es `NO_DATA` porque no se SABE que fue; D42 es `NO_DATA` porque se sabe exactamente que fue y se decidio que no fuera.
+- Consecuencia mecanica, firmada aqui: el auditor chat->disco distingue `HUECO_PREEXISTENTE` de `HUECO_NUEVO`. El primero informa; el segundo BLOQUEA mientras su motivo no conste en ESTE documento. Explicarlo en el archivo de razonamiento no basta: ese fichero es memoria, no prueba, y lo edita el mismo proceso al que se audita. Esta entrada es la que cierra el hueco D42.
+
+## D49 · PREDICCION CINEK REESCRITA (2026-08-12)
+- La prediccion firmada perdida se reescribio de memoria y quedo VERSIONADA en bronze/. Commit efb8397.
+- La perdida original: bronze/, silver/ y gold/ nunca estuvieron bajo seguimiento; cero commits los anadieron.
+- Regla ganada: un directorio sin seguimiento en el primer nivel es hallazgo del auditor, no una nota de git status.
+
+## D51 · REFERENCIA CRUZADA · M-D51 en aurelius-mvp (2026-08-12)
+- Frontera cerrada: cualquier excepcion del redactor es FronteraSinFiltro, no solo su ausencia.
+- Contenido verificado por el Soberano en clon limpio. Cowork no lee ese repositorio: declaracion, no medicion.
+
+## D52 · REFERENCIA CRUZADA · M-D52 en aurelius-mvp (2026-08-12)
+- Modo sabotaje como mecanismo permanente del codigo, no gesto manual de sesion.
+
+## D53 · REFERENCIA CRUZADA · M-D53 en aurelius-mvp (2026-08-12)
+- README de M2 el Agua, producto publico.
+
+## D54 · TUMBA DE LA COPIA DIVERGENTE (2026-08-12)
+- La copia del producto en Cuarentena/salida/ paso a necropolis/tumbas/aurelius-mvp-m2/ con TUMBA.md. Commit 28f838a.
+- Cierra el riesgo de dos verdades sobre el mismo codigo. Manda el repositorio del producto.
+
+## D55 · LIMPIEZA DE ESTRUCTURA ANIDADA EN LA TUMBA (2026-08-12)
+- Commit ed248ef. Sin cambio de contenido.
+
+## D56 · FIRMA DEL MANIFEST DE RONDA (2026-08-12)
+- MANIFEST.yaml firmado por carbono. Commit fa8e8f2.
+
+## D58 · REFERENCIA CRUZADA · M-D58 · exenciones del guardian en el producto (2026-08-12)
+- Guardian instalado en el repositorio del producto y .guardia_exento declarado.
+
+## D59 · REFERENCIA CRUZADA · M-D59 · lexico sintetico (2026-08-12)
+- El respaldo de lexico para test es SINTETICO: ninguna palabra real del lexico vigilado viaja al repositorio publico.
+- En produccion la ausencia del lexico sigue siendo frontera cerrada. La asimetria es deliberada y esta probada.
+
+## D60 · REFERENCIA CRUZADA · M-D60 · perfil y preguntas humanas (2026-08-12)
+- Tabla profile aditiva: no toca engrams ni exige migracion del CHECK de origin.
+
+## D61 · REFERENCIA CRUZADA · M-D61 · neutralizacion de termino vigilado (2026-08-12)
+
+## D62 · REFERENCIA CRUZADA · M-D62 · cierre de M2 con el manifiesto (2026-08-13)
+- El hash cubre solo el cuerpo entre marcadores; la firma va fuera para que firmar no invalide el sello.
+- Firmar no muta la memoria. Sin nombre, signed_by NO_DATA y la firma es valida. Verificar es recalcular.
+- El manifiesto guarda huellas, nunca el texto de los recuerdos.
+
+## D63 · EL TEMPLE · CARACTER DE AURELIUS (2026-08-13)
+- preceptor/El_Temple.md, sistema PRECEPTOR. Commit 928a98f. NO viaja al repositorio publico.
+- El tono (ritmo, pausas, elecciones) SI es del producto: es texto y temporizacion.
+
+## D64 · SERIES DE NUMERACION SEPARADAS (2026-08-13)
+- p0x usa serie D. El producto usa serie M. Sin colision.
+- El canon de p0x registra las decisiones del producto como referencia cruzada cuando hay evidencia legible.
+- Origen: dos registros de cambios acunaban identificadores de decision de forma independiente.
+- Regla ganada: un registro de cambios no es un registro de decisiones. git log cuenta que se movio; el canon cuenta que se decidio.
+
+## D65 · IDENTIFICADORES NUNCA ACUNADOS (2026-08-13)
+- D48, D50 y D57 no existen en canon ni en ningun commit. No se rellenan y no son huecos de perdida.
+- D24 y D42 siguen declarados como huecos previos.
+
+## D66 · E1 · NUCLEO PURO Y GERENTE OPCIONAL (2026-08-13)
+- El nucleo no sabe que modelo es el gerente: solo detecta si algo responde al CONTRATO.
+- Inyeccion, nunca importacion dentro del nucleo. El gerente es camino principal, jamas el unico.
+
+## D67 · FRONTERA ASIMETRICA HACIA EL GERENTE (2026-08-13)
+- El nucleo redacta SIEMPRE, tambien hacia el gerente. No se cree ninguna declaracion de localidad.
+- Politicas Core (claves, tokens, claves privadas): no cruzan NUNCA, ni pedido. Es D8_JAMAS traducido al producto.
+- Politicas Custom (direcciones, rutas, nombres de maquina): redactadas por defecto, liberables POR SESION.
+- El levantamiento NOMBRA el dato ante la persona, se declara, se registra y es reversible.
+- Motivo de la asimetria: un suelo que hay que levantar para trabajar se levanta siempre. Medido en casa: 55 lineas con pragma en 26 ficheros, cada una con motivo legitimo.
+- Vocabulario: en el producto quien levanta es "la persona". "Soberano" solo en el canon de p0x y del Preceptor.
+
+## D68 · E5 · PORTAPAPELES SOBERANO, ACOTADO A LA RED (2026-08-13)
+- Nada sale automatico POR RED. El gerente queda fuera por construccion, no por confianza.
+- El gerente es proceso hijo por entrada y salida estandar. El CONTRATO NUNCA es HTTP a localhost: un puerto local es indistinguible de un tunel.
+- La localidad se impone, no se cree.
+
+## D69 · E6 · CAPA BORRADORES (2026-08-13)
+- El gerente escribe en BORRADORES (drafts), tabla aparte. Nunca en engrams. Ninguna migracion del CHECK de origin.
+- Estados: pendiente, promovido, descartado. Columnas, no borrados. La capa NO se vacia nunca.
+- El recordatorio cuando se llena es un CONTADOR VISIBLE, no una purga.
+- La promocion a memoria firmada es acto exclusivo de la persona. IronClaw se conserva: el gerente escribe por quien no puede; la persona firma.
+- El nombre "plata/silver" queda reservado al Medallon: 02_CANON_OPERATIVO §1 lo define y lo nombra seis veces.
+
+## D70 · REDEFINICION DEL PRODUCTO, CON SU PORQUE (2026-08-13)
+- Aurelius-MVP no es un producto de privacidad: es una herramienta para organizar datos y empezar un proyecto, con un programa de aprendizaje.
+- La accesibilidad es requisito, no opcion. Voz como entrada para quien no puede escribir.
+- Por que la frontera se endurece a la vez que el producto deja de venderse como privacidad: una herramienta de accesibilidad se usa justo cuando la persona NO PUEDE revisar lo que sale. Quien dicta por voz no esta leyendo el prompt antes de enviarlo. El suelo protege a quien no puede vigilar.
+- Esta justificacion va en la misma entrada a proposito: separada, la frontera se leeria en un ano como resto de una etapa superada.
+
+## D71 · E7 · INSTALACION COMO ECOSISTEMA (2026-08-13)
+- Los dispositivos son parte del perfil de la persona y su ambiente. Migrar a hardware nuevo es funcion de primera clase.
+- Umbral de capacidad: lo aporta la persona buscando las caracteristicas de su equipo. Desconocido -> NO_DATA -> modo reducido. Nada de umbrales por intuicion.
+- Voz: escuchar primero, hablar despues. STT prioritario, TTS condicional. Capacidad negociada, no caracteristica.
+
+## D72 · DIAPOSITIVAS COMO EJE TRANSVERSAL (2026-08-13)
+- Nuevo lenguaje de onboarding de todas las misiones siguientes: el usuario pasa de consumidor a productor.
+- Lo que toque documentos ya firmados se re-verifica. Un eje que modifica misiones firmadas sin re-verificarlas convierte "firmado" en decorativo.
+
+## D73 · INCIDENTE DE NO PERSISTENCIA (2026-08-13)
+- Reproducido: dos recuerdos guardados con mensaje "Saved", interrupcion con Ctrl+C, contador posterior sobre la base real -> vacio.
+- Causa reproducida por Cowork sobre la copia enterrada: abrir() envolvia la sesion entera en una transaccion y capturaba BaseException con rollback. KeyboardInterrupt es BaseException. La interrupcion descartaba todas las escrituras.
+- "Saved" se imprimia porque la lectura ocurria dentro de la misma transaccion: verdad dentro, mentira fuera.
+- Autoria: el fallo es de Cowork, en codigo que escribio. Decima correccion propia de la serie y la unica que destruyo trabajo real del Soberano, dos veces.
+- Arreglo verificado: commit por escritura, antes de devolver. Si la funcion devuelve, esta en disco.
+- Regla 1: respaldo de SQLite son los tres ficheros (db, -wal, -shm) o la API de backup. Un cp del db solo NO es respaldo. Esto explica que el respaldo tambien estuviera vacio.
+- Regla 2: "Saved" solo se imprime tras commit. Una interrupcion no deja una mentira. Con test rojo que lo impone desde otra conexion, porque en la misma conexion el test veria el error como acierto.
+- Regla 3: la unica memoria del usuario se respalda antes de todo toque de esquema. Hoy se perdieron filas por el diario WAL. Queda con su cicatriz.
+
