@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# Aurelius · M1 · las tres capas ensambladas, todas como procesos hijos.
+#
+#   modelo   llama-cli   (compilación Vulkan b10068, ya residente en el metal)
+#   carácter ARQUETIPO.md (el texto firmado, leído del repo del producto)
+#   voz      piper        (es_ES-sharvard-medium, texto por stdin, PCM por stdout)
+#
+# D75: ni una capa abre un socket. Nadie escucha en un puerto, nadie habla por
+# HTTP a localhost. Se pasan el trabajo por tubería, como programas.
+#
+# Uso:  ./aurelius "tu pregunta"            (español, con voz)
+#       ./aurelius --en "your question"     (inglés, sin voz: la voz es es_ES)
+#       ./aurelius --muda "pregunta"        (solo texto)
+set -euo pipefail
+
+AQUI="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LLAMA="$HOME/soberano-bench/bin/llama-b10068-bin-ubuntu-vulkan-x64/llama-b10068"
+MODELO="$HOME/soberano-bench/models/Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
+VOZ="$AQUI/voces/es_ES-sharvard-medium.onnx"
+ARQUETIPO="$HOME/aurelius-mvp/ARQUETIPO.md"
+HABLANTE="${AURELIUS_HABLANTE:-0}"     # sharvard trae dos: 0 y 1
+CONTEXTO=4096                          # a mano: el modelo declara 262144
+
+idioma=es; hablar=si
+while [[ "${1:-}" == --* ]]; do
+  case "$1" in
+    --en) idioma=en; hablar=no; shift ;;
+    --es) idioma=es; shift ;;
+    --muda) hablar=no; shift ;;
+    *) echo "opción desconocida: $1" >&2; exit 2 ;;
+  esac
+done
+pregunta="${1:?falta la pregunta}"
+
+# El carácter se lee del repo del producto, no se copia aquí. Una segunda copia
+# se queda vieja el día que se corrija la primera.
+seccion=$([[ $idioma == es ]] && echo "## §3 · El texto · Español" || echo "## §2 · El texto · English")
+sistema=$(python3 - "$ARQUETIPO" "$seccion" <<'PY'
+import sys
+doc = open(sys.argv[1], encoding="utf-8").read()
+print(doc.split(sys.argv[2])[1].split("```")[1].strip())
+PY
+)
+
+# Capa 1 y 2: el modelo, con el carácter puesto. Proceso hijo, sin servidor.
+respuesta=$(LD_LIBRARY_PATH="$LLAMA" "$LLAMA/llama-cli" \
+  -m "$MODELO" -c $CONTEXTO -ngl 99 -n 96 -no-cnv --no-warmup -st \
+  -sys "$sistema" -p "$pregunta" 2>/dev/null \
+  | sed -n "/^> /,\$p" | tail -n +2 | sed '/^\[ Prompt:/,$d' | sed '/^$/d')
+
+printf '%s\n' "$respuesta"
+
+# Capa 3: la voz. Otro proceso hijo. El texto entra por stdin, el audio sale por
+# stdout: aquí se guarda, pero podría ir directo a un reproductor por tubería.
+if [[ $hablar == si ]]; then
+  destino="$AQUI/ultima-respuesta.wav"
+  printf '%s\n' "$respuesta" \
+    | "$AQUI/venv/bin/piper" -m "$VOZ" -s "$HABLANTE" --output-raw 2>/dev/null \
+    | python3 -c "
+import sys, wave
+crudo = sys.stdin.buffer.read()
+with wave.open('$destino', 'wb') as w:
+    w.setnchannels(1); w.setsampwidth(2); w.setframerate(22050)
+    w.writeframes(crudo)
+print(f'  voz: $destino · {len(crudo)/2/22050:.1f} s', file=sys.stderr)"
+fi

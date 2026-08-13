@@ -417,9 +417,17 @@ Cuando Le Jardin tenga CineK o Herbier activo y Aurelius sus partes funcionales,
 - Regla 3: la unica memoria del usuario se respalda antes de todo toque de esquema. Hoy se perdieron filas por el diario WAL. Queda con su cicatriz.
 
 
+## D74 · EL IDIOMA ES LA PRIMERA PREGUNTA (2026-08-13)
+- La primera pregunta de la sesion es el idioma: English o Espanol, y se hace EN LOS DOS a la vez. Preguntar en un idioma que la persona no ha elegido ya es elegirlo por ella.
+- Se guarda en el perfil (clave `language`), al lado de device y name. Un idioma ya contestado no se vuelve a preguntar: misma regla que el resto del perfil.
+- No elegir NO se guarda como "en". Queda en NO_DATA y la sesion corre en ingles. El perfil distingue a quien eligio ingles de quien no eligio nada; escribir "en" por defecto convertiria una ausencia en una respuesta.
+- Los textos viven en un solo diccionario de dos columnas, no en condicionales repartidos: una traduccion que falta es una clave que falta, y un test la encuentra antes que la persona.
+- Efecto lateral firmado en la misma ronda: una sola gramatica para elegir. Las preguntas numeradas aceptan numeros y solo numeros, el enunciado lo dice, y el rechazo nombra los que valen. Antes convivian [y/N] y opciones numeradas en la misma sesion, y el Soberano escribio "yes" tres veces antes de entender que se esperaba un "1".
+
 ## D75 · TODA CAPA QUE HABLE O PIENSE ES PROCESO HIJO (2026-08-13)
 - Toda capa que hable o piense es proceso hijo por entrada y salida estandar. Ningun servicio HTTP en localhost: un puerto local es indistinguible de un tunel. La voz no es excepcion.
 - Origen: la residencia de voz medida en la fragua (681 ms) corre como servicio HTTP en localhost. Es exactamente la forma que D68 cerro para el gerente, y entraba al MVP por la puerta de atras como "capa aparte". Se cierra aqui, con nombre.
 - Consecuencia para Piper: se invoca como programa, escribiendo a salida estandar, no como servicio. Bajo esta forma su licencia GPL no toca el nucleo Apache-2.0: es programa invocado, no codigo enlazado. La separacion no es un detalle de empaquetado, es lo que hace legitima la mezcla.
 - Consecuencia para llama-tts: viaja en la MISMA compilacion Vulkan b10068 que ya esta en el metal, y habla por entrada y salida estandar por construccion. Cumple D75 sin instalar nada, sin dependencia GPL y sin segunda cadena de suministro. Queda declarado como candidato de voz de primera clase, a comparar de oido contra Piper cuando los seis clips esten en el Beelink. Si el oido no distingue, gana el que no anade dependencia.
 - Lo que esta regla NO dice: no prohibe la red al usuario ni al Camino. Prohibe que una capa del MVP se hable a si misma por socket y llame a eso localidad.
+- Por que el modelo pequeno, dicho aqui para que dentro de un ano no parezca un error: el pequeno se eligio porque CABE y porque el Camino incluye el telefono. No se eligio por velocidad — medido en este metal, genera un 12% mas lento que el 30B-A3B en Vulkan, porque un MoE de 3B activos corre mas que un denso de 4B. Donde si gana es sin GPU (x3,1 de prefill, +39% de generacion) y en tamano (2,32 GiB contra 17,3), que es exactamente el escenario del telefono.
