@@ -115,6 +115,124 @@ class Voz:
         return time.perf_counter() - t0, len(crudo) / 2 / 22050
 
 
+PRODUCTO = os.path.expanduser("~/aurelius-mvp")
+
+
+def _wav(crudo):
+    import io
+    import wave
+    buf = io.BytesIO()
+    with wave.open(buf, "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(22050)
+        w.writeframes(crudo)
+    return buf.getvalue()
+
+
+class Cara:
+    """El puente residente -> cara. Sin socket, y conviene decir por que.
+
+    Una pagina abierta con doble clic desde el disco no puede recibir nada de
+    un proceso local: para eso haria falta un puerto, y un puerto es justo lo
+    que D75 cierra. Asi que el puente va en la direccion que SI existe — el
+    residente produce el turno de verdad, sintetiza su voz, y REESCRIBE la
+    cara con las dos cosas dentro. El boton reproduce una respuesta real,
+    no una linea grabada de antemano.
+
+    Lo que este puente NO hace, dicho aqui para que nadie lo descubra por
+    sorpresa: la pregunta se escribe en el terminal, no en la pagina. Que la
+    pagina pregunte exige socket (prohibido) o que la persona elija un fichero
+    en cada turno. Esa decision es del Soberano, no mia.
+    """
+
+    def __init__(self, ruta_db, salida):
+        self.ruta_db, self.salida = ruta_db, salida
+        self.turnos = []
+
+    def anota(self, pregunta, respuesta, crudo, lore=None):
+        import base64
+        turno = {"tu": pregunta, "el": respuesta}
+        if crudo:
+            turno["audio"] = ("data:audio/wav;base64,"
+                              + base64.b64encode(_wav(crudo)).decode())
+        if lore:
+            turno["lore"] = lore
+        self.turnos.append(turno)
+
+    def refresca(self):
+        import json
+        import tempfile
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False,
+                                         encoding="utf-8") as fh:
+            json.dump(self.turnos, fh, ensure_ascii=False)
+            ruta = fh.name
+        r = subprocess.run(
+            [sys.executable, os.path.join(PRODUCTO, "cara.py"),
+             "--db", self.ruta_db, "--out", self.salida,
+             "--turnos", ruta, "--sin-voz"],
+            cwd=PRODUCTO, capture_output=True, text=True)
+        os.unlink(ruta)
+        return r.returncode == 0
+
+
+def con_cara(ruta_db, salida, preguntas=None):
+    """Una conversacion de verdad, con la cara al dia despues de cada turno."""
+    sys.path.insert(0, PRODUCTO)
+    try:
+        import lore as L
+    except ImportError:
+        L = None
+
+    print("── residente enganchado a la cara " + "─" * 33)
+    t0 = time.perf_counter()
+    cerebro, voz = Cerebro(), Voz()
+    cara = Cara(ruta_db, salida)
+    arranque = time.perf_counter() - t0
+    print(f"  arranque (una vez): {arranque:.2f} s")
+
+    guion = preguntas or []
+    turnos, usadas = [], set()
+    for pregunta in guion:
+        t0 = time.perf_counter()
+        respuesta = cerebro.pregunta(pregunta)
+        t_modelo = time.perf_counter() - t0
+
+        t1 = time.perf_counter()
+        crudo = None
+        if voz.hay:
+            crudo = subprocess.run(
+                [PIPER, "-m", VOZ, "-s", voz.hablante, "--output-raw"],
+                input=respuesta.encode("utf-8"), capture_output=True).stdout
+        t_voz = time.perf_counter() - t1
+
+        elegida = L.elegir(pregunta + " " + respuesta, "es",
+                           usadas=usadas) if L else None
+        pieza = None
+        if elegida:
+            usadas.add(elegida[0])       # no se repite pieza en la misma charla
+            pieza = elegida[1]
+        cara.anota(pregunta, respuesta, crudo, pieza)
+
+        t2 = time.perf_counter()
+        cara.refresca()
+        t_cara = time.perf_counter() - t2
+
+        total = t_modelo + t_voz + t_cara
+        turnos.append((t_modelo, t_voz, t_cara, total))
+        print(f"  · {pregunta[:38]!r}")
+        print(f"    modelo {t_modelo:.2f}s · voz {t_voz:.2f}s · "
+              f"cara {t_cara:.2f}s · TOTAL {total:.2f}s"
+              + ("  (+lore)" if pieza else ""))
+    cerebro.cierra()
+    if turnos:
+        med = [sum(x[i] for x in turnos) / len(turnos) for i in range(4)]
+        print(f"\n  MEDIA · modelo {med[0]:.2f}s · voz {med[1]:.2f}s · "
+              f"cara {med[2]:.2f}s · TURNO COMPLETO {med[3]:.2f}s")
+    print(f"  cara al dia en: {salida}")
+    return 0
+
+
 def medir():
     print("── hijo residente · medida en este metal " + "─" * 26)
     t0 = time.perf_counter()
@@ -148,9 +266,16 @@ def medir():
 def main():
     ap = argparse.ArgumentParser(description="Aurelius M1 · hijo residente")
     ap.add_argument("--medir", action="store_true")
+    ap.add_argument("--cara", metavar="HTML",
+                    help="keep a face up to date after every real turn")
+    ap.add_argument("--db", default=os.path.expanduser("~/.aurelius/memory.db"))
+    ap.add_argument("--guion", nargs="*", metavar="PREGUNTA",
+                    help="questions to run without a keyboard (for measuring)")
     a = ap.parse_args()
     if a.medir:
         return medir()
+    if a.cara:
+        return con_cara(a.db, a.cara, a.guion)
     cerebro = Cerebro()
     voz = Voz()
     print("Aurelius vivo. Ctrl+D para cerrar.\n")
