@@ -416,3 +416,10 @@ Cuando Le Jardin tenga CineK o Herbier activo y Aurelius sus partes funcionales,
 - Regla 2: "Saved" solo se imprime tras commit. Una interrupcion no deja una mentira. Con test rojo que lo impone desde otra conexion, porque en la misma conexion el test veria el error como acierto.
 - Regla 3: la unica memoria del usuario se respalda antes de todo toque de esquema. Hoy se perdieron filas por el diario WAL. Queda con su cicatriz.
 
+
+## D75 · TODA CAPA QUE HABLE O PIENSE ES PROCESO HIJO (2026-08-13)
+- Toda capa que hable o piense es proceso hijo por entrada y salida estandar. Ningun servicio HTTP en localhost: un puerto local es indistinguible de un tunel. La voz no es excepcion.
+- Origen: la residencia de voz medida en la fragua (681 ms) corre como servicio HTTP en localhost. Es exactamente la forma que D68 cerro para el gerente, y entraba al MVP por la puerta de atras como "capa aparte". Se cierra aqui, con nombre.
+- Consecuencia para Piper: se invoca como programa, escribiendo a salida estandar, no como servicio. Bajo esta forma su licencia GPL no toca el nucleo Apache-2.0: es programa invocado, no codigo enlazado. La separacion no es un detalle de empaquetado, es lo que hace legitima la mezcla.
+- Consecuencia para llama-tts: viaja en la MISMA compilacion Vulkan b10068 que ya esta en el metal, y habla por entrada y salida estandar por construccion. Cumple D75 sin instalar nada, sin dependencia GPL y sin segunda cadena de suministro. Queda declarado como candidato de voz de primera clase, a comparar de oido contra Piper cuando los seis clips esten en el Beelink. Si el oido no distingue, gana el que no anade dependencia.
+- Lo que esta regla NO dice: no prohibe la red al usuario ni al Camino. Prohibe que una capa del MVP se hable a si misma por socket y llame a eso localidad.

@@ -1,0 +1,47 @@
+{
+  "mision": "M-D70",
+  "fecha": "2026-08-13",
+  "nodo": "soberano",
+  "hardware": "AMD Ryzen 7 255 w/ Radeon 780M Graphics",
+  "build": "b10068-571d0d540 (Vulkan, ya residente: cero descargas de runtime)",
+  "modelo": {
+    "fichero": "Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+    "origen": "unsloth/Qwen3-4B-Instruct-2507-GGUF",
+    "base_declarada": "Qwen/Qwen3-4B-Instruct-2507",
+    "licencia": "apache-2.0",
+    "params": "4.02 B (denso)",
+    "tamano_gib": 2.32,
+    "sha256_publicado": "3605803b982cb64aead44f6c1b2ae36e3acdb41d8e46c8a94c6533bc4c67e597",
+    "sha256_calculado": "3605803b982cb64aead44f6c1b2ae36e3acdb41d8e46c8a94c6533bc4c67e597",
+    "verificado_antes_de_usar": true,
+    "firma": "D1 · opcion A · Soberano"
+  },
+  "parametros_medicion": {
+    "contexto": 4096,
+    "nota_contexto": "fijado a mano. El modelo declara 262144 y ese default es el footgun documentado del nodo: se mide con techo, no con el maximo.",
+    "repeticiones": 3,
+    "herramienta": "llama-bench (pp512 / tg128) + llama-cli para el arranque real"
+  },
+  "medidas": {
+    "vulkan_ngl99": { "pp512_tok_s": 482.17, "pp512_sigma": 1.11, "tg128_tok_s": 28.69, "tg128_sigma": 0.07 },
+    "cpu_ngl0":     { "pp512_tok_s": 313.61, "pp512_sigma": 1.36, "tg128_tok_s": 13.75, "tg128_sigma": 0.05 }
+  },
+  "latencia_sentida": {
+    "prompt_arquetipo_tokens": 340,
+    "prefill_vulkan_s": 0.71,
+    "prefill_cpu_s": 1.08,
+    "arranque_frio_vulkan_s": 2.30,
+    "arranque_frio_cpu_s": 2.50,
+    "nota": "arranque frio = cargar 2,32 GiB de disco + procesar el arquetipo + primer token. Prefill = lo que se siente en cada mensaje con el modelo ya cargado."
+  },
+  "contraste_con_30b": {
+    "referencia": "soberano_bench_g0.json · Qwen3-Coder-30B-A3B (MoE, 3B activos), 17,3 GiB",
+    "prefill_vulkan": "+35% a favor del 4B (482,17 vs 357,70)",
+    "generacion_vulkan": "-12% en contra del 4B (28,69 vs 32,49)",
+    "prefill_cpu": "x3,1 a favor del 4B (313,61 vs 99,93)",
+    "generacion_cpu": "+39% a favor del 4B (13,75 vs 9,90)",
+    "tamano": "x7,5 mas pequeno",
+    "lectura": "el 4B NO se eligio por velocidad de generacion: en Vulkan pierde contra un MoE de 3B activos. Se eligio porque cabe, y ahi gana sin discusion. Donde si gana en velocidad es sin GPU: en CPU triplica el prefill y genera un 39% mas rapido, que es el escenario del telefono."
+  },
+  "backend_registrado": "ggml_vulkan: AMD Radeon 780M Graphics (RADV PHOENIX) | uma:1 fp16:1 | coopmat. ollama no interviene: llama-cli no lo usa."
+}
