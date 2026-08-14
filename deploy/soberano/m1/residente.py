@@ -181,8 +181,9 @@ def con_cara(ruta_db, salida, preguntas=None):
     sys.path.insert(0, PRODUCTO)
     try:
         import lore as L
+        import cara as C
     except ImportError:
-        L = None
+        L = C = None
 
     print("── residente enganchado a la cara " + "─" * 33)
     t0 = time.perf_counter()
@@ -192,7 +193,7 @@ def con_cara(ruta_db, salida, preguntas=None):
     print(f"  arranque (una vez): {arranque:.2f} s")
 
     guion = preguntas or []
-    turnos, usadas = [], set()
+    turnos, usadas, callado = [], set(), 0
     for pregunta in guion:
         t0 = time.perf_counter()
         respuesta = cerebro.pregunta(pregunta)
@@ -201,9 +202,13 @@ def con_cara(ruta_db, salida, preguntas=None):
         t1 = time.perf_counter()
         crudo = None
         if voz.hay:
+            # Lo que se OYE se limpia; lo que se MUESTRA no se toca. Las dos
+            # espacios de fin de linea del modelo son un salto de pagina, y
+            # dichos en voz alta se convierten en un silencio a mitad de idea.
+            dicho = C.para_voz(respuesta) if C else respuesta
             crudo = subprocess.run(
                 [PIPER, "-m", VOZ, "-s", voz.hablante, "--output-raw"],
-                input=respuesta.encode("utf-8"), capture_output=True).stdout
+                input=dicho.encode("utf-8"), capture_output=True).stdout
         t_voz = time.perf_counter() - t1
 
         elegida = L.elegir(pregunta + " " + respuesta, "es",
@@ -212,6 +217,11 @@ def con_cara(ruta_db, salida, preguntas=None):
         if elegida:
             usadas.add(elegida[0])       # no se repite pieza en la misma charla
             pieza = elegida[1]
+        else:
+            # El lector callado se CUENTA. Quedarse en silencio es la conducta
+            # correcta cuando no hay pieza que encaje, pero un silencio que
+            # nadie cuenta no se distingue de una cobertura que no existe.
+            callado += 1
         cara.anota(pregunta, respuesta, crudo, pieza)
 
         t2 = time.perf_counter()
@@ -229,8 +239,28 @@ def con_cara(ruta_db, salida, preguntas=None):
         med = [sum(x[i] for x in turnos) / len(turnos) for i in range(4)]
         print(f"\n  MEDIA · modelo {med[0]:.2f}s · voz {med[1]:.2f}s · "
               f"cara {med[2]:.2f}s · TURNO COMPLETO {med[3]:.2f}s")
+    if guion:
+        print(f"  lector callado: {callado} de {len(guion)} turnos "
+              f"(sin pieza que encajara, que es lo correcto cuando no la hay)")
+        _anota_lector(len(guion), callado)
     print(f"  cara al dia en: {salida}")
     return 0
+
+
+def _anota_lector(turnos, callado):
+    """Una linea por conversacion en la telemetria. Sin esto, decidir si LORE
+    cubre poco o mucho se haria de memoria, que es como no decidirlo."""
+    import json
+    ruta = os.path.expanduser("~/p0x/mente/telemetria/lector.jsonl")
+    if not os.path.isdir(os.path.dirname(ruta)):
+        return
+    try:
+        with open(ruta, "a", encoding="utf-8") as fh:
+            fh.write(json.dumps({"turnos": turnos, "callado": callado,
+                                 "con_pieza": turnos - callado},
+                                ensure_ascii=False) + "\n")
+    except OSError:
+        pass
 
 
 def medir():
