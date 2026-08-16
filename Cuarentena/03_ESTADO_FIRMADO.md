@@ -3,10 +3,10 @@ id: estado-firmado-ronda
 titulo: Estado firmado y frentes aparcados
 tipo: operativo
 clase: doctrina
-version: 1.0.0
+version: 1.1.0
 editor_autorizado: carbono
 caduca: 2026-09-10
-actualizado: 2026-08-10
+actualizado: 2026-08-16
 ---
 
 # ESTADO FIRMADO
@@ -450,3 +450,96 @@ Cuando Le Jardin tenga CineK o Herbier activo y Aurelius sus partes funcionales,
 - «Que la pagina pregunte» queda APLAZADO a la UI local real: una interfaz que sea ella misma un proceso, y no una pagina abierta con doble clic. Una pagina servida desde el disco no puede recibir de un proceso local sin un puerto, y el puerto es lo que D75 cierra. No es una limitacion que se arregle con ingenio: es la forma del medio. Esa UI es la siguiente pieza, no un bloqueo de la actual.
 - Lo que se OYE se limpia; lo que se MUESTRA no se toca. Los dos espacios de fin de linea y los saltos del modelo son marcas para los ojos: dichos en voz alta producen silencios a mitad de idea. La limpieza quita marcas, jamas palabras — misma regla que el tono: se puede cambiar cuando se dice algo, nunca que se dice.
 - El arquetipo se carga AL ARRANCAR el hijo residente. Editar el fichero del caracter no cambia una conversacion en curso: hay que cerrar y volver a abrir. Es correcto —el caracter no debe mutar a media charla— y se escribe aqui para que nadie edite el texto, no vea ningun cambio, y concluya que el arquetipo no se usa.
+
+---
+
+> **BLOQUE D78-D80 · REDACTADO POR CLAUDE CODE · PENDIENTE DE FIRMA DEL SOBERANO.**
+> §5 de este mismo documento dice que Claude Code «no declara canon». Estas
+> entradas no se declaran: se REDACTAN desde evidencia medida (commits, arbol,
+> informes previos) y quedan a la espera de la firma. Cada afirmacion lleva de
+> donde sale. Lo que no se pudo medir se dice, no se rellena.
+>
+> **Aviso de numeracion.** El canon y los mensajes de commit del producto NO
+> coinciden en dos sitios, y no se corrige la historia para taparlo:
+> el commit `6d3f379` lleva la etiqueta «M-D79» y contiene lo que aqui son
+> D78 (parte), D78b, D79 y D79b; y el commit `fd518b6` lleva «M-D80b» y es lo
+> que aqui es D80c. Manda este documento; la etiqueta del commit es como quedo
+> escrita en su momento.
+
+## D78 · EL GENERADOR DE LEITMOTIVS VIAJA CON EL REPO Y ES DETERMINISTA (2026-08-16)
+- La musica de M3 se FABRICA en la maquina de quien juega. No se descarga y no viaja como binario: viaja el generador. Commits `6b354c8` (lo trae al arbol, +49 lineas) y `6d3f379` (lo hace determinista, 171 lineas tocadas).
+- Que viaje con el repo solo significa algo si es DETERMINISTA, y hasta esta entrada no lo era: el ruido de fondo salia de `hash(str(i))`, y el hash de `str` en Python esta aleatorizado por proceso (`PYTHONHASHSEED`). Dos ejecuciones en la MISMA maquina daban sha256 distintos; dos clones, sonidos distintos.
+- Arreglo: `random.Random` sembrado con el NOMBRE de la sala. `random.Random(cadena)` siembra por sha512 del texto y no lo toca `PYTHONHASHSEED`. La misma sala suena igual en todas partes y para siempre; dos salas distintas suenan distinto.
+- `asegurar()` la llama `fuga.ejecutar()` al entrar en M3, porque un clon limpio no tenia sonidos hasta que alguien ejecutara el generador a mano — que es justo lo que un generador que viaja con el repo venia a evitar.
+- Y no bloquea: disco lleno o de solo lectura, M3 se hace igual. La musica es adorno del relato, no requisito. Misma regla que la voz y el oido.
+- Nada se escribe AL IMPORTAR el modulo. Un modulo que escribe en la casa de la persona solo por ser importado no se puede probar sin tocarla.
+- Verificado: `test_leitmotivs.py`, 13 pruebas, incluido el sha256 de los seis WAV.
+
+## D78b · EL APAGADO DE HARDWARE ES DEL PRODUCTO, NO DE CADA SUITE (2026-08-16)
+- `silencio.py` (commit `6d3f379`, +63 lineas). Tres puertas y las tres se cierran juntas: microfono (`oido`), sintesis (`voz`) y altavoz (`fuga._reproducir_wav`).
+- Una sola variable: `AURELIUS_SIN_HARDWARE=1`. Va por ENTORNO y no por mock en memoria a proposito, porque tiene que cruzar a los procesos hijo: `test_idioma` arranca `aurelius.py` como subproceso y un mock no cruza esa frontera.
+- Origen con cicatriz: ya paso una vez en `test_fuga` (D77) y se arreglo DENTRO de esa suite. Se sube al producto para que la siguiente suite no lo repita. Una tanda que graba la habitacion de quien la corre tarda minutos, escucha lo que no le han dado, y ademas no prueba lo que dice probar: si la respuesta entra por el microfono, el guion de teclado no se usa nunca.
+- No es «modo test». Es una declaracion sobre la MAQUINA, como `estado.json`: vale igual para un servidor sin tarjeta de sonido o para quien no quiere que un programa le encienda el microfono. Los dos son casos reales y ninguno es una prueba.
+- Verificado: `test_silencio.py`, 9 pruebas.
+
+## D79 · UNA SOLA GRAMATICA PARA ELEGIR, POR VOZ Y POR TECLADO (2026-08-16)
+- `numero_dicho(texto, cuantas)` en `fuga.py:103` (commit `6d3f379`). Es la continuacion directa de D74, que ya habia firmado una sola gramatica para las preguntas numeradas; aqui esa gramatica pasa a ser LA MISMA por los dos canales de entrada.
+- `None` NO significa «no entendi, tira con el defecto». Significa «esto no es un numero», y quien llama tiene que rechazarlo EN VOZ ALTA nombrando los que valen.
+- Un fuera de rango tambien es `None`: decir «siete» cuando hay cuatro opciones es tan invalido como decir «Carlos», y merece el mismo rechazo. Un fuera de rango que cae al defecto en silencio es la version educada de no escuchar.
+- Acepta digitos y palabras, y solo si el texto ES el numero: «el 3» vale, «tengo 3 hijos» no es una eleccion, es una frase.
+- Verificado: casos 25, 26, 27 y 28 de `test_fuga.py` (numero por voz, rechazo hablado, misma gramatica por teclado, y el defecto DICHO al agotar intentos).
+
+## D79b · EL PERMISO DEL GERENTE: FILA AUSENTE VALE 'NO', Y SE COMPRUEBA DENTRO (2026-08-16)
+- `permiso_concedido(db)` y `perfil_para_gerente(db)` en `fuga.py:157` y `:177` (commit `6d3f379`).
+- Fila ausente = `no`. Nunca un error y nunca otro defecto: una base recien creada, una fila que jamas se escribio y una sesion que se corto antes de la pregunta tienen que dar TODAS la misma respuesta, y tiene que ser la que no entrega nada. Solo un `si` explicito abre la puerta.
+- La comprobacion vive DENTRO del camino de lectura, no en quien llama. Esa es la diferencia entre un permiso y una costumbre: en el llamante, bastaria un llamante nuevo que no la conociera — y siempre hay un llamante nuevo.
+- Sin permiso LEVANTA (`SinPermiso`), no devuelve un diccionario vacio. Vacio se confunde con «no contesto nada», y son cosas distintas: una es no tener datos y la otra es tenerlos y que no sean tuyos.
+- `NO_DATA` se entrega tal cual cuando hay permiso: la ausencia tambien es del perfil.
+- Verificado: casos 19 a 24 de `test_fuga.py`, incluido el que exige que la comprobacion este dentro del camino de lectura y el que impide que abandonar la sala 3 deje un permiso suelto.
+
+## D79c · EL RANGO DE INTERPRETES SE MIDE, SE DECLARA Y NO BLOQUEA (2026-08-16)
+- Commits `1ee1b3f` (la cabecera de `bin/pruebas` declara interprete y ruta) y `e531b5b` (`interprete.py` + `test_interprete.py`, 6 pruebas).
+- Regla: una cifra sin su maquina es un rumor con decimales. `bin/pruebas` imprime `python3 -V` y su ruta ANTES de correr nada, para que salga aunque la tanda se corte a la mitad.
+- El rango vive en UN sitio (`interprete.py`) y lo consumen el producto y la tanda. Si viviera en los dos, el dia que se pruebe una version nueva habria que acertar dos veces, y bastaria fallar una para que el README prometiera un rango y el programa declarara otro.
+- Fuera del rango: se DECLARA por salida de error, en los dos idiomas — ocurre antes de que nadie haya elegido idioma — y se SIGUE. Fuera del rango probado no significa roto, significa sin dato; negarse a arrancar convertiria una ausencia de medida en un veredicto, que es lo que este arbol no hace en ningun otro sitio.
+- El README publica lo que se CORRIO, con su arbol y su sistema, y no un intervalo de compatibilidad: nadie ha corrido la suite en 3.12, asi que la tabla no dice que funcione ahi.
+- Medido: 3.10.12 y 3.14.4, ambos VERDE. La medida vieja de Ubuntu 22.04 sobre `73f7bc6` (217/217) se declara en fila aparte de la de hoy en vez de fundirse con ella.
+
+## D80 · UN SOLO ESCRITOR DEL PERFIL, CON ON CONFLICT (2026-08-16)
+- `guardar_perfil(c, pares, commit=True)` en `memory.py` (commit `5f56b15`). Es el UNICO sitio del arbol con SQL de `profile`. `escribir_perfil` — que ya existia y ya usaba `ON CONFLICT` — pasa a delegar, para que no haya dos escritores que puedan separarse con el tiempo.
+- `fuga.py:802` era el unico escritor que se saltaba la puerta: `INSERT OR REPLACE INTO profile`, que borra la fila entera y mete otra, de modo que toda columna que la sentencia no nombre vuelve a su DEFAULT. Es un DELETE con otro nombre, y la regla de cero DELETE no tiene excepcion para cuando es una sola fila. El mismo motivo ya estaba escrito en `_marcar_sala_entrada`; faltaba aplicarlo aqui.
+- `commit=False` para lotes: la Fuga vuelca el perfil de una sala entero o no lo vuelca. Un commit por clave habria convertido esa promesa en media sala escrita y roto el criterio 2 de M3.
+- LO QUE ESTA ENTRADA NO AFIRMA, y se escribe aqui para que nadie lo cuente al reves: la correccion es PREVENTIVA, no reparadora. Medido: `profile` tiene hoy exactamente `key`, `value`, `updated_at`, y la sentencia vieja las nombraba las tres. No se perdio ningun dato. Lo que se arregla es que haya un solo escritor y que la sentencia siga siendo correcta el dia que `profile` gane una columna.
+- La prueba (caso 22 de `test_memory.py`) se monta sobre una clave que YA EXISTE y una columna extra con valor distinto de su DEFAULT. Las dos condiciones hacen falta: con clave nueva no hay conflicto y las dos sentencias escriben lo mismo — medido, las dos dan `x` — de modo que el caso daria verde con la mala dentro. Un test que pasa con el bug dentro no es un test.
+- Leccion de metodo, de la misma familia que las tres anteriores del Preceptor: el prompt afirmaba que `memory.py` no tenia pareja de `leer_perfil`. La tenia (`escribir_perfil`, `memory.py:237`, +20 llamantes, presente ya en `12d6071`). El error fue buscar `def guardar_perfil` — el nombre supuesto — en vez de `def .*perfil`, la funcion que hace el trabajo. Una busqueda con la forma de la suposicion confirma la suposicion. Ejecutado al pie de la letra habria creado un segundo escritor con la misma semantica y otro nombre.
+
+## D80b · LO QUE APAGA UNA GUARDIA Y LO QUE LOS CRITERIOS NO MIDEN, EN LA RAIZ (2026-08-16)
+- `EXCEPCIONES.md` (commit `2c2c163`) y `LIMITES_DEL_CRITERIO.md` (commit `bd52d76`), los dos en la RAIZ del producto y versionados. Comprobado: `git ls-files '*.md'` da siete e incluye a ambos.
+- Van a la raiz y no a `docs/` porque `docs/` esta en `.gitignore` linea 7 — por un motivo escrito dentro y correcto, que no se toca — y `git ls-files docs/` da 0. Un registro que no esta versionado no es un registro.
+- `EXCEPCIONES.md`: una fila por pragma que apaga una guardia — fichero, linea, pragma, motivo, fecha. Hoy hay uno: `voz.py:43`, introducido en `73f7bc6`. El motivo dice por que ESA linea es segura (un prefijo de gestor de paquetes es igual en cualquier maquina y no describe a nadie), no que la guardia moleste. Queda escrita la orden que reconcilia la tabla con el arbol.
+- `LIMITES_DEL_CRITERIO.md`: tres partes. (a) que verifican los 10 criterios de M3, uno por fila, mas los sabotajes 6/6 que les dan valor. (b) QUE NO VERIFICAN: ninguno comprueba que la persona salga sabiendo algo que no sabia al entrar, que era la razon de construir M3. Un 10/10 verde es compatible con alguien que recorre las seis salas y sale igual que entro. Sin disculpa y sin promesa: nada de «criterio 11 pendiente», que seria sustituir una medida que falta por una intencion. (c) el acta del rojo del 2026-08-16.
+- Esto es doctrina de producto, no de proceso: el titular no afirma mas que la seccion que lo sostiene, y donde no hay seccion se dice que no la hay.
+
+## D80c · TMPDIR FIJADO, Y EL ACTA DEL ROJO ENMENDADA (2026-08-16)
+- Commit `fd518b6` (etiquetado «M-D80b» en su mensaje; ver el aviso de numeracion arriba). `bin/pruebas` fija `export TMPDIR="${TMPDIR:-/var/tmp}"` antes de cualquier operacion, con guarda: si no existe o no se puede escribir, para con codigo 2. <!-- guardia:permitir /var/tmp es prefijo de sistema (FHS), no el home de nadie; es el dato medido de D80c -->
+- Motivo medido: `/tmp` en el Soberano es tmpfs de 29 GB — RAM — y `/var/tmp` es el NVMe. `TMPDIR` no estaba puesto, asi que `tempfile` resolvia a `/tmp` y las tandas escribian en RAM sin que nadie lo hubiera elegido ni quedara constancia. Dos tandas con el mismo numero podian no haber corrido en el mismo sitio; las salidas lo prueban (`/tmp/fuga_8dqsdn_b` en una, `/var/tmp/fuga_ligpbeb8` en otra). <!-- guardia:permitir /var/tmp es prefijo de sistema (FHS), no el home de nadie; es el dato medido de D80c -->
+- ENMIENDA AL ACTA DEL ROJO, sin borrar lo anterior: el disco queda descartado (541 GB libres, cero eventos de `ENOSPC` o E/S en el journal de toda la semana, y los seis positivos del grep eran nombres de ficheros de Chromium). NO queda descartada la presion de memoria sobre `/tmp`. Un tmpfs lleno devuelve `ENOSPC` sin dejar rastro en el journal y sin disparar `oom-kill`, asi que la ausencia de registro no lo excluye: el cero es evidencia contra el disco y no es evidencia contra la RAM.
+- Se corrige ademas una frase que argumentaba en la direccion contraria: «`TemporaryDirectory` ni siquiera toca el disco» se habia escrito COMO apoyo del descarte, y es el flanco. Que el temporal viviera en RAM no aleja las pruebas del problema.
+- Esto NO identifica el mecanismo. Cierra una indeterminacion: si el rojo vuelve, vuelve en un sitio conocido, con espacio medido y estable. `TMPDIR` se imprime ahora en la cabecera junto al interprete, por el mismo motivo que el: «donde escribio» es parte de la maquina.
+- Consecuencia honesta: las tandas anteriores a este commit corrieron en el sitio sospechoso. No las invalida, pero la serie comparable empieza aqui.
+
+## D80d · INCIDENTE DE BORRADO DEL CLON DE TRABAJO (2026-08-16)
+- Que paso: `~/p0x/aurelius-mvp` desaparecio durante una sesion. El sintoma que confundio fue que hasta `true` devolvia 1 sin salida — no es que los comandos fallaran, es que ningun comando puede arrancar en un directorio que no existe. Se resuelve con `cd`, no reviviendo nada.
+- Que NO se perdio, medido en el momento: `p0x` entero y sano (canon, blueprints, doctrina, `Cuarentena/salida/` con 44 ficheros). El producto estaba empujado a GitHub (`6b354c8..73f7bc6`), asi que `git clone` lo devolvia entero. `~/.aurelius/` — lo unico irreemplazable y sin copia — intacto.
+- Origen del riesgo: un `purge` de `python3.12` seguido de `autoremove -y`. La gravedad dependia de la distribucion (en 22.04 el 3.12 venia de `deadsnakes` y purgarlo no toca el sistema; en 24.04 el 3.12 ES el sistema). Se resolvio mirando `/var/log/apt/history.log` en vez de adivinar. <!-- guardia:permitir /var/tmp es prefijo de sistema (FHS), no el home de nadie; es el dato medido de D80c -->
+- Leccion 1: lo unico sin copia es `~/.aurelius/`. Todo lo demas tiene remoto. El orden de comprobacion lo decide una sola pregunta — ¿esto tiene copia en algun sitio? — y se mira primero lo que no la tiene.
+- Leccion 2: `autoremove` es el comando que hace el dano en cascada. No se ejecuta otro «por si acaso» mientras se diagnostica.
+- Leccion 3 (la que costo la tarde): el rojo que siguio al borrado no era del codigo. Mismo clon y mismo commit en otra maquina daban VERDE. La cifra no viajaba con su interprete, y de ahi sale D79c.
+- Pendiente y declarado: la prueba de recuperacion HECHA A PROPOSITO — borrar, restaurar desde el remoto, cronometrar y exigir verde — sigue sin hacerse. Es el unico test que mediria lo unico que el producto promete: que te lo llevas y vuelve.
+
+## D80e · ESTADO VERIFICADO AL CIERRE DE LA RONDA (2026-08-16)
+- Producto en `fd518b6`, arbol limpio, empujado a `origin/main` (`github.com/piskyRpapalo/aurelius`), remoto comprobado igual al local.
+- **224/224 VERDE, salida 0**, 13 suites, 6 corredores, sabotajes 4/4 y 6/6.
+- Reproducido de forma INDEPENDIENTE por el Preceptor sobre el arbol `5a86cc6`, en otra maquina y otro interprete (3.10.12): 224/224, salida 0. Tercera reproduccion independiente de una cifra de Claude Code en esta serie y la tercera que sale exacta.
+- ACOTACION: esa reproduccion independiente es de `5a86cc6`. El commit `fd518b6` (D80c) solo esta verificado en el Soberano, en 3.14.4 y en 3.10.12. No se cuenta como verificado fuera hasta que lo este.
+- El canon `p0x` NO esta empujado a `jetson`. Todo lo de esta ronda vive en un solo disco.
