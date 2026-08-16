@@ -261,8 +261,20 @@ def escanear_lineas(ruta: str, lineas: list[tuple[int, str]]) -> list[str]:
     canon_d23 = bool(RUTAS_CANON_D23.search(ruta))
     hallazgos: list[str] = []
     for num, texto in lineas:
+        # El pragma exime reglas NO críticas. D8_JAMAS (TOKEN-PROVEEDOR, 
+        # IP-TAILNET, CLAVE-PRIVADA) NUNCA se exime, incluso con pragma.
         if PRAGMA.search(texto):
-            continue
+            # Verifica si la línea tiene alguna regla crítica (D8_JAMAS)
+            tiene_regla_critica = False
+            for rid, _desc, patron in REGLAS:
+                if patron.search(texto) and rid in D8_JAMAS:
+                    tiene_regla_critica = True
+                    break
+            
+            # Solo hace continue si NO hay reglas críticas
+            if not tiene_regla_critica:
+                continue
+            # Si hay regla crítica, continúa el flujo normal de detección
         for rid, _desc, patron in REGLAS:
             m = patron.search(texto)
             if not m:

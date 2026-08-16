@@ -56,7 +56,7 @@ fichero en disco. El Códice no se ha corrompido en ninguno de los traslados.
 
 ```
 $ ls -la p0x/mente/codice/
-lrwxrwxrwx  CODICE_david.md -> /mnt/nvme/p0x/codice/CODICE_david.md
+lrwxrwxrwx  CODICE_david.md -> /mnt/nvme/p0x/codice/CODICE_david.md  # guardia:permitir · transcrito de auditoría anterior a D34 · ruta de disco propio · 2026-08-09
 
 $ sha256sum p0x/mente/codice/CODICE_david.md
 sha256sum: … No such file or directory

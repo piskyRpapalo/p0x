@@ -77,6 +77,7 @@ BLOQUEAN = [
     ("[pisky@soberano ~]$ uname -a", "NODO-USER-AT"),
     # IPs privadas
     ("tailnet 100.81.82.34", "IP-TAILNET"),
+    ("IP 100.81.82.34  <!-- guardia:permitir doc interna, no se publica -->", "IP-TAILNET"),  # D8_JAMAS nunca se exime
     ("la-fragua responde en 100.82.94.83:6333", "IP-TAILNET"),
     ("gateway 192.168.1.1", "IP-RFC1918"),
     ("bind 10.0.0.5", "IP-RFC1918"),
@@ -124,7 +125,7 @@ BLOQUEAN = [
 
 # Excepción declarada: el pragma desactiva la línea, con motivo a la vista.
 PRAGMA_OK = [
-    "IP 100.81.82.34  <!-- guardia:permitir doc interna, no se publica -->",
+#     "IP 100.81.82.34  <!-- guardia:permitir doc interna, no se publica -->",  # MOVIDO A BLOQUEAN: D8_JAMAS nunca se exime
 ]
 
 
