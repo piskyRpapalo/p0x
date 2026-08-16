@@ -10,7 +10,24 @@ Por eso este auditor lee la lista de esperados de un fichero FUERA de git
 es la memoria; el estado firmado es la prueba; la distancia es el hallazgo.
 
 Salida: una linea por hallazgo. Codigo 1 si hay ausencias reales, 0 si no.
-Un HUECO declarado (D24) es NO_DATA, no una ausencia: se informa y no bloquea.
+
+Un HUECO no es una ausencia, pero no todos los huecos valen lo mismo, y el
+auditor que los trataba igual no servia para lo unico que importa: notar que
+una edicion acaba de abrir uno. Se declara la ANTIGUEDAD del hueco:
+
+  HUECO_PREEXISTENTE  el salto es anterior a la serie que audita. Nadie vivo
+                      sabe que fue (D24). NO_DATA puro: se informa, no bloquea.
+  HUECO_NUEVO         el salto lo abrio una edicion de esta serie (D42). Es
+                      hallazgo BLOQUEANTE mientras su motivo no conste en el
+                      ESTADO FIRMADO. No basta con explicarlo en el archivo de
+                      razonamiento: ese fichero es memoria, no prueba, y lo
+                      edita el mismo proceso al que se le esta auditando. Un
+                      hueco que se justifica a si mismo en su propio cuaderno
+                      es un hueco sin justificar.
+
+El HUECO a secas ya no se acepta: obligaba a decidir de memoria si un salto
+era viejo o recien hecho, que es exactamente la clase de juicio atencional que
+D28 prohibe. Declarar la antiguedad cuesta una palabra y la vuelve mecanica.
 
     python3 audit_dids.py [--razonamiento RUTA] [--firmado RUTA]
 """
@@ -46,7 +63,16 @@ FIN = "<!-- D_IDS_ESPERADOS:FIN -->"
 # busque cabeceras declara siete ausencias falsas.
 FORMA_CABECERA = "cabecera"
 FORMA_TABLA = "tabla"
-FORMA_HUECO = "HUECO"
+
+# Antiguedad del hueco. Ver el docstring: la distincion es el objeto de este
+# auditor, no un detalle de formato.
+FORMA_HUECO_PRE = "HUECO_PREEXISTENTE"
+FORMA_HUECO_NUEVO = "HUECO_NUEVO"
+HUECOS = (FORMA_HUECO_PRE, FORMA_HUECO_NUEVO)
+
+# Forma retirada. Se rechaza en vez de mapearse a una de las dos por defecto:
+# cualquier default aqui adivina la antiguedad de un hueco, que es el dato.
+FORMA_HUECO_OBSOLETA = "HUECO"
 
 
 def leer_esperados(ruta: str) -> list[tuple[str, str]]:
@@ -78,12 +104,34 @@ def leer_esperados(ruta: str) -> list[tuple[str, str]]:
         if len(partes) < 2:
             print(f"BLOQUEADO · linea sin forma declarada: {linea!r}")
             sys.exit(2)
-        esperados.append((partes[0], partes[1]))
+        d_id, forma = partes[0], partes[1]
+        if forma == FORMA_HUECO_OBSOLETA:
+            print(f"BLOQUEADO · {d_id} declarado como {FORMA_HUECO_OBSOLETA} "
+                  f"a secas, forma retirada.")
+            print(f"  Declara {FORMA_HUECO_PRE} (salto anterior a esta serie) "
+                  f"o {FORMA_HUECO_NUEVO} (salto abierto por una edicion de "
+                  f"esta serie).")
+            sys.exit(2)
+        if forma not in (FORMA_CABECERA, FORMA_TABLA, *HUECOS):
+            print(f"BLOQUEADO · {d_id} declarado con forma desconocida: "
+                  f"{forma!r}")
+            sys.exit(2)
+        esperados.append((d_id, forma))
     return esperados
 
 
-def leer_en_disco(ruta: str) -> tuple[set[str], set[str]]:
-    """(ids como cabecera, ids como fila de tabla) presentes en el firmado."""
+def justificado_en_firmado(d_id: str, texto: str) -> bool:
+    """¿El estado firmado cita este D-id en el cuerpo de alguna decision?
+
+    Se busca en el firmado y NO en el archivo de razonamiento a proposito: un
+    hueco nuevo se cierra firmando su motivo donde vive la prueba. El limite
+    de palabra evita que D4 se de por justificado al aparecer D42.
+    """
+    return re.search(rf"\b{re.escape(d_id)}\b", texto) is not None
+
+
+def leer_en_disco(ruta: str) -> tuple[set[str], set[str], str]:
+    """(ids como cabecera, ids como fila de tabla, texto) del firmado."""
     try:
         with open(ruta, encoding="utf-8") as fh:
             texto = fh.read()
@@ -92,7 +140,7 @@ def leer_en_disco(ruta: str) -> tuple[set[str], set[str]]:
         sys.exit(2)
     cabeceras = set(re.findall(r"^## (D[0-9]+) · ", texto, re.MULTILINE))
     tablas = set(re.findall(r"^\| \*\*(D[0-9]+)\*\* \|", texto, re.MULTILINE))
-    return cabeceras, tablas
+    return cabeceras, tablas, texto
 
 
 def main() -> int:
@@ -102,22 +150,28 @@ def main() -> int:
     args = ap.parse_args()
 
     esperados = leer_esperados(args.razonamiento)
-    cabeceras, tablas = leer_en_disco(args.firmado)
+    cabeceras, tablas, texto_firmado = leer_en_disco(args.firmado)
     en_disco = cabeceras | tablas
 
     ausentes: list[str] = []
     forma_mal: list[str] = []
     huecos: list[str] = []
+    huecos_sin_firmar: list[str] = []
 
     for d_id, forma in esperados:
-        if forma == FORMA_HUECO:
+        if forma in HUECOS:
             if d_id in en_disco:
                 forma_mal.append(
-                    f"{d_id} · declarado HUECO en el archivo de razonamiento "
-                    f"pero PRESENTE en disco — actualiza el archivo"
+                    f"{d_id} · declarado {forma} en el archivo de "
+                    f"razonamiento pero PRESENTE en disco — actualiza el "
+                    f"archivo"
                 )
+            elif forma == FORMA_HUECO_NUEVO and not justificado_en_firmado(
+                d_id, texto_firmado
+            ):
+                huecos_sin_firmar.append(d_id)
             else:
-                huecos.append(d_id)
+                huecos.append(f"{d_id} ({forma})")
             continue
         if d_id not in en_disco:
             ausentes.append(d_id)
@@ -144,10 +198,17 @@ def main() -> int:
         print(f"  FORMA     · {m}")
     for d in huerfanos:
         print(f"  HUERFANO  · {d} en disco y NO esta en la lista de esperados")
+    for d in huecos_sin_firmar:
+        print(f"  HUECO_NUEVO · {d} lo abrio una edicion de esta serie y su "
+              f"motivo NO consta en el estado firmado")
+        print(f"                explicarlo en el archivo de razonamiento no "
+              f"basta: ese fichero es memoria, no prueba")
     for d in huecos:
         print(f"  NO_DATA   · {d} hueco declarado — no se rellena, no bloquea")
 
-    fallos = len(ausentes) + len(forma_mal) + len(huerfanos)
+    fallos = len(ausentes) + len(forma_mal) + len(huerfanos) + len(
+        huecos_sin_firmar
+    )
     print()
     print(f"RESULTADO: {fallos} hallazgo(s) que bloquean, "
           f"{len(huecos)} NO_DATA declarado(s)")

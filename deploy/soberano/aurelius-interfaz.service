@@ -3,13 +3,32 @@ Description=Aurelius — cara del Preceptor (interfaz estatica :8050, tailnet)
 Documentation=file:///home/pisky/aurelius/scripts/servir_interfaz.py
 After=network-online.target
 Wants=network-online.target
+# D27: limite de arranques. Antes no habia ninguno, y por eso un fallo de bind
+# se convirtio en ~29 953 reinicios (2026-08-01) en lugar de detener la unidad.
+# Con esto, cinco fallos en 60 s dejan el servicio en `failed` y VISIBLE.
+StartLimitIntervalSec=60
+StartLimitBurst=5
 
 [Service]
+# Type=simple confirmado por evidencia de runtime del Soberano (D27-CONT):
+# el script corre en primer plano, systemd no pierde el proceso.
 Type=simple
-WorkingDirectory=/home/pisky/aurelius
+# %h en vez de ruta absoluta: el especificador de systemd para el home del
+# usuario. La unidad deja de nombrar a un usuario concreto y se vuelve
+# replicable por cualquiera que clone el repo (objetivo Free Will).
+WorkingDirectory=%h/aurelius
+# La direccion de escucha NO se escribe aqui. Vive en un fichero fuera de git,
+# por dos razones que apuntan al mismo sitio:
+#   · 04_CONTRATO §3.5: cero IPs de tailnet en nada publicable, y esa regla
+#     manda sobre cualquier mejora. La guardia bloquea IP-TAILNET siempre y
+#     sin exencion posible (D18/D23, suelo duro D8_JAMAS).
+#   · Portabilidad: cada nodo declara su propia direccion sin editar la unidad.
+# SIN prefijo `-`: si falta el fichero, el servicio NO arranca. Falla cerrado.
+# Con `-` la variable quedaria vacia y el bind seria impredecible.
+EnvironmentFile=%h/.config/aurelius/interfaz.env
 # Ruta ABSOLUTA a python (footgun: el PATH de systemd != PATH interactivo, no ve
 # ~/.local/bin). El script usa solo stdlib (http.server) → python3 del sistema basta.
-ExecStart=/usr/bin/python3 /home/pisky/aurelius/scripts/servir_interfaz.py --host 0.0.0.0 --puerto 8050
+ExecStart=/usr/bin/python3 %h/aurelius/scripts/servir_interfaz.py --host ${AURELIUS_BIND_HOST} --puerto 8050
 Restart=on-failure
 RestartSec=3
 # servir_interfaz.py convierte SIGTERM en cierre limpio (KeyboardInterrupt) → stop ordenado.

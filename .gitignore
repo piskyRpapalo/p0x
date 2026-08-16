@@ -63,3 +63,15 @@ verde/cuaderno.md
 .aider.input.history
 .aider.tags.cache.v4/
 Cuarentena/necropolis/D18_guardia_por_regla.patch
+
+# ─── Árboles ajenos o repos propios (no contenido de p0x) ───
+ComfyUI/
+soberano-bench/
+CineK_Studio/
+cine_soberano_app/
+aurelius-mvp/
+archive_cinek_automatico_20260810/
+.cache/
+node_modules/
+github-profile/
+codice-emancipacion-atomica/
