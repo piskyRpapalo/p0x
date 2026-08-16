@@ -854,3 +854,59 @@ destapó y no le tocaba resolver.
   remoto que **no pasa por `git push`** y que por tanto los ganchos no frenan.
   Es doctrina, no preferencia: no se reabre sin enmienda de §1. El resto de la
   ronda MCP-1 queda en `deploy/soberano/MCP.md`.
+
+### 2026-08-16 · Cierre técnico de aurelius-mvp · sugerencias
+
+Misión: PASO 1–6 del cierre técnico (`guardar_perfil`, `EXCEPCIONES.md`,
+`LIMITES_DEL_CRITERIO.md`, intérprete en la cabecera, rango de Python, push).
+Resultado: VERDE 224/224 en 3.14.4 y en 3.10.12, empujado a `origin/main`
+(`5a86cc6`). Estado de las seis: **ABIERTAS**.
+
+- **S1 · La corrección del PASO 1 es preventiva, no reparadora. Que conste en
+  el acta antes de que se cuente al revés.** (Coste S.) `profile` tiene hoy
+  exactamente tres columnas — `key`, `value`, `updated_at` — y el
+  `INSERT OR REPLACE` de `fuga.py:802` las nombraba **las tres**. Medido: hoy
+  no perdía ningún dato. Lo que se arregló es que dejara de haber dos
+  escritores y que la sentencia siga siendo correcta el día que `profile` gane
+  una columna; el caso 22 simula ese día con una columna `extra`. Sostener
+  «se corrigió una pérdida de datos» sería afirmar más de lo que la sección
+  sostiene.
+
+- **S2 · `aurelius.py` no lo importa ninguna suite.** (Coste M.) Son 21 KB y
+  es el punto de entrada del producto — `main()`, `arranque()`, `sesion()`,
+  `ofrecer_m3()` —, y hasta esta misión **cero** ficheros de prueba lo
+  importaban (`grep -l "import aurelius" test_*.py` daba vacío).
+  `test_interprete.py` es lo primero que lo arranca, y solo como subproceso y
+  solo para `--view`. Encaja con el PROMPT 2 de la cola pero es más agudo: no
+  es que las suites fabriquen el dato, es que ahí no hay suite.
+
+- **S3 · Medir 3.11, 3.12 y 3.13 y convertir el intervalo en puntos.**
+  (Coste S.) El README declara hoy dos medidas reales y dice explícitamente
+  que lo de en medio se infiere. Con `uv` instalado eso deja de costar nada:
+  `uv python install 3.12.x` y la tanda con un shim de `PATH` — así se hizo
+  la medida de 3.10.12 de esta misión, en menos de dos minutos y sin sudo.
+  Tres puntos más y el intervalo deja de ser una inferencia.
+
+- **S4 · El inventario que planifica una misión se verifica con `git grep`
+  antes de firmarla.** (Coste S.) §2 del artefacto de cola daba
+  `guardar_perfil` como inexistente — correcto — pero el PASO 1 añadía que
+  «`memory.py` tiene `leer_perfil` y no tiene su pareja». La pareja existía:
+  `escribir_perfil`, en `memory.py:237`, ya con `ON CONFLICT`, con más de 20
+  llamantes. Ejecutar el PASO 1 al pie de la letra habría creado un segundo
+  escritor con la misma semántica y otro nombre, que es peor que el problema
+  que venía a resolver. Es la misma clase de error que la cicatriz de las
+  claves relayadas: un dato del árbol que pasa por un resumen intermedio.
+
+- **S5 · La cifra del README se puede quedar vieja en silencio.** (Coste S.)
+  Decía `12/12 tests green` para una suite que llevaba 24 casos, y `217` para
+  un árbol que ya iba por otro número. Se corrigieron a mano en esta misión;
+  a mano se volverán a quedar viejas. `bin/pruebas` ya imprime el total: un
+  modo `--comprobar-readme` que compare el total impreso con el que afirma el
+  README, y falle si divergen, cierra la vía.
+
+- **S6 · Las anclas de sabotaje acoplan las suites a líneas exactas del
+  producto.** (Coste S.) Editar `fuga._volcar_pendiente` estuvo a punto de
+  invalidar un ancla de `test_fuga.py`. **El mecanismo aguantó** — verifica
+  que el ancla aparezca una vez y rechaza el sabotaje si no —, así que esto
+  no es un fallo abierto sino un coste de mantenimiento que conviene tener
+  contado antes de que sean veinte anclas en vez de diez.
