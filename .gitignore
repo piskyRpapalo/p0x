@@ -8,6 +8,9 @@ pipeline/whisper.cpp/
 *.bak-*
 __pycache__/
 .venv/
+# venv del dashboard local: PEP 668 impide instalar pywebview en el python del
+# sistema, así que vive aquí. Regenerable en un comando (ver README).
+.venv-dashboard/
 
 # derivados ligeros pero 100% regenerables desde el corpus .md ya versionado —
 # trackearlos solo crea diffs de ruido en cada ingesta, sin historia nueva real
