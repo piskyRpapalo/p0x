@@ -453,10 +453,10 @@ Cuando Le Jardin tenga CineK o Herbier activo y Aurelius sus partes funcionales,
 
 ---
 
-> **BLOQUE D78-D80 · REDACTADO POR CLAUDE CODE · PENDIENTE DE FIRMA DEL SOBERANO.**
-> §5 de este mismo documento dice que Claude Code «no declara canon». Estas
-> entradas no se declaran: se REDACTAN desde evidencia medida (commits, arbol,
-> informes previos) y quedan a la espera de la firma. Cada afirmacion lleva de
+> **BLOQUE D78-D80 · FIRMADO POR EL SOBERANO · 2026-08-16.**
+> Redactado por Claude Code desde evidencia medida y **firmado por Pisky** en
+> la respuesta de cierre de ronda M-D80. §5 de este documento dice que Claude
+> Code «no declara canon»: no lo declaro — lo redacte, y la firma es suya. Cada afirmacion lleva de
 > donde sale. Lo que no se pudo medir se dice, no se rellena.
 >
 > **Aviso de numeracion.** El canon y los mensajes de commit del producto NO
@@ -543,3 +543,13 @@ Cuando Le Jardin tenga CineK o Herbier activo y Aurelius sus partes funcionales,
 - Reproducido de forma INDEPENDIENTE por el Preceptor sobre el arbol `5a86cc6`, en otra maquina y otro interprete (3.10.12): 224/224, salida 0. Tercera reproduccion independiente de una cifra de Claude Code en esta serie y la tercera que sale exacta.
 - ACOTACION: esa reproduccion independiente es de `5a86cc6`. El commit `fd518b6` (D80c) solo esta verificado en el Soberano, en 3.14.4 y en 3.10.12. No se cuenta como verificado fuera hasta que lo este.
 - El canon `p0x` NO esta empujado a `jetson`. Todo lo de esta ronda vive en un solo disco.
+
+## D80f · EL NUMERO DEL TEST ES EL DEL CRITERIO, Y EL RANGO SON CINCO PUNTOS (2026-08-16)
+- Commit `7d0a72d` del producto. Cierra dos de las tres deudas que el Soberano puso al firmar M3 (§4.2.b y §3.d de su respuesta de cierre).
+- NUMERACION: `test_07` cubria el criterio 8, `test_08` el 7, `test_09` el 10 y `test_10` el 9. Nada fallaba por eso — los diez pasaban — y por eso duro: solo se ve auditando, y quien auditase por el numero del metodo concluiria que faltan criterios que estan. Renombrados los cuatro.
+- Renombrar no basta porque volveria a torcerse. `test_00_el_numero_del_test_es_el_del_criterio` lo comprueba POR INTROSPECCION: lee el numero del metodo y el que declara su docstring y exige que sean el mismo, y exige ademas que esten los diez — una renumeracion que borrase uno dejaria la primera comprobacion en verde con nueve. No se usa lista escrita a mano: seria otra cosa mas que se puede desincronizar del arbol, el mismo fallo con un fichero mas.
+- Verificado en los dos sentidos: verde sobre el arbol arreglado y ROJO sobre una copia donde se deshace el arreglo. Un test que pasa con el bug dentro no es un test.
+- INTERPRETES: `uv run --python X.Y ./bin/pruebas` funciona. 225/225 salida 0 en 3.10.12, 3.11.16, 3.12.13, 3.13.15 y 3.14.4. El intervalo inferido de D79c pasa a CINCO PUNTOS MEDIDOS.
+- Lo que fallaba era la invocacion, no `uv`: `unittest discover` corre 145 de 225 — no encuentra las cinco suites con corredor propio, que es lo que el README ya advertia — imprime su informe por salida de error mientras los casos imprimen por salida estandar, y termina en 0. De ahi que la salida mostrase el final de una fuga y ningun recuento. Un verde que cubre el 64% y no lo dice es exactamente el fallo que `bin/pruebas` existe para impedir.
+- Lo que sigue SIN cubrir y se declara: las cuatro medidas con `uv` fijan el INTERPRETE, no la distribucion, y corrieron en una sola maquina. Una segunda maquina es otra medida.
+- `CIERRE_M3.md` pasa a FIRMADA y conserva la trampa de numeracion como cicatriz cerrada, no borrada.
