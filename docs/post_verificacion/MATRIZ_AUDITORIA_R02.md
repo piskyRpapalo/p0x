@@ -65,7 +65,7 @@ Prueba determinista sobre un fichero sintético en `/tmp` (no se tocó el reposi
 
 | Línea de prueba | Detectado |
 |---|---|
-| IP tailnet sola `100.101.102.103` | **sí** — `[IP-TAILNET]` |  # guardia:permitir IP-ejemplo-documentacion-regla-IP-TAILNET
+| IP tailnet sola `<IP-DE-EJEMPLO>` | **sí** — `[IP-TAILNET]` |  # guardia:permitir IP-ejemplo-documentacion-regla-IP-TAILNET
 | La misma IP tailnet + la palabra `localhost` | **NO** |
 | Token de proveedor con forma viva `ghp_…` | **sí** — `[TOKEN-PROVEEDOR]` |
 | El mismo token + `/home/pisky/p0x` en la línea | **NO** |

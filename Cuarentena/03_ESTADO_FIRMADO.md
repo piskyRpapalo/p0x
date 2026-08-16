@@ -83,7 +83,7 @@ Cuando Le Jardin tenga CineK o Herbier activo y Aurelius sus partes funcionales,
 ## VERIFICACIÓN RAÍZ P0X (2026-08-11)
 - Escaneo de keys en toda la raíz p0x (excluyendo Cuarentena, .git, node_modules, dist): dos coincidencias.
 - Ambas en /home/pisky/p0x/deploy/comun/hooks/test_guardia.py, líneas 90 y 92.  # guardia:permitir ruta-local-documentacion-D8
-- Confirmado como fixtures de test (tuplas de casos de prueba con etiqueta TOKEN-PROVEEDOR).
+- Confirmado como fixtures de test (tuplas de casos de prueba con etiqueta <TOKEN-DE-PROVEEDOR>).
 - AKIAIOSFODNN7EXAMPLQ es el placeholder literal de la documentación AWS.  # guardia:permitir placeholder-AWS-D10
 - Decisión: ignorar. No son credenciales vivas. Se declaran en POST_VERIFICACION_R00 como datos de test verificados.
 - Pre-check de la raíz: VERDE. Cero keys reales.
