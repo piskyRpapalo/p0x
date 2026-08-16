@@ -910,3 +910,50 @@ Resultado: VERDE 224/224 en 3.14.4 y en 3.10.12, empujado a `origin/main`
   que el ancla aparezca una vez y rechaza el sabotaje si no —, así que esto
   no es un fallo abierto sino un coste de mantenimiento que conviene tener
   contado antes de que sean veinte anclas en vez de diez.
+
+## Misión · Dashboard local de Aurelius (PyWebView) · 2026-08-16
+
+- **S1 · El gerente `aurelius-m1/aurelius` tiene tres rutas viejas cableadas a
+  `$HOME`.** (Coste S.) `llama-cli`, el `.gguf` y `ARQUETIPO.md` se mudaron
+  dentro del repo privado y el wrapper se quedó apuntando al home. Invocado a
+  mano moría con `FileNotFoundError` antes de generar un token; el dashboard lo
+  sortea dándole su propio `HOME`, y se pusieron dos enlaces para la vía CLI.
+  Son dos parches para un literal: la corrección de verdad es un `RAIZ`
+  configurable en el wrapper. Mientras no se haga, cualquier tercer llamante
+  vuelve a tropezar con lo mismo.
+
+- **S2 · La cara habla por `fetch` con un servidor que en local no existe.**
+  (Coste M.) `aurelius_face.html` fue escrita contra `:8050` + ollama: cinco
+  rutas `/api/*` y los `.json` de config. El dashboard las reconduce con un
+  *user script*, que funciona pero es un doble de un contrato que nadie ha
+  escrito. Si la cara va a tener dos transportes —servidor y proceso—, merece
+  una capa de transporte declarada en un sitio, y no un shim que persigue por
+  detrás cada `fetch` nuevo que se añada.
+
+- **S3 · `lsof -i -p <pid>` sin `-a` no comprueba lo que parece.** (Coste S.)
+  Los filtros de `lsof` se combinan con OR: el comando de verificación de D75
+  lista los sockets de toda la máquina y da por «violado» un proceso que no
+  tiene ninguno. Aquí salieron firefox, open-webui y el propio agente. Todo
+  guion de verificación de D75 que ande por el repo debería llevar `-a`, y
+  conviene comprobar los que ya existen.
+
+- **S4 · `about:blank` levanta un servidor HTTP en pywebview.** (Coste S.)
+  `is_local_url()` lo trata como url local y arranca el servidor interno en
+  `:42001` — un `LISTEN` real, D75 roto sin que nadie lo pida. `file://` está
+  excluido y no lo dispara. Queda anotado como footgun del arnés, no del
+  código: cualquier futura ventana PyWebView en el rack debe nacer con `html=`
+  o con `file://`, nunca con `about:blank`.
+
+- **S5 · La Fetch API no lee `file://`, y el ajuste que parece cubrirlo no lo
+  cubre.** (Coste S.) `ALLOW_FILE_URLS` mapea a `allow_file_access_from_file_urls`,
+  que vale para XHR y no para `fetch()`. El síntoma fue mudo y caro de leer: la
+  cara pintaba «point Aurelius at your model» con el modelo respondiendo a su
+  lado, porque `cargarConfig()` fallaba en silencio y caía al literal de último
+  recurso. Cualquier página servida por `file://` en el rack tiene este agujero.
+
+- **S6 · `models.json` quedó modificado en el repo público y sin commit.**
+  (Coste S.) El `default` pasó al 4B y se añadió su entrada, con los números
+  medidos en este nodo (2.33 GB reales, no los 2.5 estimados). Es un cambio al
+  producto público decidido desde una misión del canon privado: necesita commit
+  propio en `aurelius`, en su rama, con el criterio de `hardware_verified` del
+  propio manifiesto revisado — el 30B sigue marcado `true` y ya no es el default.
