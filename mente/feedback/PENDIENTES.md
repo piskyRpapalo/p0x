@@ -957,3 +957,58 @@ Resultado: VERDE 224/224 en 3.14.4 y en 3.10.12, empujado a `origin/main`
   producto público decidido desde una misión del canon privado: necesita commit
   propio en `aurelius`, en su rama, con el criterio de `hardware_verified` del
   propio manifiesto revisado — el 30B sigue marcado `true` y ya no es el default.
+
+### 2026-08-17 · P3 · SECURITY.md y descubribilidad del repo público · sugerencias
+
+- **S1 · El repo `piskyRpapalo/aurelius` está publicado sin `description` ni
+  `topics`.** (Coste S.) Medido con `gh repo view --json description,repositoryTopics`:
+  `description` es cadena vacía, `repositoryTopics` es `null`, `homepageUrl` vacío.
+  Un repo así no aparece en la búsqueda de GitHub por tema ni en los listados de
+  lenguaje: solo lo encuentra quien ya conoce la URL. Es el freno de publicación
+  más barato de quitar del backlog. **No se ha cambiado** — la misión pedía solo
+  reporte.
+
+- **S2 · `SECURITY.md` promete plazos que nadie vigila.** (Coste S.) El fichero
+  compromete acuse en 7 días, valoración en 14 y arreglo en 90. No hay ningún
+  filtro, etiqueta ni recordatorio sobre `davidpecero@gmail.com` que haga sonar
+  esos relojes. Una promesa de seguridad incumplida es peor que no tenerla:
+  autoriza al que reporta a publicar sin esperar, y así está escrito en el propio
+  fichero.
+
+- **S3 · No hay canal cifrado publicado para reportes.** (Coste M.) `SECURITY.md`
+  dice «si quieres cifrado, escríbelo en claro y lo acordamos», que es un
+  compromiso honesto pero obliga al reportante a mandar el primer contacto en
+  claro. Publicar una clave pública (o activar *private vulnerability reporting*
+  de GitHub, que es coste S y no necesita clave) cierra el hueco.
+
+- **S4 · El alcance declarado nombra superficies que nadie ha auditado.**
+  (Coste L.) El fichero pone dentro de alcance la censura en la frontera
+  (`--export`), la descarga del cerebro/voz del primer arranque y el HTML
+  generado por `cara.py`. Declarar alcance no es haberlo revisado: convendría una
+  pasada propia sobre esos tres puntos —integridad verificada de la descarga,
+  inyección en `cara.html`, fugas en el export— antes de que la encuentre un
+  tercero.
+
+- **S5 · Dos commits ajenos aterrizaron en `main` durante esta misión.**
+  (Coste S.) Entre la lectura inicial del repo y el commit de `SECURITY.md`
+  entraron `6a921c0` (descarga desde unsloth) y `131a48b` (README del MVP v1)
+  desde otra sesión. No hubo conflicto y `SECURITY.md` va solo en su commit, pero
+  dos sesiones escribiendo a la vez sobre `main` del repo público es una colisión
+  que la próxima vez puede no ser limpia. Falta convención de bloqueo o de rama
+  por misión.
+
+## Sugerencias de la misión P1 (README del MVP v1) · 2026-08-17
+
+| # | Sugerencia | Coste |
+|---|-----------|-------|
+| S1 | Cablear la fila llama-cli del README o marcarla "coming soon". La verificación muestra cero referencias a `llama-cli` en el árbol (no a "llama", que sí aparece 59 veces en español: «se calcula al llamar», «el código no llama a hash»). El README insinúa una conversación con el modelo que el árbol todavía no puede sostener. | S |
+| S2 | `test_memory.py` (25/25) y el total del árbol (225/225, `bin/pruebas`, 13 suites) conviven en la misma sección del README. Un lector rápido lee dos verdades y sospecha de ambas. Una línea que las relacione lo arregla. | S |
+| S3 | El README es bilingüe de facto (cuerpo inglés, `## Verificación` español). O se parte en README.md / README.es.md, o se asume la mezcla explícitamente — hoy parece un descuido y no lo es. | M |
+| S4 | Medir la conversación cuando llama-cli exista, en la máquina del Soberano y con `ollama ps` anotado, para que la primera cifra de latencia que entre al README nazca con fuente. | M |
+| S5 | Añadir una fila más a la tabla de intérpretes desde una segunda máquina física. Hoy cuatro de las seis filas comparten hardware, y el README ya lo confiesa — cerrar la confesión vale más que ampliarla. | L |
+| S6 | Patrón de verificación: el hallazgo original verificó "cero referencias a llama" con un grep en inglés sobre un corpus comentado en español, y el comando citado devolvía 59, no 0 — la conclusión era correcta por accidente. Verificar en un idioma lo que está escrito en otro ya tiene cicatriz en este nodo (las claves relayadas). Documentar la lección. | S |
+
+Corrección declarada sobre el encargo: S2 llegaba como «`test_descarga.py` (225)». Es falso —
+`test_descarga.py` tiene 18 pruebas; las 225 son del árbol entero vía `bin/pruebas` (README:154-158,
+13 suites). Se anexa el dato medido, no el recibido: este fichero es memoria, y una cifra con la
+fuente equivocada envenena la siguiente misión que la lea.
