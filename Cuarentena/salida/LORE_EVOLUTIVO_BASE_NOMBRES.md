@@ -5,13 +5,26 @@ tipo: operativo
 clase: doctrina
 version: 1.0.0
 sistema: MVP
-estado: PROPUESTA · pendiente de firma
+estado: FIRMADA COMO DIRECCIÓN · 2026-08-19
 scopes: P2 producto · P3 preceptor (ausente) · P1 referencia · D doctrina
 actualizado: 2026-08-19
 ---
 
 # LORE EVOLUTIVO · BASE DE NOMBRES
 ### El reglamento del juego cuya mecánica es la doctrina ya probada.
+
+> **FIRMADA COMO DIRECCIÓN (2026-08-19).** Con tres decisiones del Soberano encima:
+> **1 · M2/M3: manda el árbol.** M2 = el Agua (la memoria), M3 = el Refugio (la fuga de seis
+> salas). El modo campaña se reordena; el código no se toca para encajar en un relato.
+> **2 · La base se firma como dirección**, no como canon cerrado: sus `NO_DATA` siguen siendo
+> `NO_DATA`.
+> **3 · La hipótesis del RPG se acepta con su etiqueta**: `evidencia_fuerza: heuristica_campo`.
+> Sigue viva y ahora se sabe cuánto pesa.
+>
+> **Y un cambio de diseño que reordena la campaña entera: el modo es MODULAR.**
+> Núcleo obligatorio **M0 · M1 · M2**; después, un **punto de decisión**: ir directo al Proyecto,
+> o hacer side quests. **M3–M7 son opcionales y sueltas** — se puede hacer solo M3, o M3+M5, o
+> ninguna. Cada una da una ventaja concreta al Proyecto. La campaña deja de ser un pasillo.
 
 **La ley bidireccional, tal como la fijó el Soberano:** *si el Narrador lo dice, el código lo
 mide; si el código lo mide, el Narrador lo puede decir.*
