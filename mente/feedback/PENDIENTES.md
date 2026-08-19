@@ -1012,3 +1012,26 @@ Corrección declarada sobre el encargo: S2 llegaba como «`test_descarga.py` (22
 `test_descarga.py` tiene 18 pruebas; las 225 son del árbol entero vía `bin/pruebas` (README:154-158,
 13 suites). Se anexa el dato medido, no el recibido: este fichero es memoria, y una cifra con la
 fuente equivocada envenena la siguiente misión que la lea.
+
+### 2026-08-19 · Patrón de verificación · lo que un test mide de verdad
+
+**Un test que se rompe cuando el código mejora medía la forma, no la propiedad.**
+
+Cicatriz concreta: el caso 14 de `test_cara.py` («en instalación limpia el Camino está a cero
+y no finge progreso») comparaba el **dict entero** de cifras contra
+`{"perfil": 0, "recuerdos": 0, "sello": False}`. Al hacer medibles las side quests M3–M6, el
+diccionario ganó cuatro contadores legítimos —salas, huellas, senderos, cicatrices— y el caso
+se puso rojo. El código había mejorado y la prueba lo llamó fallo.
+
+Lo que el caso quería sostener era *«en limpio, ningún contador miente»*. Eso se comprueba
+recorriendo los valores, no fijando las claves. Reescrito así, admite contadores nuevos y
+además vigila algo que antes no miraba: que ningún peldaño sea obligatorio y opcional a la vez.
+
+**Cómo se reconoce el fallo antes de cometerlo:** si la aserción cita una estructura completa
+—un dict, una lista ordenada, una cadena entera— probablemente está midiendo la forma. La
+pregunta que lo desarma es *¿qué frase en castellano quiero que siga siendo verdad?*, y luego
+comprobar esa frase. `assertEqual(cifras, {...})` no es una frase; «ningún contador miente en
+limpio» sí.
+
+Hermano del patrón #S6 del 2026-08-17 (verificar en un idioma lo que está escrito en otro): en
+los dos casos la prueba pasaba o fallaba por una razón distinta de la que decía su nombre.
