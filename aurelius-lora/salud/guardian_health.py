@@ -19,8 +19,9 @@ VENTANA = 20
 MEJORA_MIN = 0.01
 
 
-def leer_perdidas(ruta):
+def leer_perdidas(ruta, vals=None):
     valores = []
+    vals = [] if vals is None else vals
     try:
         for linea in ruta.open(encoding="utf-8"):
             linea = linea.strip()
@@ -32,6 +33,8 @@ def leer_perdidas(ruta):
                 continue
             if isinstance(d.get("loss"), (int, float)):
                 valores.append(float(d["loss"]))
+            if isinstance(d.get("val_loss"), (int, float)):
+                vals.append(float(d["val_loss"]))
     except OSError:
         return None
     return valores
@@ -68,6 +71,22 @@ def main(argv=None):
         else:
             print(f"[guardian-5] ALERTA · la pérdida no baja · {detalle}")
             alerta = True
+
+    # El informe del entrenador manda sobre la bitacora: si la Fase 2 ya
+    # aborto por sobreajuste, decirlo es mas util que reinterpretar las cifras.
+    try:
+        ent = json.loads((RAIZ / "salida" / "entrenamiento.json").read_text(encoding="utf-8"))
+        medido = True
+        if ent.get("abortado"):
+            print(f"[guardian-5] ALERTA · la Fase 2 aborto: {ent['abortado']}")
+            alerta = True
+        else:
+            h = ent.get("historial") or []
+            if h:
+                print(f"[guardian-5] entrenamiento: {len(h)} evaluaciones · "
+                      f"val {h[0]['val']:.4f} -> {h[-1]['val']:.4f}")
+    except (OSError, json.JSONDecodeError):
+        print("[guardian-5] NO_DATA · sin informe de entrenamiento")
 
     try:
         inf = json.loads(a.informe.read_text(encoding="utf-8"))

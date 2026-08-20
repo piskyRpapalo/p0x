@@ -17,6 +17,11 @@ PRODUCTO = Path(os.environ.get(
     "AURELIUS_REPO_LOCAL", Path.home() / "p0x" / "aurelius-mvp"))
 DESEQUILIBRIO_MAX = 0.05          # P3: 5 %
 LARGO_MAX = 4000
+# Suelo de longitud. PROXY DECLARADO: el guardian es stdlib y no tiene
+# tokenizador, asi que mide caracteres. ~4 tokens son ~12 caracteres en
+# estos dos idiomas. Sirve para AVISAR, no para decidir: quien decide es
+# el entrenador, que si tokeniza.
+LARGO_MIN_CANON = 12
 
 # Vocabulario de control del rack. LORE.md §1: no viaja. La lista es corta a
 # propósito -- una lista larga da falsa seguridad y esto es una red, no un muro.
@@ -43,9 +48,19 @@ def texto_de(reg):
 
 
 def validar(registros):
-    fallos = []
+    """Devuelve (fallos, avisos, resumen).
+
+    Un fallo para la tanda; un aviso solo se dice. La diferencia importa: si
+    todo fuera fallo, este dataset nunca estaria verde por culpa de entradas
+    legitimas de `textos.py`, y un guardian que jamas puede estar verde ensena
+    a ignorarlo. Eso es peor que no tenerlo.
+    """
+    fallos, avisos = [], []
     def mal(regla, id_, detalle):
         fallos.append({"regla": regla, "id": id_, "detalle": detalle})
+
+    def avisa(regla, id_, detalle):
+        avisos.append({"regla": regla, "id": id_, "detalle": detalle})
 
     ids = Counter(r.get("id") for r in registros)
     for id_, n in ids.items():
@@ -94,6 +109,9 @@ def validar(registros):
         if not cuerpo.strip():
             mal("R6 contenido vacio", r.get("id"), "-")
             continue
+        if r.get("clase") == "canon" and len(cuerpo) < LARGO_MIN_CANON:
+            avisa("R7 corta para entrenar", r.get("id"),
+                f"{len(cuerpo)} car. · un causal no aprende de esto")
         if len(cuerpo) > LARGO_MAX:
             mal("R6 demasiado largo", r.get("id"), f"{len(cuerpo)} car.")
         if red is not None:
@@ -109,8 +127,8 @@ def validar(registros):
             if palabra in bajo:
                 mal("R5 vocabulario de la casa", r.get("id"), palabra)
                 break
-    return fallos, {"total": len(registros), "en": en, "es": es,
-                    "redactor": red is not None}
+    return fallos, avisos, {"total": len(registros), "en": en, "es": es,
+                            "redactor": red is not None}
 
 
 def main(argv=None):
@@ -135,7 +153,7 @@ def main(argv=None):
             rotas += 1
             print(f"[guardian-1] linea {n}: JSON invalido")
 
-    fallos, resumen = validar(registros)
+    fallos, avisos, resumen = validar(registros)
     print(f"[guardian-1] {resumen['total']} registros · "
           f"en={resumen['en']} es={resumen['es']}")
     if not resumen["redactor"]:
@@ -144,6 +162,14 @@ def main(argv=None):
         print(f"  FALLO  {f['regla']:32s} {f['id']}  ·  {f['detalle']}")
     if len(fallos) > 40:
         print(f"  … y {len(fallos)-40} más")
+
+    if avisos:
+        print(f"[guardian-1] {len(avisos)} avisos · el entrenador los descarta, "
+              f"no bloquean:")
+        for v in avisos[:3]:
+            print(f"  aviso  {v['regla']:28s} {v['id']}  ·  {v['detalle']}")
+        if len(avisos) > 3:
+            print(f"  … y {len(avisos)-3} más de la misma clase")
 
     if fallos or rotas:
         print(f"[guardian-1] ROJO · {len(fallos)} fallos, {rotas} lineas rotas")

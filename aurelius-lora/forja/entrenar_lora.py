@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 """FASE 2 · TRAINER GUARDIAN · LoRA en CPU sobre Qwen3-4B-Instruct.
 
-NO es QLoRA. La Q de QLoRA es la cuantización NF4 de bitsandbytes, y ese kernel
-es CUDA. En este metal --Radeon 780M integrada, sin NVIDIA-- lo que hay es LoRA
-en bf16/fp32. Cabe de sobra en 40 GiB, porque en LoRA solo se entrenan los
-adaptadores. Ver README §2 B1: el problema no era el espacio, era el nombre.
+Hiperparámetros FIRMADOS por el Soberano el 2026-08-20, tras la Fase 0:
+    rango 8 · 1 época · corte de validación del 10 %
+La razón está medida: 11,8 M de parámetros entrenables contra ~4 000 tokens de
+datos memorizaban en vez de aprender. Con r=8 son 5,9 M, y una época no le da
+tiempo a recitar.
 
-CERROJO DOBLE. Este guion no entrena hasta que se cumplan las dos:
-  1. `--ejecutar`, explícito.
-  2. FASE0_VEREDICTO.json existe y nombra un entrenador elegido.
+NO es QLoRA. La Q es el NF4 de bitsandbytes y ese kernel es CUDA; aquí no hay
+NVIDIA. Esto es LoRA en bf16, que en este metal va a 45-60 tok/s (Fase 0).
 
-Sin la segunda, entrenar sería elegir entrenador por intuición, que es
-justamente lo que la Fase 0 existe para impedir.
+CERROJO DOBLE: `--ejecutar`, y un veredicto de Fase 0 que nombre entrenador.
 """
 from __future__ import annotations
 
@@ -19,6 +18,8 @@ import argparse
 import json
 import shutil
 import sys
+import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -28,10 +29,18 @@ SALIDA = RAIZ / "salida"
 
 BASE_HF = "Qwen/Qwen3-4B-Instruct-2507"     # los pesos sin cuantizar, no el GGUF
 
-HIPER = {                                    # punto de partida, no dogma
-    "rank": 16, "alpha": 32, "dropout": 0.05,
-    "lr": 2e-4, "epocas": 3, "batch": 1, "acumulacion": 8,
-    "max_len": 1024, "objetivo": ["q_proj", "k_proj", "v_proj", "o_proj"],
+HIPER = {
+    "rank": 8,                # FIRMADO. Era 16; memorizaba.
+    "alpha": 16,              # 2x el rango, como estaba la proporción en r=16
+    "dropout": 0.05,
+    "lr": 2e-4,
+    "epocas": 1,              # FIRMADO. Eran 3.
+    "validacion": 0.10,       # FIRMADO. 10 % de los datos.
+    "max_len": 512,
+    "cada_cuantos_evalua": 20,
+    "min_tokens": 4,           # ver `descartar_degeneradas`
+
+    "objetivo": ["q_proj", "k_proj", "v_proj", "o_proj"],
 }
 
 
@@ -42,8 +51,8 @@ def veredicto():
         return None
 
 
-def revisar():
-    """Todo lo que falta, dicho de una vez. No se para en el primer hueco."""
+def revisar(exportacion=True):
+    """Todo lo que falta, de una vez. No para en el primer hueco."""
     faltas = []
     v = veredicto()
     if v is None:
@@ -52,23 +61,89 @@ def revisar():
         faltas.append("el veredicto de la Fase 0 no nombra entrenador elegido")
     if not DATASET.is_file():
         faltas.append(f"no existe {DATASET}: datos/construir_dataset.py --ejecutar")
-    if not shutil.which("llama-quantize"):
-        faltas.append("llama-quantize no está: sin él no hay export a GGUF (Fase 2 §b)")
+    if exportacion:
+        for h in ("llama-export-lora", "llama-quantize"):
+            if not shutil.which(h):
+                faltas.append(f"{h} no está: corre forja/compilar_llamacpp.sh --ejecutar")
     return faltas, v
+
+
+def cargar(ruta):
+    """Separa lo que entrena de lo que no, y dice por qué.
+
+    Los negativos NO entran en el paso causal. Un entrenamiento causal aprende
+    a CONTINUAR el texto que se le da: meterle el campo `rechazado` le enseña
+    exactamente la forma que las tres familias existen para evitar. Sirven como
+    pares de preferencia (una pasada DPO futura) y como aserciones del tester
+    de la Fase 3, que es donde ya se usan.
+    """
+    entrenables, negativos = [], 0
+    for linea in ruta.open(encoding="utf-8"):
+        linea = linea.strip()
+        if not linea:
+            continue
+        r = json.loads(linea)
+        if r.get("clase") != "canon":
+            negativos += 1
+            continue
+        texto = "\n".join(m.get("contenido", "")
+                          for m in r.get("mensajes", [])).strip()
+        if texto:
+            entrenables.append({"texto": texto, "idioma": r.get("idioma", "?")})
+    return entrenables, negativos
+
+
+def partir(muestras, fraccion):
+    """Corte de validación estratificado por idioma.
+
+    Sin estratificar, un corte del 10 % sobre 208 puede llevarse 21 muestras
+    del mismo idioma y dejar la validación midiendo media promesa. P3 no es
+    solo del dataset: es también de cómo se mide.
+    """
+    val, tren = [], []
+    for idioma in ("en", "es"):
+        de_ese = [m for m in muestras if m["idioma"] == idioma]
+        corte = max(1, round(len(de_ese) * fraccion))
+        # Determinista: cada n-ésima. Sin barajar, para que dos corridas del
+        # mismo dataset partan igual y sus pérdidas se puedan comparar.
+        paso = max(1, len(de_ese) // corte)
+        elegidas = set(range(0, len(de_ese), paso))
+        while len(elegidas) > corte:
+            elegidas.pop()
+        for i, m in enumerate(de_ese):
+            (val if i in elegidas else tren).append(m)
+    otros = [m for m in muestras if m["idioma"] not in ("en", "es")]
+    tren.extend(otros)
+    return tren, val
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description="FASE 2 · trainer guardian")
     ap.add_argument("--ejecutar", action="store_true")
     ap.add_argument("--version", default="v1")
+    ap.add_argument("--hilos", type=int, default=8)
+    ap.add_argument("--sin-exportacion", action="store_true",
+                    help="entrena aunque falten las herramientas de la Fase 4")
     a = ap.parse_args(argv)
 
-    faltas, v = revisar()
-    print(f"[guardian-2] base: {BASE_HF} (pesos sin cuantizar, ~8 GB)")
+    faltas, v = revisar(exportacion=not a.sin_exportacion)
+    print(f"[guardian-2] base: {BASE_HF} (pesos sin cuantizar, bf16)")
     print(f"[guardian-2] LoRA r={HIPER['rank']} alpha={HIPER['alpha']} "
-          f"lr={HIPER['lr']} epocas={HIPER['epocas']}")
-    print(f"[guardian-2] entrenador elegido: {(v or {}).get('elegido') or 'NO_DATA'}")
-    print(f"[guardian-2] salida prevista: {SALIDA / a.version}")
+          f"lr={HIPER['lr']} · {HIPER['epocas']} época · "
+          f"validación {HIPER['validacion']:.0%}")
+    print(f"[guardian-2] entrenador: {(v or {}).get('elegido') or 'NO_DATA'}")
+
+    if DATASET.is_file():
+        muestras, negativos = cargar(DATASET)
+        tren, val = partir(muestras, HIPER["validacion"])
+        print(f"[guardian-2] {len(muestras)} entrenables · "
+              f"tren {len(tren)} · validación {len(val)} "
+              f"(en={sum(1 for m in val if m['idioma']=='en')} "
+              f"es={sum(1 for m in val if m['idioma']=='es')})")
+        print(f"[guardian-2] {negativos} negativos FUERA del paso causal "
+              f"(ver docstring de cargar)")
+    else:
+        tren = val = []
 
     if faltas:
         print("[guardian-2] BLOQUEADO · falta:")
@@ -81,9 +156,131 @@ def main(argv=None):
         print("[guardian-2] no entreno con huecos. Paro.", file=sys.stderr)
         return 2
 
-    print("[guardian-2] el bucle de entrenamiento se escribe contra el "
-          "entrenador que firme la Fase 0, no antes: cada uno tiene su API y "
-          "escribir para los tres es escribir tres veces mal.")
+    import torch
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+    from peft import LoraConfig, get_peft_model
+
+    torch.set_num_threads(a.hilos)
+    tok = AutoTokenizer.from_pretrained(BASE_HF)
+    modelo = AutoModelForCausalLM.from_pretrained(BASE_HF, dtype=torch.bfloat16)
+    modelo.config.use_cache = False
+    modelo = get_peft_model(modelo, LoraConfig(
+        r=HIPER["rank"], lora_alpha=HIPER["alpha"], lora_dropout=HIPER["dropout"],
+        bias="none", task_type="CAUSAL_LM", target_modules=HIPER["objetivo"]))
+    entrenables = sum(p.numel() for p in modelo.parameters() if p.requires_grad)
+    print(f"[guardian-2] parámetros entrenables: {entrenables:,}")
+
+    def descartar_degeneradas(muestras):
+        """Fuera lo que no tiene con qué entrenar.
+
+        Un modelo causal predice el token siguiente: tras desplazar etiquetas,
+        una muestra de UN token deja cero posiciones objetivo y su pérdida es
+        una media sobre el vacío -- `nan`. Y un `nan` en el gradiente no se
+        queda en su paso: envenena los pesos del adapter para siempre.
+
+        Medido el 2026-08-20: el mini-run de Fase 0 dio nan en los pasos 37, 38
+        y 85. La causa son 14 entradas de `textos.py` de <=2 tokens -- 'o',
+        'yes', 'lista', 'ready'. Son cadenas legítimas del producto y no son
+        texto entrenable: de la palabra "o" no se aprende una voz.
+        """
+        buenas, fuera = [], []
+        for m in muestras:
+            n = len(tok(m["texto"])["input_ids"])
+            (buenas if n >= HIPER["min_tokens"] else fuera).append(m)
+        return buenas, fuera
+
+    tren, fuera_tren = descartar_degeneradas(tren)
+    val, fuera_val = descartar_degeneradas(val)
+    if fuera_tren or fuera_val:
+        print(f"[guardian-2] descartadas por cortas "
+              f"(<{HIPER['min_tokens']} tokens): "
+              f"{len(fuera_tren)} de tren, {len(fuera_val)} de validación")
+
+    def lote_de(m):
+        b = tok(m["texto"], return_tensors="pt", truncation=True,
+                max_length=HIPER["max_len"])
+        b["labels"] = b["input_ids"].clone()
+        return b
+
+    def perdida_validacion():
+        modelo.eval()
+        total = 0.0
+        with torch.no_grad():
+            for m in val:
+                total += float(modelo(**lote_de(m)).loss.item())
+        modelo.train()
+        return total / max(len(val), 1)
+
+    opt = torch.optim.AdamW(
+        [p for p in modelo.parameters() if p.requires_grad], lr=HIPER["lr"])
+    modelo.train()
+    SALIDA.mkdir(parents=True, exist_ok=True)
+    destino = SALIDA / a.version
+    bitacora = SALIDA / "loss.jsonl"
+
+    ventana, historial = [], []
+    abortado = None
+    t0 = time.time()
+
+    with bitacora.open("w", encoding="utf-8") as fh:
+        for paso, m in enumerate(tren * HIPER["epocas"], 1):
+            salida = modelo(**lote_de(m))
+            salida.loss.backward()
+            opt.step()
+            opt.zero_grad(set_to_none=True)
+            perdida = float(salida.loss.item())
+            ventana.append(perdida)
+            fh.write(json.dumps({"paso": paso, "loss": perdida}) + "\n")
+
+            if paso % HIPER["cada_cuantos_evalua"] == 0:
+                tren_medio = sum(ventana) / len(ventana)
+                val_medio = perdida_validacion()
+                ventana = []
+                historial.append({"paso": paso, "train": tren_medio, "val": val_medio})
+                fh.write(json.dumps({"paso": paso, "loss": tren_medio,
+                                     "val_loss": val_medio}) + "\n")
+                fh.flush()
+                print(f"  paso {paso:4d} · train {tren_medio:.4f} · "
+                      f"val {val_medio:.4f}", flush=True)
+
+                # SOBREAJUSTE: la validación sube mientras el tren baja. Se
+                # exige que las DOS cosas pasen: una validación que sube sola
+                # puede ser ruido de 21 muestras, y abortar por ruido enseña a
+                # desconfiar del guardián.
+                if len(historial) >= 2:
+                    a0, a1 = historial[-2], historial[-1]
+                    if a1["val"] > a0["val"] and a1["train"] < a0["train"]:
+                        abortado = (f"sobreajuste en el paso {paso}: "
+                                    f"val {a0['val']:.4f}→{a1['val']:.4f} sube "
+                                    f"mientras train {a0['train']:.4f}→"
+                                    f"{a1['train']:.4f} baja")
+                        break
+
+    informe = {
+        "fecha": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "version": a.version,
+        "hiper": HIPER,
+        "tren": len(tren), "validacion": len(val),
+        "pasos": len(historial) * HIPER["cada_cuantos_evalua"],
+        "historial": historial,
+        "segundos": round(time.time() - t0, 1),
+        "abortado": abortado,
+    }
+    (SALIDA / "entrenamiento.json").write_text(
+        json.dumps(informe, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    if abortado:
+        print(f"\n[guardian-2] ABORTA · {abortado}")
+        print("[guardian-2] el adapter NO se guarda: un modelo que ya empezó a "
+              "recitar no mejora por guardarlo.")
+        return 1
+
+    destino.mkdir(parents=True, exist_ok=True)
+    modelo.save_pretrained(str(destino))
+    tok.save_pretrained(str(destino))
+    print(f"\n[guardian-2] VERDE · adapter en {destino}")
+    print(f"[guardian-2] siguiente: convert_lora_to_gguf.py → "
+          f"llama-export-lora → llama-quantize")
     return 0
 
 

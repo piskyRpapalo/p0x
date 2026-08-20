@@ -11,7 +11,18 @@
 
 ## La respuesta
 
-**Sí. Importa, entrena, y converge.** 100 pasos en **94 segundos de pared**.
+**Sí. Importa, entrena y produce gradientes.** 100 pasos en **94 segundos de pared**.
+
+> **CORRECCIÓN sobre la primera redacción de este veredicto (misma fecha).**
+> Escribí «converge» apoyándome en el primer y el último valor de pérdida.
+> Al enseñar al guardián de la Fase 5 a leer esa bitácora salió que **tres
+> pasos dieron `nan`** (37, 38 y 85) y que la serie rebota entre 2,27 y 9,59.
+> Con eso, «converge» era más de lo que el dato sostiene: lo demostrado es que
+> **arranca, entrena a la velocidad medida y devuelve gradientes**.
+> Las cifras de velocidad no dependen de la pérdida y siguen en pie.
+>
+> La causa de los `nan` está encontrada y arreglada — ver §El defecto que
+> encontró el guardián de salud.
 
 | | |
 |---|---|
@@ -92,3 +103,28 @@ que firmes.
 **Entrenador elegido: PEFT + transformers sobre torch-CPU.** Con eso ya se
 puede aplicar `integracion/PATCH.md`. Sigue en NO_DATA la ruta de exportación
 a GGUF (Fase 4).
+
+
+## El defecto que encontró el guardián de salud
+
+Al hacer que la Fase 5 leyera la validación, delató los `nan` del mini-run. La
+causa es concreta: **14 entradas del canon miden ≤2 tokens** — `'o'`, `'yes'`,
+`'lista'`, `'ready'`, `'--- talking'`.
+
+Un modelo causal predice el token siguiente. Tras desplazar las etiquetas, una
+muestra de **un** token deja **cero posiciones objetivo**, y su pérdida es una
+media sobre el vacío: `nan`. Y un `nan` no se queda en su paso — envenena los
+pesos del adapter para el resto de la corrida.
+
+Arreglado en los dos sitios donde tenía que estarlo:
+
+* **El entrenador decide.** `descartar_degeneradas` tokeniza y deja fuera lo que
+  baje de 4 tokens, diciendo cuántas descarta. De la palabra «o» no se aprende
+  una voz.
+* **El guardián avisa.** Regla **R7**, con proxy declarado: el guardián es
+  biblioteca estándar y no tiene tokenizador, así que mide caracteres. Es un
+  **aviso, no un fallo** — si bloqueara, este dataset jamás estaría verde por
+  culpa de entradas legítimas de `textos.py`, y un guardián que nunca puede
+  estar verde enseña a ignorarlo.
+
+Efecto real sobre la Fase 2: **tren 188 → 163 · validación 20 → 17.**
