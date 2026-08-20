@@ -32,7 +32,7 @@ el encargo pide commits. El nombre se conserva; cambia el padre.
 
 | | Decisión del Soberano |
 |---|---|
-| **P1 · Datos** | **No** chats crudos como voz primaria. Primario: canon del producto (`textos.py`, `narrador.py`, `LORE.md`, `CIERRE_M*.md`, turnos reales de `--charla`). Secundario: correcciones del Soberano como pares de preferencia, y las tres familias de fallos del sprint como negativos. ~1–2 MB **curado**. |
+| **P1 · Datos** | **No** chats crudos como voz primaria. Primario: canon del producto (`textos.py`, `narrador.py`, `LORE.md`, `CIERRE_M*.md`, turnos reales de `--charla`). Secundario: correcciones del Soberano como pares de preferencia, y las tres familias de fallos del sprint como negativos. **v1 = los 226 registros del canon** (208 de voz + 18 negativos), firmado el 2026-08-20. El 1–2 MB es **horizonte, no condición de entrada**: el guardián añade turnos reales y correcciones sesión a sesión. **Nada de relleno sintético para alcanzar el número.** |
 | **P2 · Espacio** | Sí, medido. Sobra. |
 | **P3 · Idioma** | **Bilingüe** EN+ES en pares paralelos, como `textos.py`. ES como ancla de tono. **No** ES-first. |
 | **P4 · Forja** | **Todo local, todo soberano.** Beelink de noche. **Nunca cloud:** el dataset es el alma. |

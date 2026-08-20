@@ -45,25 +45,20 @@ justo lo que este proyecto no firma.
 Mismo cuerpo que `preferencia`, con `elegido` vacío: solo se marca la forma a
 evitar y por qué.
 
-> ### `NO_DATA` · las tres familias
+> ### FIRMADO 2026-08-20 · las tres familias
 >
-> P1 dice «las tres familias de fallos del sprint como negativos». **La
-> enumeración exacta no llegó a esta sesión y no la invento.** Los candidatos
-> que sí medí, para que firmes tres (o los sustituyas):
+> El Soberano firmó las tres familias que medí en el sprint. El contenido vive
+> en `datos/negativos.json` — datos, no código — y produce **18 negativos**
+> (9 casos × 2 idiomas):
 >
-> 1. **Registro equivocado** — voseo (*«¿Qué querés saber primero?»*) en una
->    sesión declarada `es`.
-> 2. **Cantar verde sin mirar** — `bin/pruebas` dice `VERDE 241/241` viendo 13
->    de 26 suites.
-> 3. **Rellenar en vez de declarar** — dar por verificado lo que dijo un
->    tercero (el apéndice del borrador del Preceptor).
+> | | Familia | Casos |
+> |---|---|---|
+> | **F1** | TONO | voseo en sesión `es` · relleno · emojis |
+> | **F2** | SENSOR DESHONESTO | cantar «verde 241/241» viendo 13 de 26 suites · dar por verificado lo de un tercero · tres ausencias dichas igual |
+> | **F3** | PROMESA ROTA DE PRIMER ARRANQUE | saludar con el texto de cierre · ofrecer crear memoria sin dejar aceptar · preguntar el idioma dos veces |
 >
-> Lectura alternativa, por si te referías a los tres fallos de primer arranque
-> del commit `de6577d`: el saludo con el texto de cierre · las banderas que
-> prometían crear la memoria sin preguntarlo · el idioma preguntado dos veces.
-> Son fallos de código, no de voz — sirven peor como negativos de un LoRA.
->
-> `construir_dataset.py` deja el hueco declarado y **no rellena ninguno**.
+> Los nueve casos salen de esta casa y llevan su fecha. Ninguno es inventado, y
+> **no se rellena con sintéticos** para engordar el número (Firma 1).
 
 ## Lo que el guardián rechaza (Fase 1)
 

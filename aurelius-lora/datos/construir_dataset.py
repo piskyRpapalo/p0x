@@ -99,12 +99,37 @@ def _piezas_del_lore(commit: str):
 
 
 def _negativos():
-    """NO_DATA declarado. Ver datos/ESQUEMA.md.
+    """Las tres familias, FIRMADAS por el Soberano el 2026-08-20.
 
-    Las tres familias no llegaron enumeradas. No se rellenan por parecido:
-    un negativo inventado enseña a evitar algo que nadie pidió evitar.
+    El contenido vive en `datos/negativos.json`, no aqui: una familia se
+    corrige editando datos, sin tocar codigo ni volver a leer este fichero.
+    Cada caso sale en los dos idiomas (P3) para no romper el equilibrio.
     """
-    return []
+    ruta = Path(__file__).resolve().parent / "negativos.json"
+    try:
+        familias = json.loads(ruta.read_text(encoding="utf-8"))["familias"]
+    except (OSError, json.JSONDecodeError, KeyError) as e:
+        print(f"[dataset] NO_DATA · negativos ilegibles: {e}", file=sys.stderr)
+        return []
+
+    fuera = []
+    for fam in familias:
+        for caso in fam["casos"]:
+            for idioma in ("en", "es"):
+                rechazado = caso["rechazado"][idioma]
+                fuera.append({
+                    "id": f"negativo/{idioma}/{fam['id']}-{caso['clave']}",
+                    "clase": "negativo",
+                    "idioma": idioma,
+                    "origen": f"sprint 2026-08-20 · familia {fam['id']} {fam['nombre']}",
+                    "huella": huella(rechazado),
+                    "peso": 2.0,
+                    "prompt": caso["prompt"][idioma],
+                    "elegido": "",
+                    "rechazado": rechazado,
+                    "motivo": caso["motivo"],
+                })
+    return fuera
 
 
 def construir():
@@ -131,7 +156,9 @@ def main(argv=None):
     print(f"[dataset] registros: {len(registros)} · " +
           " · ".join(f"{k}={v}" for k, v in sorted(por_idioma.items())))
     print(f"[dataset] peso crudo: {peso/1024:.1f} KiB")
-    print(f"[dataset] negativos: 0 · NO_DATA declarado (ver ESQUEMA.md)")
+    negs = [r for r in registros if r["clase"] == "negativo"]
+    familias = sorted({r["origen"].split("familia ")[-1] for r in negs})
+    print(f"[dataset] negativos: {len(negs)} · " + " · ".join(familias))
 
     if not a.ejecutar:
         print(f"[dataset] CERROJO: no se escribe. Añade --ejecutar para {a.salida}")

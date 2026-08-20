@@ -55,9 +55,21 @@ def validar(registros):
     por_huella = {}
     for r in registros:
         por_huella.setdefault(r.get("huella"), []).append(r.get("id"))
+    def sin_idioma(id_):
+        """El id menos su segmento de idioma: `x/es/y` y `x/en/y` son el mismo caso."""
+        trozos = (id_ or "").split("/")
+        return "/".join(t for i, t in enumerate(trozos) if not (i == 1 and t in ("en", "es")))
+
     for h, lista in por_huella.items():
-        if len(lista) > 1 and len(set(lista)) > 1:
-            mal("R1 huella repetida con id distinto", ",".join(sorted(lista)), h)
+        distintos = set(lista)
+        if len(lista) > 1 and len(distintos) > 1:
+            # Dos idiomas del MISMO caso pueden compartir contenido a proposito:
+            # la pregunta del idioma se dice en los dos a la vez, porque se hace
+            # antes de saber en cual hablar (textos.py). La regla existe para
+            # cazar duplicados accidentales, no cadenas bilingues deliberadas.
+            if len({sin_idioma(i) for i in distintos}) == 1:
+                continue
+            mal("R1 huella repetida con id distinto", ",".join(sorted(distintos)), h)
 
     presentes = set(ids)
     for r in registros:
