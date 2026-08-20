@@ -67,9 +67,10 @@ def main(argv=None):
         if ok is None:
             print(f"[guardian-5] pérdida: aún no medible · {detalle}")
         elif ok:
-            print(f"[guardian-5] pérdida: converge · {detalle}")
+            print(f"[guardian-5] pérdida de ENTRENAMIENTO: converge · {detalle}")
+            print("[guardian-5]   (esto no dice nada de la validación · ver abajo)")
         else:
-            print(f"[guardian-5] ALERTA · la pérdida no baja · {detalle}")
+            print(f"[guardian-5] ALERTA · la pérdida de entrenamiento no baja · {detalle}")
             alerta = True
 
     # El informe del entrenador manda sobre la bitacora: si la Fase 2 ya
