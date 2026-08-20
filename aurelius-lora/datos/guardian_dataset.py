@@ -1,0 +1,144 @@
+#!/usr/bin/env python3
+"""FASE 1 · DATASET GUARDIAN · valida data/lora_dataset.jsonl. Solo stdlib.
+
+No arregla nada. Mide, dice qué falla y con qué regla, y sale distinto de 0.
+Un guardián que corrige en silencio es un guardián que oculta.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+from collections import Counter
+from pathlib import Path
+
+PRODUCTO = Path(os.environ.get(
+    "AURELIUS_REPO_LOCAL", Path.home() / "p0x" / "aurelius-mvp"))
+DESEQUILIBRIO_MAX = 0.05          # P3: 5 %
+LARGO_MAX = 4000
+
+# Vocabulario de control del rack. LORE.md §1: no viaja. La lista es corta a
+# propósito -- una lista larga da falsa seguridad y esto es una red, no un muro.
+CASA = ("soberano", "la-fragua", "la-torre", "el-vigia", "el-vigía",
+        "musculo-hp", "hexelion", "beelink", "jetson", "tailnet", "p0x")
+
+
+def cargar_redactor():
+    """El guardrails del producto, si está. Si no está, se dice."""
+    sys.path.insert(0, str(PRODUCTO))
+    try:
+        import guardrails
+        return guardrails
+    except ImportError:
+        return None
+    finally:
+        sys.path.pop(0)
+
+
+def texto_de(reg):
+    partes = [m.get("contenido", "") for m in reg.get("mensajes", [])]
+    partes += [reg.get(k, "") for k in ("prompt", "elegido", "rechazado")]
+    return "\n".join(p for p in partes if p)
+
+
+def validar(registros):
+    fallos = []
+    def mal(regla, id_, detalle):
+        fallos.append({"regla": regla, "id": id_, "detalle": detalle})
+
+    ids = Counter(r.get("id") for r in registros)
+    for id_, n in ids.items():
+        if n > 1:
+            mal("R1 id duplicado", id_, f"{n} veces")
+
+    por_huella = {}
+    for r in registros:
+        por_huella.setdefault(r.get("huella"), []).append(r.get("id"))
+    for h, lista in por_huella.items():
+        if len(lista) > 1 and len(set(lista)) > 1:
+            mal("R1 huella repetida con id distinto", ",".join(sorted(lista)), h)
+
+    presentes = set(ids)
+    for r in registros:
+        if r.get("clase") != "canon":
+            continue
+        par = r.get("par")
+        if not par:
+            mal("R2 canon sin par", r.get("id"), "P3 exige pareja")
+        elif par not in presentes:
+            mal("R2 par inexistente", r.get("id"), par)
+
+    cuenta = Counter(r.get("idioma") for r in registros)
+    en, es = cuenta.get("en", 0), cuenta.get("es", 0)
+    if en + es:
+        desv = abs(en - es) / max(en, es, 1)
+        if desv > DESEQUILIBRIO_MAX:
+            mal("R3 desequilibrio EN/ES", "-", f"en={en} es={es} ({desv:.1%})")
+
+    red = cargar_redactor()
+    for r in registros:
+        cuerpo = texto_de(r)
+        if not cuerpo.strip():
+            mal("R6 contenido vacio", r.get("id"), "-")
+            continue
+        if len(cuerpo) > LARGO_MAX:
+            mal("R6 demasiado largo", r.get("id"), f"{len(cuerpo)} car.")
+        if red is not None:
+            try:
+                _, hallazgos = red.redactar_salida(cuerpo)
+                if hallazgos:
+                    mal("R4 dato privado", r.get("id"),
+                        ", ".join(sorted({h.get("policy", "?") for h in hallazgos})))
+            except Exception as e:
+                mal("R4 no verificable", r.get("id"), type(e).__name__)
+        bajo = cuerpo.lower()
+        for palabra in CASA:
+            if palabra in bajo:
+                mal("R5 vocabulario de la casa", r.get("id"), palabra)
+                break
+    return fallos, {"total": len(registros), "en": en, "es": es,
+                    "redactor": red is not None}
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(description="FASE 1 · dataset guardian")
+    ap.add_argument("--dataset", type=Path,
+                    default=Path(__file__).resolve().parent.parent / "data" / "lora_dataset.jsonl")
+    a = ap.parse_args(argv)
+
+    if not a.dataset.is_file():
+        print(f"[guardian-1] NO_DATA · no existe {a.dataset}")
+        print("[guardian-1] constrúyelo con datos/construir_dataset.py --ejecutar")
+        return 2
+
+    registros, rotas = [], 0
+    for n, linea in enumerate(a.dataset.open(encoding="utf-8"), 1):
+        linea = linea.strip()
+        if not linea:
+            continue
+        try:
+            registros.append(json.loads(linea))
+        except json.JSONDecodeError:
+            rotas += 1
+            print(f"[guardian-1] linea {n}: JSON invalido")
+
+    fallos, resumen = validar(registros)
+    print(f"[guardian-1] {resumen['total']} registros · "
+          f"en={resumen['en']} es={resumen['es']}")
+    if not resumen["redactor"]:
+        print("[guardian-1] AVISO: guardrails.py no importable · R4 NO VERIFICADA")
+    for f in fallos[:40]:
+        print(f"  FALLO  {f['regla']:32s} {f['id']}  ·  {f['detalle']}")
+    if len(fallos) > 40:
+        print(f"  … y {len(fallos)-40} más")
+
+    if fallos or rotas:
+        print(f"[guardian-1] ROJO · {len(fallos)} fallos, {rotas} lineas rotas")
+        return 1
+    print("[guardian-1] VERDE")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
