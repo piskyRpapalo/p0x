@@ -1035,3 +1035,54 @@ limpio» sí.
 
 Hermano del patrón #S6 del 2026-08-17 (verificar en un idioma lo que está escrito en otro): en
 los dos casos la prueba pasaba o fallaba por una razón distinta de la que decía su nombre.
+
+### 2026-08-20 · Cierre del sprint B5/B7 en el Doogee · sugerencias
+
+Sesión de frontera sobre `aurelius` en `de6577d`. Línea base **344 pruebas / 26 suites**,
+verde. B5 y B7 cerrados por el Soberano; B6 queda en `NO_DATA` (su definición nunca llegó a
+la sesión). Las licencias se resuelven en el paquete posterior, por decisión del Soberano —
+no se anexan aquí como pendiente sino como dato de estado.
+
+- **S1 · Cada turno de `--charla` recarga el modelo entero.** (Coste M.) Medido en el Doogee
+  S110 sobre `de6577d`: turno 1 **379,0 s**, turno 2 **326,4 s**. El segundo no fue más barato
+  que el primero, así que no hay ventaja de caliente: `llama-completion` se lanza como hijo en
+  cada turno y paga los 2,3 GiB cada vez. El segundo turno costó cinco minutos y medio para
+  devolver tres palabras («¿Qué instalaste?»). Si el motor puede quedarse residente entre
+  turnos, el producto cambia de categoría; si no puede, la promesa pública tiene que decir
+  minutos y no tok/s.
+
+- **S2 · Falta la cifra que siente la persona.** (Coste S.) `conversacion.py` documenta
+  `2,93 ± 0,38 tok/s` de generación en este teléfono. Esa cifra describe el motor; la que
+  describe la experiencia es **5,4–6,3 min por turno**, y hoy no está escrita en ningún sitio
+  del árbol. Anexarla junto a la otra, con su máquina, como manda la casa.
+
+- **S3 · `bin/pruebas` corre 13 de las 26 suites y dice `VERDE 241/241`.** (Coste M.) Las
+  otras 13 —`andamio`, `borradores`, `conversacion`, `costura`, `frontera`, `fusible`,
+  `hilos`, `identidad`, `narrador`, `puente`, `puerta`, `recuperacion`, `traza`— suman **103
+  pruebas que ese corredor no ve**. 241 + 103 = 344. Un corredor que canta verde sobre el 70 %
+  del árbol es peor que no tenerlo, porque da permiso para no mirar. O se completan las suites,
+  o `bin/pruebas` imprime en rojo cuántas deja fuera.
+
+- **S4 · Instrumentos: un proceso zombi se queda el puerto y el nuevo muere en silencio.**
+  (Coste S.) Ocurrió **dos veces en una sola sesión**, en los dos extremos del túnel: el oyente
+  de `eco-remoto` en 8900 (el eco del teléfono se escribió en el fichero de una sesión anterior,
+  y el registro nuevo salió vacío pese a que el teléfono decía «enviado»), y el puente en 8734
+  del propio Doogee (arrancado en otra sesión con `--cara` relativo, devolvía `500
+  FileNotFoundError` mientras el mío moría sin poder atarse). En los dos casos el síntoma
+  mintió: parecía un fallo del producto y era un cadáver ocupando el puerto. Los instrumentos
+  deberían morir ruidosamente al no poder atarse, no en `/dev/null`.
+
+- **S5 · `adb input text` no acepta acentos.** (Coste S.) Un solo carácter acentuado lanza
+  `NullPointerException` en `InputShellCommand.sendText` y **no teclea nada** — el fallo es
+  limpio, pero solo si se comprueba después. Hermano de la cicatriz de las claves relayadas: el
+  canal intermedio corrompe lo que pasa por él. Documentar junto a las tres trampas de adb.
+
+- **S6 · Voseo en una sesión declarada `es`.** (Coste S.) La primera respuesta que un
+  desconocido recibió del producto fue «¿Qué **querés** saber primero?». El idioma se eligió
+  como español y el registro salió rioplatense. No es un fallo de corrección, es un fallo de
+  quién parece estar hablando.
+
+Corrección declarada sobre la herencia recibida: llegaba como «el Doogee tiene el producto
+instalado, el cerebro verificado y la voz, **con memoria recién nacida**». Falso — la memoria
+**no existía**: el primer arranque estaba detenido en la pregunta de idioma y `~/.aurelius/`
+estaba vacío. Se creó en esta sesión. Se anexa el dato medido, no el recibido.
