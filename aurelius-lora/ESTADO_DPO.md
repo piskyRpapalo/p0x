@@ -20,13 +20,12 @@ escritos tal cual; ni una palabra tocada.
 fichero de datos, que es donde vive el contenido desde que las familias se
 firmaron.
 
-## 2 · Validador · VERDE
+## 2 · Validador · VERDE · **Capa 1, higiene LÉXICA**
 
-`forja/validar_mitades.py`, siete reglas firmadas. **Las 18 mitades pasan.**
+`forja/validar_mitades.py`, siete reglas firmadas.
 
-Y se falsificó, porque un validador que aprueba todo puede estar simplemente
-roto: contra los 18 `rechazado` —que deben disparar— **caza 9**. Emojis, color
-como estado, lista negra y evasión sin causa saltan donde tienen que saltar.
+**Su trabajo es uno: que los 18 `elegido` estén limpios antes de entrenar.**
+**18/18 pasan.** Eso es el resultado; lo demás es diagnóstico del instrumento.
 
 Comprobado además lo que **no** debe marcarse:
 
@@ -41,11 +40,27 @@ La regla de evasión mira **el verbo que sigue** al «no puedo», no el «no pue
 Negarse a afirmar lo que no se ha mirado es el sensor honesto; cerrar la puerta
 sin decir por qué es lo que se caza.
 
-**Observación, no corrección.** La lista negra es literal: el rechazado inglés
-de `F1/relleno` dice *«We go way back»* donde el español dice *«somos viejos
-conocidos»*, y no está en la lista firmada. Los cuatro de F3 y los dos de voseo
-tampoco disparan — sus rupturas son de momento y de registro dialectal, que
-ninguna de las siete reglas mira. Se dice; no se amplía la lista por iniciativa.
+### Los rechazados no son cobertura, son falsificación
+
+Pasar el validador por los 18 `rechazado` sirve para **una** cosa: demostrar que
+tiene dientes, porque un validador que aprueba todo puede estar simplemente
+roto. Caza **9 de 18**, y con eso queda demostrado.
+
+**Los 9 que no caza no son un hueco.** Los rechazados son la mitad negativa del
+par: ya son el ejemplo de lo que no se quiere, y no hace falta que una regla
+léxica los señale para que cumplan su función en DPO.
+
+Y no los caza porque **sus rupturas no son léxicas**, cada una con su capa:
+
+| Sin cazar | n | Ruptura | Quién la mide |
+|---|---:|---|---|
+| F3 · saludo-de-cierre, memoria sin consentir, idioma dos veces | **6** | momento y estructura | el **tester conductual** post-DPO |
+| F1 · voseo | 2 | registro dialectal | no es lista negra |
+| F1 · relleno EN — «We go way back» | 1 | idioma distinto al firmado | fuera de la lista literal |
+
+**Corrección de cuenta sobre la lectura recibida:** F3 aporta **6**, no 4 — son
+tres casos en dos idiomas. El reparto es 2 + 1 + 6 = 9. La lectura por capas no
+cambia; la cifra sí, y aquí se anexa la medida.
 
 ## 3 · Lo que queda
 
