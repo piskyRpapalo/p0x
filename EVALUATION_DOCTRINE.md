@@ -110,4 +110,4 @@ learning and starts memorizing.
 This doctrine is not a suggestion. It is the difference between a
 local wrapper and a sovereign system. Implement it, run your
 tests, and let the carbon sign the final commit only when the
-guardian is green.
+guardian is validated.
