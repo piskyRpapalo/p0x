@@ -117,6 +117,7 @@ def _negativos():
         for caso in fam["casos"]:
             for idioma in ("en", "es"):
                 rechazado = caso["rechazado"][idioma]
+                elegido = caso.get("elegido", {}).get(idioma, "")
                 fuera.append({
                     "id": f"negativo/{idioma}/{fam['id']}-{caso['clave']}",
                     "clase": "negativo",
@@ -125,7 +126,7 @@ def _negativos():
                     "huella": huella(rechazado),
                     "peso": 2.0,
                     "prompt": caso["prompt"][idioma],
-                    "elegido": "",
+                    "elegido": elegido,
                     "rechazado": rechazado,
                     "motivo": caso["motivo"],
                 })
