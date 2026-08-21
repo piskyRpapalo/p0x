@@ -109,6 +109,17 @@ def validar(registros):
         if not cuerpo.strip():
             mal("R6 contenido vacio", r.get("id"), "-")
             continue
+        # R8 · media pieza no es un par. Un registro de preferencia con
+        # `rechazado` y sin `elegido` no puede entrenar DPO: se le ensenaria
+        # que evitar sin ensenarle que hacer en su lugar. Es FALLO y no aviso,
+        # porque a diferencia de una cadena corta -- que el entrenador
+        # descarta solo -- esto no se descarta: bloquea la pasada entera.
+        if r.get("clase") in ("preferencia", "negativo"):
+            faltan = [k for k in ("prompt", "elegido", "rechazado")
+                      if not (r.get(k) or "").strip()]
+            if faltan:
+                mal("R8 par manco", r.get("id"), "falta: " + ", ".join(faltan))
+
         if r.get("clase") == "canon" and len(cuerpo) < LARGO_MIN_CANON:
             avisa("R7 corta para entrenar", r.get("id"),
                 f"{len(cuerpo)} car. · un causal no aprende de esto")
