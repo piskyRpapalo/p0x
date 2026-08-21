@@ -35,7 +35,9 @@ HIPER = {
     "dropout": 0.05,
     "lr": 2e-4,
     "epocas": 1,              # FIRMADO. Eran 3.
-    "validacion": 0.10,       # FIRMADO. 10 % de los datos.
+    "validacion": 0.20,       # FIRMADO v2. Era 0,10: 17 muestras eran poca
+                              # evidencia para un umbral que aborta una corrida.
+    "subidas_para_abortar": 2,  # FIRMADO v2. Era 1 (implicito).
     "max_len": 512,
     "cada_cuantos_evalua": 20,
     "min_tokens": 4,           # ver `descartar_degeneradas`
@@ -243,17 +245,28 @@ def main(argv=None):
                 print(f"  paso {paso:4d} · train {tren_medio:.4f} · "
                       f"val {val_medio:.4f}", flush=True)
 
-                # SOBREAJUSTE: la validación sube mientras el tren baja. Se
-                # exige que las DOS cosas pasen: una validación que sube sola
-                # puede ser ruido de 21 muestras, y abortar por ruido enseña a
-                # desconfiar del guardián.
-                if len(historial) >= 2:
-                    a0, a1 = historial[-2], historial[-1]
-                    if a1["val"] > a0["val"] and a1["train"] < a0["train"]:
+                # SOBREAJUSTE. Dos exigencias, y las dos vienen de una cicatriz.
+                #
+                # 1) Que la validación suba MIENTRAS el tren baja. Una
+                #    validación que sube sola puede ser ruido, y abortar por
+                #    ruido enseña a desconfiar del guardián.
+                # 2) Que pase DOS evaluaciones seguidas. La v1 abortó en el
+                #    paso 120 con una sola subida sobre 17 muestras: la regla
+                #    era correcta y la evidencia, delgada. Dos subidas cuestan
+                #    veinte segundos y separan el giro de la curva del ruido.
+                n = HIPER["subidas_para_abortar"]
+                if len(historial) >= n + 1:
+                    tramos = historial[-(n + 1):]
+                    seguidas = all(
+                        b["val"] > a["val"] and b["train"] < a["train"]
+                        for a, b in zip(tramos, tramos[1:]))
+                    if seguidas:
+                        detalle = " · ".join(
+                            f"{a['val']:.4f}→{b['val']:.4f}"
+                            for a, b in zip(tramos, tramos[1:]))
                         abortado = (f"sobreajuste en el paso {paso}: "
-                                    f"val {a0['val']:.4f}→{a1['val']:.4f} sube "
-                                    f"mientras train {a0['train']:.4f}→"
-                                    f"{a1['train']:.4f} baja")
+                                    f"{n} subidas seguidas de validación "
+                                    f"({detalle}) con el tren bajando")
                         break
 
     informe = {

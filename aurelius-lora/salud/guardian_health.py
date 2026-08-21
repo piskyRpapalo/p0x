@@ -86,6 +86,23 @@ def main(argv=None):
             if h:
                 print(f"[guardian-5] entrenamiento: {len(h)} evaluaciones · "
                       f"val {h[0]['val']:.4f} -> {h[-1]['val']:.4f}")
+                # No basta con mirar el principio y el final. Un modelo puede
+                # acabar mejor que como empezo y aun asi haber pasado hace
+                # rato por su mejor momento -- y lo que se guarda es el ULTIMO
+                # paso, no el mejor. Medido en v2: la validacion toco fondo en
+                # el paso 80 y termino un 29 % peor, y este guardian decia
+                # "sin alertas". Un sensor que calla eso no es honesto.
+                mejor = min(h, key=lambda e: e["val"])
+                if mejor is not h[-1]:
+                    peor = (h[-1]["val"] - mejor["val"]) / mejor["val"]
+                    print(f"[guardian-5] el mejor momento fue el paso "
+                          f"{mejor['paso']} (val {mejor['val']:.4f}); "
+                          f"el adapter guardado es del paso {h[-1]['paso']} "
+                          f"(val {h[-1]['val']:.4f}, {peor:+.1%})")
+                    if peor > 0.10:
+                        print("[guardian-5] ALERTA · se guardo un adapter "
+                              "medida peor que el mejor que hubo")
+                        alerta = True
     except (OSError, json.JSONDecodeError):
         print("[guardian-5] NO_DATA · sin informe de entrenamiento")
 
