@@ -93,16 +93,31 @@ def main(argv=None):
                 # el paso 80 y termino un 29 % peor, y este guardian decia
                 # "sin alertas". Un sensor que calla eso no es honesto.
                 mejor = min(h, key=lambda e: e["val"])
-                if mejor is not h[-1]:
-                    peor = (h[-1]["val"] - mejor["val"]) / mejor["val"]
+                # QUE se guardo lo dice el entrenador, no lo supone este
+                # guardian. La primera version de esto asumia que lo guardado
+                # era el ultimo paso; el dia que el entrenador aprendio a
+                # guardar el mejor, el sensor empezo a mentir sin que nadie
+                # tocara el sensor. Una suposicion sobre otro modulo caduca
+                # cuando ese modulo cambia -- y no avisa.
+                guardado_paso = ent.get("mejor_paso")
+                if ent.get("guardado") != "mejor_checkpoint" or not guardado_paso:
+                    guardado_paso = h[-1]["paso"]
+                guardado = next((e for e in h if e["paso"] == guardado_paso), h[-1])
+
+                if guardado["paso"] != mejor["paso"]:
+                    peor = (guardado["val"] - mejor["val"]) / mejor["val"]
                     print(f"[guardian-5] el mejor momento fue el paso "
                           f"{mejor['paso']} (val {mejor['val']:.4f}); "
-                          f"el adapter guardado es del paso {h[-1]['paso']} "
-                          f"(val {h[-1]['val']:.4f}, {peor:+.1%})")
+                          f"el adapter guardado es del paso {guardado['paso']} "
+                          f"(val {guardado['val']:.4f}, {peor:+.1%})")
                     if peor > 0.10:
                         print("[guardian-5] ALERTA · se guardo un adapter "
                               "medida peor que el mejor que hubo")
                         alerta = True
+                else:
+                    print(f"[guardian-5] parada temprana correcta · se guardo "
+                          f"el paso {mejor['paso']} (val {mejor['val']:.4f}), "
+                          f"que es el mejor de los {len(h)}")
     except (OSError, json.JSONDecodeError):
         print("[guardian-5] NO_DATA · sin informe de entrenamiento")
 

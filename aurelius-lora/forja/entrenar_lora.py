@@ -160,7 +160,10 @@ def main(argv=None):
 
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
-    from peft import LoraConfig, get_peft_model
+    from peft import (LoraConfig, get_peft_model,
+                      get_peft_model_state_dict,
+                      set_peft_model_state_dict)
+    import copy
 
     torch.set_num_threads(a.hilos)
     tok = AutoTokenizer.from_pretrained(BASE_HF)
@@ -222,6 +225,15 @@ def main(argv=None):
 
     ventana, historial = [], []
     abortado = None
+    # PARADA TEMPRANA DE VERDAD. No basta con dejar de entrenar: hay que
+    # QUEDARSE CON EL MEJOR y tirar el resto. La v2 termino su epoca entera,
+    # no aborto, y guardo el paso 140 -- un 28,8 % peor en validacion que el
+    # paso 80, por el que ya habia pasado. Guardar el ultimo es guardar el que
+    # mas ha memorizado.
+    #
+    # El adapter son 5,9 M de parametros: una copia en RAM cuesta ~23 MiB y
+    # ahorra reescribir el disco en cada mejora.
+    mejor = {"val": float("inf"), "paso": 0, "train": None, "pesos": None}
     t0 = time.time()
 
     with bitacora.open("w", encoding="utf-8") as fh:
@@ -239,11 +251,17 @@ def main(argv=None):
                 val_medio = perdida_validacion()
                 ventana = []
                 historial.append({"paso": paso, "train": tren_medio, "val": val_medio})
+                if val_medio < mejor["val"]:
+                    mejor.update(val=val_medio, paso=paso, train=tren_medio,
+                                 pesos=copy.deepcopy(
+                                     get_peft_model_state_dict(modelo)))
                 fh.write(json.dumps({"paso": paso, "loss": tren_medio,
                                      "val_loss": val_medio}) + "\n")
                 fh.flush()
                 print(f"  paso {paso:4d} · train {tren_medio:.4f} · "
-                      f"val {val_medio:.4f}", flush=True)
+                      f"val {val_medio:.4f}"
+                      + ("  ← mejor" if mejor["paso"] == paso else ""),
+                      flush=True)
 
                 # SOBREAJUSTE. Dos exigencias, y las dos vienen de una cicatriz.
                 #
@@ -278,23 +296,39 @@ def main(argv=None):
         "historial": historial,
         "segundos": round(time.time() - t0, 1),
         "abortado": abortado,
+        "mejor_paso": mejor["paso"],
+        "mejor_val": None if mejor["pesos"] is None else round(mejor["val"], 4),
+        "guardado": "mejor_checkpoint",
     }
     (SALIDA / "entrenamiento.json").write_text(
         json.dumps(informe, ensure_ascii=False, indent=2), encoding="utf-8")
 
     if abortado:
         print(f"\n[guardian-2] ABORTA · {abortado}")
-        print("[guardian-2] el adapter NO se guarda: un modelo que ya empezó a "
-              "recitar no mejora por guardarlo.")
+
+    if mejor["pesos"] is None:
+        print("[guardian-2] no hubo ni una evaluación: nada que guardar.",
+              file=sys.stderr)
         return 1
 
+    # Se guarda el MEJOR, incluso cuando la corrida abortó. Un aborto dice
+    # "deja de entrenar", no "tira lo que ya habías ganado": el mejor
+    # checkpoint es anterior al giro y no lleva dentro el sobreajuste que
+    # disparó el aborto.
+    set_peft_model_state_dict(modelo, mejor["pesos"])
     destino.mkdir(parents=True, exist_ok=True)
     modelo.save_pretrained(str(destino))
     tok.save_pretrained(str(destino))
-    print(f"\n[guardian-2] VERDE · adapter en {destino}")
+
+    ultimo = historial[-1]
+    print(f"\n[guardian-2] guardado el paso {mejor['paso']} "
+          f"(val {mejor['val']:.4f}), no el {ultimo['paso']} "
+          f"(val {ultimo['val']:.4f})")
+    print(f"[guardian-2] {'ABORTADA pero con adapter' if abortado else 'VERDE'}"
+          f" · adapter en {destino}")
     print(f"[guardian-2] siguiente: convert_lora_to_gguf.py → "
           f"llama-export-lora → llama-quantize")
-    return 0
+    return 1 if abortado else 0
 
 
 if __name__ == "__main__":
