@@ -124,13 +124,18 @@ def main(argv=None):
     ap.add_argument("--ejecutar", action="store_true")
     ap.add_argument("--version", default="v1")
     ap.add_argument("--hilos", type=int, default=8)
+    # El rango se puede mover POR BANDERA, no editando HIPER. Los valores
+    # firmados siguen siendo los del diccionario; un experimento que cambia
+    # la constante deja el fichero mintiendo sobre lo que se firmo.
+    ap.add_argument("--rango", type=int, default=HIPER["rank"])
+    ap.add_argument("--alpha", type=int, default=HIPER["alpha"])
     ap.add_argument("--sin-exportacion", action="store_true",
                     help="entrena aunque falten las herramientas de la Fase 4")
     a = ap.parse_args(argv)
 
     faltas, v = revisar(exportacion=not a.sin_exportacion)
     print(f"[guardian-2] base: {BASE_HF} (pesos sin cuantizar, bf16)")
-    print(f"[guardian-2] LoRA r={HIPER['rank']} alpha={HIPER['alpha']} "
+    print(f"[guardian-2] LoRA r={a.rango} alpha={a.alpha} "
           f"lr={HIPER['lr']} · {HIPER['epocas']} época · "
           f"validación {HIPER['validacion']:.0%}")
     print(f"[guardian-2] entrenador: {(v or {}).get('elegido') or 'NO_DATA'}")
@@ -170,7 +175,7 @@ def main(argv=None):
     modelo = AutoModelForCausalLM.from_pretrained(BASE_HF, dtype=torch.bfloat16)
     modelo.config.use_cache = False
     modelo = get_peft_model(modelo, LoraConfig(
-        r=HIPER["rank"], lora_alpha=HIPER["alpha"], lora_dropout=HIPER["dropout"],
+        r=a.rango, lora_alpha=a.alpha, lora_dropout=HIPER["dropout"],
         bias="none", task_type="CAUSAL_LM", target_modules=HIPER["objetivo"]))
     entrenables = sum(p.numel() for p in modelo.parameters() if p.requires_grad)
     print(f"[guardian-2] parámetros entrenables: {entrenables:,}")
@@ -290,7 +295,7 @@ def main(argv=None):
     informe = {
         "fecha": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "version": a.version,
-        "hiper": HIPER,
+        "hiper": {**HIPER, "rank": a.rango, "alpha": a.alpha},
         "tren": len(tren), "validacion": len(val),
         "pasos": len(historial) * HIPER["cada_cuantos_evalua"],
         "historial": historial,

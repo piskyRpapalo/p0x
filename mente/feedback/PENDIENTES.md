@@ -1086,3 +1086,17 @@ Corrección declarada sobre la herencia recibida: llegaba como «el Doogee tiene
 instalado, el cerebro verificado y la voz, **con memoria recién nacida**». Falso — la memoria
 **no existía**: el primer arranque estaba detenido en la pregunta de idioma y `~/.aurelius/`
 estaba vacío. Se creó en esta sesión. Se anexa el dato medido, no el recibido.
+
+### 2026-08-21 · adb · trampa nº4, con incidente
+
+- **S1 · `input text` con comillas anidadas abre el selector de ficheros del
+  sistema.** (Coste S.) Cuarta trampa de adb, y la primera que expone datos
+  ajenos al trabajo. Al intentar enviar un `python3 -c "..."` con comillas
+  escapadas a Termux, el escapado se rompió y Android abrió
+  `com.google.android.documentsui` con documentos personales del Soberano en
+  pantalla — una factura y un pedido. No se abrió ninguno, no se exploró, se
+  retrocedió, se trajo Termux al frente y **se borraron las capturas que los
+  contenían**. `KEYCODE_BACK` no cerró el selector; lo que funcionó fue lanzar
+  Termux con `monkey`. **Regla: nada de comillas anidadas por `input text`.** Lo
+  que no quepa en una línea sin comillas se escribe a fichero y se ejecuta por
+  nombre, o no se envía.
