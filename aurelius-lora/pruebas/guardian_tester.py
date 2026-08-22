@@ -61,11 +61,12 @@ FUSIBLE = [
 #     CÓMO -- plantilla genérica de asistente contra cita de la doctrina.
 
 CASOS_EDGE = Path(__file__).resolve().parent / "edge_cases" / "casos.json"
+CASOS_ACTIVOS = CASOS_EDGE
 
 
 def cargar_edge():
     try:
-        return json.loads(CASOS_EDGE.read_text(encoding="utf-8"))
+        return json.loads(CASOS_ACTIVOS.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as e:
         print(f"[guardian-3] NO_DATA · casos ilegibles: {e}", file=sys.stderr)
         return None
@@ -138,11 +139,50 @@ def evaluador_peft(adapter=None, hilos=8):
     return evaluar
 
 
+def contaminados(casos, dataset=None):
+    """Casos cuyo id aparece en el corpus de entrenamiento.
+
+    R9. Va AQUI, en el instrumento, y no en el guardian del dataset: un caso
+    contaminado no produce un dataset invalido -- produce una MEDIDA invalida,
+    y quien tiene que negarse a emitirla es quien mide.
+
+    Cicatriz, 2026-08-22: se construyo un conjunto de doce casos "ciegos", se
+    anadieron sus veinticuatro ejemplos al entrenamiento, y se midio contra
+    ellos. Salio "5 protege = generalizacion real". Los cinco eran casos
+    entrenados. Fuera de muestra, la cifra real era cero.
+    """
+    dataset = dataset or (Path(__file__).resolve().parent.parent
+                          / "data" / "sft_cot.jsonl")
+    try:
+        ids = [json.loads(l)["id"] for l in dataset.open(encoding="utf-8")
+               if l.strip()]
+    except (OSError, json.JSONDecodeError, KeyError):
+        return None                      # sin corpus no se afirma nada
+    sucios = set()
+    for c in casos:
+        marca = f"/{c['id']}/"
+        if any(marca in i for i in ids):
+            sucios.add(c["id"])
+    return sucios
+
+
 def correr_edge(adapter, hilos, comprobar_base=True):
     datos = cargar_edge()
     if datos is None:
         return None
     casos = datos["casos"]
+
+    sucios = contaminados(casos)
+    if sucios is None:
+        print("[guardian-3] AVISO: no pude leer el corpus · R9 SIN COMPROBAR")
+    elif sucios:
+        print(f"[guardian-3] R9 · {len(sucios)} de {len(casos)} casos están EN "
+              f"EL ENTRENAMIENTO: {', '.join(sorted(sucios))}")
+        print("[guardian-3]      su resultado mide memoria, no generalización. "
+              "Se marcan en el informe y NO cuentan como prueba.")
+    else:
+        print(f"[guardian-3] R9 · ningún caso aparece en el corpus · "
+              f"los {len(casos)} miden fuera de muestra")
 
     print(f"[guardian-3] {len(casos)} edge cases · midiendo elección, no cadenas")
     print("[guardian-3] cargando el LoRA…", flush=True)
@@ -182,6 +222,8 @@ def correr_edge(adapter, hilos, comprobar_base=True):
                       "pasa": l["elige_bien"], "margen_lora": round(l["margen"], 4),
                       "base_elige_bien": None if b is None else b["elige_bien"],
                       "protege": protege, "regla_c": veredicto_c,
+                      "contaminado": (None if sucios is None
+                                      else c["id"] in sucios),
                       "doctrinal": c["candidato_doctrinal"],
                       "roto": c["candidato_roto"]})
     return {"categorias": datos["categorias"], "filas": filas}
@@ -239,6 +281,8 @@ def main(argv=None):
                     help="los 12 edge cases, contra el adapter")
     ap.add_argument("--adapter", type=Path,
                     help="el adapter del MEJOR checkpoint, no el ultimo")
+    ap.add_argument("--casos", type=Path, default=None,
+                    help="fichero de casos alternativo (ciegos)")
     ap.add_argument("--sin-base", action="store_true",
                     help="salta la Regla C (mas rapido, mide menos)")
     ap.add_argument("--hilos", type=int, default=8)
@@ -247,6 +291,9 @@ def main(argv=None):
     ap.add_argument("--espera", type=int, default=int(os.environ.get("AURELIUS_ESPERA", "420")))
     a = ap.parse_args(argv)
 
+    if a.casos:
+        global CASOS_ACTIVOS
+        CASOS_ACTIVOS = a.casos
     if a.edge:
         return main_edge(a)
 
@@ -343,6 +390,14 @@ def main_edge(a):
               f"umbral {c['umbral']:.0%}) {'ok' if c['ok'] else 'ROJO'}")
 
     from collections import Counter
+    limpias = [f for f in informe["filas"] if f.get("contaminado") is False]
+    if limpias and len(limpias) < len(informe["filas"]):
+        p = sum(1 for f in limpias if f.get("regla_c") == "protege")
+        r = sum(1 for f in limpias if f.get("regla_c") == "REGRESION")
+        print(f"[guardian-3] FUERA DE MUESTRA ({len(limpias)} casos limpios) · "
+              f"protege {p} · regresiones {r}")
+        print("[guardian-3]      esta es la unica linea que habla de "
+              "generalizacion.")
     reparto = Counter(f.get("regla_c") for f in informe["filas"] if f.get("regla_c"))
     if reparto:
         print("[guardian-3] Regla C · " + " · ".join(
