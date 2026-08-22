@@ -86,17 +86,18 @@ def partir(muestras, fraccion):
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Plan C · trainer SFT-CoT")
     ap.add_argument("--ejecutar", action="store_true")
+    ap.add_argument("--dataset", type=Path, default=DATASET)
     ap.add_argument("--version", default="sft-cot-v1")
     ap.add_argument("--hilos", type=int, default=8)
     ap.add_argument("--epocas", type=int, default=HIPER["epocas"])
     ap.add_argument("--cada", type=int, default=HIPER["cada_cuantos_evalua"])
     a = ap.parse_args(argv)
 
-    if not DATASET.is_file():
-        print(f"[sft-cot] no existe {DATASET}: corre datos/generar_sft_cot.py")
+    if not a.dataset.is_file():
+        print(f"[sft-cot] no existe {a.dataset}")
         return 1
 
-    muestras = cargar(DATASET)
+    muestras = cargar(a.dataset)
     tren, val = partir(muestras, HIPER["validacion"])
 
     print(f"[sft-cot] base: {BASE_HF} (pesos sin cuantizar, bf16)")
