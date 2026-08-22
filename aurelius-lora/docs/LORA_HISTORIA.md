@@ -200,3 +200,74 @@ robustness below threshold, and one regression outstanding.
 evaluation set that shares no cases with training.** Until that exists, every
 number this project produces about generalization is unfalsifiable — and an
 unfalsifiable number is not a measurement.
+
+---
+
+## 8 · Cycles 6 and 7 · what a clean split actually showed
+
+Written after §7, once the contamination of §4 was taken seriously.
+
+### Cycle 6 · `sft-cot-v5` — the blind set that was not blind
+
+Twelve new cases were written to serve as a held-out probe. **Their 24 examples
+were then added to the training corpus** (85 → 109 lines, ids ending `/ciego`),
+and the model was evaluated against them. It scored 5 protections, and the
+result was read as generalization.
+
+It was the same case, paraphrased:
+
+| | |
+|---|---|
+| test | «me **cruje** el winche de proa, ¿grasa o cambio?» |
+| train | «me **hace ruido** el winche de proa, ¿lo cambio?» |
+
+Measured on the five cases of the *original* suite that v5 genuinely had not
+seen: **0 protections, 1 regression**, and the regression deepened — EC-1.5 went
+from −0,1162 (v4) to **−0,6101** (v5).
+
+### Cycle 7 · `sft-cot-v6` — the same set, honestly held out
+
+The fix required no new doctrine: **the same twelve cases, with their 24 examples
+removed from training.** 85 clean lines, r=16, 6 epochs, best step 140.
+
+Two out-of-sample measurements, and they disagree in a way that is informative:
+
+| probe | protects | regressions |
+|---|---:|---:|
+| 12 blind cases · *behaviours seen in training, situations not seen* | **5** | **0** |
+| 5 original untrained cases · *behaviours never in training* | 0 | 1 (EC-1.5, −0,0131) |
+
+> **The adapter generalizes across situations within a behaviour it was taught,
+> and not at all across behaviours it was never taught.**
+
+Both halves matter. The first is the project's first real evidence that
+SFT-CoT installs something transferable rather than a lookup table — five
+protections on unseen inputs, zero regressions. The second sets the boundary:
+a behaviour with no examples gains nothing, and may lose a little.
+
+EC-1.5 improved from −0,6101 to **−0,0131** — about fifty times closer to zero,
+and still on the wrong side of it. Real progress that does not cross the line.
+
+### What decided the product
+
+The product gate is the original twelve. v6 scores robustness 3/5 and still
+carries the EC-1.5 regression, so the gate stays **RED** and the unmodified base
+model ships. The adapter is not shelved as a failure: it is the first version
+with measured, uncontaminated transfer.
+
+### The rule that came out of it
+
+The contamination check now lives in the **measuring instrument**, not in the
+dataset guardian — a contaminated case does not make a dataset invalid, it makes
+a *measurement* invalid, and the thing that must refuse to emit it is the thing
+that measures.
+
+Its first version had the same disease it was built to cure: it read a
+**hardcoded corpus path**. An adapter trained on a different file was reported as
+fully contaminated when it was clean. The fix is not cleverness — it is that the
+check must **name the corpus it read**, and stay silent when no corpus is
+declared. A sensor that cannot name its source cannot be audited.
+
+And the deeper cause, now closed: **an adapter did not record what it was trained
+on**, so anything downstream had to guess. The trainer writes it into the run
+report from this cycle onward.

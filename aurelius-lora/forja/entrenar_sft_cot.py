@@ -202,6 +202,9 @@ def main(argv=None):
     informe = {
         "fecha": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "version": a.version,
+        # Un adapter que no sabe con que se entreno obliga a adivinar a quien
+        # lo mida despues, y adivinar fue la averia de R9 del 2026-08-22.
+        "dataset": str(DATASET),
         "hiper": {**HIPER, "epocas": a.epocas, "cada": a.cada},
         "tren": len(tren), "validacion": len(val),
         "mejor_paso": mejor["paso"],

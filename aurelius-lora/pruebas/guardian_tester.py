@@ -64,9 +64,9 @@ CASOS_EDGE = Path(__file__).resolve().parent / "edge_cases" / "casos.json"
 CASOS_ACTIVOS = CASOS_EDGE
 
 
-def cargar_edge():
+def cargar_edge(ruta=None):
     try:
-        return json.loads(CASOS_ACTIVOS.read_text(encoding="utf-8"))
+        return json.loads((ruta or CASOS_ACTIVOS).read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as e:
         print(f"[guardian-3] NO_DATA · casos ilegibles: {e}", file=sys.stderr)
         return None
@@ -151,8 +151,8 @@ def contaminados(casos, dataset=None):
     ellos. Salio "5 protege = generalizacion real". Los cinco eran casos
     entrenados. Fuera de muestra, la cifra real era cero.
     """
-    dataset = dataset or (Path(__file__).resolve().parent.parent
-                          / "data" / "sft_cot.jsonl")
+    if dataset is None:
+        return None      # sin corpus declarado NO se afirma nada: ver `main_edge`
     try:
         ids = [json.loads(l)["id"] for l in dataset.open(encoding="utf-8")
                if l.strip()]
@@ -166,22 +166,24 @@ def contaminados(casos, dataset=None):
     return sucios
 
 
-def correr_edge(adapter, hilos, comprobar_base=True):
+def correr_edge(adapter, hilos, comprobar_base=True, corpus=None,
+                casos_ruta=None):
     datos = cargar_edge()
     if datos is None:
         return None
     casos = datos["casos"]
 
-    sucios = contaminados(casos)
+    sucios = contaminados(casos, corpus)
     if sucios is None:
-        print("[guardian-3] AVISO: no pude leer el corpus · R9 SIN COMPROBAR")
+        print("[guardian-3] R9 SIN COMPROBAR · no se declaró corpus "
+              "(--corpus RUTA). No afirmo nada sobre contaminación.")
     elif sucios:
         print(f"[guardian-3] R9 · {len(sucios)} de {len(casos)} casos están EN "
-              f"EL ENTRENAMIENTO: {', '.join(sorted(sucios))}")
+              f"{corpus.name}: {', '.join(sorted(sucios))}")
         print("[guardian-3]      su resultado mide memoria, no generalización. "
               "Se marcan en el informe y NO cuentan como prueba.")
     else:
-        print(f"[guardian-3] R9 · ningún caso aparece en el corpus · "
+        print(f"[guardian-3] R9 · ningún caso aparece en {corpus.name} · "
               f"los {len(casos)} miden fuera de muestra")
 
     print(f"[guardian-3] {len(casos)} edge cases · midiendo elección, no cadenas")
@@ -286,6 +288,9 @@ def main(argv=None):
     ap.add_argument("--sin-base", action="store_true",
                     help="salta la Regla C (mas rapido, mide menos)")
     ap.add_argument("--hilos", type=int, default=8)
+    ap.add_argument("--corpus", type=Path,
+                    help="el corpus con el que se entreno ESTE adapter. Sin el, "
+                         "R9 no afirma nada")
     ap.add_argument("--informe", type=Path)
     ap.add_argument("--tope", type=int, default=int(os.environ.get("AURELIUS_TOPE_TOKENS", "80")))
     ap.add_argument("--espera", type=int, default=int(os.environ.get("AURELIUS_ESPERA", "420")))
@@ -348,8 +353,29 @@ def main(argv=None):
     return 0
 
 
+def corpus_de(a):
+    """El corpus del adapter: declarado a mano, o el que el propio adapter guarda.
+
+    NO se adivina con una ruta por defecto. Esa fue exactamente la avería del
+    2026-08-22: R9 leia `sft_cot.jsonl` fijo, un adapter entrenado con
+    `sft_cot_v6.jsonl` daba doce casos "contaminados" que no lo estaban, y el
+    aviso era falso. Un sensor que no puede nombrar su fuente no puede
+    auditarse; ahora la nombra o se calla.
+    """
+    if a.corpus:
+        return a.corpus
+    try:
+        d = json.loads((a.adapter / "informe.json").read_text(encoding="utf-8"))
+        ruta = d.get("dataset")
+        if ruta:
+            return Path(ruta)
+    except (OSError, json.JSONDecodeError, TypeError):
+        pass
+    return None
+
+
 def main_edge(a):
-    datos = cargar_edge()
+    datos = cargar_edge(a.casos)
     if datos is None:
         return 2
     if not a.ejecutar:
@@ -363,7 +389,9 @@ def main_edge(a):
         print("[guardian-3] NO_DATA · falta --adapter", file=sys.stderr)
         return 2
 
-    informe = correr_edge(a.adapter, a.hilos, comprobar_base=not a.sin_base)
+    informe = correr_edge(a.adapter, a.hilos,
+                          comprobar_base=not a.sin_base,
+                          corpus=corpus_de(a), casos_ruta=a.casos)
     if informe is None:
         return 2
     porcat, veredicto = juzgar_edge(informe)
