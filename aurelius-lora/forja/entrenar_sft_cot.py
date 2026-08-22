@@ -6,7 +6,13 @@ con formato CoT: el modelo aprende a razonar antes de responder.
 
 Hiperparámetros FIRMADOS por el Soberano el 2026-08-21:
     rank 16 · alpha 32 · lr 1e-4 · 2 épocas
-    dataset: data/sft_cot.jsonl (60 ejemplos, 10 por caso ROJO)
+    dataset: data/sft_cot.jsonl
+
+REPLAY BUFFER (v3+): random.shuffle(tren) antes de cada época para
+evitar catastrophic forgetting. El modelo ve viejos y nuevos mezclados.
+
+CHECKPOINTS (v4+): guarda el mejor paso durante el entrenamiento,
+no solo al final. Si se interrumpe, el mejor sigue disponible.
 
 NO toca entrenar_lora.py ni sus HIPER firmados de la Fase 2.
 """
@@ -15,13 +21,14 @@ from __future__ import annotations
 import argparse
 import copy
 import json
+import random
 import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 
 import torch
-from peft import LoraConfig, get_peft_model, get_peft_model_state_dict
+from peft import LoraConfig, get_peft_model, get_peft_model_state_dict, set_peft_model_state_dict
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -46,7 +53,6 @@ HIPER = {
 
 
 def cargar(ruta):
-    """Carga el dataset SFT-CoT. Clase 'canon' con campo 'texto'."""
     entrenables = []
     for linea in ruta.open(encoding="utf-8"):
         linea = linea.strip()
@@ -62,7 +68,6 @@ def cargar(ruta):
 
 
 def partir(muestras, fraccion):
-    """Corte de validación estratificado por idioma."""
     val, tren = [], []
     for idioma in ("en", "es"):
         de_ese = [m for m in muestras if m["idioma"] == idioma]
@@ -83,6 +88,8 @@ def main(argv=None):
     ap.add_argument("--ejecutar", action="store_true")
     ap.add_argument("--version", default="sft-cot-v1")
     ap.add_argument("--hilos", type=int, default=8)
+    ap.add_argument("--epocas", type=int, default=HIPER["epocas"])
+    ap.add_argument("--cada", type=int, default=HIPER["cada_cuantos_evalua"])
     a = ap.parse_args(argv)
 
     if not DATASET.is_file():
@@ -94,7 +101,7 @@ def main(argv=None):
 
     print(f"[sft-cot] base: {BASE_HF} (pesos sin cuantizar, bf16)")
     print(f"[sft-cot] LoRA r={HIPER['rank']} alpha={HIPER['alpha']} "
-          f"lr={HIPER['lr']} · {HIPER['epocas']} épocas · "
+          f"lr={HIPER['lr']} · {a.epocas} épocas · "
           f"validación {HIPER['validacion']:.0%}")
     print(f"[sft-cot] muestras: {len(muestras)} (tren {len(tren)}, val {len(val)})")
 
@@ -154,47 +161,47 @@ def main(argv=None):
     modelo.train()
     SALIDA.mkdir(parents=True, exist_ok=True)
     destino = SALIDA / a.version
-    bitacora = SALIDA / "loss_sft_cot.jsonl"
+    destino.mkdir(parents=True, exist_ok=True)
+    bitacora = destino / "loss.jsonl"
 
     mejor = {"val": float("inf"), "paso": 0, "train": None, "pesos": None}
     t0 = time.time()
 
     with bitacora.open("w", encoding="utf-8") as fh:
-        for paso, m in enumerate(tren * HIPER["epocas"], 1):
-            salida = modelo(**lote_de(m))
-            salida.loss.backward()
-            opt.step()
-            opt.zero_grad(set_to_none=True)
-            perdida = float(salida.loss.item())
-            fh.write(json.dumps({"paso": paso, "loss": perdida}) + "\n")
+        paso = 0
+        for epoca in range(a.epocas):
+            random.shuffle(tren)
+            for m in tren:
+                paso += 1
+                salida = modelo(**lote_de(m))
+                salida.loss.backward()
+                opt.step()
+                opt.zero_grad(set_to_none=True)
+                perdida = float(salida.loss.item())
+                fh.write(json.dumps({"paso": paso, "loss": perdida}) + "\n")
 
-            if paso % HIPER["cada_cuantos_evalua"] == 0:
-                val_medio = perdida_validacion()
-                fh.write(json.dumps({"paso": paso, "val_loss": val_medio}) + "\n")
-                fh.flush()
-                print(f"  paso {paso:4d} · val {val_medio:.4f}"
-                      + ("  ← mejor" if val_medio < mejor["val"] else ""),
-                      flush=True)
-                if val_medio < mejor["val"]:
-                    mejor.update(val=val_medio, paso=paso,
-                                 pesos=copy.deepcopy(
-                                     get_peft_model_state_dict(modelo)))
+                if paso % a.cada == 0:
+                    val_medio = perdida_validacion()
+                    fh.write(json.dumps({"paso": paso, "val_loss": val_medio}) + "\n")
+                    fh.flush()
+                    print(f"  paso {paso:4d} · val {val_medio:.4f}"
+                          + ("  ← mejor" if val_medio < mejor["val"] else ""),
+                          flush=True)
+                    if val_medio < mejor["val"]:
+                        mejor.update(val=val_medio, paso=paso)
+                        # CHECKPOINT: guardar durante entrenamiento
+                        set_peft_model_state_dict(modelo, get_peft_model_state_dict(modelo))
+                        modelo.save_pretrained(destino)
+                        tok.save_pretrained(destino)
 
     print(f"[sft-cot] entrenamiento completado en {time.time()-t0:.0f}s")
     print(f"[sft-cot] mejor paso: {mejor['paso']} · val {mejor['val']:.4f}")
-
-    if mejor["pesos"] is not None:
-        from peft import set_peft_model_state_dict
-        set_peft_model_state_dict(modelo, mejor["pesos"])
-        destino.mkdir(parents=True, exist_ok=True)
-        modelo.save_pretrained(destino)
-        tok.save_pretrained(destino)
-        print(f"[sft-cot] adapter guardado en {destino}")
+    print(f"[sft-cot] adapter guardado en {destino}")
 
     informe = {
         "fecha": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "version": a.version,
-        "hiper": HIPER,
+        "hiper": {**HIPER, "epocas": a.epocas, "cada": a.cada},
         "tren": len(tren), "validacion": len(val),
         "mejor_paso": mejor["paso"],
         "mejor_val_loss": mejor["val"],
