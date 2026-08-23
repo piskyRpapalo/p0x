@@ -1,6 +1,6 @@
 <!--
   EL CODICE — david · P0X
-  Ruta: /mnt/nvme/p0x/codice/CODICE_david.md
+  Ruta: ~/p0x/codice/CODICE_david.md
   Curador: el Preceptor · Autoridad final: el Soberano (lee/corrige/exporta/borra)
   Indexacion: coleccion Qdrant `codice_david` · embeddings nomic-embed-text (la-fragua :11434)
   Chunking: Chonkie (semantico, por tokens del modelo) · metadata {capa, dominio, fecha, tipo}
