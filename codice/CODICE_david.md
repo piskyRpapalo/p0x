@@ -36,8 +36,14 @@
 | Ciencia del aprendizaje / psicologia | solido (ventaja unica) |
 | Redes / Linux / sistemas (ARM, Tailscale, Docker) | practicante |
 
-### Recursos reales (verificado 2026-06-27)
-- **Computo**: la-fragua (RK3588, CPU, ~15 GiB, sin CUDA -> qwen3:8b batch + nomic-embed + Qdrant + Codice en NVMe 3.7 TiB) · la-torre (Jetson Orin Nano 8 GB, memoria unificada, CUDA -> qwen3:4b interactivo + Sinodo) · proxy LiteLLM enruta · El Oraculo para lo pesado (a mano).
+### Recursos reales — @sleeping desde 2026-08-23
+> **Este apartado esta dormido, no borrado.**
+>
+> **Motivo:** describe el rack de 2026-06-27, que ya no existe. Nombraba «El Oraculo» (un PC Windows fuera del rack actual) como host de lo pesado, daba `qwen3:8b` en la-fragua y `qwen3:4b` en la-torre como techo de computo, y enrutaba por un proxy LiteLLM que hoy no manda. Desde el 2026-08-04 `musculo-hp-01` esta inhabilitado. Leido como vigente, este apartado le dice al Soberano que NO puede hacer cosas que hace todos los dias.
+>
+> **Condicion de despertar:** un inventario de hardware real, medido y fechado — no recordado. Cada nodo con su modelo cargado, su RAM libre con el modelo dentro, y su backend (`ollama ps` primero, como manda el canon). Cuando exista ese inventario, este apartado se reescribe con el y se despierta.
+>
+> **Mientras duerma:** el techo de computo no se deduce de aqui. Se mide.
 - **Tiempo**: *[franjas reales — noches / fines de semana]*
 - **Ubicacion**: Lisboa (Beato). Migracion planificada: Castelo Branco.
 
