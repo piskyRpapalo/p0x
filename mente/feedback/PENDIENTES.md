@@ -1100,3 +1100,17 @@ estaba vacío. Se creó en esta sesión. Se anexa el dato medido, no el recibido
   Termux con `monkey`. **Regla: nada de comillas anidadas por `input text`.** Lo
   que no quepa en una línea sin comillas se escribe a fichero y se ejecuta por
   nombre, o no se envía.
+
+## 2026-08-23 · Verificación del plan v1.1 (informe: INFORME_VERIFICACION_v11.md)
+
+- (S) Firmar el orden nuevo: historial del tablero (B.1) ANTES de toda la Fase A.
+- (S) `--modelo` en `aurelius.py --charla` — 1 h, desbloquea el 30B en el Beelink.
+- (S) Reescribir el §II del plan: el intent de Termux NO puede ejecutar comandos desde
+  el navegador (Chrome no tiene `com.termux.permission.RUN_COMMAND`). Camino real:
+  abrir Termux con MAIN/LAUNCHER + comando al portapapeles.
+- (M) Taller Nivel 1 con `--json-schema`: medido viable en Beelink (10 s) y Doogee (2m13s).
+  Sin reintentos ni prompt-hack.
+- (M) `PRAGMA user_version` con pruebas de migración sobre copias reales de memoria.
+- (L) Retirar A.4 (pathlib) o degradarlo: 335 usos en 43 ficheros, beneficio estético.
+- Decisión pendiente del Soberano: tag `v1.0.0` (no creado) y si el reparto
+  gratis/pago se publica o se queda en la forja.
