@@ -1,6 +1,6 @@
 <!--
   ÍNDICE MAESTRO DEL CORPUS — P0X (mente/corpus/)
-  Ruta: /mnt/nvme/p0x/mente/corpus/_INDICE.md
+  Ruta: ~/p0x/mente/corpus/_INDICE.md
 
   QUÉ ES: la base curada de psicología/aprendizaje que alimentará la mecánica
   pedagógica futura (Bjork, retrieval, spacing, carga cognitiva, dual coding,
