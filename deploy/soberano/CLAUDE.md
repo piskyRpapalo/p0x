@@ -124,6 +124,65 @@ se decidiría de memoria, que es exactamente lo que esta sección existe para im
 | **musculo-hp-02** | **Nodo de rack** · asume la verificación cruzada que tenía hp-01 | **No es un «músculo»** (medido 2026-08-04): Chromebook `Google/Dratini` con Debian, i5-10310U, **7.6 GiB RAM**, eMMC, **sin GPU**. No sirve para entrenar ni para servir un 30B. Docker y Python sí, Node no. Limpiado de servicios de *earning* ajenos al rack |
 | **Claude Fable 5 / Opus** (fuera del rack) | Doctrina, arquitectura, veredictos con evidencia | Token caro — se reserva, jamás ejecuta en el rack |
 
+## Modelo de inferencia del nodo (medido 2026-08-25)
+
+- **Modelo:** `Qwen3.8-27B-Uncensored-OrcaRouter-Q4_K_M.gguf` · 16.810.714.496 bytes (15,65 GiB
+  según llama-bench) · en `~/ia-models/qwen-uncensored/`. Reemplaza a `qwen3-coder-30b`, que
+  **sigue instalado en Ollama ocupando 18 GB** y con tag pelado `:latest` — retirarlo o fijarle
+  tag explícito es tarea pendiente del Soberano.
+- **Hardware:** Beelink Ryzen 7 255 (8 núcleos / 16 hilos, L3 16 MiB) + Radeon 780M (gfx1103).
+
+### Velocidad, con su backend al lado
+
+Medido con `llama-bench -p 128 -n 32 -r 1`, mismo binario y mismo modelo:
+
+| backend | prompt | generación |
+|---|---|---|
+| CPU (`-ngl 0`, 8 hilos) | 22,76 tok/s | 2,74 tok/s |
+| **Vulkan (`-ngl 99`)** | **67,17 tok/s** | **4,63 tok/s** |
+| | **×2,95** | **×1,69** |
+
+La generación en una iGPU está limitada por el ancho de banda de la DDR5, que comparte con la
+CPU: por eso el prompt casi se triplica y la generación no. Para los bucles —que meten
+documentos largos y generan poco— **la cifra que manda es la del prompt**.
+
+### Vulkan YA estaba en el sistema, en dos sitios
+
+No hace falta descargar ni compilar nada. Comprobado el 2026-08-25:
+
+- `p0x/soberano-bench/bin/llama-b10068-bin-ubuntu-vulkan-x64/` — build completo de llama.cpp
+  con Vulkan, 89 MB, con `llama-bench`, `llama-cli`, `llama-completion` y `llama-server`.
+  Enumera `Vulkan0: AMD Radeon 780M (RADV PHOENIX) · 32.812 MiB libres` — **el modelo de 16 GB
+  cabe entero en la GPU**, y el driver expone `KHR_coopmat` (la ruta rápida).
+- `/usr/local/lib/ollama/vulkan/libggml-vulkan.so` — Ollama trae su propio runner Vulkan.
+
+Runtime del sistema: `libvulkan1` 1.4.341 + `mesa-vulkan-drivers` 26.0.3 (RADV), la iGPU en
+`/dev/dri/renderD128`. Lo que **no** hay son las cabeceras ni `glslc`, así que *compilar* un
+backend Vulkan aquí no se puede sin sudo — pero no hace falta, porque ya está construido.
+
+### Tres cosas que se creían y no son
+
+- **«Backend: llama-cli con Vulkan/CPU híbrido».** Falso. Los binarios del PATH
+  (`~/.local/bin/llama-cli`, `llama-completion`) **no tienen backend Vulkan**:
+  `--list-devices` devuelve `(none)`. El Vulkan está en el build de `soberano-bench`, no en el
+  PATH.
+- **`-ngl 999` en `~/.local/bin/qwen-chat.sh`.** Contra un binario sin GPU es un **no-op
+  silencioso**: parece que descarga capas a la GPU y no descarga ninguna. Un flag que miente
+  es peor que un flag ausente.
+- **«Pendiente: ROCm con `HSA_OVERRIDE_GFX_VERSION=gfx1100`».** Innecesario. ROCm no soporta
+  gfx1103, pero **Vulkan sí, hoy, y ya está instalado**. Forzar un override para fingir otra
+  GPU es la peor forma de conseguir lo que ya se tiene por la puerta buena.
+
+### Contexto: `NO_DATA` hasta medirlo
+
+El modelo declara 262K de contexto. **Eso es la ficha del modelo, no el techo de esta
+máquina**, y este canon ya tiene una regla para eso: *«`num_ctx` demostrado por dato»*. No se
+ha medido cuánto contexto cabe con el 27B cargado en los 32,8 GiB de la asignación Vulkan.
+Hasta que se mida, `NO_DATA`.
+
+Y `qwen-chat.sh` **no fija `-c`**, así que deja el defecto — que en un modelo de 262K es
+exactamente el footgun que este canon documenta.
+
 ## Footguns conocidos (con cicatriz)
 
 - **Tags Ollama pelados** apuntan a variantes Thinking con razonamiento no desactivable — siempre
