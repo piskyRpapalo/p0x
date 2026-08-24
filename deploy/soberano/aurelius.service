@@ -18,7 +18,7 @@ WorkingDirectory=%h/p0x/aurelius
 #    cayo» se leen igual. El envoltorio detecta `INVOCATION_ID` (lo pone
 #    systemd y solo systemd), corre en primer plano y entrega el proceso con
 #    `exec`, para que systemd vigile al servidor y no a un envoltorio.
-ExecStart=%h/p0x/aurelius/bin/aurelius-servicio arranca
+ExecStart=%h/p0x/aurelius/bin/preceptoros-servicio arranca
 Restart=always
 RestartSec=10
 
