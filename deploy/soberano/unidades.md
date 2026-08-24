@@ -12,6 +12,7 @@ del Soberano»* + *«`systemctl --user list-units` al cerrar cada sesión»*. Fi
 |---|---|---|---|---|---|
 | `guardian.timer` | Vigila que no entre en el árbol de Aurelius un `import` fuera de la biblioteca estándar | diario 04:00 (±15 min), `Persistent=true` | **Solo lee** `~/p0x/aurelius`. Escribe latidos y hallazgos en `~/.aurelius/loops.db`. `ProtectSystem=strict` + `ReadWritePaths=~/.aurelius` | 2026-08-24 · **ACTIVA**, probada a mano antes de cronificar (dejó latido) | `systemctl --user disable --now guardian.timer` |
 
+| `afinador.timer` | Corre `bin/pruebas` entera y vigila **que la tanda siga midiendo**: recuento a la baja, suites que caen del corredor, cobertura que se ensancha, sabotajes ciegos | diario 03:00 (±15 min), `Persistent=true` | **Solo lee** `~/p0x/aurelius`. Escribe latidos y hallazgos en `~/.aurelius/loops.db`. `Nice=10` + `IOSchedulingClass=idle` para no competir con la persona | 2026-08-25 · **ACTIVA**, probada a mano y bajo systemd (87 s, dejó latido) antes de cronificar | `systemctl --user disable --now afinador.timer` |
 | `aurelius.service` | La cara (PWA) en `127.0.0.1:8740`, vía `bin/aurelius-servicio` | `Type=simple` + `Restart=always`, permanente | Sirve desde **`~/p0x/aurelius`** (el árbol bueno). Escribe `~/.aurelius/pwa.log` | 2026-08-25 · **FIRMADA**, `enabled`, verificada estable 25 s sin reiniciar | `systemctl --user disable --now aurelius.service` |
 
 ### Sobre `aurelius.service` — encontrada sin firma, firmada al día siguiente
@@ -44,6 +45,14 @@ ese envoltorio existe para evitar. Verificado tras arrancar: `NRestarts` no se m
   dirigir.
 - `s0` — construido y probado, **sin cronificar**. Semanal. Se activa cuando haya varios
   filtros de los que sospechar; con uno solo no tiene de qué.
-- `afinador`, `centinela`, `peregrino`, `medico`, `escriba`, `cronista`, `vigia` — **no
-  existen todavía**. Son L1/L2/L3 y están sin escribir. No se cronifica lo que no está
-  construido y probado.
+- `centinela`, `peregrino`, `medico`, `escriba`, `cronista`, `vigia` — **no existen
+  todavía**. Son L1/L2/L3 y están sin escribir. No se cronifica lo que no está construido y
+  probado.
+
+### Por qué el Afinador va a las 03:00 y el Guardián a las 04:00
+
+Una hora entre los dos, a propósito. El Afinador corre la tanda entera —138 s medidos, y
+crea y borra árboles temporales— y el Guardián lee el árbol para ver qué importa cada
+fichero. Solapados, el Guardián podría estar leyendo mientras el otro tiene el árbol a
+medias, y el hallazgo resultante sería sobre un estado que no existe fuera de esos dos
+minutos. Separados, cada uno mide algo real.

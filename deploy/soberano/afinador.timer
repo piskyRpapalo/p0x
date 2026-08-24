@@ -1,0 +1,12 @@
+[Unit]
+Description=Afinador · la tanda de pruebas, cada noche
+
+[Timer]
+# 03:00, una hora antes que el Guardian: si la tanda deja el arbol tocado, que
+# el Guardian mire despues y no a la vez.
+OnCalendar=*-*-* 03:00:00
+RandomizedDelaySec=15min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

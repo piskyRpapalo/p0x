@@ -1,0 +1,21 @@
+[Unit]
+Description=Afinador · corre la tanda de pruebas y vigila que siga midiendo (L1)
+# Documentacion: aurelius-internal/agentes/ARQ_LOOPS.md
+
+[Service]
+Type=oneshot
+# `%h`: la unidad se versiona y no lleva dentro el nombre de un usuario.
+# El interprete absoluto: systemd no carga ~/.bashrc y no ve ~/.local/bin.
+ExecStart=/usr/bin/python3 %h/p0x/aurelius-internal/agentes/bucles/afinador.py
+WorkingDirectory=%h/p0x/aurelius-internal/agentes/bucles
+# 138 s medidos; el bucle ya se corta solo a los 1200 s. Este es el freno de
+# systemd por si el corte de dentro fallara.
+TimeoutStartSec=1800
+# Lee el arbol de Aurelius y escribe su latido. Nada mas.
+ProtectSystem=strict
+ReadWritePaths=%h/.aurelius %h/p0x/aurelius
+PrivateTmp=true
+NoNewPrivileges=true
+# Cuesta CPU de verdad: que no compita con lo que la persona este haciendo.
+Nice=10
+IOSchedulingClass=idle
