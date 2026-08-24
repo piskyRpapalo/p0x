@@ -1,0 +1,26 @@
+[Unit]
+Description=Aurelius · la cara (PWA) en local
+After=network.target
+
+[Service]
+Type=simple
+# `%h` y no una ruta con mi nombre de usuario dentro: la unidad se versiona.
+WorkingDirectory=%h/p0x/aurelius
+# `bin/aurelius-servicio` y NO `python3 aurelius.py`, a proposito:
+#
+#  - `aurelius.py` es el producto INTERACTIVO. Bajo `Type=simple` con
+#    `Restart=always` seria un bucle de arranques, no un servicio.
+#  - El envoltorio existe por una cicatriz medida y escrita dentro de el: con
+#    `Type=simple`, systemd vigila al proceso que lanza; si ese proceso se va a
+#    segundo plano y devuelve 0, systemd cree que murio limpiamente y lo
+#    reinicia. Medido en este mismo Beelink: **23 reinicios en bucle, cada diez
+#    segundos, con status=0** -- el peor sintoma, porque «salio bien» y «se
+#    cayo» se leen igual. El envoltorio detecta `INVOCATION_ID` (lo pone
+#    systemd y solo systemd), corre en primer plano y entrega el proceso con
+#    `exec`, para que systemd vigile al servidor y no a un envoltorio.
+ExecStart=%h/p0x/aurelius/bin/aurelius-servicio arranca
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target

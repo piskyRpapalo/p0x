@@ -12,26 +12,30 @@ del Soberano»* + *«`systemctl --user list-units` al cerrar cada sesión»*. Fi
 |---|---|---|---|---|---|
 | `guardian.timer` | Vigila que no entre en el árbol de Aurelius un `import` fuera de la biblioteca estándar | diario 04:00 (±15 min), `Persistent=true` | **Solo lee** `~/p0x/aurelius`. Escribe latidos y hallazgos en `~/.aurelius/loops.db`. `ProtectSystem=strict` + `ReadWritePaths=~/.aurelius` | 2026-08-24 · **ACTIVA**, probada a mano antes de cronificar (dejó latido) | `systemctl --user disable --now guardian.timer` |
 
-| `aurelius.service` | «Aurelius Brain Service» · `bin/aurelius-servicio` desde `aurelius-mvp` | `Type=simple` + `Restart=always`, corriendo desde 2026-08-23 02:21 | `WorkingDirectory` y `ExecStart` apuntan a **`aurelius-mvp`**, no a `aurelius` | **NO firmada · encontrada por el chequeo de cierre el 2026-08-24** | `systemctl --user stop aurelius.service` |
+| `aurelius.service` | La cara (PWA) en `127.0.0.1:8740`, vía `bin/aurelius-servicio` | `Type=simple` + `Restart=always`, permanente | Sirve desde **`~/p0x/aurelius`** (el árbol bueno). Escribe `~/.aurelius/pwa.log` | 2026-08-25 · **FIRMADA**, `enabled`, verificada estable 25 s sin reiniciar | `systemctl --user disable --now aurelius.service` |
 
-### Sobre `aurelius.service` — hallazgo del primer día de la regla
+### Sobre `aurelius.service` — encontrada sin firma, firmada al día siguiente
 
-Estaba corriendo **antes** de que la regla se firmara, y no lo puso esta sesión. Lo encontró
-el `systemctl --user list-units` de cierre, que es exactamente para lo que existe ese
-chequeo. Tres cosas que el Soberano tiene que decidir:
+La encontró el `systemctl --user list-units` de cierre del 2026-08-24: llevaba corriendo
+desde el 23 a las 02:21, `active` pero `disabled`, y sirviendo desde `aurelius-mvp` —el
+árbol cuya `main` estuvo sesenta commits divergida—. Firmada el 2026-08-25 y reapuntada a
+`~/p0x/aurelius`, ahora sí `enabled`: sobrevive a un reinicio y es reproducible.
 
-1. **`enabled` dice `disabled` pero está `active`.** Se arrancó a mano y lleva vivo desde el
-   23 de agosto. Al reiniciar la máquina **no volverá**, así que hoy hay un servicio que
-   funciona y que nadie podría reproducir.
-2. **Sirve desde `aurelius-mvp`, no desde `aurelius`.** Es el árbol cuya rama `main` estuvo
-   sesenta commits divergida. Lo que ese servicio está sirviendo ahora mismo no es
-   necesariamente lo que hay en `origin/main`.
-3. **`Restart=always` sin firma.** Un servicio que se relanza solo, indefinidamente, es
-   justo la figura que la regla nombra: algo con autoridad corriendo cuando nadie mira.
+**Desviación declarada sobre la orden.** La orden decía
+`ExecStart=/usr/bin/python3 .../aurelius.py`. No se hizo así, y el motivo es medible:
 
-Propuesta, sin ejecutar: decidir si se firma (y entonces `enable`, y apuntarlo al árbol
-bueno) o se para. **No se toca hasta que lo digas**: llevaba dos días sirviendo y pararlo
-por iniciativa propia sería romper algo que funciona sin saber quién lo usa.
+- `aurelius.py` es el producto **interactivo**, no un servidor. Bajo `Type=simple` con
+  `Restart=always` sería un bucle de arranques.
+- `bin/aurelius-servicio` existe por una cicatriz escrita dentro de él: con `Type=simple`,
+  systemd vigila al proceso que lanza; si ese proceso se va a segundo plano y devuelve 0,
+  systemd cree que murió limpiamente y lo reinicia. **Medido en este Beelink: 23 reinicios
+  en bucle, cada diez segundos, con `status=0`** — el peor síntoma, porque «salió bien» y
+  «se cayó» se leen igual. El envoltorio detecta `INVOCATION_ID`, corre en primer plano y
+  entrega el proceso con `exec`.
+
+Se cumple la intención de la orden —apuntarla al árbol bueno— sin reintroducir el bug que
+ese envoltorio existe para evitar. Verificado tras arrancar: `NRestarts` no se movió en
+25 s, y `/api/estado` responde HTTP 200 desde `~/p0x/aurelius`.
 
 ## Lo que NO está activado, y por qué
 
