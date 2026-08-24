@@ -1114,3 +1114,42 @@ estaba vacío. Se creó en esta sesión. Se anexa el dato medido, no el recibido
 - (L) Retirar A.4 (pathlib) o degradarlo: 335 usos en 43 ficheros, beneficio estético.
 - Decisión pendiente del Soberano: tag `v1.0.0` (no creado) y si el reparto
   gratis/pago se publica o se queda en la forja.
+
+## 2026-08-24 · Verificación cruzada de v3.1 (docs en `aurelius-internal/docs/`)
+
+- **S1 · El guardián de higiene no está instalado en `aurelius-internal`.** (Coste S.) Es el
+  repo que **sí está en GitHub** y el que más documentación de infraestructura contiene
+  (nodos, puertos, rutas del Faro). `p0x` sí lo tiene y esta misma sesión lo comprobó en
+  carne propia: bloqueó dos veces la propuesta del Faro por IPs de tailnet y por `host:puerto`.
+  El repo protegido es el que no se publica; el publicado va desnudo. `bin/p0x-instalar-ganchos`
+  ya existe.
+
+- **S2 · Tres clones de `aurelius` con tres HEAD distintos, y dos arrastran el blob.**
+  (Coste M.) `~/p0x/aurelius` está limpio en `4f2f64e`; `~/p0x/aurelius-mvp` tiene `main`
+  clavada en `0fb9784` (ahead 60/behind 60, `.git` 36 MB) y el Doogee está en `0fb9784` con
+  `ashly_zhao.md` de 3.541.100 bytes vivo en su pack. **Un `push` desde cualquiera de los dos
+  resucita la línea entera** y deja el ticket a GitHub Support en papel mojado. La purga
+  remota no vale mientras haya quien reponga el objeto.
+
+- **S3 · La regla de higiene systemd sigue sin llegar al repo.** (Coste S.) *«no se crean
+  servicios systemd sin aprobación explícita del Soberano»* + *«`systemctl list-units` al
+  cerrar cada sesión»* está en el archivo, citada por `ARQ_LOOPS.md`, y no está ni en
+  `CLAUDE.md` ni en `mente/`. Esta sesión recibió orden de cronificar siete bucles «porque es
+  mecánico» y paró por leer `ARQ_LOOPS.md`, no por leer la doctrina. La próxima puede no
+  leerlo.
+
+- **S4 · `bin/pruebas` sigue certificando el 73 % del árbol.** (Coste M.) Medido hoy: 282/282
+  en 17 suites, y 103 pruebas más en las 13 que el corredor no declara. Total real **385/385
+  en 30 suites**. La deuda S3 del 2026-08-21 no ha cambiado de fondo, solo de numerador
+  (241 → 282). O se completan las suites, o el corredor imprime en rojo cuántas deja fuera.
+
+- **S5 · Una crítica del Preceptor entró como enmienda sin comprobarse contra el código.**
+  (Coste S.) «La tabla `hilos` no existe» era falsa (`memory.py:111` y `:117`, con
+  `test_hilos.py` en verde) y v3.1 la aceptó sin abrir el fichero. **Un documento que corrige
+  hacia el error es peor que uno que calla.** Regla que se propone: ninguna enmienda de
+  inventario se firma sin el `grep` que la sostiene, pegado al lado.
+
+- **S6 · `aurelius-internal/` figura como `??` sin seguimiento dentro de `p0x`.** (Coste S.)
+  Es el mismo pie del que salió `9368dc8 chore: sacar el gitlink accidental de aurelius/`.
+  Merece decisión explícita —`.gitignore` o submódulo— antes de que un `git add -A` lo
+  resuelva por su cuenta.
