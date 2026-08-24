@@ -173,15 +173,34 @@ backend Vulkan aquí no se puede sin sudo — pero no hace falta, porque ya est�
   gfx1103, pero **Vulkan sí, hoy, y ya está instalado**. Forzar un override para fingir otra
   GPU es la peor forma de conseguir lo que ya se tiene por la puerta buena.
 
-### Contexto: `NO_DATA` hasta medirlo
+### Contexto: **32768 medido**
 
-El modelo declara 262K de contexto. **Eso es la ficha del modelo, no el techo de esta
-máquina**, y este canon ya tiene una regla para eso: *«`num_ctx` demostrado por dato»*. No se
-ha medido cuánto contexto cabe con el 27B cargado en los 32,8 GiB de la asignación Vulkan.
-Hasta que se mida, `NO_DATA`.
+El modelo declara 262K. Eso es su ficha, no el techo de esta máquina. Medido el 2026-08-25:
+**`-c 32768` con `-ngl 99` carga y responde**, con la GPU llena y 50 GB de RAM libres.
+Subirlo exige volver a medir, no suponer. Por encima de 32K: `NO_DATA`.
 
-Y `qwen-chat.sh` **no fija `-c`**, así que deja el defecto — que en un modelo de 262K es
-exactamente el footgun que este canon documenta.
+### 🔴 El razonamiento va ENCENDIDO por defecto, y en un bucle eso arruina la noche
+
+Medido con `«Responde solo con la palabra: listo»`:
+
+| | pensamiento interno | generación | qué devuelve |
+|---|---|---|---|
+| por defecto | **~45 tokens** para decir una palabra | 4,7 tok/s | tras razonar |
+| **`--reasoning off`** | ninguno | **6,9 tok/s** | directa |
+
+A 5 tok/s, cada token de pensamiento invisible es tiempo de pared. Cuarenta y cinco tokens
+para una palabra; en una tarea real son cientos o miles. **`--reasoning off` es obligatorio
+en todo bucle**, y opcional (o deseable) en el chat, donde pensar mejora la respuesta.
+
+Es la misma familia que la regla de los tags pelados de Ollama que ya está en este canon:
+*«apuntan a variantes Thinking con razonamiento no desactivable»*. Aquí sí es desactivable —
+pero hay que acordarse, y por eso queda escrito.
+
+### El lanzador
+
+`deploy/soberano/qwen-chat.sh` (desplegado en `~/.local/bin/`). Usa el binario Vulkan, `-ngl
+99` de verdad y `-c 32768` medido. Para si no encuentra binario o modelo, en vez de caer a CPU
+en silencio — que es exactamente lo que hacía antes sin decirlo.
 
 ## Footguns conocidos (con cicatriz)
 
