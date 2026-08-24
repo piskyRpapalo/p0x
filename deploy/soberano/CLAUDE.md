@@ -97,6 +97,15 @@ se decidiría de memoria, que es exactamente lo que esta sección existe para im
   dependa de velocidad, `ollama ps` primero — anota CPU/GPU en el resultado. Vulkan puede
   activarse o caerse entre sesiones (depende del drop-in `OLLAMA_IGPU_ENABLE=1`); nunca asumas
   el backend de la sesión anterior (aprobado, Misión G1-R, 2026-07-19).
+- **Servicios y timers: ninguno sin firma explícita, y `systemctl --user list-units` al
+  cerrar sesión.** (Firmada 2026-08-24. Venía del archivo de mayo y nunca había llegado al
+  repo: *«un servicio fantasma con autoridad es la semilla del próximo IronClaw»*.) Crear una
+  unidad systemd o una línea de cron es dejar algo corriendo con tus permisos cuando tú no
+  estás mirando — no es una tarea mecánica por mucho que el comando sea corto. Se pide firma
+  para **cada** unidad, una por una, y se anota en `deploy/soberano/unidades.md` qué hace,
+  qué toca y cómo se apaga. Un bucle **se construye y se prueba primero**; cronificarlo es un
+  paso aparte y posterior.
+
 - **Commit por bloque, push soberano.** Cada bloque de misión termina en commit (git desde el
   minuto cero). Convención del repo: `p0x` empuja a `jetson` (la-torre), `hexelion` empuja a
   `torre` — mismo remoto, incluido en `~/.ssh/config` como host `la-torre`.
