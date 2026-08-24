@@ -10,7 +10,7 @@ del Soberano»* + *«`systemctl --user list-units` al cerrar cada sesión»*. Fi
 
 | unidad | qué hace | cuándo | qué toca | firmada | cómo se apaga |
 |---|---|---|---|---|---|
-| `guardian.timer` | Vigila que no entre en el árbol de Aurelius un `import` fuera de la biblioteca estándar | diario 04:00 (±15 min) | **Solo lee** `~/p0x/aurelius`. Escribe latidos y hallazgos en `~/.aurelius/loops.db` | 2026-08-24 | `systemctl --user disable --now guardian.timer` |
+| `guardian.timer` | Vigila que no entre en el árbol de Aurelius un `import` fuera de la biblioteca estándar | diario 04:00 (±15 min), `Persistent=true` | **Solo lee** `~/p0x/aurelius`. Escribe latidos y hallazgos en `~/.aurelius/loops.db`. `ProtectSystem=strict` + `ReadWritePaths=~/.aurelius` | 2026-08-24 · **ACTIVA**, probada a mano antes de cronificar (dejó latido) | `systemctl --user disable --now guardian.timer` |
 
 ## Lo que NO está activado, y por qué
 

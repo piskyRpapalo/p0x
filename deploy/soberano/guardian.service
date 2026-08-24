@@ -1,0 +1,21 @@
+[Unit]
+Description=Guardian de dependencias de Aurelius (L1)
+# Documentacion: aurelius-internal/agentes/ARQ_LOOPS.md
+
+[Service]
+Type=oneshot
+# `%h` y no la ruta escrita a mano: systemd la expande al home del usuario, asi
+# que la unidad vale para otro usuario sin editarla -- y ademas no mete una
+# ruta personal en el repositorio, que es lo que vigila el guardia de higiene.
+#
+# El interprete SI va absoluto, y a proposito: systemd no carga ~/.bashrc, asi
+# que no ve ~/.local/bin. Un binario resuelto por PATH implicito funciona en la
+# sesion interactiva y falla a las cuatro de la manana, que es justo cuando
+# nadie mira.
+ExecStart=/usr/bin/python3 %h/p0x/aurelius-internal/agentes/bucles/guardian.py
+WorkingDirectory=%h/p0x/aurelius-internal/agentes/bucles
+# Solo lee el arbol y escribe su latido. Nada mas necesita.
+ProtectSystem=strict
+ReadWritePaths=%h/.aurelius
+PrivateTmp=true
+NoNewPrivileges=true

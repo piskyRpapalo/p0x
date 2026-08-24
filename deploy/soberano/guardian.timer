@@ -1,0 +1,13 @@
+[Unit]
+Description=Guardian de dependencias · diario
+
+[Timer]
+OnCalendar=*-*-* 04:00:00
+# Dispersion para no clavarlo en el segundo exacto junto a todo lo demas.
+RandomizedDelaySec=15min
+# Si el equipo estaba apagado a las 04:00, corre al encender. Un vigilante que
+# solo vigila si la maquina estuvo despierta no vigila.
+Persistent=true
+
+[Install]
+WantedBy=timers.target
