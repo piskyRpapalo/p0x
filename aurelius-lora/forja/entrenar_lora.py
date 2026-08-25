@@ -295,6 +295,9 @@ def main(argv=None):
     informe = {
         "fecha": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "version": a.version,
+        # Misma regla que en entrenar_sft_cot: un adapter que no sabe con que
+        # se entreno obliga a adivinar a quien lo mida despues (averia R9).
+        "dataset": str(DATASET),
         "hiper": {**HIPER, "rank": a.rango, "alpha": a.alpha},
         "tren": len(tren), "validacion": len(val),
         "pasos": len(historial) * HIPER["cada_cuantos_evalua"],

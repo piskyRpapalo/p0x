@@ -225,6 +225,7 @@ def main(argv=None):
 
     (SALIDA / "dpo.json").write_text(json.dumps({
         "fecha": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "dataset": str(DATASET),
         "hiper": HIPER, "desde": str(a.desde) if a.desde else "base",
         "tren": len(tren), "validacion": len(val),
         "historial": historial, "mejor_paso": mejor["paso"],
