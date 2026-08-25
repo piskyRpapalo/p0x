@@ -12,6 +12,7 @@ del Soberano»* + *«`systemctl --user list-units` al cerrar cada sesión»*. Fi
 |---|---|---|---|---|---|
 | `guardian.timer` | Vigila que no entre en el árbol de Aurelius un `import` fuera de la biblioteca estándar | diario 04:00 (±15 min), `Persistent=true` | **Solo lee** `~/p0x/aurelius`. Escribe latidos y hallazgos en `~/.aurelius/loops.db`. `ProtectSystem=strict` + `ReadWritePaths=~/.aurelius` | 2026-08-24 · **ACTIVA**, probada a mano antes de cronificar (dejó latido) | `systemctl --user disable --now guardian.timer` |
 
+| `curador.timer` | Higiene de la memoria: duplicados y enlaces rotos. **Propone, no toca** | domingos 05:00 (±30 min), `Persistent=true` | Abre `memory.db` en **solo lectura** (`mode=ro` en el código **y** `ReadOnlyPaths` en la unidad: dos cerrojos independientes). Escribe latidos y hallazgos | 2026-08-25 · **ACTIVA**, probada a mano y bajo systemd | `systemctl --user disable --now curador.timer` |
 | `afinador.timer` | Corre `bin/pruebas` entera y vigila **que la tanda siga midiendo**: recuento a la baja, suites que caen del corredor, cobertura que se ensancha, sabotajes ciegos | diario 03:00 (±15 min), `Persistent=true` | **Solo lee** `~/p0x/aurelius`. Escribe latidos y hallazgos en `~/.aurelius/loops.db`. `Nice=10` + `IOSchedulingClass=idle` para no competir con la persona | 2026-08-25 · **ACTIVA**, probada a mano y bajo systemd (87 s, dejó latido) antes de cronificar | `systemctl --user disable --now afinador.timer` |
 | `aurelius.service` | La cara (PWA) en `127.0.0.1:8740`, vía `bin/aurelius-servicio` | `Type=simple` + `Restart=always`, permanente | Sirve desde **`~/p0x/aurelius`** (el árbol bueno). Escribe `~/.aurelius/pwa.log` | 2026-08-25 · **FIRMADA**, `enabled`, verificada estable 25 s sin reiniciar | `systemctl --user disable --now aurelius.service` |
 
@@ -48,6 +49,18 @@ ese envoltorio existe para evitar. Verificado tras arrancar: `NRestarts` no se m
 - `centinela`, `peregrino`, `medico`, `escriba`, `cronista`, `vigia` — **no existen
   todavía**. Son L1/L2/L3 y están sin escribir. No se cronifica lo que no está construido y
   probado.
+
+### El reparto horario, y por qué
+
+| hora | bucle | por qué ahí |
+|---|---|---|
+| 03:00 | Afinador | corre la tanda entera (138 s) y crea y borra árboles temporales |
+| 04:00 | Guardián | lee el árbol; si solapara con el Afinador leería un estado a medias |
+| dom 05:00 | Curador | **carga 16 GB de modelo**. Va el último y solo un día por semana |
+
+El Curador es el único que carga el 27B. Con el cuelgue del 2026-08-24 fresco —causado por
+varias cargas simultáneas de ese modelo— que no comparta hora con nadie no es cortesía: es la
+lección.
 
 ### Por qué el Afinador va a las 03:00 y el Guardián a las 04:00
 

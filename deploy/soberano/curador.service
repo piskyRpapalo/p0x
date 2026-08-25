@@ -1,0 +1,20 @@
+[Unit]
+Description=Curador · higiene de la memoria, solo lectura (L3)
+# Documentacion: aurelius-internal/agentes/ARQ_LOOPS.md
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 %h/p0x/aurelius-internal/agentes/bucles/curador.py
+WorkingDirectory=%h/p0x/aurelius-internal/agentes/bucles
+# 20 llamadas al modelo como mucho, a ~7 s cada una, mas la carga de 16 GB.
+TimeoutStartSec=3600
+# Lee la memoria en SOLO LECTURA -- el propio codigo abre con mode=ro -- y solo
+# escribe su latido. `ReadWritePaths` no incluye memory.db a proposito: aunque
+# alguien metiera un UPDATE manana, systemd no le dejaria.
+ProtectSystem=strict
+ReadOnlyPaths=%h/.aurelius/memory.db
+ReadWritePaths=%h/.aurelius/loops.db %h/.aurelius/cache_bucles.bin
+PrivateTmp=true
+NoNewPrivileges=true
+Nice=10
+IOSchedulingClass=idle
