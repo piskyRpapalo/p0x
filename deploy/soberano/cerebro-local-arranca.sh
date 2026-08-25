@@ -85,7 +85,7 @@ nohup env GGML_BACKEND_PATH="$VK" LD_LIBRARY_PATH="$OLLAMA_LIB" \
 # El log de arranque queda en fichero: la vez anterior se perdió por vivir en un pty.
 for _ in $(seq 1 60); do
   if curl -sf -m 2 "http://$BIND:$PUERTO/health" 2>/dev/null | grep -q ok; then
-    printf 'Listo. /health responde ok en %s:%s (alcanzable desde la tailnet).\n' "$BIND" "$PUERTO"
+    printf 'Listo. /health responde ok en %s:%s (bind %s: si es 127.0.0.1 NO sale de esta maquina).\n' "$BIND" "$PUERTO" "$BIND"
     printf 'Arranque registrado en %s\n' "$LOG"
     exit 0
   fi
