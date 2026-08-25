@@ -1159,7 +1159,11 @@ estaba vacío. Se creó en esta sesión. Se anexa el dato medido, no el recibido
 - **S1 · `cc-local` no es viable con el arnés de Claude Code, y la causa es aritmética.**
   (Coste L.) Medido en cuatro pasadas: el preámbulo del arnés son **67.071 tokens**, y a los
   67 tok/s de prompt que da esta iGPU eso son **~17 minutos de lectura antes del primer
-  token, por llamada**. Una prueba mínima («di LISTO») agotó 420 s sin responder. No es el
+  token, por llamada**. El veredicto se apoya en la **cuarta** pasada: prompt mínimo
+  («di LISTO»), servidor arriba, **agotó 420 s sin responder**. (La tercera pasada sí
+  arrancó y estaba trabajando: murió con `Connection refused` porque esta sesión paró el
+  servidor para liberar 38 GiB antes de los timers de la noche. No cuenta como fallo.)
+  No es el
   modelo: el mismo servidor contesta `/v1/messages` en menos de un segundo con un prompt
   corto. La Regla de oro sigue siendo correcta, pero **la vía de delegación no puede ser
   Claude Code**: es `cerebro.py`, que manda prompts de decenas de tokens. Antes de dar
