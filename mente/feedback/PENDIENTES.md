@@ -1153,3 +1153,41 @@ estaba vacío. Se creó en esta sesión. Se anexa el dato medido, no el recibido
   Es el mismo pie del que salió `9368dc8 chore: sacar el gitlink accidental de aurelius/`.
   Merece decisión explícita —`.gitignore` o submódulo— antes de que un `git add -A` lo
   resuelva por su cuenta.
+
+## SUGERENCIAS · sesión Despertar del Preceptor (2026-08-26)
+
+- **S1 · `cc-local` no es viable con el arnés de Claude Code, y la causa es aritmética.**
+  (Coste L.) Medido en cuatro pasadas: el preámbulo del arnés son **67.071 tokens**, y a los
+  67 tok/s de prompt que da esta iGPU eso son **~17 minutos de lectura antes del primer
+  token, por llamada**. Una prueba mínima («di LISTO») agotó 420 s sin responder. No es el
+  modelo: el mismo servidor contesta `/v1/messages` en menos de un segundo con un prompt
+  corto. La Regla de oro sigue siendo correcta, pero **la vía de delegación no puede ser
+  Claude Code**: es `cerebro.py`, que manda prompts de decenas de tokens. Antes de dar
+  `cc-local` por muerto conviene medir el preámbulo **con los servidores MCP apagados** —
+  esos esquemas son la mitad del peso, y es una medición de diez minutos.
+
+- **S2 · `ollama.service` dice `active` y el puerto 11434 rechaza conexiones.** (Coste S.)
+  El inventario del rack lo daba por vivo. Un servicio que se declara activo y no atiende es
+  el sensor deshonesto en su forma más pura, y está a nivel de sistema, no de usuario.
+
+- **S3 · Dos unidades corren sin fila en `unidades.md`.** (Coste S.) `open-webui.service`
+  (`active/running`) y `aurelius-interfaz.service` (`loaded`, y su copia del repo tiene
+  1.947 B frente a los 549 B de la instalada). La regla del propio fichero dice que una de
+  las dos cosas es mentira; hay que averiguar cuál.
+
+- **S4 · Los once adapters existentes no se pueden comprobar con R9.** (Coste S.) El arreglo
+  de `entrenar_sft_cot.py` vale para lo que se entrene a partir de hoy, pero **ningún
+  `informe.json` de `sft-cot-v1..v6` tiene campo `dataset`**, así que `corpus_de()` devuelve
+  `None` y el tester dice «R9 SIN COMPROBAR» sobre todos ellos. O se les anota el corpus a
+  mano desde la bitácora, o el documento de publicación lo declara caso por caso.
+
+- **S5 · El PDF «Prompt Maestro… Nexo, Le Jardin y HEXELION» sigue sin leer.** (Coste S.)
+  Es el único de los cuatro de Cuarentena sin veredicto, y a propósito: 645 KiB que esta
+  sesión no abrió. Firmar «fusionar» por el título sería la avería de S5 del 2026-08-25 con
+  el signo cambiado.
+
+- **S6 · El 27B no puede ser el cerebro de la cara mientras no haya motor residente.**
+  (Coste M.) Medido: 4,32 tok/s y **25 s por turno**, frente a 3,9 s del 4B por Vulkan. Y el
+  producto **carga el modelo entero en cada turno**, porque `motor_llama` lanza un proceso
+  hijo por diseño (D68, sin socket). Querer el 27B en la conversación no es un ajuste de
+  configuración: es exactamente la decisión que `FRONTERA_D68.md` deja abierta y sin firmar.
