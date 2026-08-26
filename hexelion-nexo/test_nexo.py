@@ -8,6 +8,7 @@ no responde 501 a un POST por su cuenta.
 """
 
 import json
+import os
 import re
 import tempfile
 import threading
@@ -489,6 +490,111 @@ class ElDiagramaDeCapas(unittest.TestCase):
         self.assertNotIn("banda focal", self.html())
         js = (AQUI / "estatico" / "nexo.js").read_text(encoding="utf-8")
         self.assertIn("classList.toggle('focal', n === d.nivel)", js)
+
+
+class ElRack(unittest.TestCase):
+    """El unico sensor que sale de la maquina, y el unico con interruptor."""
+
+    def fuente(self):
+        return (AQUI / "sensores" / "nodos.py").read_text(encoding="utf-8")
+
+    def test_51_el_panel_no_abre_sesiones_ssh(self):
+        """Una ventana que entra por SSH en cuatro maquinas cada 30 s es un
+        agente con llaves, no una ventana."""
+        f = self.fuente()
+        for prohibido in ('"ssh"', "'ssh'", "paramiko", "ssh -", "scp "):
+            self.assertNotIn(prohibido, f)
+
+    def test_52_los_nodos_se_indexan_por_su_nombre_del_tailnet(self):
+        """Medido: La Fragua se llama `ubuntu` en su propio sistema. Indexar por
+        HostName la dejaba fuera del mapa como si estuviera caida."""
+        f = self.fuente()
+        self.assertIn("DNSName", f)
+        self.assertIn("def _nombre(", f)
+
+    def test_53_con_la_red_cortada_no_se_pregunta_y_se_dice(self):
+        import sensores.nodos as N
+        antes = N.sin_red()
+        try:
+            N.sin_red(True)
+            lectura = N.leer()
+            self.assertEqual(lectura["estado"], sensores.NO_DATA)
+            self.assertIn("red cortada", lectura["causa"])
+        finally:
+            N.sin_red(antes)
+
+    def test_54_el_interruptor_llega_desde_la_linea_de_ordenes(self):
+        fuente = (AQUI / "servidor.py").read_text(encoding="utf-8")
+        self.assertIn("--sin-red", fuente)
+        self.assertIn("nodos.sin_red(args.sin_red)", fuente)
+
+    def test_55_toda_correccion_al_gateway_se_declara(self):
+        """El registro remoto da este nodo por caido. Corregirlo esta bien;
+        corregirlo en silencio no."""
+        f = self.fuente()
+        self.assertIn("correcciones.append", f)
+        self.assertIn("avisos", f)
+        lectura = registro.uno("nodos")
+        if lectura["estado"] == "ok":
+            self.assertIsInstance(lectura["avisos"], list)
+            for fila in lectura["nodos"]:
+                self.assertIn(fila["estado"],
+                              ("ONLINE", "OFFLINE", "CRITICO", "EN ESPERA",
+                               sensores.NO_DATA))
+
+    def test_56_un_estado_critico_nunca_viene_sin_su_alerta(self):
+        lectura = registro.uno("nodos")
+        if lectura["estado"] != "ok":
+            self.skipTest(lectura["causa"])
+        for fila in lectura["nodos"]:
+            with self.subTest(nodo=fila["nodo"]):
+                if fila["estado"] == "CRITICO":
+                    self.assertTrue(fila["alerta"],
+                                    "un rojo sin causa no se puede reparar")
+
+    def test_56b_la_direccion_del_gateway_no_vive_en_el_codigo(self):
+        """Infraestructura en la maquina, no en la historia del repo."""
+        f = self.fuente()
+        self.assertNotIn("http://la-", f)
+        self.assertIn("os.environ.get(VARIABLE)", f)
+
+    def test_56c_sin_gateway_declarado_el_panel_no_adivina_uno(self):
+        import sensores.nodos as N
+        antes_conf, antes_env = N.CONF, os.environ.get(N.VARIABLE)
+        with tempfile.TemporaryDirectory() as d:
+            N.CONF = Path(d) / "no_existe.conf"
+            os.environ.pop(N.VARIABLE, None)
+            try:
+                self.assertEqual(N.gateway(), "")
+                lectura = N.leer()
+                self.assertEqual(lectura["estado"], "ok",
+                                 "sin gateway el tailnet sigue contestando")
+                self.assertFalse(lectura["gateway_declarado"])
+                self.assertIn("sin gateway declarado", lectura["causa"])
+            finally:
+                N.CONF = antes_conf
+                if antes_env is not None:
+                    os.environ[N.VARIABLE] = antes_env
+
+    def test_57_el_rack_es_una_tira_no_una_rejilla_fija(self):
+        """Un quinto nodo tiene que alargar la fila, no re-maquetarla."""
+        css = (AQUI / "estatico" / "hexelion.css").read_text(encoding="utf-8")
+        tira = css.split(".tira{")[1].split("}")[0]
+        self.assertIn("overflow-x:auto", tira)
+        self.assertNotIn("grid-template-columns", tira)
+
+    def test_58_el_rojo_solo_aparece_cuando_hay_algo_roto(self):
+        css = (AQUI / "estatico" / "hexelion.css").read_text(encoding="utf-8")
+        # Por REGLA y no por linea: una regla puede ocupar tres renglones, y el
+        # selector solo esta en el primero. Partir por lineas suspendia reglas
+        # correctas por el sitio donde cabia el texto.
+        for regla in css.split("}"):
+            if "var(--red)" not in regla or "{" not in regla:
+                continue
+            selector = regla.rsplit("{", 1)[0].strip().splitlines()[-1]
+            self.assertTrue(
+                any(p in selector for p in ("critico", "alerta", "c-crit")),
+                f"rojo fuera de un fallo real: {selector}")
 
 
 if __name__ == "__main__":

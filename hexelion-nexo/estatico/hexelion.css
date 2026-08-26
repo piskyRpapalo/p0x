@@ -172,6 +172,29 @@ body.rancio h1 em{color:var(--amber)}
 .capas .banda.dormida .nombre{fill:var(--ink-4)}
 .capas .banda.dormida .nota{fill:rgba(214,236,222,.16)}
 
+/* ── el rack · tira horizontal ──────────────────────────────────
+   Y no una rejilla fija: el dia que entre un quinto nodo la fila se alarga en
+   vez de re-maquetarse entera. Mismo veredicto que retiro la grilla del
+   herbier. En el telefono se desliza; en el escritorio caben los cuatro. */
+.tira{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;
+      scroll-snap-type:x proximity}
+.tira::-webkit-scrollbar{height:5px}
+.tira::-webkit-scrollbar-thumb{background:var(--linea-mod);border-radius:3px}
+.nodo{flex:1 1 190px;min-width:186px;scroll-snap-align:start;padding:10px 12px;
+      border:1px solid var(--linea-mod);border-radius:var(--radius);
+      background:rgba(255,255,255,.022)}
+.nodo header{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.nodo header b{font-family:var(--serif);font-size:13px;letter-spacing:.1em;
+               text-transform:uppercase;color:var(--ink)}
+.nodo p{margin:6px 0 0}
+.nodo__metal{font-size:9.5px;color:var(--ink-4);line-height:1.5}
+.nodo__nota{font-size:10.5px;color:var(--ink-2)}
+/* El unico rojo del panel, y solo cuando hay algo roto de verdad. */
+.nodo--critico{border-color:color-mix(in oklch,var(--red),transparent 55%)}
+.nodo__alerta{font-size:10px;color:var(--red);letter-spacing:.04em;
+              border-top:1px dashed color-mix(in oklch,var(--red),transparent 70%);
+              padding-top:6px;margin-top:8px}
+
 footer{margin-top:22px;padding-top:14px;border-top:1px solid var(--hair);
        color:var(--ink-4);font-size:var(--fs-meta);line-height:1.7}
 code{color:var(--neon-soft);font-size:.95em}

@@ -45,6 +45,28 @@ function sinDato(id, lectura) {
 
 const PINTORES = {
 
+  nodos(d) {
+    // Tira horizontal y no rejilla fija: cuando entre un quinto nodo, la fila
+    // se alarga en vez de re-maquetarse. Es el mismo veredicto que retiro la
+    // grilla 4x4 del herbier.
+    const CLASE = {ONLINE: 'c-ok', CRITICO: 'c-crit', OFFLINE: 'c-mut',
+                   'EN ESPERA': 'c-warn', NO_DATA: 'c-warn'};
+    const tarjetas = (d.nodos || []).map(n => `
+      <article class="nodo ${n.estado === 'CRITICO' ? 'nodo--critico' : ''}">
+        <header><b>${esc(n.nodo)}</b>
+          <span class="chip ${CLASE[n.estado] || 'c-mut'}">${esc(n.estado)}</span></header>
+        <p class="nodo__metal">${esc(n.metal)}</p>
+        <p class="nodo__nota">${hueco(n.nota)
+          ? '<span class="nodata">' + NO_DATA + '</span>' : esc(n.nota)}</p>
+        ${n.alerta ? `<p class="nodo__alerta">${esc(n.alerta)}</p>` : ''}
+      </article>`).join('');
+    pinta('m-nodos',
+      d.en_pie + ' en pie' + (d.criticos ? ' · ' + d.criticos + ' crítico' : ''),
+      d.criticos ? 'c-crit' : 'c-ok',
+      `<div class="tira">${tarjetas}</div>` +
+      causa('fuente: ' + d.fuente + (d.avisos.length ? ' · ' + d.avisos.join(' · ') : '')));
+  },
+
   soberania(d) {
     // El diagrama manda: la banda focal se mueve con el nivel en vigor. Un
     // layer stack pintado a mano se quedaria diciendo «0» el dia que suba, y

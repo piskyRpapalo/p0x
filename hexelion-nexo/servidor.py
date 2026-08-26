@@ -25,7 +25,7 @@ from sensores import registro                                    # noqa: E402
 
 # Importar un sensor es registrarlo. La lista es esta y no un barrido del
 # directorio, por el motivo escrito en `sensores/registro.py`.
-from sensores import (cinek, jardin, lora, preceptor,             # noqa: E402,F401
+from sensores import (cinek, jardin, lora, nodos, preceptor,      # noqa: E402,F401
                       soberania, timers)
 
 PUERTO = 8765
@@ -46,6 +46,7 @@ RUTAS = {
     "/api/lora": lambda: registro.uno("lora"),
     "/api/cinek": lambda: registro.uno("cinek"),
     "/api/jardin": lambda: registro.uno("jardin"),
+    "/api/nodos": lambda: registro.uno("nodos"),
 }
 
 VERSION = "0.1.0"
@@ -126,8 +127,15 @@ def main(argv=None):
     p.add_argument("--anfitrion", default=ANFITRION,
                    help="por defecto 127.0.0.1 · salir de ahi se firma aparte")
     p.add_argument("--ruidoso", action="store_true", help="una linea por peticion")
+    # El unico sensor que sale de la maquina es el de nodos, y por eso es el
+    # unico con interruptor. Con esto puesto el panel entero se queda dentro.
+    p.add_argument("--sin-red", action="store_true",
+                   help="no preguntar al tailnet · los nodos remotos salen NO_DATA")
     args = p.parse_args(argv)
+    nodos.sin_red(args.sin_red)
     servidor = construir(args.puerto, args.anfitrion, args.ruidoso)
+    if args.sin_red:
+        print("red cortada · los nodos remotos no se preguntan")
     print(f"Nexo · http://{args.anfitrion}:{args.puerto}  ·  ctrl-c para parar")
     try:
         servidor.serve_forever()
