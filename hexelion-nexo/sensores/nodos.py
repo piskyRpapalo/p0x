@@ -145,6 +145,7 @@ def leer():
                         "lo de los nodos remotos sale solo del tailnet")
 
     correcciones = []
+    sin_sonda = []
     filas = []
     for nombre, metal, papel in RACK:
         g = salud.get(EN_EL_GATEWAY.get(nombre, nombre)) or {}
@@ -175,10 +176,18 @@ def leer():
                 nota = (f"ADS-B vivo · {adsb.get('aircraft', sensores.NO_DATA)} "
                         f"aeronaves · AIS 0 buques")
         if nombre == "la-torre" and arriba:
-            nota = ("Ollama sirviendo" if sondas.get("ollama_11434")
-                    else "en pie · sin sonda de Ollama")
-            if not sondas.get("ollama_11434"):
-                estado = "EN ESPERA"
+            # CICATRIZ. Aqui habia `estado = "EN ESPERA"` cuando faltaba la
+            # sonda, y eso era exactamente el fallo que este arbol existe para
+            # impedir: **una ausencia de dato convertida en una afirmacion de
+            # estado**. Que el gateway no conteste no dice nada sobre si el
+            # nodo esta dormido -- dice que no lo sabemos. El nodo responde en
+            # el tailnet, luego esta en pie; lo que no hay es la sonda, y eso
+            # se declara con su nombre.
+            if sondas.get("ollama_11434"):
+                nota = "Ollama sirviendo"
+            else:
+                nota = "en pie · inferencia " + sensores.NO_DATA
+                sin_sonda.append(nombre)
 
         filas.append({
             "nodo": nombre, "metal": metal, "estado": estado,
@@ -186,6 +195,10 @@ def leer():
             "sondas": sorted(k for k, v in sondas.items() if v is True),
         })
 
+    if sin_sonda:
+        correcciones.append(
+            "sin sonda profunda de " + ", ".join(sin_sonda)
+            + " · responden en el tailnet, pero de sus servicios no hay dato")
     avisos = [a for a in (aviso_ts, aviso_gw) if a] + correcciones
     return sensores.dato(
         nodos=filas,

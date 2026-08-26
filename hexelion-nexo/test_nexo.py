@@ -658,6 +658,25 @@ class ElRack(unittest.TestCase):
                 if antes_env is not None:
                     os.environ[N.VARIABLE] = antes_env
 
+    def test_56d_una_sonda_que_falta_no_es_un_nodo_dormido(self):
+        """La cicatriz. Que el gateway calle no dice que un nodo duerma: dice
+        que no lo sabemos, y eso tiene nombre propio."""
+        # Sin comentarios: la cicatriz que explica por que NO se hace cita la
+        # linea vieja, y citarla ahi es correcto. Lo que no puede es ejecutarse.
+        codigo = "\n".join(l for l in self.fuente().splitlines()
+                           if not l.lstrip().startswith("#"))
+        self.assertNotIn('estado = "EN ESPERA"', codigo,
+                         "una ausencia de dato no puede afirmar un estado")
+        self.assertIn("sin_sonda.append", codigo)
+        lectura = registro.uno("nodos")
+        if lectura["estado"] != "ok":
+            self.skipTest(lectura["causa"])
+        for fila in lectura["nodos"]:
+            with self.subTest(nodo=fila["nodo"]):
+                self.assertNotEqual(
+                    fila["estado"], "EN ESPERA",
+                    f"{fila['nodo']} declarado dormido sin haberlo medido")
+
     def test_57_el_rack_es_una_tira_no_una_rejilla_fija(self):
         """Un quinto nodo tiene que alargar la fila, no re-maquetarla."""
         css = (AQUI / "estatico" / "static" / "hexelion.css").read_text(encoding="utf-8")
