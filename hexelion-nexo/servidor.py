@@ -23,6 +23,10 @@ sys.path.insert(0, str(AQUI))
 import sensores                                                  # noqa: E402
 from sensores import registro                                    # noqa: E402
 
+# Importar un sensor es registrarlo. La lista es esta y no un barrido del
+# directorio, por el motivo escrito en `sensores/registro.py`.
+from sensores import soberania, timers                           # noqa: E402,F401
+
 PUERTO = 8765
 ANFITRION = "127.0.0.1"
 ESTATICO = AQUI / "estatico"
@@ -35,6 +39,8 @@ RUTAS = {
                            "sensores": sorted(registro.SENSORES),
                            "medido": sensores.ahora()},
     "/api/estado": lambda: registro.todo(),
+    "/api/soberania": lambda: registro.uno("soberania"),
+    "/api/timers": lambda: registro.uno("timers"),
 }
 
 VERSION = "0.1.0"

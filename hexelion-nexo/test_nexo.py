@@ -151,5 +151,72 @@ class LaPuertaHTTP(unittest.TestCase):
             self.assertNotIn(prohibido, fuente.lower())
 
 
+class SensoresDeSistema(unittest.TestCase):
+    """El nivel y los bucles. Lo que se mide de la maquina, no de los proyectos."""
+
+    def test_14_la_soberania_se_pregunta_al_nucleo_no_se_recalcula(self):
+        fuente = (AQUI / "sensores" / "soberania.py").read_text(encoding="utf-8")
+        self.assertIn("import soberania", fuente)
+        for copiado in ("NIVEL_MAXIMO = 3", "CAPACIDADES = {"):
+            self.assertNotIn(copiado, fuente,
+                             "la tabla del nucleo no se copia: se pregunta")
+
+    def test_15_el_sensor_de_soberania_no_escribe_en_el_nucleo(self):
+        fuente = (AQUI / "sensores" / "soberania.py").read_text(encoding="utf-8")
+        for escritura in ("write_text", "fijar_nivel", "modo_santuario",
+                          "open(", "unlink"):
+            self.assertNotIn(escritura, fuente, "el nivel 3 se engancha, no reforma")
+
+    def test_16_el_nivel_es_un_entero_en_rango_o_un_hueco(self):
+        lectura = registro.uno("soberania")
+        if lectura["estado"] == "ok":
+            self.assertIsInstance(lectura["nivel"], int)
+            self.assertGreaterEqual(lectura["nivel"], 0)
+            self.assertLessEqual(lectura["nivel"], lectura["maximo"])
+        else:
+            self.assertTrue(lectura["causa"])
+
+    def test_17_los_timers_se_leen_con_show_y_no_parseando_la_tabla(self):
+        fuente = (AQUI / "sensores" / "timers.py").read_text(encoding="utf-8")
+        self.assertIn('"show"', fuente)
+        # La cadena entrecomillada, no la palabra: el docstring del modulo
+        # explica precisamente por que NO se usa, y nombrarla ahi es correcto.
+        self.assertNotIn('"list-timers"', fuente,
+                         "esa tabla alinea fechas con espacios dentro: se adivina")
+
+    def test_18_un_timer_sin_estrenar_no_declara_resultado(self):
+        """systemd dice `Result=success` de un servicio que jamas arranco."""
+        lectura = registro.uno("timers")
+        if lectura["estado"] != "ok":
+            self.skipTest(f"sin systemd de usuario: {lectura['causa']}")
+        for fila in lectura["propios"] + lectura["ajenos"]:
+            with self.subTest(unidad=fila["unidad"]):
+                if fila["ultima"] == sensores.NO_DATA:
+                    self.assertEqual(fila["resultado"], sensores.NO_DATA)
+                    self.assertTrue(fila["causa"])
+
+    def test_19_los_timers_del_sistema_no_se_cuentan_como_bucles_propios(self):
+        lectura = registro.uno("timers")
+        if lectura["estado"] != "ok":
+            self.skipTest("sin systemd de usuario")
+        for fila in lectura["propios"]:
+            self.assertFalse(fila["unidad"].startswith(("ubuntu-", "launchpadlib")))
+
+    def test_20_el_sensor_de_timers_no_arranca_ni_para_nada(self):
+        fuente = (AQUI / "sensores" / "timers.py").read_text(encoding="utf-8")
+        for verbo in ('"start"', '"stop"', '"restart"', '"enable"', '"disable"',
+                      '"daemon-reload"'):
+            self.assertNotIn(verbo, fuente, "ventana de lectura: no ejecuta")
+
+    def test_21_cada_ruta_nueva_responde_una_lectura_valida(self):
+        with ServidorEnPie() as s:
+            for ruta in ("/api/soberania", "/api/timers"):
+                with self.subTest(ruta=ruta):
+                    codigo, cuerpo, _ = s.get(ruta)
+                    self.assertEqual(codigo, 200)
+                    self.assertIn(json.loads(cuerpo)["estado"],
+                                  ("ok", sensores.NO_DATA))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
