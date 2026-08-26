@@ -127,6 +127,36 @@ const PINTORES = {
 };
 
 // ── el bucle ────────────────────────────────────────────────────────────────
+//
+// Treinta segundos, y no menos: los sensores hablan con systemd y con el disco,
+// y un panel que pregunta cada segundo deja de ser una ventana para convertirse
+// en carga. Cuando la pestaña esta oculta NO se pregunta nada -- nadie esta
+// mirando-- y al volver se pide de inmediato en vez de esperar al siguiente
+// turno, que es lo que hace que parezca que se ha quedado colgado.
+
+const CADA = 30000;
+let ultimaBuena = null;   // Date de la ultima respuesta que llego entera
+let reloj = null;
+
+function edad() {
+  if (!ultimaBuena) return null;
+  return Math.round((Date.now() - ultimaBuena.getTime()) / 1000);
+}
+
+function envejecer() {
+  // La degradacion honesta. La pagina NO se vacia --lo de antes sigue siendo
+  // cierto de cuando se midio-- pero deja de presentarse como viva: se marca
+  // entera y la cabecera dice desde cuando. Una interfaz congelada enseñando
+  // cifras viejas es peor que una vacia, porque parece que funciona.
+  const s = edad();
+  const chip = $('#chip-conexion');
+  document.body.classList.add('rancio');
+  chip.textContent = 'sin lectura';
+  chip.className = 'chip c-warn';
+  $('#meta-medido').textContent = s === null
+    ? 'el servidor no ha contestado ni una vez'
+    : 'sin lectura desde hace ' + s + ' s · lo de abajo es de la ultima buena';
+}
 
 async function tick() {
   let datos;
@@ -135,14 +165,13 @@ async function tick() {
     if (!r.ok) throw new Error('estado ' + r.status);
     datos = await r.json();
   } catch (e) {
-    // Ni una traza de red en la cara. Se dice que no hay dato y desde cuando.
-    const chip = $('#chip-conexion');
-    chip.textContent = 'sin lectura';
-    chip.className = 'chip c-warn';
-    $('#meta-medido').textContent =
-      'el servidor no contesta · lo de abajo es de la ultima lectura buena';
+    // Ni una traza de red en la cara: no ha fallado nada que la persona pueda
+    // arreglar leyendo un errno. Se dice que no hay dato y desde cuando.
+    envejecer();
     return;
   }
+  ultimaBuena = new Date();
+  document.body.classList.remove('rancio');
   const chip = $('#chip-conexion');
   chip.textContent = 'en vivo';
   chip.className = 'chip c-ok';
@@ -156,8 +185,30 @@ async function tick() {
       sinDato(id, lectura);
       continue;
     }
-    try { PINTORES[nombre](lectura); } catch (e) { sinDato(id, {causa: 'la tarjeta no se pudo pintar'}); }
+    try {
+      PINTORES[nombre](lectura);
+    } catch (e) {
+      // Una tarjeta que revienta al pintarse no puede llevarse a las otras
+      // cinco por delante, igual que un sensor caido no tumba a los demas.
+      sinDato(id, {causa: 'la tarjeta no se pudo pintar con esta lectura'});
+    }
   }
 }
 
+function arrancar() {
+  if (reloj !== null) clearInterval(reloj);
+  reloj = setInterval(tick, CADA);
+}
+
+function parar() {
+  if (reloj !== null) { clearInterval(reloj); reloj = null; }
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { parar(); return; }
+  tick();        // al volver, de inmediato: esperar 30 s parece un cuelgue
+  arrancar();
+});
+
 tick();
+arrancar();

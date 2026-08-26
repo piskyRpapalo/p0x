@@ -385,5 +385,53 @@ class LaCara(unittest.TestCase):
                     self.assertEqual(cab["X-Frame-Options"], "DENY")
 
 
+class ElRefrescoVivo(unittest.TestCase):
+    """Que se refresque, que no machaque, y que sepa envejecer."""
+
+    def js(self):
+        return (AQUI / "estatico" / "nexo.js").read_text(encoding="utf-8")
+
+    def test_38_el_intervalo_es_de_treinta_segundos_y_no_de_uno(self):
+        js = self.js()
+        m = re.search(r"const CADA = (\d+);", js)
+        self.assertIsNotNone(m, "el intervalo se declara una vez, con nombre")
+        self.assertGreaterEqual(int(m.group(1)), 30000,
+                                "los sensores hablan con systemd y con el disco: "
+                                "preguntar cada segundo es carga, no ventana")
+
+    def test_39_con_la_pestana_oculta_no_se_pregunta_nada(self):
+        js = self.js()
+        self.assertIn("visibilitychange", js)
+        self.assertIn("document.hidden", js)
+        self.assertIn("clearInterval", js, "parar de verdad, no solo ignorar")
+
+    def test_40_al_volver_se_pide_de_inmediato(self):
+        """Esperar 30 s al volver a la pestaña se lee como un cuelgue."""
+        js = self.js()
+        vuelta = js.split("if (document.hidden)")[1]
+        self.assertIn("tick();", vuelta.split("});")[0])
+
+    def test_41_la_pagina_no_se_vacia_cuando_el_servidor_calla(self):
+        """Lo medido sigue siendo cierto de cuando se midio. Se marca, no se borra."""
+        js = self.js()
+        self.assertIn("classList.add('rancio')", js)
+        self.assertIn("ultimaBuena", js)
+        self.assertIn("sin lectura desde hace", js)
+        self.assertNotIn("innerHTML = ''", js)
+
+    def test_42_lo_rancio_se_ve_sin_leer_una_palabra(self):
+        css = (AQUI / "estatico" / "hexelion.css").read_text(encoding="utf-8")
+        # Sin quitar espacios: el combinador de descendencia ES un espacio, y
+        # quitarlo convierte «body.rancio .mod» en otro selector distinto.
+        self.assertIn("body.rancio .mod{", css)
+        self.assertIn("saturate", css, "el color es lo que un ojo lee como «ya no»")
+
+    def test_43_una_tarjeta_que_revienta_no_se_lleva_a_las_otras(self):
+        js = self.js()
+        bucle = js.split("for (const [nombre, lectura]")[1]
+        self.assertIn("try {", bucle)
+        self.assertIn("sinDato(id,", bucle.split("catch")[1])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
