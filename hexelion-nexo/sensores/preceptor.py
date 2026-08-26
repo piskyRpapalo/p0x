@@ -67,15 +67,17 @@ def _edad(iso):
         return None
 
 
-def leer():
-    try:
-        corta, larga = _version()
-    except Exception as e:                                       # noqa: BLE001
-        return sensores.hueco(f"el nucleo no se pudo leer · {type(e).__name__}")
+def tanda():
+    """La ultima tanda registrada, con su edad. Sin nucleo al lado tambien.
 
-    tanda = {"estado": sensores.NO_DATA,
-             "causa": "no hay ninguna tanda registrada · corre: "
-                      "python3 -m sensores.preceptor --medir"}
+    Vive aparte de `leer()` a proposito: leer la cache no necesita que el arbol
+    del nucleo este ahi, y mezclarlas hacia que una prueba de la cache fallara
+    en cualquier maquina donde el nucleo no fuera vecino -- que es toda menos la
+    nuestra. Una prueba que depende del vecindario no prueba el codigo.
+    """
+    salida = {"estado": sensores.NO_DATA,
+              "causa": "no hay ninguna tanda registrada · corre: "
+                       "python3 -m sensores.preceptor --medir"}
     if CACHE.is_file():
         try:
             crudo = json.loads(CACHE.read_text(encoding="utf-8"))
@@ -84,16 +86,24 @@ def leer():
         if isinstance(crudo, dict) and crudo.get("pruebas"):
             edad = _edad(crudo.get("medido", ""))
             rancia = edad is None or edad > RANCIA
-            tanda = {
+            salida = {
                 "estado": "ok",
                 "pruebas": crudo["pruebas"], "suites": crudo["suites"],
                 "verde": bool(crudo.get("verde")),
                 "medido": crudo.get("medido"),
                 "rancia": rancia,
                 "causa": "medida hace mas de 24 h · no dice nada del arbol de hoy"
-                         if rancia else "",
+                          if rancia else "",
             }
-    return sensores.dato(version=corta, huella=larga, tanda=tanda,
+    return salida
+
+
+def leer():
+    try:
+        corta, larga = _version()
+    except Exception as e:                                       # noqa: BLE001
+        return sensores.hueco(f"el nucleo no se pudo leer · {type(e).__name__}")
+    return sensores.dato(version=corta, huella=larga, tanda=tanda(),
                          ruta="preceptor-os-core/")
 
 

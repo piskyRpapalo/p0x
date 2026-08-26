@@ -283,7 +283,7 @@ class SensoresDeProyecto(unittest.TestCase):
                 "suites": 1, "verde": True}), encoding="utf-8")
             P.CACHE = falsa
             try:
-                tanda = P.leer()["tanda"]
+                tanda = P.tanda()
             finally:
                 P.CACHE = viejo
         self.assertTrue(tanda["rancia"])
@@ -297,7 +297,7 @@ class SensoresDeProyecto(unittest.TestCase):
             rota.write_text("{roto", encoding="utf-8")
             P.CACHE = rota
             try:
-                tanda = P.leer()["tanda"]
+                tanda = P.tanda()
             finally:
                 P.CACHE = viejo
         self.assertEqual(tanda["estado"], sensores.NO_DATA)
@@ -643,8 +643,16 @@ class ElRack(unittest.TestCase):
     def test_56c_sin_gateway_declarado_el_panel_no_adivina_uno(self):
         import sensores.nodos as N
         antes_conf, antes_env = N.CONF, os.environ.get(N.VARIABLE)
+        antes_rack = N.RACK_CONF
         with tempfile.TemporaryDirectory() as d:
             N.CONF = Path(d) / "no_existe.conf"
+            # Un rack propio: sin gateway NO es lo mismo que sin rack, y sin
+            # este fichero la prueba comprobaria lo segundo creyendo medir lo
+            # primero. En una maquina sin rack.conf --toda menos la nuestra--
+            # pasaba por el motivo equivocado.
+            rack = Path(d) / "rack.conf"
+            rack.write_text("nodo-x | metal | papel | nodo-x\n", encoding="utf-8")
+            N.RACK_CONF = rack
             os.environ.pop(N.VARIABLE, None)
             try:
                 self.assertEqual(N.gateway(), "")
@@ -654,9 +662,22 @@ class ElRack(unittest.TestCase):
                 self.assertFalse(lectura["gateway_declarado"])
                 self.assertIn("sin gateway declarado", lectura["causa"])
             finally:
-                N.CONF = antes_conf
+                N.CONF, N.RACK_CONF = antes_conf, antes_rack
                 if antes_env is not None:
                     os.environ[N.VARIABLE] = antes_env
+
+    def test_56e_sin_rack_declarado_no_se_inventan_nodos(self):
+        """Un panel relleno de ejemplos es peor que uno vacio: el vacio se ve."""
+        import sensores.nodos as N
+        antes = N.RACK_CONF
+        with tempfile.TemporaryDirectory() as d:
+            N.RACK_CONF = Path(d) / "no_existe.conf"
+            try:
+                lectura = N.leer()
+                self.assertEqual(lectura["estado"], sensores.NO_DATA)
+                self.assertIn("sin rack declarado", lectura["causa"])
+            finally:
+                N.RACK_CONF = antes
 
     def test_56d_una_sonda_que_falta_no_es_un_nodo_dormido(self):
         """La cicatriz. Que el gateway calle no dice que un nodo duerma: dice
