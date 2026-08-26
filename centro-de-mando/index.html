@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Centro de Mando · P0X</title>
+<style>
+  :root{
+    --fondo:#0b0d0c; --panel:#111413; --linea:#1e2422; --linea-viva:#2f6b4f;
+    --texto:#c9d1cd; --tenue:#6b7772; --ambar:#a9762b; --verde:#3fa971;
+    --rojo:#b2504a; --mono:ui-monospace,"JetBrains Mono","DejaVu Sans Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--fondo);color:var(--texto);font-family:var(--mono);
+       font-size:14px;line-height:1.55;padding:28px 20px 48px}
+  header{max-width:1180px;margin:0 auto 26px;border-bottom:1px solid var(--linea);
+         padding-bottom:16px}
+  h1{margin:0;font-size:17px;letter-spacing:.14em;font-weight:600;color:#e6ece9}
+  h1 span{color:var(--linea-viva)}
+  .cabecera-nota{margin:8px 0 0;color:var(--tenue);font-size:12px;max-width:80ch}
+  .rejilla{max-width:1180px;margin:0 auto;display:grid;gap:16px;
+           grid-template-columns:repeat(auto-fit,minmax(330px,1fr))}
+  .widget{background:var(--panel);border:1px solid var(--linea);border-radius:3px;
+          padding:16px 18px 18px;display:flex;flex-direction:column;min-width:0}
+  .widget h2{margin:0 0 2px;font-size:12px;letter-spacing:.2em;color:#e6ece9;font-weight:600}
+  .sub{margin:0 0 14px;font-size:11px;color:var(--tenue);letter-spacing:.04em}
+  .grande{font-size:34px;line-height:1.1;margin:6px 0 2px;color:#e6ece9;font-weight:600}
+  .grande small{font-size:12px;color:var(--tenue);letter-spacing:.1em;display:block;
+                margin-top:6px;font-weight:400}
+  .fila{display:flex;justify-content:space-between;gap:14px;padding:7px 0;
+        border-top:1px solid var(--linea);min-width:0}
+  .fila:first-of-type{border-top:0}
+  .fila .k{color:var(--tenue);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fila .v{text-align:right;white-space:nowrap}
+  .punto{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:7px;
+         vertical-align:middle}
+  .p-ok{background:var(--verde)} .p-espera{background:var(--ambar)} .p-nulo{background:#3a4340}
+  .nodata{color:var(--ambar);letter-spacing:.06em}
+  .pie{margin-top:auto;padding-top:12px;color:var(--tenue);font-size:11px;
+       border-top:1px dashed var(--linea)}
+  code{color:#9fb3ab}
+  .santuario{border-left:2px solid var(--linea-viva);padding-left:10px;margin:10px 0 0;
+             color:var(--tenue);font-size:12px}
+  footer{max-width:1180px;margin:26px auto 0;color:var(--tenue);font-size:11px;
+         border-top:1px solid var(--linea);padding-top:14px;max-width:1180px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>CENTRO DE MANDO <span>· P0X</span></h1>
+  <p class="cabecera-nota">
+    Instantánea medida el <strong>2026-08-26 21:01 WEST</strong>. Esta página es
+    HTML plano: no consulta nada, no abre un socket y no se actualiza sola. Todo
+    lo que enseña se midió una vez, y por eso lleva la hora al lado. Un panel que
+    se pintara como si estuviera vivo mentiría sobre lo único que importa aquí.
+  </p>
+</header>
+
+<main class="rejilla">
+
+  <section class="widget">
+    <h2>PRECEPTOR OS</h2>
+    <p class="sub">núcleo público · niveles 0-1</p>
+    <div class="grande">Nivel 0<small>SANTUARIO · POR DEFECTO</small></div>
+    <div class="santuario">
+      Biblioteca estándar, disco local, cero sockets. Ninguna capacidad por
+      encima del suelo está concedida.
+    </div>
+    <div style="margin-top:14px">
+      <div class="fila"><span class="k">pruebas</span><span class="v">526 / 526</span></div>
+      <div class="fila"><span class="k">suites</span><span class="v">36 · 6 corredores</span></div>
+      <div class="fila"><span class="k">sabotajes</span><span class="v">4/4 · 6/6</span></div>
+      <div class="fila"><span class="k">centinela</span><span class="v"><span class="punto p-nulo"></span>sin poner</span></div>
+    </div>
+    <p class="pie">
+      <code>preceptor-os-core/</code> → <code>aurelius/</code> · el número lo da
+      <code>bash bin/pruebas</code> y no este panel.
+    </p>
+  </section>
+
+  <section class="widget">
+    <h2>HEXELION</h2>
+    <p class="sub">nivel 3 · orquestador · timers de usuario</p>
+    <div>
+      <div class="fila">
+        <span class="k"><span class="punto p-ok"></span>afinador.timer</span>
+        <span class="v">27 ago · 03:08</span></div>
+      <div class="fila"><span class="k">└ última pasada</span>
+        <span class="v">26 ago · 03:01</span></div>
+      <div class="fila">
+        <span class="k"><span class="punto p-ok"></span>guardian.timer</span>
+        <span class="v">27 ago · 04:03</span></div>
+      <div class="fila"><span class="k">└ última pasada</span>
+        <span class="v">26 ago · 04:08</span></div>
+      <div class="fila">
+        <span class="k"><span class="punto p-espera"></span>curador.timer</span>
+        <span class="v">dom 30 ago · 05:10</span></div>
+      <div class="fila"><span class="k">└ última pasada</span>
+        <span class="v nodata">NO_DATA · no ha corrido nunca</span></div>
+    </div>
+    <p class="pie">
+      Las horas son las que dio <code>systemctl --user list-timers</code>, no las
+      del plan: el afinador va a las 03:08 y el guardián a las 04:03. El curador
+      está armado y sin estrenar — eso no es un cero, es un hueco declarado.
+    </p>
+  </section>
+
+  <section class="widget">
+    <h2>CINEK</h2>
+    <p class="sub">pipeline de vídeo local · marcador de posición</p>
+    <div>
+      <div class="fila"><span class="k">cinek.log</span>
+        <span class="v">8 ago 10:56 · 403 KiB</span></div>
+      <div class="fila"><span class="k">cinek_v2.log</span>
+        <span class="v">8 ago 05:34 · 1,4 MiB</span></div>
+      <div class="fila"><span class="k">app.log</span>
+        <span class="v">7 ago 15:23 · 3,8 KiB</span></div>
+      <div class="fila"><span class="k">actividad desde entonces</span>
+        <span class="v nodata">NO_DATA</span></div>
+    </div>
+    <p class="pie">
+      <code>hexelion-cinek/</code> → <code>CineK_Studio/</code>. Tres ficheros,
+      ninguno tocado en 18 días. Este panel no los relee: hacerlo pide un lector
+      que salga del fichero, y eso es otra decisión.
+    </p>
+  </section>
+
+  <section class="widget">
+    <h2>JARDÍN</h2>
+    <p class="sub">permacultura y sensores</p>
+    <div class="grande nodata" style="font-size:22px">NO_DATA
+      <small>EN ESPERA DE CONEXIÓN</small></div>
+    <div style="margin-top:12px">
+      <div class="fila"><span class="k">módulo en disco</span>
+        <span class="v nodata">no existe todavía</span></div>
+      <div class="fila"><span class="k">sensores</span>
+        <span class="v nodata">NO_DATA</span></div>
+      <div class="fila"><span class="k">última lectura</span>
+        <span class="v nodata">NO_DATA</span></div>
+    </div>
+    <p class="pie">
+      El índice lo sitúa dentro de <code>hexelion/</code>; ahí no hay ninguna
+      carpeta de jardín a esta hora. Se dice el hueco en vez de pintar un cero
+      que parecería una planta seca.
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  Cuatro paneles, cuatro fuentes, y ninguna consultada en vivo · sin red, sin
+  scripts de fuera, sin fuentes remotas · para volver a medir:
+  <code>bash ~/p0x/aurelius/bin/pruebas</code> ·
+  <code>systemctl --user list-timers</code>
+</footer>
+
+</body>
+</html>
