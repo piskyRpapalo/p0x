@@ -920,6 +920,15 @@ class ElCielo(unittest.TestCase):
                 "ventana": {"sur": v[0], "norte": v[1], "oeste": v[2],
                             "este": v[3], "origen": v[4]}}
 
+    def test_77b_sin_gateway_el_cielo_no_dice_que_la_antena_calla(self):
+        """No tener a quien preguntar y preguntar sin respuesta son dos cosas."""
+        import sensores.adsb as A
+        with mock.patch.object(A.nodos, "gateway", return_value=""):
+            lectura = A.leer()
+        self.assertEqual(lectura["estado"], sensores.NO_DATA)
+        self.assertIn("sin gateway", lectura["causa"])
+        self.assertNotIn("no contesta", lectura["causa"])
+
     def test_78_no_hay_ninguna_libreria_de_mapas(self):
         for fichero in ("sensores/adsb.py", "fragmentos.py",
                         "estatico/static/nexo.js"):
@@ -1007,7 +1016,11 @@ class ElCielo(unittest.TestCase):
     def test_88_sin_ninguna_situada_no_se_dibuja_un_cielo_vacio(self):
         import sensores.adsb as A
         import fragmentos as FR
-        with mock.patch.object(A.urllib.request, "urlopen",
+        # Se declara el gateway: sin el, el sensor corta ANTES de llegar a la
+        # red y este caso comprobaria «no hay gateway» creyendo medir «el
+        # gateway no contesta». Dos huecos distintos con la misma forma.
+        with mock.patch.object(A, "_url", return_value="http://inventado/x"), \
+             mock.patch.object(A.urllib.request, "urlopen",
                                side_effect=TimeoutError("nada")):
             lectura = A.leer()
         self.assertEqual(lectura["estado"], sensores.NO_DATA)
