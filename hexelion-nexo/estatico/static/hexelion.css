@@ -164,6 +164,30 @@ h1 em{font-style:normal;color:var(--glow)}
    dos cosas distintas con el mismo nombre es una averia esperando su turno. */
 .puntos{letter-spacing:.22em;color:var(--gold);font-size:11px}
 
+/* ── el cielo · ADS-B ───────────────────────────────────────────────────── */
+.cielo{width:100%;height:auto;display:block;background:#080D0B;
+       border:1px solid var(--linea)}
+.cielo .marco{fill:none;stroke:var(--linea-viva);stroke-width:1}
+/* La cruz marca el centro de la ventana. Discontinua y apagada: es referencia,
+   no dato, y competir con los aviones la volveria ruido. */
+.cielo .cruz{stroke:var(--linea);stroke-width:1;stroke-dasharray:2 6}
+.cielo .avion{stroke-width:1}
+/* El unico glow del mapa, y solo en lo que esta volando ahora mismo -- misma
+   regla que las cifras vivas: el halo significa «esto esta pasando». */
+.cielo .baja{fill:var(--glow);stroke:var(--glow)}
+.cielo .media{fill:var(--amber);stroke:var(--amber)}
+/* Alta va en cian y NO en rojo, aunque el encargo pedia rojo. En esta pantalla
+   el rojo ya significa una cosa --hay algo roto, y ahora mismo hay un nodo en
+   rojo porque lo esta--. Un avion a 36.000 pies no esta averiado: esta lejos.
+   Darle el mismo color rompe el unico codigo que el panel tiene, y de los dos
+   significados solo uno se puede reparar. La altura es una escala, no una
+   alarma: verde cerca, ambar medio, cian lejos, y el relleno se vacia segun
+   sube -- asi tambien se lee sin color. */
+.cielo .alta{fill:none;stroke:var(--neon)}
+.cielo .muda{fill:none;stroke:var(--ink-4);stroke-dasharray:2 2}
+.cielo circle{filter:drop-shadow(0 0 3px currentColor)}
+.cielo :hover{cursor:crosshair}
+
 /* ── la camara ──────────────────────────────────────────────────────────── */
 .camara{display:block;width:100%;height:auto;border:1px solid var(--linea-viva);
         background:#0C120F}

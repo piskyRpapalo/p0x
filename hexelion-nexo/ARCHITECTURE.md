@@ -158,7 +158,7 @@ htmx minified is roughly 14 KB, and it renders nothing on its own. **This entire
 | Update path | **push, not poll** | SSE · the browser never asks |
 | Bytes per quiet update | **~386 B** | only changed sections travel |
 | Sensor reads per viewer | **0** | one refresher serves every open tab |
-| Tests | **109** | two suites, one runner · 20 of them chaos |
+| Tests | **123** | two suites, one runner · 20 of them chaos |
 | Build step | **none** | clone, `python3 servidor.py` |
 
 On latency: updates are pushed the moment the refresher notices a change, so the

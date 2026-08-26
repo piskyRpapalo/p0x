@@ -903,5 +903,160 @@ class LaCamara(unittest.TestCase):
             self.assertNotIn(palabra, js.lower())
 
 
+class ElCielo(unittest.TestCase):
+    """Aeronaves situadas, sin una sola libreria de mapas."""
+
+    def avion(self, lat, lon, pies=5000, hexid="abc123"):
+        import sensores.adsb as A
+        return {"hex": hexid, "vuelo": "TEST1", "lat": lat, "lon": lon,
+                "pies": pies, "nudos": 400, "escalon": A.escalon(pies)}
+
+    def lectura(self, aviones, oidas=None):
+        import sensores.adsb as A
+        v = A.ventana(aviones)
+        return {"estado": "ok", "aviones": aviones, "situadas": len(aviones),
+                "oidas": oidas if oidas is not None else len(aviones),
+                "mudas": max((oidas or len(aviones)) - len(aviones), 0),
+                "ventana": {"sur": v[0], "norte": v[1], "oeste": v[2],
+                            "este": v[3], "origen": v[4]}}
+
+    def test_78_no_hay_ninguna_libreria_de_mapas(self):
+        for fichero in ("sensores/adsb.py", "fragmentos.py",
+                        "estatico/static/nexo.js"):
+            bajo = (AQUI / fichero).read_text(encoding="utf-8").lower()
+            with self.subTest(fichero=fichero):
+                for pesado in ("leaflet", "openlayers", "mapbox", "googleapis",
+                               "tile.openstreetmap", "d3."):
+                    self.assertNotIn(pesado, bajo)
+
+    def test_79_un_solo_avion_no_divide_entre_cero(self):
+        """La formula obvia --normalizar entre minimo y maximo-- revienta aqui."""
+        import fragmentos as FR
+        html = FR.adsb(self.lectura([self.avion(38.7, -9.1)]))["html"]
+        self.assertEqual(html.count("<circle"), 1)
+
+    def test_80_dos_aviones_cerca_no_se_pintan_en_esquinas_opuestas(self):
+        """El fallo del encuadre automatico: dos aviones a pocos kilometros
+        acabarian en extremos del dibujo, y el mapa mentiria sobre la distancia."""
+        import fragmentos as FR
+        import re as _re
+        cerca = [self.avion(38.70, -9.10), self.avion(38.72, -9.12)]
+        html = FR.adsb(self.lectura(cerca))["html"]
+        xs = [float(x) for x in _re.findall(r'cx="([\d.]+)"', html)]
+        ys = [float(y) for y in _re.findall(r'cy="([\d.]+)"', html)]
+        self.assertLess(max(xs) - min(xs), FR.ADSB_ANCHO * 0.5,
+                        "dos aviones cercanos no pueden ocupar medio mapa")
+        self.assertLess(max(ys) - min(ys), FR.ADSB_ALTO * 0.5)
+
+    def test_81_la_escala_no_cambia_cuando_entra_otro_avion_cerca(self):
+        """Con encuadre automatico, un avion quieto parece moverse porque entro
+        otro por el otro lado. Con suelo, se queda quieto."""
+        import fragmentos as FR
+        import re as _re
+        def x_del_primero(aviones):
+            html = FR.adsb(self.lectura(aviones))["html"]
+            return float(_re.findall(r'cx="([\d.]+)"', html)[0])
+        uno = [self.avion(38.70, -9.10)]
+        dos = uno + [self.avion(38.71, -9.11)]
+        self.assertAlmostEqual(x_del_primero(uno), x_del_primero(dos), delta=40)
+
+    def test_82_el_norte_queda_arriba(self):
+        import fragmentos as FR
+        import re as _re
+        html = FR.adsb(self.lectura([self.avion(39.5, -9.0),
+                                     self.avion(38.5, -9.0)]))["html"]
+        ys = [float(y) for y in _re.findall(r'cy="([\d.]+)"', html)]
+        self.assertLess(ys[0], ys[1], "el de mas latitud va mas arriba")
+
+    def test_83_los_tres_escalones_de_altura(self):
+        import sensores.adsb as A
+        self.assertEqual(A.escalon(500), "baja")
+        self.assertEqual(A.escalon(18000), "media")
+        self.assertEqual(A.escalon(36000), "alta")
+        self.assertEqual(A.escalon(None), sensores.NO_DATA)
+
+    def test_84_la_altura_no_usa_el_rojo(self):
+        """El rojo de este panel significa «hay algo roto». Un avion alto no
+        esta averiado: esta lejos. Dos significados para un color deja el
+        codigo sin significado."""
+        css = (AQUI / "estatico" / "static" / "hexelion.css").read_text(encoding="utf-8")
+        cielo = css.split(".cielo .avion")[1].split("/* ── la camara")[0]
+        self.assertNotIn("var(--red)", cielo)
+
+    def test_85_la_altura_tambien_se_lee_sin_color(self):
+        """El relleno se vacia segun sube. Quien no distinga verde de ambar
+        sigue viendo tres cosas distintas."""
+        css = (AQUI / "estatico" / "static" / "hexelion.css").read_text(encoding="utf-8")
+        self.assertIn(".cielo .alta{fill:none", css)
+
+    def test_86_cada_avion_lleva_su_rotulo_sin_una_linea_de_javascript(self):
+        import fragmentos as FR
+        html = FR.adsb(self.lectura([self.avion(38.7, -9.1)]))["html"]
+        self.assertIn("<title>", html)
+        self.assertNotIn("onmouseover", html)
+        self.assertNotIn("<script", html)
+
+    def test_87_las_que_no_dicen_donde_estan_se_cuentan_igual(self):
+        """Ensenar «2 aviones» oyendo a ocho es mentir por omision: el numero
+        es cierto y la frase es falsa."""
+        import fragmentos as FR
+        frag = FR.adsb(self.lectura([self.avion(38.7, -9.1)], oidas=8))
+        self.assertIn("1 de 8", frag["chip"])
+        self.assertIn("7 emiten sin decir donde estan", frag["html"])
+
+    def test_88_sin_ninguna_situada_no_se_dibuja_un_cielo_vacio(self):
+        import sensores.adsb as A
+        import fragmentos as FR
+        with mock.patch.object(A.urllib.request, "urlopen",
+                               side_effect=TimeoutError("nada")):
+            lectura = A.leer()
+        self.assertEqual(lectura["estado"], sensores.NO_DATA)
+        self.assertIn("no contesta", lectura["causa"])
+        html = FR.html_de("adsb", lectura)
+        self.assertNotIn("<svg", html)
+        self.assertIn("nodata", html)
+
+    def test_89_una_ventana_ilegible_se_ignora_y_no_revienta(self):
+        import sensores.adsb as A
+        antes = os.environ.get(A.VARIABLE)
+        try:
+            for basura in ("", "1,2", "norte,sur", "9,9,9,9", "a,b,c,d"):
+                os.environ[A.VARIABLE] = basura
+                with self.subTest(ventana=basura):
+                    v = A.ventana([{"lat": 38.7, "lon": -9.1}])
+                    self.assertEqual(v[4], "deducida")
+        finally:
+            os.environ.pop(A.VARIABLE, None)
+            if antes is not None:
+                os.environ[A.VARIABLE] = antes
+
+    def test_90_una_ventana_declarada_manda_y_se_dice(self):
+        import sensores.adsb as A
+        antes = os.environ.get(A.VARIABLE)
+        os.environ[A.VARIABLE] = "38.0,40.0,-10.0,-8.0"
+        try:
+            v = A.ventana([{"lat": 38.7, "lon": -9.1}])
+            self.assertEqual((v[0], v[1], v[2], v[3]), (38.0, 40.0, -10.0, -8.0))
+            self.assertEqual(v[4], "declarada")
+        finally:
+            os.environ.pop(A.VARIABLE, None)
+            if antes is not None:
+                os.environ[A.VARIABLE] = antes
+
+    def test_91_un_avion_fuera_de_la_ventana_se_pega_al_borde(self):
+        """Con ventana declarada puede haber trafico fuera. Un circulo pintado
+        a x=-40 no se ve pero SI cuenta arriba, y esa resta no cuadraria."""
+        import fragmentos as FR
+        import re as _re
+        lectura = self.lectura([self.avion(38.7, -9.1)])
+        lectura["ventana"] = {"sur": 45.0, "norte": 46.0, "oeste": 0.0,
+                              "este": 1.0, "origen": "declarada"}
+        html = FR.adsb(lectura)["html"]
+        x = float(_re.findall(r'cx="([\d.]+)"', html)[0])
+        y = float(_re.findall(r'cy="([\d.]+)"', html)[0])
+        self.assertTrue(0 <= x <= FR.ADSB_ANCHO)
+        self.assertTrue(0 <= y <= FR.ADSB_ALTO)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

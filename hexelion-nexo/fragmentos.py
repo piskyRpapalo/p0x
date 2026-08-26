@@ -232,6 +232,7 @@ TARJETAS = {
     "nodos": ("El rack", True, "nodos"),
     "mapa": ("La malla", False, "nodos"),
     "observe": ("Observe · camara", False, "observe"),
+    "adsb": ("El cielo · ADS-B", False, "adsb"),
     "cerebro": ("Segundo cerebro", False, "cerebro"),
     "preceptor": ("Nucleo publico", False, "preceptor"),
     "timers": ("Bucles de agentes", False, "timers"),
@@ -324,6 +325,59 @@ def mapa(d):
     }
 
 
+# ── el cielo · aeronaves situadas ───────────────────────────────────────────
+
+ADSB_ANCHO, ADSB_ALTO = 400, 300
+# Escala de altura, no semaforo. Ver el comentario del CSS: el rojo de este
+# panel ya significa «roto», y un avion alto no esta roto, esta lejos.
+COLOR_ALTURA = {"baja": "baja", "media": "media", "alta": "alta"}
+
+
+def _situar(a, v):
+    """Grados a pixeles. La `y` va invertida: el norte esta arriba."""
+    x = (a["lon"] - v["oeste"]) / (v["este"] - v["oeste"]) * ADSB_ANCHO
+    y = (v["norte"] - a["lat"]) / (v["norte"] - v["sur"]) * ADSB_ALTO
+    # Se recorta al marco en vez de dejar que un avion salga del dibujo: con
+    # ventana declarada puede haber trafico fuera de ella, y un circulo pintado
+    # a x=-40 no se ve pero SI cuenta en la cifra de arriba. Pegado al borde,
+    # al menos, dice «esta por ahi».
+    return max(6, min(ADSB_ANCHO - 6, x)), max(6, min(ADSB_ALTO - 6, y))
+
+
+def adsb(d):
+    v = d["ventana"]
+    marcas = []
+    for a in d.get("aviones", []):
+        x, y = _situar(a, v)
+        clase = COLOR_ALTURA.get(a["escalon"], "muda")
+        pies = a["pies"]
+        # `<title>` dentro del circulo: el navegador ensena el rotulo al pasar
+        # por encima, sin una linea de JavaScript ni un solo byte de libreria.
+        rotulo = (f'{a["vuelo"]} · {a["hex"]} · '
+                  f'{pies if pies != NO_DATA else NO_DATA} ft · '
+                  f'{a["nudos"] if a["nudos"] != NO_DATA else NO_DATA} kt')
+        marcas.append(f'<circle class="avion {clase}" cx="{x:.1f}" cy="{y:.1f}" '
+                      f'r="4"><title>{e(rotulo)}</title></circle>')
+
+    # El marco y la cruz si caen en la rejilla de 4: son estructura, no dato.
+    guia = (f'<rect class="marco" x="0" y="0" width="{ADSB_ANCHO}" height="{ADSB_ALTO}"/>'
+            f'<line class="cruz" x1="{ADSB_ANCHO // 2}" y1="0" '
+            f'x2="{ADSB_ANCHO // 2}" y2="{ADSB_ALTO}"/>'
+            f'<line class="cruz" x1="0" y1="{ADSB_ALTO // 2}" '
+            f'x2="{ADSB_ANCHO}" y2="{ADSB_ALTO // 2}"/>')
+
+    mudas = d.get("mudas", 0)
+    nota = (f'{d.get("situadas")} situadas de {d.get("oidas")} oidas · '
+            f'{mudas} emiten sin decir donde estan · escala {v["origen"]}')
+    return {
+        "chip": f'{d.get("situadas")} de {d.get("oidas")}',
+        "clase": "c-warn" if mudas else "c-ok",
+        "html": (f'<svg class="cielo" viewBox="0 0 {ADSB_ANCHO} {ADSB_ALTO}" '
+                 f'role="img" aria-label="{e(nota)}">{guia}{"".join(marcas)}</svg>'
+                 + causa(nota)),
+    }
+
+
 # ── el segundo cerebro · la forma, nunca el contenido ───────────────────────
 
 def cerebro(d):
@@ -360,6 +414,7 @@ def observe(d):
 
 
 FRAGMENTOS = {"soberania": soberania, "nodos": nodos, "mapa": mapa,
+              "adsb": adsb,
               "preceptor": preceptor, "timers": timers, "lora": lora,
               "cinek": cinek, "jardin": jardin, "cerebro": cerebro,
               "observe": observe}

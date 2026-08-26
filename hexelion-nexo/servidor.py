@@ -56,7 +56,7 @@ from sensores import registro                                    # noqa: E402
 
 # Importar un sensor es registrarlo. La lista es esta y no un barrido del
 # directorio, por el motivo escrito en `sensores/registro.py`.
-from sensores import (cerebro, cinek, jardin, lora, nodos,        # noqa: E402,F401
+from sensores import (adsb, cerebro, cinek, jardin, lora, nodos,  # noqa: E402,F401
                       observe, preceptor, soberania, timers)
 
 PUERTO = 8765
@@ -79,6 +79,7 @@ RUTAS = {
     "/api/jardin": lambda: registro.uno("jardin"),
     "/api/cerebro": lambda: registro.uno("cerebro"),
     "/api/observe": lambda: registro.uno("observe"),
+    "/api/adsb": lambda: registro.uno("adsb"),
     "/api/nodos": lambda: registro.uno("nodos"),
 }
 
