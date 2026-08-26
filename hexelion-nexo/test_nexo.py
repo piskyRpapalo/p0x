@@ -8,6 +8,7 @@ no responde 501 a un POST por su cuenta.
 """
 
 import json
+import tempfile
 import threading
 import unittest
 import urllib.error
@@ -211,6 +212,107 @@ class SensoresDeSistema(unittest.TestCase):
     def test_21_cada_ruta_nueva_responde_una_lectura_valida(self):
         with ServidorEnPie() as s:
             for ruta in ("/api/soberania", "/api/timers"):
+                with self.subTest(ruta=ruta):
+                    codigo, cuerpo, _ = s.get(ruta)
+                    self.assertEqual(codigo, 200)
+                    self.assertIn(json.loads(cuerpo)["estado"],
+                                  ("ok", sensores.NO_DATA))
+
+
+class SensoresDeProyecto(unittest.TestCase):
+    """Los cuatro proyectos. Cada uno mide lo suyo o declara por que no puede."""
+
+    def test_22_todos_los_sensores_estan_registrados(self):
+        esperados = {"soberania", "timers", "preceptor", "lora", "cinek", "jardin"}
+        self.assertTrue(esperados.issubset(set(registro.SENSORES)),
+                        f"faltan: {esperados - set(registro.SENSORES)}")
+
+    def test_23_ningun_sensor_de_proyecto_escribe_desde_la_lectura(self):
+        """`medir()` escribe, y por eso se llama a mano. `leer()` jamas."""
+        for nombre in ("lora", "cinek", "jardin", "soberania", "timers"):
+            fuente = (AQUI / "sensores" / f"{nombre}.py").read_text(encoding="utf-8")
+            with self.subTest(sensor=nombre):
+                for escritura in ("write_text", "write_bytes", "mkdir", "unlink"):
+                    self.assertNotIn(escritura, fuente)
+
+    def test_24_la_tanda_del_nucleo_siempre_viene_con_su_hora(self):
+        lectura = registro.uno("preceptor")
+        if lectura["estado"] != "ok":
+            self.skipTest(lectura["causa"])
+        tanda = lectura["tanda"]
+        if tanda["estado"] == "ok":
+            self.assertTrue(tanda["medido"], "una cifra sin hora es un rumor")
+            self.assertIn("rancia", tanda)
+        else:
+            self.assertIn("--medir", tanda["causa"], "y se dice como medirla")
+
+    def test_25_una_tanda_rancia_se_declara_rancia(self):
+        import sensores.preceptor as P
+        viejo = P.CACHE
+        with tempfile.TemporaryDirectory() as d:
+            falsa = Path(d) / "tanda.json"
+            falsa.write_text(json.dumps({
+                "medido": "2020-01-01T00:00:00+00:00", "pruebas": 1,
+                "suites": 1, "verde": True}), encoding="utf-8")
+            P.CACHE = falsa
+            try:
+                tanda = P.leer()["tanda"]
+            finally:
+                P.CACHE = viejo
+        self.assertTrue(tanda["rancia"])
+        self.assertIn("24 h", tanda["causa"])
+
+    def test_26_una_tanda_ilegible_no_se_pinta_como_buena(self):
+        import sensores.preceptor as P
+        viejo = P.CACHE
+        with tempfile.TemporaryDirectory() as d:
+            rota = Path(d) / "tanda.json"
+            rota.write_text("{roto", encoding="utf-8")
+            P.CACHE = rota
+            try:
+                tanda = P.leer()["tanda"]
+            finally:
+                P.CACHE = viejo
+        self.assertEqual(tanda["estado"], sensores.NO_DATA)
+
+    def test_27_una_carpeta_sin_pesos_no_cuenta_como_adapter(self):
+        lectura = registro.uno("lora")
+        if lectura["estado"] != "ok":
+            self.skipTest(lectura["causa"])
+        for a in lectura["adapters"]:
+            with self.subTest(adapter=a["nombre"]):
+                if a["estado"] == "ok":
+                    self.assertGreater(a["bytes"], 0)
+                else:
+                    self.assertTrue(a["causa"])
+        self.assertEqual(lectura["entrenados"],
+                         sum(1 for a in lectura["adapters"] if a["estado"] == "ok"))
+
+    def test_28_el_pipeline_no_se_lee_entero_solo_se_lista(self):
+        fuente = (AQUI / "sensores" / "cinek.py").read_text(encoding="utf-8")
+        for lectura in ("read_text", "readlines", "read_bytes"):
+            self.assertNotIn(lectura, fuente,
+                             "un registro de MiB en una respuesta de 30 s tira el panel")
+
+    def test_29_el_jardin_mira_el_disco_cada_vez_y_no_una_sola(self):
+        """Un marcador que dice «en espera» sin mirar lo diria tambien despues."""
+        import sensores.jardin as J
+        lectura = J.leer()
+        self.assertEqual(lectura["estado"], sensores.NO_DATA)
+        self.assertIn("sin carpeta en disco", lectura["causa"])
+        viejo = J.RAIZ
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "jardin").mkdir()
+            J.RAIZ = Path(d)
+            try:
+                self.assertEqual(J.leer()["estado"], "ok",
+                                 "si la carpeta aparece, el sensor tiene que verla")
+            finally:
+                J.RAIZ = viejo
+
+    def test_30_cada_ruta_de_proyecto_responde(self):
+        with ServidorEnPie() as s:
+            for ruta in ("/api/preceptor", "/api/lora", "/api/cinek", "/api/jardin"):
                 with self.subTest(ruta=ruta):
                     codigo, cuerpo, _ = s.get(ruta)
                     self.assertEqual(codigo, 200)
