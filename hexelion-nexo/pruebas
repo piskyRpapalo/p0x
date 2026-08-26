@@ -2,7 +2,7 @@
 # La tanda del Nexo. Un solo sitio del que sale el numero, como en el nucleo.
 set -uo pipefail
 cd "$(dirname "$0")" || exit 2
-SUITES=(test_nexo)
+SUITES=(test_nexo test_caos)
 echo "── EL NEXO · PRUEBAS ───────────────────────────────────────────"
 echo "  $(python3 -V 2>&1) · $(command -v python3)"
 echo

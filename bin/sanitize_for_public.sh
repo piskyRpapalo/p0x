@@ -77,7 +77,8 @@ done
 
 # --- lo que tiene que estar --------------------------------------------------
 echo
-for necesario in ".gitignore" ".env.example" "rack.conf.example" "LEEME.md"; do
+for necesario in ".gitignore" ".env.example" "rack.conf.example" \
+                 "LEEME.md" "README.md" "ARCHITECTURE.md" "PROFILE_INTRO.md"; do
   if [ -f "$DESTINO/$necesario" ]; then
     echo "  ${verde}ok${fin}    ${necesario} presente"
   else
