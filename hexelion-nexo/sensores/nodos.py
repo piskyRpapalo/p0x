@@ -57,15 +57,45 @@ def gateway():
     except (OSError, IndexError):
         return ""
 
-RACK = (
-    ("soberano",  "Beelink · Ryzen 7 255 · 64 GB", "nucleo publico · inferencia local"),
-    ("la-fragua", "Orange Pi 5 Plus · RK3588 · 16 GB", "gateway · faro · voz · bateria"),
-    ("el-vigia",  "Raspberry Pi · SDR · ESP32", "adquisicion RF · ADS-B y AIS"),
-    ("la-torre",  "Jetson Orin Nano Super · CUDA 12.6", "inferencia acelerada"),
-)
+# El rack tampoco vive en el codigo, y por dos motivos distintos. El primero es
+# el mismo del gateway: son nombres de maquina. El segundo es que un rack
+# cableado aqui hace que este repo solo sirva para UN rack -- el nuestro-- y
+# quien lo clone vera cuatro tarjetas de nodos que no tiene.
+#
+# Formato de `rack.conf`, una linea por nodo, separadas por `|`:
+#   nombre | metal | papel | nombre_en_el_gateway
+#
+# Sin fichero no se inventa un rack: se declara el hueco. Un panel de nodos que
+# se rellena con nodos de ejemplo es peor que uno vacio, porque el vacio se ve.
+RACK_CONF = Path(__file__).resolve().parents[1] / "estado" / "rack.conf"
+NODO_PROPIO = "NEXO_NODO_PROPIO"     # cual de ellos es esta maquina
 
-# El nombre que usa el gateway para cada nodo, que no es el del tailnet.
-EN_EL_GATEWAY = {"la-fragua": "fragua", "el-vigia": "vigilante", "la-torre": "torre"}
+
+def rack():
+    """Los nodos declarados. Lista vacia si no hay ninguno -- y eso se dice."""
+    filas = []
+    try:
+        crudo = RACK_CONF.read_text(encoding="utf-8")
+    except OSError:
+        return filas
+    for linea in crudo.splitlines():
+        linea = linea.strip()
+        if not linea or linea.startswith("#"):
+            continue
+        partes = [c.strip() for c in linea.split("|")]
+        while len(partes) < 4:
+            partes.append("")
+        filas.append(tuple(partes[:4]))
+    return filas
+
+
+def propio():
+    """Cual de los nodos es esta maquina. Sin declararlo, ninguno lo es.
+
+    Importa: es el unico del que se sabe algo de primera mano, y por eso el
+    unico cuyo estado puede corregir lo que diga un registro remoto.
+    """
+    return (os.environ.get(NODO_PROPIO) or "").strip()
 
 _SIN_RED = False
 
@@ -144,15 +174,22 @@ def leer():
             aviso_gw = (f"el gateway no contesta · {type(e).__name__} · "
                         "lo de los nodos remotos sale solo del tailnet")
 
+    declarados = rack()
+    if not declarados:
+        return sensores.hueco(
+            f"sin rack declarado · una linea por nodo en {RACK_CONF.name} "
+            "(nombre | metal | papel | nombre_en_el_gateway)")
+
+    yo = propio()
     correcciones = []
     sin_sonda = []
     filas = []
-    for nombre, metal, papel in RACK:
-        g = salud.get(EN_EL_GATEWAY.get(nombre, nombre)) or {}
+    for nombre, metal, papel, en_gateway in declarados:
+        g = salud.get(en_gateway or nombre) or {}
         sondas = dict(g.get("probes") or {})
         arriba = vivos.get(nombre)
 
-        if nombre == "soberano":
+        if nombre and nombre == yo:
             # De primera mano: este codigo se esta ejecutando aqui.
             arriba = True
             if (g.get("health") or "") == "offline":
@@ -166,7 +203,7 @@ def leer():
         elif arriba is True:
             estado, nota = "ONLINE", papel
 
-        if nombre == "el-vigia" and antena:
+        if antena and "AIS" in papel.upper():
             ais = (antena.get("ais") or {})
             adsb = (antena.get("adsb") or {})
             if arriba and not ais.get("live"):
@@ -175,7 +212,7 @@ def leer():
                 # El matiz que separa un servicio caido de una radio ausente.
                 nota = (f"ADS-B vivo · {adsb.get('aircraft', sensores.NO_DATA)} "
                         f"aeronaves · AIS 0 buques")
-        if nombre == "la-torre" and arriba:
+        if arriba and "INFERENCIA" in papel.upper() and nombre != yo:
             # CICATRIZ. Aqui habia `estado = "EN ESPERA"` cuando faltaba la
             # sonda, y eso era exactamente el fallo que este arbol existe para
             # impedir: **una ausencia de dato convertida en una afirmacion de

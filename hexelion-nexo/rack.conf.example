@@ -1,0 +1,18 @@
+# EL NEXO · el rack de esta instalacion.
+#
+# Copia a `estado/rack.conf`. Una linea por nodo, cuatro campos separados por
+# `|`. Sin este fichero la tarjeta del rack declara el hueco en vez de inventar
+# nodos: un panel relleno de ejemplos es peor que uno vacio, porque el vacio se
+# ve y el ejemplo se confunde con un dato.
+#
+#   nombre        el nombre por el que responde en la red (MagicDNS o DNS)
+#   metal         que hardware es · texto libre, solo se muestra
+#   papel         que hace · si contiene AIS o INFERENCIA, se le miden sondas
+#                 especificas de esa cadena
+#   en_el_gateway como lo llama el gateway, si es que lo llama de otra forma
+#
+# nombre | metal | papel | en_el_gateway
+nodo-uno   | Mini PC · 8 nucleos · 64 GB    | nucleo publico · inferencia local | nodo-uno
+nodo-dos   | SBC ARM · 16 GB · NVMe         | gateway · voz · bateria           | dos
+nodo-tres  | SBC · radio definida por software | adquisicion RF · ADS-B y AIS   | tres
+nodo-cuatro| Modulo con GPU · CUDA          | inferencia acelerada              | cuatro

@@ -13,12 +13,41 @@ Lo que este panel hace es mirar.
 
 import argparse
 import json
+import os
 import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 AQUI = Path(__file__).resolve().parent
 sys.path.insert(0, str(AQUI))
+
+
+def _cargar_env(ruta=None):
+    """Lee `.env` si existe. Lo que ya venga en el entorno MANDA.
+
+    Ese orden importa: un fichero no puede pisar lo que alguien puso a mano al
+    arrancar, porque entonces `NEXO_GATEWAY=... python3 servidor.py` mentiria
+    sobre lo que hace. Ausente no es un fallo -- todo esto es opcional.
+    """
+    ruta = ruta or (AQUI / ".env")
+    try:
+        crudo = ruta.read_text(encoding="utf-8")
+    except OSError:
+        return {}
+    puestas = {}
+    for linea in crudo.splitlines():
+        linea = linea.strip()
+        if not linea or linea.startswith("#") or "=" not in linea:
+            continue
+        clave, _, valor = linea.partition("=")
+        clave, valor = clave.strip(), valor.strip().strip('"').strip("'")
+        if clave and clave not in os.environ:
+            os.environ[clave] = valor
+            puestas[clave] = valor
+    return puestas
+
+
+_cargar_env()
 
 import fragmentos                                               # noqa: E402
 import sensores                                                  # noqa: E402

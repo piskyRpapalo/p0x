@@ -1,0 +1,8 @@
+# La configuracion de ESTA instalacion. Nombres de maquina y de red: se quedan
+# en la maquina. Los ejemplos versionados son `.env.example` y
+# `rack.conf.example`.
+.env
+estado/
+
+__pycache__/
+*.pyc
