@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# La tanda del Nexo. Un solo sitio del que sale el numero, como en el nucleo.
+set -uo pipefail
+cd "$(dirname "$0")" || exit 2
+SUITES=(test_nexo)
+echo "── EL NEXO · PRUEBAS ───────────────────────────────────────────"
+echo "  $(python3 -V 2>&1) · $(command -v python3)"
+echo
+TOTAL=0; FALLOS=0
+for s in "${SUITES[@]}"; do
+  informe="$(timeout 300 python3 -m unittest "$s" 2>&1 >/dev/null)"; codigo=$?
+  n="$(printf '%s' "$informe" | sed -n 's/^Ran \([0-9]*\) test.*/\1/p' | tail -1)"; n="${n:-0}"
+  TOTAL=$((TOTAL + n))
+  if [ "$codigo" = "0" ]; then printf '  ok    %s.py  %s\n' "$s" "$n"
+  else FALLOS=$((FALLOS+1)); printf '  FALLO %s.py  %s\n' "$s" "$n"
+       printf '%s' "$informe" | grep -E '^(FAIL|ERROR):' | sed 's/^/        /'; fi
+done
+echo
+[ "$FALLOS" = "0" ] && { echo "VERDE · ${TOTAL}/${TOTAL} · ${#SUITES[@]} suites"; exit 0; }
+echo "ROJO · ${FALLOS} suite(s) en fallo"; exit 1
