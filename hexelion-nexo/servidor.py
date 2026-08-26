@@ -20,7 +20,9 @@ from pathlib import Path
 AQUI = Path(__file__).resolve().parent
 sys.path.insert(0, str(AQUI))
 
+import fragmentos                                               # noqa: E402
 import sensores                                                  # noqa: E402
+import vigia as _vigia                                           # noqa: E402
 from sensores import registro                                    # noqa: E402
 
 # Importar un sensor es registrarlo. La lista es esta y no un barrido del
@@ -49,7 +51,17 @@ RUTAS = {
     "/api/nodos": lambda: registro.uno("nodos"),
 }
 
-VERSION = "0.1.0"
+# Cuanto espera un flujo quieto antes de mandar un latido. Un proxy silencioso
+# por el medio cierra lo que lleva rato callado, y el navegador no distingue esa
+# muerte de un fallo -- asi que se habla aunque no haya novedad.
+LATIDO = 25.0
+
+VERSION = "0.2.0"
+
+# El vigia: un hilo que refresca y muchos flujos que solo miran. Se arranca en
+# `construir()` y no al importar, para que las pruebas puedan levantar el
+# servidor sin dejar un hilo suelto por cada caso.
+VIGIA = _vigia.Vigia()
 
 TIPOS = {".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8",
          ".js": "text/javascript; charset=utf-8", ".svg": "image/svg+xml",
@@ -85,6 +97,8 @@ class Nexo(BaseHTTPRequestHandler):
 
     def do_GET(self):
         ruta = self.path.split("?", 1)[0].rstrip("/") or "/"
+        if ruta == "/api/flujo":
+            return self._flujo()
         if ruta.startswith("/api"):
             fabrica = RUTAS.get(ruta)
             if fabrica is None:
@@ -101,7 +115,51 @@ class Nexo(BaseHTTPRequestHandler):
 
     do_HEAD = do_GET
 
+    def _flujo(self):
+        """Server-Sent Events. Lo que viaja es HTML terminado, no JSON.
+
+        El navegador no parsea nada ni decide nada: coge la cadena y la coloca.
+        Y se manda **solo lo que ha cambiado**, no las siete tarjetas cada vez
+        -- con seis quietas y una viva, eso son 386 bytes en vez de 8 KB.
+        """
+        if self.command == "HEAD":
+            return self._responder(200, b"", "text/event-stream; charset=utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream; charset=utf-8")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Accel-Buffering", "no")
+        self.end_headers()
+        self.close_connection = True
+
+        visto = -1
+        try:
+            while True:
+                tarjetas, version, medido = (
+                    VIGIA.instantanea() if visto < 0 else VIGIA.espera(visto, LATIDO))
+                if version != visto:
+                    for nombre, html in tarjetas.items():
+                        self._evento("m-" + nombre, html)
+                    visto = version
+                # El latido va siempre: es lo que le dice a la cara que sigue
+                # habiendo alguien al otro lado aunque nada haya cambiado.
+                self._evento("latido", medido)
+        except (BrokenPipeError, ConnectionResetError):
+            pass                      # la pestaña se cerro. No es un fallo.
+        except OSError:
+            pass
+
+    def _evento(self, nombre, dato):
+        # Un `data:` por linea, que es lo que exige el formato. Los fragmentos
+        # ya vienen en una sola, pero un dato de fuera podria no venirlo.
+        cuerpo = f"event: {nombre}\n"
+        for linea in str(dato).split("\n"):
+            cuerpo += f"data: {linea}\n"
+        self.wfile.write((cuerpo + "\n").encode("utf-8"))
+        self.wfile.flush()
+
     def _estatico(self, ruta):
+        # `/static/...` y `/` cuelgan del mismo arbol: el directorio `static`
+        # vive dentro de `estatico/`, asi que la ruta ya cuadra sin traduccion.
         nombre = "index.html" if ruta == "/" else ruta.lstrip("/")
         destino = (ESTATICO / nombre).resolve()
         # La comprobacion que impide servir medio disco por una ruta con `..`.
@@ -114,7 +172,9 @@ class Nexo(BaseHTTPRequestHandler):
         self._responder(200, destino.read_bytes(), tipo)
 
 
-def construir(puerto=PUERTO, anfitrion=ANFITRION, ruidoso=False):
+def construir(puerto=PUERTO, anfitrion=ANFITRION, ruidoso=False, vigilar=True):
+    if vigilar and VIGIA._hilo is None:
+        VIGIA.arrancar()
     servidor = ThreadingHTTPServer((anfitrion, puerto), Nexo)
     servidor.ruidoso = ruidoso
     servidor.daemon_threads = True

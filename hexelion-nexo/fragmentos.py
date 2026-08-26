@@ -1,0 +1,275 @@
+"""El HTML lo escribe el servidor. El navegador solo lo coloca.
+
+Antes esto vivia en `nexo.js`: llegaba JSON y siete pintores lo convertian en
+HTML en el cliente. Ahora la lectura se convierte en fragmento AQUI y por el
+flujo viaja HTML terminado. Tres cosas cambian y las tres importan:
+
+- El navegador no parsea ni decide nada. Coloca una cadena y se acaba.
+- El escapado ocurre en un solo sitio, en Python, sobre el dato crudo -- y no
+  en cada pintor, que es donde se olvida uno.
+- La regla de «sin dato, NO_DATA con causa» deja de estar repetida en dos
+  lenguajes. Un solo `sin_dato()` la aplica a todo lo que sale.
+
+Biblioteca estandar: `html.escape` y nada mas.
+"""
+
+from html import escape
+
+NO_DATA = "NO_DATA"
+
+
+def _vacio(v):
+    return v is None or v == NO_DATA or v == ""
+
+
+def e(v):
+    return escape(str(v), quote=True)
+
+
+def hueco(texto=NO_DATA):
+    return f'<span class="nodata">{e(texto)}</span>'
+
+
+def fila(k, v, clase="", sangrada=False):
+    cuerpo = hueco() if _vacio(v) else f'<span class="{e(clase)}">{e(v)}</span>'
+    extra = " fila--sangrada" if sangrada else ""
+    return (f'<div class="fila{extra}"><span class="k">{e(k)}</span>'
+            f'<span class="v">{cuerpo}</span></div>')
+
+
+def causa(texto):
+    return f'<p class="causa">{e(texto)}</p>' if texto else ""
+
+
+def cifra(valor, pie, viva=False):
+    clase = "cifra viva" if viva else "cifra"
+    dentro = hueco() if _vacio(valor) else e(valor)
+    return f'<div class="{clase}">{dentro}<small>{e(pie)}</small></div>'
+
+
+def sin_dato(lectura):
+    motivo = (lectura or {}).get("causa") or "el sensor no devolvio nada"
+    return {"chip": NO_DATA, "clase": "c-warn",
+            "html": f'<div class="cifra">{hueco()}</div>' + causa(motivo)}
+
+
+# ── un fragmento por sensor ─────────────────────────────────────────────────
+
+def soberania(d):
+    caps = "".join(
+        fila(c["nombre"], "concedida" if c["concedida"] else "no concedida",
+             "c-ok" if c["concedida"] else "c-mut")
+        for c in d.get("capacidades", []))
+    pie = ("corte activo · el centinela manda sobre lo declarado"
+           if d.get("cortado")
+           else f'nivel {d.get("nivel")} en vigor · nada por encima esta concedido')
+    return {
+        "chip": "santuario · corte" if d.get("cortado") else f'nivel {d.get("nivel")}',
+        "clase": "c-warn" if d.get("cortado") else ("c-ok" if d.get("nivel") == 0 else "c-gold"),
+        "html": caps + causa("el nivel 0 no aparece en la tabla: lo que el suelo "
+                             "ya hace no pide permiso"),
+        "nivel": d.get("nivel"),
+        "pie": pie,
+    }
+
+
+CLASE_NODO = {"ONLINE": "c-ok", "CRITICO": "c-crit", "OFFLINE": "c-mut",
+              "EN ESPERA": "c-warn", NO_DATA: "c-warn"}
+
+
+def nodos(d):
+    tarjetas = []
+    for n in d.get("nodos", []):
+        critico = " nodo--critico" if n["estado"] == "CRITICO" else ""
+        alerta = (f'<p class="nodo__alerta">{e(n["alerta"])}</p>'
+                  if n.get("alerta") else "")
+        sondas = ", ".join(n.get("sondas") or [])
+        # <details> y no un toggle con estado en JS: el navegador ya sabe abrir
+        # y cerrar, lo hace con teclado y con lector de pantalla, y no cuesta
+        # un solo byte de descarga ni de memoria.
+        detalle = (f'<details class="nodo__mas"><summary>sondas</summary>'
+                   f'<p>{e(sondas)}</p></details>') if sondas else ""
+        tarjetas.append(
+            f'<article class="nodo{critico}"><header><b>{e(n["nodo"])}</b>'
+            f'<span class="chip {CLASE_NODO.get(n["estado"], "c-mut")}">'
+            f'{e(n["estado"])}</span></header>'
+            f'<p class="nodo__metal">{e(n["metal"])}</p>'
+            f'<p class="nodo__nota">{hueco() if _vacio(n["nota"]) else e(n["nota"])}</p>'
+            f'{alerta}{detalle}</article>')
+    avisos = d.get("avisos") or []
+    return {
+        "chip": f'{d.get("en_pie")} en pie' + (f' · {d["criticos"]} critico'
+                                               if d.get("criticos") else ""),
+        "clase": "c-crit" if d.get("criticos") else "c-ok",
+        "html": f'<div class="tira">{"".join(tarjetas)}</div>'
+                + causa("fuente: " + str(d.get("fuente", NO_DATA))
+                        + (" · " + " · ".join(avisos) if avisos else "")),
+    }
+
+
+def preceptor(d):
+    t = d.get("tanda") or {}
+    ok = t.get("estado") == "ok"
+    verde = ok and t.get("verde")
+    rancia = ok and t.get("rancia")
+    medido = (t.get("medido") or "").replace("T", " ")[:16]
+    return {
+        "chip": ("verde · rancia" if rancia else "verde") if verde else NO_DATA,
+        "clase": ("c-warn" if rancia else "c-ok") if verde else "c-warn",
+        "html": cifra(f'{t["pruebas"]} / {t["pruebas"]}' if ok else None,
+                      f'{t["suites"]} SUITES' if ok else "SIN TANDA REGISTRADA",
+                      viva=bool(verde and not rancia))
+                + fila("version", d.get("version"))
+                + fila("ficheros de la cara", (d.get("huella") or {}).get("ficheros"))
+                + fila("medida", medido or None)
+                + fila("ruta", d.get("ruta"), "c-mut")
+                + causa(t.get("causa", "")),
+    }
+
+
+def timers(d):
+    filas = []
+    sin_estrenar = 0
+    for f in d.get("propios", []):
+        filas.append(fila(f["unidad"].replace(".timer", ""), f["proxima"],
+                          "c-ok" if f["activo"] else "c-crit"))
+        if _vacio(f["ultima"]):
+            sin_estrenar += 1
+        etiqueta = "sin estrenar" if _vacio(f["resultado"]) else f["resultado"]
+        filas.append(fila(f"ultima · {etiqueta}", f["ultima"],
+                          "c-mut" if f["resultado"] == "success" else "c-warn", True))
+    nota = f'{sin_estrenar} armado(s) y sin dispararse nunca · ' if sin_estrenar else ""
+    return {"chip": f'{d.get("cuantos")} bucles',
+            "clase": "c-warn" if sin_estrenar else "c-ok",
+            "html": "".join(filas) + causa(
+                nota + f'{d.get("cuantos_ajenos")} timers del sistema, aparte')}
+
+
+def lora(d):
+    ads = "".join(
+        fila(a["nombre"],
+             f'{a["bytes"] / 1048576:.1f} MiB' if a["estado"] == "ok" else None,
+             "c-ok" if a["estado"] == "ok" else "", True)
+        for a in d.get("adapters", []))
+    return {"chip": f'{d.get("entrenados")} adapters',
+            "clase": "c-gold" if d.get("entrenados") else "c-warn",
+            "html": cifra(d.get("ejemplos_totales"),
+                          f'EJEMPLOS · {len(d.get("datasets", []))} DATASETS')
+                    + fila("fase", d.get("fase"), "c-warn")
+                    + fila("con pesos",
+                           f'{d.get("entrenados")} de {len(d.get("adapters", []))}')
+                    + ads
+                    + causa("una carpeta sin fichero de pesos no cuenta como adapter")}
+
+
+def cinek(d):
+    filas = "".join(
+        fila(r["nombre"], f'{r["bytes"] / 1024:.0f} KiB · {r["dias"]} d')
+        for r in d.get("registros", [])[:4])
+    quietud = d.get("quietud_dias")
+    return {"chip": f'{quietud} d sin tocar',
+            "clase": "c-warn" if isinstance(quietud, int) and quietud > 7 else "c-ok",
+            "html": cifra(quietud, "DIAS DE QUIETUD") + filas
+                    + causa(f'{d.get("nota", "")} · los registros se listan, no se leen')}
+
+
+def jardin(d):
+    return {"chip": "en espera", "clase": "c-mut",
+            "html": fila("rutas en disco", " · ".join(d.get("rutas") or []) or None)
+                    + fila("sensores", d.get("sensores_declarados"))
+                    + fila("ultima lectura", d.get("ultima_lectura"))
+                    + causa(d.get("causa", ""))}
+
+
+# ── el layer stack, compuesto aqui ──────────────────────────────────────────
+# La banda focal la decide Python y llega marcada. Antes la ponia el navegador
+# con classList.toggle: funcionaba, y era logica de decision viviendo en el
+# cliente por costumbre y no por motivo. Aqui hay un sitio menos donde mirar.
+
+CAPAS = ((3, 24, "ECOSISTEMA", "hardware · complementos · fuera del build"),
+         (2, 88, "EXPANSION", "todo lo que cruza el borde · consentido uno a uno"),
+         (1, 152, "ARNES", "un modelo en este disco · no sale de la maquina"),
+         (0, 216, "SANTUARIO", "el suelo · no pide permiso a nadie"))
+
+
+def capas(nivel, pie):
+    bandas = []
+    for n, y, nombre, nota in CAPAS:
+        clase = "banda"
+        if n == nivel:
+            clase += " focal"
+        elif n > (nivel if isinstance(nivel, int) else -1):
+            clase += " dormida"
+        bandas.append(
+            f'<g class="{clase}" data-nivel="{n}">'
+            f'<rect x="96" y="{y}" width="800" height="64"/>'
+            f'<text class="eyebrow" x="112" y="{y + 36}">L{n}</text>'
+            f'<text class="nombre" x="192" y="{y + 36}">{e(nombre)}</text>'
+            f'<text class="nota" x="880" y="{y + 36}" text-anchor="end">{e(nota)}</text>'
+            f'</g>')
+    return ('<svg class="capas" viewBox="0 0 1000 344" role="img" '
+            'aria-label="Las cuatro capas de soberania, con la capa en vigor destacada">'
+            '<g class="brujula"><text class="eyebrow" x="40" y="52">alcance</text>'
+            '<path d="M 56 200 L 56 76 M 48 92 L 56 76 L 64 92"/>'
+            '<text class="eyebrow" x="40" y="272">suelo</text></g>'
+            + "".join(bandas)
+            + '<rect class="silueta" x="96" y="24" width="800" height="256"/>'
+            + f'<text class="pie" x="96" y="308">{e(pie)}</text></svg>')
+
+
+# ── la seccion entera, cabecera incluida ────────────────────────────────────
+# El titulo vive AQUI y no en el HTML: la seccion se reemplaza entera por el
+# flujo, asi que si el titulo viviera en la pagina se perderia en el primer
+# refresco. Un solo sitio, y lo que llega es la tarjeta terminada.
+
+TARJETAS = {
+    "soberania": ("Capas de soberania", "var(--ac-prove)", True),
+    "nodos": ("El rack · cuatro nodos", "var(--ac-listen)", True),
+    "preceptor": ("Nucleo publico", "var(--ac-listen)", False),
+    "timers": ("Bucles de agentes", "var(--ac-mind)", False),
+    "lora": ("La forja · adapters", "var(--ac-harvest)", False),
+    "cinek": ("Pipeline de video", "var(--ac-alert)", False),
+    "jardin": ("Jardin · permacultura", "var(--ac-sustain)", False),
+}
+
+
+def seccion(nombre, frag):
+    titulo, _acento, _ancho = TARJETAS.get(nombre, (nombre, "", False))
+    figura = ""
+    if nombre == "soberania" and "nivel" in frag:
+        figura = f'<div class="mod__body mod__body--figura">{capas(frag["nivel"], frag.get("pie", ""))}</div>'
+    return (f'<div class="mod__head"><span class="mod__title">'
+            f'<span class="pico">&#9656;</span> {e(titulo)}</span>'
+            f'<span class="mod__spacer"></span>'
+            f'<span class="chip {e(frag["clase"])}">{e(frag["chip"])}</span></div>'
+            f'{figura}'
+            f'<div class="mod__body">{frag["html"]}</div>')
+
+
+FRAGMENTOS = {"soberania": soberania, "nodos": nodos, "preceptor": preceptor,
+              "timers": timers, "lora": lora, "cinek": cinek, "jardin": jardin}
+
+
+def de(nombre, lectura):
+    """Lectura -> fragmento. Un sensor sin dato, o que revienta, sale como hueco."""
+    pintor = FRAGMENTOS.get(nombre)
+    if pintor is None or not lectura or lectura.get("estado") != "ok":
+        frag = sin_dato(lectura)
+        if nombre == "soberania":
+            # Sin lectura no hay banda focal. El diagrama sale entero y apagado,
+            # que dice la verdad: no se sabe en que nivel corre.
+            frag["nivel"], frag["pie"] = None, "sin lectura del guardian"
+        return frag
+    try:
+        return pintor(lectura)
+    except Exception:                                            # noqa: BLE001
+        return sin_dato({"causa": "la tarjeta no se pudo componer con esta lectura"})
+
+
+def html_de(nombre, lectura):
+    """Lo que viaja por el flujo: una seccion terminada, en una sola linea.
+
+    Una sola linea porque en SSE cada salto obliga a un `data:` nuevo, y un
+    fragmento partido a mano es un fragmento que un dia se parte mal.
+    """
+    return seccion(nombre, de(nombre, lectura)).replace("\n", " ")

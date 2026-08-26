@@ -12,6 +12,7 @@ import os
 import re
 import tempfile
 import threading
+import time
 import unittest
 import urllib.error
 import urllib.request
@@ -44,6 +45,30 @@ class ServidorEnPie:
     def get(self, ruta):
         with urllib.request.urlopen(self.url(ruta), timeout=5) as r:
             return r.status, r.read().decode("utf-8"), dict(r.headers)
+
+    def flujo(self, ruta, segundos=4):
+        """Lee un trozo del flujo y corta. Sin esto habria que esperar a que
+        el servidor cerrara, y un flujo bien hecho no cierra nunca."""
+        trozo = []
+        r = urllib.request.urlopen(self.url(ruta), timeout=segundos)
+        try:
+            fin = time.monotonic() + segundos
+            while time.monotonic() < fin:
+                try:
+                    linea = r.readline()
+                except (TimeoutError, OSError):
+                    # Se acabo lo que habia que leer. No es un fallo: entre
+                    # tanda y tanda el flujo calla, y callar es lo correcto --
+                    # el latido llega cuando toca, no cuando la prueba mira.
+                    break
+                if not linea:
+                    break
+                trozo.append(linea.decode("utf-8", "replace"))
+                if len(trozo) > 400:
+                    break
+        finally:
+            r.close()
+        return "".join(trozo)
 
     def pide(self, ruta, metodo="GET", datos=None):
         req = urllib.request.Request(self.url(ruta), method=metodo, data=datos)
@@ -325,171 +350,228 @@ class SensoresDeProyecto(unittest.TestCase):
 class LaCara(unittest.TestCase):
     """Lo que tiene que ser verdad de una pagina que no puede salir a la red."""
 
+    FICHEROS = ("index.html", "static/hexelion.css", "static/nexo.js")
+
     def cara(self, nombre):
         return (AQUI / "estatico" / nombre).read_text(encoding="utf-8")
 
     def test_31_la_cara_no_carga_nada_de_fuera(self):
-        """v9 traia Google Fonts y Leaflet por CDN. Aqui eso no entra."""
-        for nombre in ("index.html", "hexelion.css", "nexo.js"):
+        """Zero-CDN, y comprobado: ni htmx, ni alpine, ni una fuente remota."""
+        for nombre in self.FICHEROS:
             texto = self.cara(nombre)
             with self.subTest(fichero=nombre):
                 for fuera in ("http://", "https://", "//unpkg", "//cdn",
-                              "fonts.googleapis", "@import url("):
-                    self.assertNotIn(fuera, texto,
-                                     "un panel que necesita internet para "
-                                     "dibujarse es una contradiccion")
+                              "jsdelivr", "cloudflare", "fonts.googleapis",
+                              "@import url("):
+                    self.assertNotIn(fuera, texto)
 
-    def test_32_la_cara_no_abre_ningun_socket_que_no_sea_su_propia_api(self):
-        js = self.cara("nexo.js")
-        for prohibido in ("WebSocket", "EventSource", "sendBeacon",
-                          "XMLHttpRequest", "import("):
-            self.assertNotIn(prohibido, js)
-        for llamada in re.findall(r"fetch\(\s*'([^']*)'", js):
-            self.assertTrue(llamada.startswith("/api/"),
-                            f"la cara pide fuera de su api: {llamada}")
+    def test_32_no_hay_ni_un_framework(self):
+        """React, Vue, Angular, htmx, Alpine: ninguno, ni local ni remoto.
 
-    def test_33_todo_lo_que_se_pinta_pasa_por_el_escapador(self):
-        js = self.cara("nexo.js")
-        self.assertIn("const esc =", js)
-        # `innerHTML` solo se escribe desde `pinta`, que recibe html ya escapado.
-        self.assertEqual(js.count(".innerHTML"), 1,
-                         "un segundo innerHTML es un segundo sitio donde revisar")
+        La reactividad la da `EventSource`, que es del navegador: cero bytes
+        descargados y cero dependencias que auditar.
+        """
+        for nombre in self.FICHEROS:
+            bajo = self.cara(nombre).lower()
+            with self.subTest(fichero=nombre):
+                for marco in ("react", "vue", "angular", "htmx", "alpine",
+                              "jquery", "svelte"):
+                    self.assertNotIn(marco, bajo)
+        self.assertIn("new EventSource(", self.cara("static/nexo.js"))
 
-    def test_34_no_data_no_se_pinta_como_un_valor(self):
-        js = self.cara("nexo.js")
-        self.assertIn('class="nodata"', js)
-        css = self.cara("hexelion.css")
-        self.assertIn(".nodata{", css.replace(" ", ""))
+    def test_33_el_cliente_no_compone_html_solo_lo_coloca(self):
+        """Ni plantillas ni concatenacion en el navegador: el HTML llega hecho."""
+        js = self.cara("static/nexo.js")
+        self.assertIn("innerHTML = ev.data", js)
+        self.assertNotIn("<div", js)
+        self.assertNotIn("<span", js)
 
-    def test_35_cada_modulo_del_html_tiene_su_pintor_y_al_reves(self):
-        html = self.cara("index.html")
-        js = self.cara("nexo.js")
-        en_html = set(re.findall(r'id="m-([a-z]+)"', html))
-        pintores = set(re.findall(r"^  ([a-z]+)\(d\) \{", js, re.M))
-        self.assertEqual(en_html, pintores,
-                         "una tarjeta sin pintor se queda en «Cargando…» "
-                         "para siempre y nadie se entera")
+    def test_34_el_escapado_ocurre_en_un_solo_sitio(self):
+        """En Python, sobre el dato crudo. No repartido por siete pintores."""
+        fuente = (AQUI / "fragmentos.py").read_text(encoding="utf-8")
+        self.assertIn("from html import escape", fuente)
+        js = self.cara("static/nexo.js")
+        self.assertNotIn("replace(/[&<>", js, "el escapado ya no vive aqui")
+
+    def test_35_cada_seccion_de_la_pagina_tiene_su_fragmento_y_al_reves(self):
+        """Una seccion sin fragmento se queda vacia para siempre; un fragmento
+        sin seccion es un dato que nadie ve. Las dos averias son invisibles."""
+        import fragmentos as FR
+        en_html = set(re.findall(r'<section class="mod[^"]*" id="m-([a-z]+)"',
+                                 self.cara("index.html")))
+        self.assertEqual(en_html, set(FR.FRAGMENTOS))
+        self.assertEqual(en_html, set(FR.TARJETAS))
+        self.assertEqual(en_html, set(registro.SENSORES))
 
     def test_36_los_sensores_y_las_tarjetas_son_los_mismos(self):
-        html = self.cara("index.html")
-        en_html = set(re.findall(r'id="m-([a-z]+)"', html))
-        self.assertEqual(en_html, set(registro.SENSORES),
-                         "un sensor sin tarjeta es un dato que nadie ve")
+        import fragmentos as FR
+        self.assertEqual(set(FR.FRAGMENTOS), set(registro.SENSORES))
 
     def test_37_la_pagina_se_sirve_entera_desde_el_nexo(self):
         with ServidorEnPie() as s:
-            for ruta in ("/", "/hexelion.css", "/nexo.js"):
+            for ruta in ("/", "/static/hexelion.css", "/static/nexo.js"):
                 with self.subTest(ruta=ruta):
                     codigo, cuerpo, cab = s.get(ruta)
                     self.assertEqual(codigo, 200)
                     self.assertTrue(cuerpo.strip())
                     self.assertEqual(cab["X-Frame-Options"], "DENY")
 
+    def test_38_no_data_no_se_pinta_como_un_valor(self):
+        import fragmentos as FR
+        self.assertIn('class="nodata"', FR.hueco())
+        self.assertIn(".nodata{", self.cara("static/hexelion.css"))
+        self.assertIn('class="nodata"', FR.fila("k", None))
 
-class ElRefrescoVivo(unittest.TestCase):
-    """Que se refresque, que no machaque, y que sepa envejecer."""
+
+class ElBrutalismo(unittest.TestCase):
+    """Estructura rigida, alto contraste, y el halo solo donde hay vida."""
+
+    def css(self):
+        return (AQUI / "estatico" / "static" / "hexelion.css").read_text(encoding="utf-8")
+
+    def test_39_el_fondo_es_oscuro_profundo_y_no_negro_plano(self):
+        self.assertIn("--fondo:#060B09", self.css().replace(" ", ""))
+
+    def test_40_radio_de_borde_cero_en_todas_partes(self):
+        css = self.css()
+        self.assertIn("border-radius:0", css.replace(" ", ""))
+        for valor in re.findall(r"border-radius:\s*([^;}]+)", css):
+            with self.subTest(valor=valor):
+                self.assertEqual(valor.strip(), "0")
+
+    def test_41_ni_un_gradiente_ni_una_sombra_difusa(self):
+        css = self.css()
+        for prohibido in ("linear-gradient", "radial-gradient", "conic-gradient",
+                          "box-shadow", "backdrop-filter"):
+            self.assertNotIn(prohibido, css)
+
+    def test_42_ninguna_animacion_de_entrada(self):
+        css = self.css()
+        for prohibido in ("@keyframes", "animation:", "transition:"):
+            self.assertNotIn(prohibido, css)
+
+    def test_43_el_halo_vive_solo_en_las_cifras_vivas(self):
+        for regla in self.css().split("}"):
+            if "text-shadow" not in regla or "{" not in regla:
+                continue
+            selector = regla.rsplit("{", 1)[0].strip().splitlines()[-1]
+            self.assertIn("viva", selector, f"halo fuera de una cifra viva: {selector}")
+
+    def test_44_una_sola_familia_y_es_monoespaciada(self):
+        css = self.css()
+        self.assertIn("monospace", css)
+        for prohibida in ("serif;", "Georgia", "Cinzel", "sans-serif"):
+            self.assertNotIn(prohibida, css)
+
+
+class ElFlujo(unittest.TestCase):
+    """SSE: el servidor empuja HTML, un solo lector, y saber envejecer."""
 
     def js(self):
-        return (AQUI / "estatico" / "nexo.js").read_text(encoding="utf-8")
+        return (AQUI / "estatico" / "static" / "nexo.js").read_text(encoding="utf-8")
 
-    def test_38_el_intervalo_es_de_treinta_segundos_y_no_de_uno(self):
-        js = self.js()
-        m = re.search(r"const CADA = (\d+);", js)
-        self.assertIsNotNone(m, "el intervalo se declara una vez, con nombre")
-        self.assertGreaterEqual(int(m.group(1)), 30000,
-                                "los sensores hablan con systemd y con el disco: "
-                                "preguntar cada segundo es carga, no ventana")
+    def test_45_el_flujo_manda_html_terminado_y_no_json(self):
+        with ServidorEnPie() as s:
+            trozo = s.flujo("/api/flujo", segundos=4)
+        self.assertIn("event: m-", trozo)
+        self.assertIn("data: <div class=", trozo)
+        self.assertNotIn('data: {"', trozo, "por el flujo no viaja json")
 
-    def test_39_con_la_pestana_oculta_no_se_pregunta_nada(self):
-        js = self.js()
-        self.assertIn("visibilitychange", js)
-        self.assertIn("document.hidden", js)
-        self.assertIn("clearInterval", js, "parar de verdad, no solo ignorar")
+    def test_46_el_flujo_manda_un_latido_aunque_nada_cambie(self):
+        """Una conexion viva que no habla es indistinguible de una muerta."""
+        with ServidorEnPie() as s:
+            self.assertIn("event: latido", s.flujo("/api/flujo", segundos=4))
 
-    def test_40_al_volver_se_pide_de_inmediato(self):
-        """Esperar 30 s al volver a la pestaña se lee como un cuelgue."""
-        js = self.js()
-        vuelta = js.split("if (document.hidden)")[1]
-        self.assertIn("tick();", vuelta.split("});")[0])
+    def test_47_un_solo_lector_para_todas_las_pestanas(self):
+        """Abrir una pestaña mas cuesta un socket, no una ronda de sondas."""
+        fuente = (AQUI / "vigia.py").read_text(encoding="utf-8")
+        self.assertIn("threading.Condition", fuente)
+        servidor = (AQUI / "servidor.py").read_text(encoding="utf-8")
+        flujo = servidor.split("def _flujo(")[1].split("def _evento(")[0]
+        self.assertNotIn("registro.uno", flujo,
+                         "el flujo no lee sensores: espera al vigia")
 
-    def test_41_la_pagina_no_se_vacia_cuando_el_servidor_calla(self):
-        """Lo medido sigue siendo cierto de cuando se midio. Se marca, no se borra."""
+    def test_48_solo_se_manda_lo_que_ha_cambiado(self):
+        import vigia as V
+        v = V.Vigia(cada=999)
+        try:
+            self.assertTrue(v.refrescar(), "la primera ronda compone las siete")
+            self.assertEqual([n for n in v.refrescar() if n not in ("nodos",)], [],
+                             "una segunda ronda seguida no puede cambiarlo todo")
+        finally:
+            v.parar()
+
+    def test_49_el_formato_sse_parte_bien_lo_que_lleve_saltos(self):
+        servidor = (AQUI / "servidor.py").read_text(encoding="utf-8")
+        self.assertIn('for linea in str(dato).split("\\n")', servidor)
+        import fragmentos as FR
+        for nombre in FR.FRAGMENTOS:
+            with self.subTest(sensor=nombre):
+                self.assertNotIn("\n", FR.html_de(nombre, registro.uno(nombre)))
+
+    def test_50_si_el_latido_para_la_pagina_deja_de_fingirse_viva(self):
         js = self.js()
         self.assertIn("classList.add('rancio')", js)
-        self.assertIn("ultimaBuena", js)
-        self.assertIn("sin lectura desde hace", js)
-        self.assertNotIn("innerHTML = ''", js)
+        self.assertIn("flujo.onerror", js)
+        self.assertIn("setInterval", js, "un socket abierto y mudo tambien envejece")
+        self.assertNotIn("innerHTML = ''", js, "lo medido no se borra: se marca")
 
-    def test_42_lo_rancio_se_ve_sin_leer_una_palabra(self):
-        css = (AQUI / "estatico" / "hexelion.css").read_text(encoding="utf-8")
-        # Sin quitar espacios: el combinador de descendencia ES un espacio, y
-        # quitarlo convierte «body.rancio .mod» en otro selector distinto.
-        self.assertIn("body.rancio .mod{", css)
-        self.assertIn("saturate", css, "el color es lo que un ojo lee como «ya no»")
-
-    def test_43_una_tarjeta_que_revienta_no_se_lleva_a_las_otras(self):
+    def test_51_la_reconexion_no_se_escribe_a_mano(self):
+        """EventSource reconecta solo. Escribirlo seria reimplementar el navegador."""
         js = self.js()
-        bucle = js.split("for (const [nombre, lectura]")[1]
-        self.assertIn("try {", bucle)
-        self.assertIn("sinDato(id,", bucle.split("catch")[1])
+        self.assertNotIn("setTimeout(conectar", js)
+        self.assertNotIn("reconnect", js.lower())
+
+    def test_52_abrir_y_cerrar_no_cuesta_ni_un_byte_de_estado(self):
+        """`<details>` en vez de un toggle con estado: el navegador ya sabe, y
+        ademas lo hace con teclado y con lector de pantalla."""
+        fuente = (AQUI / "fragmentos.py").read_text(encoding="utf-8")
+        self.assertIn("<details", fuente)
+        self.assertNotIn("x-data", fuente)
+        self.assertNotIn("addEventListener('click'", self.js())
 
 
 class ElDiagramaDeCapas(unittest.TestCase):
-    """Layer stack segun la gramatica de diagram-design, y viva."""
+    """Layer stack segun la gramatica de diagram-design, compuesto en Python."""
 
-    def html(self):
-        return (AQUI / "estatico" / "index.html").read_text(encoding="utf-8")
+    def svg(self, nivel=0):
+        import fragmentos as FR
+        return FR.capas(nivel, "pie de prueba")
 
-    def css(self):
-        return (AQUI / "estatico" / "hexelion.css").read_text(encoding="utf-8")
-
-    def test_44_cuatro_bandas_y_ni_una_mas(self):
-        """4-6 capas dice la gramatica. Aqui son exactamente los cuatro niveles."""
-        niveles = re.findall(r'class="banda" data-nivel="(\d)"', self.html())
+    def test_53_cuatro_bandas_y_ni_una_mas(self):
+        niveles = re.findall(r'data-nivel="(\d)"', self.svg())
         self.assertEqual(sorted(niveles), ["0", "1", "2", "3"])
 
-    def test_45_toda_coordenada_es_divisible_por_cuatro(self):
-        """La regla dura de la retícula. Lo que la rompe se ve generado."""
-        svg = self.html().split('<svg class="capas"')[1].split("</svg>")[0]
+    def test_54_toda_coordenada_es_divisible_por_cuatro(self):
+        svg = self.svg()
         for attr in ("x", "y", "width", "height"):
             for valor in re.findall(rf'\b{attr}="(\d+)"', svg):
                 with self.subTest(attr=attr, valor=valor):
-                    self.assertEqual(int(valor) % 4, 0,
-                                     f"{attr}={valor} no cae en la retícula de 4")
+                    self.assertEqual(int(valor) % 4, 0)
 
-    def test_46_todas_las_bandas_tienen_la_misma_altura(self):
-        svg = self.html().split('<svg class="capas"')[1].split("</svg>")[0]
-        alturas = set(re.findall(r'height="(\d+)"', svg))
-        self.assertEqual(len(alturas - {"256"}), 1,
-                         "alturas distintas sin motivo hacen invisible la jerarquia")
+    def test_55_una_banda_focal_y_solo_una(self):
+        for nivel in (0, 1, 2, 3):
+            with self.subTest(nivel=nivel):
+                svg = self.svg(nivel)
+                self.assertEqual(svg.count("banda focal"), 1)
+                self.assertEqual(svg.count(f'data-nivel="{nivel}"'), 1)
+                self.assertIn(f'class="banda focal" data-nivel="{nivel}"', svg)
 
-    def test_47_un_solo_acento_sobre_una_sola_banda(self):
-        """Dos focos borran el foco. El acento vive en `.focal` y en ningun sitio mas."""
-        css = self.css()
-        reglas = [l for l in css.splitlines() if "var(--glow)" in l and ".capas" in l]
-        for r in reglas:
-            self.assertIn("focal", r, f"acento fuera de la banda focal: {r.strip()}")
+    def test_56_lo_que_esta_por_encima_del_nivel_sale_dormido(self):
+        svg = self.svg(1)
+        self.assertEqual(svg.count("banda dormida"), 2)   # el 2 y el 3
 
-    def test_48_el_marco_de_neon_esta_retirado(self):
-        """Sentenciado por nombre: competia con los datos y desgastaba contraste."""
-        css = self.css()
-        mod = css.split(".mod{")[1].split("}")[0]
-        self.assertIn("box-shadow:none", mod)
-        self.assertIn("1px solid", mod)
-        self.assertNotIn("--mod-glow", mod)
+    def test_57_sin_lectura_no_hay_banda_focal(self):
+        """No saber en que nivel corre no puede parecerse a estar en el 0."""
+        import fragmentos as FR
+        frag = FR.de("soberania", {"estado": "NO_DATA", "causa": "sin guardian"})
+        self.assertIsNone(frag["nivel"])
+        self.assertNotIn("banda focal", FR.capas(frag["nivel"], frag["pie"]))
 
-    def test_49_el_glow_queda_reservado_a_las_cifras_vivas(self):
-        css = self.css()
-        for linea in css.splitlines():
-            if "text-shadow" in linea or ("box-shadow" in linea and "0 0 1" in linea):
-                self.assertIn("viva", linea,
-                              f"halo fuera de una cifra viva: {linea.strip()}")
-
-    def test_50_la_banda_focal_la_pone_el_dato_no_el_html(self):
-        """Un diagrama pintado a mano seguiria diciendo 0 el dia que suba."""
-        self.assertNotIn("banda focal", self.html())
-        js = (AQUI / "estatico" / "nexo.js").read_text(encoding="utf-8")
-        self.assertIn("classList.toggle('focal', n === d.nivel)", js)
+    def test_58_la_banda_focal_la_decide_el_servidor(self):
+        js = (AQUI / "estatico" / "static" / "nexo.js").read_text(encoding="utf-8")
+        self.assertNotIn("focal", js)
+        self.assertNotIn("banda", js)
 
 
 class ElRack(unittest.TestCase):
@@ -578,13 +660,13 @@ class ElRack(unittest.TestCase):
 
     def test_57_el_rack_es_una_tira_no_una_rejilla_fija(self):
         """Un quinto nodo tiene que alargar la fila, no re-maquetarla."""
-        css = (AQUI / "estatico" / "hexelion.css").read_text(encoding="utf-8")
+        css = (AQUI / "estatico" / "static" / "hexelion.css").read_text(encoding="utf-8")
         tira = css.split(".tira{")[1].split("}")[0]
         self.assertIn("overflow-x:auto", tira)
         self.assertNotIn("grid-template-columns", tira)
 
     def test_58_el_rojo_solo_aparece_cuando_hay_algo_roto(self):
-        css = (AQUI / "estatico" / "hexelion.css").read_text(encoding="utf-8")
+        css = (AQUI / "estatico" / "static" / "hexelion.css").read_text(encoding="utf-8")
         # Por REGLA y no por linea: una regla puede ocupar tres renglones, y el
         # selector solo esta en el primero. Partir por lineas suspendia reglas
         # correctas por el sitio donde cabia el texto.
