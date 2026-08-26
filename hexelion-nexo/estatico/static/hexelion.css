@@ -140,6 +140,34 @@ h1 em{font-style:normal;color:var(--glow)}
 .nodo__mas[open] summary::before{content:"[-] "}
 .nodo__mas p{font-size:9px;color:var(--ink-3);word-break:break-all}
 
+/* ── la malla ───────────────────────────────────────────────────────────── */
+.malla{width:100%;height:auto;display:block;margin:2px 0 4px}
+/* Las aristas, todas iguales y todas apagadas: el enlace no es el dato. Lo
+   que se lee de un vistazo es el color de los cuadrados. */
+.malla .aristas line{stroke:var(--linea-viva);stroke-width:1}
+.malla text{font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+            fill:var(--ink-3);text-transform:uppercase}
+.malla .est{font-size:8px;letter-spacing:.14em;fill:var(--ink-4)}
+.malla rect{stroke-width:1;fill:#0C120F}
+.malla .vivo rect{stroke:var(--glow)}
+.malla .vivo .est{fill:var(--glow)}
+.malla .roto rect{stroke:var(--red);fill:#1A0C0C}
+.malla .roto .est{fill:var(--red)}
+.malla .ido rect{stroke:var(--ink-4)}
+.malla .mudo rect{stroke:var(--ink-4);stroke-dasharray:3 3}
+.malla .mudo .est{fill:var(--amber)}
+
+/* ── la silueta del jardin ──────────────────────────────────────────────── */
+/* Los puntos llenos y los huecos con el MISMO peso: el hueco es dato, no
+   ausencia de dato, y apagarlo lo convertiria en decoracion. */
+/* `.puntos` y no `.silueta`: el contorno del layer stack ya se llamaba asi, y
+   dos cosas distintas con el mismo nombre es una averia esperando su turno. */
+.puntos{letter-spacing:.22em;color:var(--gold);font-size:11px}
+
+/* ── la camara ──────────────────────────────────────────────────────────── */
+.camara{display:block;width:100%;height:auto;border:1px solid var(--linea-viva);
+        background:#0C120F}
+
 /* ── sin flujo ──────────────────────────────────────────────────────────── */
 body.rancio .mod{border-color:#141B17}
 body.rancio .mod__body,body.rancio .mod__head{opacity:.5}

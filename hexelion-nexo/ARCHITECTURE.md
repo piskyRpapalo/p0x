@@ -143,7 +143,7 @@ write. Open/close state uses `<details>`, which the browser already knows how to
 do — with keyboard and screen reader support, for free.
 
 The htmx-shaped alternative was considered and declined on its own metric:
-htmx minified is roughly 14 KB. **This entire front end is 11 KB.**
+htmx minified is roughly 14 KB, and it renders nothing on its own. **This entire front end — ten live cards, a topology map and an MJPEG feed — is 14 KB.**
 
 ---
 
@@ -151,14 +151,14 @@ htmx minified is roughly 14 KB. **This entire front end is 11 KB.**
 
 | | | |
 |---|---|---|
-| Front end, total download | **11 KiB** | HTML + CSS + JS · less than minified htmx alone |
+| Front end, total download | **14 KiB** | HTML + CSS + JS · ten cards, still under minified htmx + Alpine |
 | Client JavaScript | **51 lines** | it places strings; it computes nothing |
 | Server resident memory | **29 MB RSS** | empty CPython on this machine is already 9.7 |
 | Runtime dependencies | **0** | none vendored, none fetched |
 | Update path | **push, not poll** | SSE · the browser never asks |
 | Bytes per quiet update | **~386 B** | only changed sections travel |
 | Sensor reads per viewer | **0** | one refresher serves every open tab |
-| Tests | **90** | two suites, one runner · 20 of them chaos |
+| Tests | **109** | two suites, one runner · 20 of them chaos |
 | Build step | **none** | clone, `python3 servidor.py` |
 
 On latency: updates are pushed the moment the refresher notices a change, so the

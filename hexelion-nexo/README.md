@@ -8,9 +8,9 @@
 <sub>🇬🇧 The server sends finished HTML. The browser places it. Nothing else.<br>
 🇪🇸 El servidor manda HTML terminado. El navegador lo coloca. Nada más.</sub>
 
-<img src="https://img.shields.io/badge/front--end-11%20KiB-3DF58F?style=flat-square&labelColor=060B09" alt="Front end: 11 KiB">
+<img src="https://img.shields.io/badge/front--end-14%20KiB-3DF58F?style=flat-square&labelColor=060B09" alt="Front end: 14 KiB">
 <img src="https://img.shields.io/badge/dependencies-0-3DF58F?style=flat-square&labelColor=060B09" alt="Dependencies: 0">
-<img src="https://img.shields.io/badge/tests-90%2F90-3DF58F?style=flat-square&labelColor=060B09" alt="Tests: 90 of 90">
+<img src="https://img.shields.io/badge/tests-109%2F109-3DF58F?style=flat-square&labelColor=060B09" alt="Tests: 109 of 109">
 <img src="https://img.shields.io/badge/python-stdlib%20only-C6A664?style=flat-square&labelColor=060B09" alt="Python: standard library only">
 <img src="https://img.shields.io/badge/cloud-none-C6A664?style=flat-square&labelColor=060B09" alt="Cloud: none">
 
@@ -58,7 +58,7 @@ aparte y deliberado.
 ```
 cp .env.example .env                    # gateway + which node is this machine
 cp rack.conf.example estado/rack.conf   # one line per node
-bash pruebas                            # 90/90 · 2 suites
+bash pruebas                            # 109/109 · 2 suites
 ```
 
 🇬🇧 All optional. With nothing configured the panel still starts and the cards

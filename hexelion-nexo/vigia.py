@@ -53,11 +53,17 @@ class Vigia:
     # ── el hilo ──────────────────────────────────────────────────────────
     def refrescar(self):
         """Una ronda. Devuelve los nombres cuya tarjeta cambio."""
-        nuevas = {}
-        for nombre in registro.SENSORES:
-            # `registro.uno` ya es a prueba de balas: un sensor que revienta
-            # devuelve hueco, no excepcion. Aqui no hay nada que capturar.
-            nuevas[nombre] = fragmentos.html_de(nombre, registro.uno(nombre))
+        # Se recorren las TARJETAS y no los sensores: dos tarjetas pueden comer
+        # del mismo sensor --el rack y la malla lo hacen-- y en ese caso la
+        # lectura se hace UNA vez y se compone dos.
+        lecturas, nuevas = {}, {}
+        for nombre in fragmentos.TARJETAS:
+            fuente = fragmentos.sensor_de(nombre)
+            if fuente not in lecturas:
+                # `registro.uno` ya es a prueba de balas: un sensor que revienta
+                # devuelve hueco, no excepcion. Aqui no hay nada que capturar.
+                lecturas[fuente] = registro.uno(fuente)
+            nuevas[nombre] = fragmentos.html_de(nombre, lecturas[fuente])
         with self._cond:
             cambiadas = [n for n, h in nuevas.items() if self._tarjetas.get(n) != h]
             if cambiadas:

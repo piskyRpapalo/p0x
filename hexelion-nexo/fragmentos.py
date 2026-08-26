@@ -224,19 +224,29 @@ def capas(nivel, pie):
 # flujo, asi que si el titulo viviera en la pagina se perderia en el primer
 # refresco. Un solo sitio, y lo que llega es la tarjeta terminada.
 
+# Cada tarjeta declara DE QUE SENSOR come. Casi siempre del que se llama igual,
+# pero el mapa y el rack comparten lectura: son dos formas de mirar el mismo
+# dato, y un segundo sensor para lo mismo serian dos verdades sobre un hecho.
 TARJETAS = {
-    "soberania": ("Capas de soberania", "var(--ac-prove)", True),
-    "nodos": ("El rack · cuatro nodos", "var(--ac-listen)", True),
-    "preceptor": ("Nucleo publico", "var(--ac-listen)", False),
-    "timers": ("Bucles de agentes", "var(--ac-mind)", False),
-    "lora": ("La forja · adapters", "var(--ac-harvest)", False),
-    "cinek": ("Pipeline de video", "var(--ac-alert)", False),
-    "jardin": ("Jardin · permacultura", "var(--ac-sustain)", False),
+    "soberania": ("Capas de soberania", True, "soberania"),
+    "nodos": ("El rack", True, "nodos"),
+    "mapa": ("La malla", False, "nodos"),
+    "observe": ("Observe · camara", False, "observe"),
+    "cerebro": ("Segundo cerebro", False, "cerebro"),
+    "preceptor": ("Nucleo publico", False, "preceptor"),
+    "timers": ("Bucles de agentes", False, "timers"),
+    "lora": ("La forja · adapters", False, "lora"),
+    "cinek": ("Pipeline de video", False, "cinek"),
+    "jardin": ("Jardin · permacultura", False, "jardin"),
 }
 
 
+def sensor_de(nombre):
+    return TARJETAS.get(nombre, (None, None, nombre))[2]
+
+
 def seccion(nombre, frag):
-    titulo, _acento, _ancho = TARJETAS.get(nombre, (nombre, "", False))
+    titulo = TARJETAS.get(nombre, (nombre, False, nombre))[0]
     figura = ""
     if nombre == "soberania" and "nivel" in frag:
         figura = f'<div class="mod__body mod__body--figura">{capas(frag["nivel"], frag.get("pie", ""))}</div>'
@@ -248,8 +258,111 @@ def seccion(nombre, frag):
             f'<div class="mod__body">{frag["html"]}</div>')
 
 
-FRAGMENTOS = {"soberania": soberania, "nodos": nodos, "preceptor": preceptor,
-              "timers": timers, "lora": lora, "cinek": cinek, "jardin": jardin}
+# ── el mapa · la malla, dibujada ────────────────────────────────────────────
+# Sin libreria de mapas, y no por ahorro: un mapa geografico aqui seria una
+# mentira util -- lo que importa de esta topologia no es donde estan las
+# maquinas sino QUIEN VE A QUIEN, y eso no tiene coordenadas. Se dibuja la
+# malla: todos con todos, que es lo que hace una red de este tipo.
+#
+# Come del mismo sensor que la tarjeta del rack. Un segundo sensor para el
+# mismo dato serian dos verdades sobre el mismo hecho.
+
+MAPA_ANCHO, MAPA_ALTO, MAPA_R = 400, 224, 88
+COLOR_ESTADO = {"ONLINE": "vivo", "CRITICO": "roto",
+                "OFFLINE": "ido", NO_DATA: "mudo"}
+
+
+def _en_rejilla(v):
+    """A multiplo de 4. La misma regla que el layer stack, por el mismo motivo."""
+    return int(round(v / 4.0)) * 4
+
+
+def _sitios(cuantos):
+    """Reparte los nodos en un circulo. Dos se ponen enfrentados, no encima."""
+    import math
+    cx, cy = MAPA_ANCHO // 2, MAPA_ALTO // 2
+    if cuantos == 1:
+        return [(cx, cy)]
+    return [(_en_rejilla(cx + MAPA_R * math.cos(-math.pi / 2 + 2 * math.pi * i / cuantos)),
+             _en_rejilla(cy + MAPA_R * 0.62 * math.sin(-math.pi / 2 + 2 * math.pi * i / cuantos)))
+            for i in range(cuantos)]
+
+
+def mapa(d):
+    nodos_ = d.get("nodos", [])
+    if not nodos_:
+        return sin_dato({"causa": "sin nodos que dibujar"})
+    sitios = _sitios(len(nodos_))
+
+    # Las aristas primero, para que los nodos queden encima de las lineas.
+    aristas = []
+    for i in range(len(sitios)):
+        for j in range(i + 1, len(sitios)):
+            (x1, y1), (x2, y2) = sitios[i], sitios[j]
+            aristas.append(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}"/>')
+
+    marcas = []
+    for (x, y), n in zip(sitios, nodos_):
+        clase = COLOR_ESTADO.get(n["estado"], "mudo")
+        marcas.append(
+            f'<g class="nodo-mapa {clase}">'
+            f'<rect x="{x - 8}" y="{y - 8}" width="16" height="16"/>'
+            f'<text x="{x}" y="{y + 28}" text-anchor="middle">{e(n["nodo"])}</text>'
+            f'<text class="est" x="{x}" y="{y + 40}" text-anchor="middle">'
+            f'{e(n["estado"])}</text></g>')
+
+    return {
+        "chip": f'{len(nodos_)} nodos',
+        "clase": "c-crit" if d.get("criticos") else "c-ok",
+        "html": (f'<svg class="malla" viewBox="0 0 {MAPA_ANCHO} {MAPA_ALTO}" '
+                 f'role="img" aria-label="La malla: {len(nodos_)} nodos, todos '
+                 f'conectados con todos">'
+                 f'<g class="aristas">{"".join(aristas)}</g>'
+                 f'{"".join(marcas)}</svg>'
+                 + causa("cada linea es un enlace cifrado punto a punto · no hay "
+                         "centro, y por eso no hay nodo cuya caida apague el resto")),
+    }
+
+
+# ── el segundo cerebro · la forma, nunca el contenido ───────────────────────
+
+def cerebro(d):
+    filas = "".join(
+        f'<div class="fila"><span class="k">{e(f["que"])}</span>'
+        f'<span class="v"><span class="puntos">{e(f["silueta"])}</span> '
+        f'{e(f["cuantos"])}</span></div>'
+        for f in d.get("filas", []))
+    vacio = d.get("vacio")
+    falta = d.get("faltan") or []
+    return {
+        "chip": ("vacio" if vacio else f'{d.get("engramas")} engramas'),
+        "clase": "c-warn" if vacio else "c-gold",
+        "html": (cifra(d.get("densidad"), "ENLACES POR ENGRAMA",
+                       viva=bool(d.get("enlaces")))
+                 + filas
+                 + causa((d.get("causa") or "")
+                         + (" · sin tabla de " + ", ".join(falta) if falta else "")
+                         + " · se cuenta la forma; no se lee una sola palabra")),
+    }
+
+
+# ── la camara · una etiqueta, cero JavaScript ───────────────────────────────
+
+def observe(d):
+    # `<img>` y ya esta: el navegador lleva decadas leyendo MJPEG. Y solo se
+    # emite cuando la camara YA contesto, porque un `<img>` roto ensena el icono
+    # de imagen partida -- que parece un fallo del panel y es de la camara, y no
+    # dice cual de los dos.
+    return {"chip": "en vivo" if d.get("mjpeg") else "responde",
+            "clase": "c-ok",
+            "html": f'<img class="camara" src="{e(d["url"])}" alt="camara en vivo">'
+                    + causa(f'{d.get("tipo")} · sin una linea de JavaScript')}
+
+
+FRAGMENTOS = {"soberania": soberania, "nodos": nodos, "mapa": mapa,
+              "preceptor": preceptor, "timers": timers, "lora": lora,
+              "cinek": cinek, "jardin": jardin, "cerebro": cerebro,
+              "observe": observe}
 
 
 def de(nombre, lectura):

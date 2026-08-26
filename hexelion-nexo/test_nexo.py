@@ -14,6 +14,7 @@ import tempfile
 import threading
 import time
 import unittest
+from unittest import mock
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -406,11 +407,20 @@ class LaCara(unittest.TestCase):
                                  self.cara("index.html")))
         self.assertEqual(en_html, set(FR.FRAGMENTOS))
         self.assertEqual(en_html, set(FR.TARJETAS))
-        self.assertEqual(en_html, set(registro.SENSORES))
+        # Ya no es una igualdad con los sensores: dos tarjetas pueden comer del
+        # mismo --el rack y la malla lo hacen--. Lo que si tiene que cumplirse
+        # es que toda tarjeta coma de algo que existe, y que ningun sensor se
+        # quede sin quien lo ensene.
+        fuentes = {FR.sensor_de(n) for n in FR.TARJETAS}
+        self.assertTrue(fuentes <= set(registro.SENSORES),
+                        f"tarjetas sin sensor: {fuentes - set(registro.SENSORES)}")
+        self.assertEqual(set(registro.SENSORES) - fuentes, set(),
+                         "hay un sensor que no se ensena en ninguna tarjeta")
 
-    def test_36_los_sensores_y_las_tarjetas_son_los_mismos(self):
+    def test_36_todo_sensor_tiene_quien_lo_ensene(self):
         import fragmentos as FR
-        self.assertEqual(set(FR.FRAGMENTOS), set(registro.SENSORES))
+        self.assertEqual({FR.sensor_de(n) for n in FR.TARJETAS},
+                         set(registro.SENSORES))
 
     def test_37_la_pagina_se_sirve_entera_desde_el_nexo(self):
         with ServidorEnPie() as s:
@@ -719,9 +729,178 @@ class ElRack(unittest.TestCase):
             if "var(--red)" not in regla or "{" not in regla:
                 continue
             selector = regla.rsplit("{", 1)[0].strip().splitlines()[-1]
+            # `roto` es como la malla llama a un nodo en fallo. Entra en la
+            # lista por lo que significa, no por parecerse a las otras.
             self.assertTrue(
-                any(p in selector for p in ("critico", "alerta", "c-crit")),
+                any(p in selector for p in ("critico", "alerta", "c-crit", "roto")),
                 f"rojo fuera de un fallo real: {selector}")
+
+
+class LaMalla(unittest.TestCase):
+    """La topologia, dibujada sin una sola libreria de mapas."""
+
+    def malla(self, estados):
+        import fragmentos as FR
+        return FR.mapa({"nodos": [{"nodo": n, "estado": s} for n, s in estados],
+                        "criticos": sum(1 for _, s in estados if s == "CRITICO")})
+
+    def test_59_no_hay_ninguna_libreria_de_mapas(self):
+        """Un mapa geografico aqui seria una mentira util: de esta topologia
+        importa quien ve a quien, y eso no tiene coordenadas."""
+        fuente = (AQUI / "fragmentos.py").read_text(encoding="utf-8")
+        for pesado in ("leaflet", "mapbox", "openlayers", "googleapis", "tile"):
+            self.assertNotIn(pesado, fuente.lower())
+
+    def test_60_un_cuadrado_por_nodo_y_una_arista_por_pareja(self):
+        html = self.malla([("a", "ONLINE"), ("b", "ONLINE"),
+                           ("c", "CRITICO"), ("d", "OFFLINE")])["html"]
+        self.assertEqual(html.count('class="nodo-mapa'), 4)
+        self.assertEqual(html.count("<line"), 6, "cuatro nodos son seis parejas")
+
+    def test_61_el_estado_del_nodo_llega_al_dibujo(self):
+        html = self.malla([("a", "ONLINE"), ("b", "CRITICO"),
+                           ("c", "OFFLINE"), ("d", sensores.NO_DATA)])["html"]
+        for clase in ("vivo", "roto", "ido", "mudo"):
+            self.assertIn(f'nodo-mapa {clase}', html)
+
+    def test_62_la_malla_tambien_cae_en_la_rejilla_de_cuatro(self):
+        html = self.malla([("a", "ONLINE"), ("b", "ONLINE"), ("c", "ONLINE")])["html"]
+        for attr in ("x1", "y1", "x2", "y2", "x", "y", "width", "height"):
+            for valor in re.findall(rf'\b{attr}="(-?\d+)"', html):
+                with self.subTest(attr=attr, valor=valor):
+                    self.assertEqual(int(valor) % 4, 0)
+
+    def test_63_sin_nodos_no_se_dibuja_una_malla_vacia(self):
+        frag = self.malla([])
+        self.assertEqual(frag["chip"], sensores.NO_DATA)
+        self.assertIn("nodata", frag["html"])
+
+    def test_64_la_malla_y_el_rack_comen_del_mismo_sensor(self):
+        """Dos lecturas del mismo hecho serian dos verdades sobre el mismo hecho."""
+        import fragmentos as FR
+        self.assertEqual(FR.sensor_de("mapa"), FR.sensor_de("nodos"))
+
+
+class ElSegundoCerebro(unittest.TestCase):
+    """La forma de una memoria. Jamas su contenido."""
+
+    def test_65_no_se_lee_una_sola_palabra_de_la_memoria(self):
+        """Es la memoria de una persona y el panel puede acabar en una pantalla
+        que mira alguien mas. Se cuenta; no se selecciona texto."""
+        fuente = (AQUI / "sensores" / "cerebro.py").read_text(encoding="utf-8")
+        for columna in ("select what", "select why", "select *", "select text",
+                        "fetchall"):
+            self.assertNotIn(columna, fuente.lower())
+        self.assertIn("count(*)", fuente)
+
+    def test_66_la_base_se_abre_en_solo_lectura(self):
+        fuente = (AQUI / "sensores" / "cerebro.py").read_text(encoding="utf-8")
+        self.assertIn("mode=ro", fuente)
+        for escritura in ("insert", "update ", "delete", "drop", "commit()"):
+            self.assertNotIn(escritura, fuente.lower())
+
+    def test_67_sin_memoria_en_el_disco_se_declara_el_hueco(self):
+        import sensores.cerebro as C
+        with mock.patch.object(C, "ruta", return_value=None):
+            lectura = C.leer()
+        self.assertEqual(lectura["estado"], sensores.NO_DATA)
+        self.assertIn("no hay ninguna memoria", lectura["causa"])
+
+    def test_68_un_jardin_vacio_tiene_forma(self):
+        """Cinco huecos y no una fila en blanco: es la diferencia entre «no hay
+        nada» y «no se ha mirado»."""
+        import sensores.cerebro as C
+        self.assertEqual(C.silueta(0, 10), "○" * C.PUNTOS)
+        self.assertEqual(len(C.silueta(0, 10)), C.PUNTOS)
+
+    def test_69_lo_que_existe_nunca_sale_como_vacio(self):
+        """Uno entre mil redondea a cero puntos. Un recuerdo que existe no puede
+        dibujarse igual que ninguno."""
+        import sensores.cerebro as C
+        for cuantos, techo in ((1, 1000), (1, 100), (3, 500)):
+            with self.subTest(cuantos=cuantos, techo=techo):
+                self.assertIn("●", C.silueta(cuantos, techo))
+
+    def test_70_la_silueta_siempre_mide_lo_mismo(self):
+        import sensores.cerebro as C
+        for cuantos in (0, 1, 5, 50, 5000):
+            self.assertEqual(len(C.silueta(cuantos, 50)), C.PUNTOS)
+
+    def test_71_una_base_de_otra_version_no_es_una_averia(self):
+        import sensores.cerebro as C
+        import sqlite3
+        with tempfile.TemporaryDirectory() as d:
+            db = Path(d) / "memory.db"
+            con = sqlite3.connect(db)
+            con.execute("create table engrams (id integer primary key)")
+            con.commit()
+            con.close()
+            with mock.patch.object(C, "ruta", return_value=db):
+                lectura = C.leer()
+        self.assertEqual(lectura["estado"], "ok")
+        self.assertIn("enlaces", lectura["faltan"], "lo que falta se declara")
+
+    def test_72_un_fichero_que_no_es_una_memoria_sale_como_hueco(self):
+        import sensores.cerebro as C
+        with tempfile.TemporaryDirectory() as d:
+            db = Path(d) / "memory.db"
+            db.write_bytes(b"esto no es sqlite")
+            with mock.patch.object(C, "ruta", return_value=db):
+                lectura = C.leer()
+        self.assertEqual(lectura["estado"], sensores.NO_DATA)
+        self.assertTrue(lectura["causa"])
+
+
+class LaCamara(unittest.TestCase):
+    """Una etiqueta y cero JavaScript. Y ninguna etiqueta si no hay camara."""
+
+    def test_73_sin_camara_declarada_no_se_apunta_a_ninguna_red(self):
+        """El panel por defecto no carga un solo recurso de fuera."""
+        import sensores.observe as O
+        import fragmentos as FR
+        with mock.patch.object(O, "direccion", return_value=""):
+            lectura = O.leer()
+        self.assertEqual(lectura["estado"], sensores.NO_DATA)
+        html = FR.html_de("observe", lectura)
+        self.assertNotIn("<img", html)
+        self.assertNotIn("http", html)
+
+    def test_74_una_camara_que_no_contesta_no_se_pinta_rota(self):
+        """Un <img> roto ensena el icono de imagen partida: parece un fallo del
+        panel y es de la camara, y no dice cual de los dos."""
+        import sensores.observe as O
+        import fragmentos as FR
+        with mock.patch.object(O, "direccion", return_value="http://inventada/x"), \
+             mock.patch.object(O, "_responde", side_effect=TimeoutError("nada")):
+            lectura = O.leer()
+        self.assertEqual(lectura["estado"], sensores.NO_DATA)
+        self.assertIn("sin senal", lectura["causa"])
+        self.assertNotIn("<img", FR.html_de("observe", lectura))
+
+    def test_75_una_camara_viva_se_pinta_con_una_etiqueta_y_nada_mas(self):
+        import sensores.observe as O
+        import fragmentos as FR
+        with mock.patch.object(O, "direccion", return_value="http://camara/s"), \
+             mock.patch.object(O, "_responde",
+                               return_value="multipart/x-mixed-replace"):
+            lectura = O.leer()
+        self.assertTrue(lectura["mjpeg"])
+        html = FR.html_de("observe", lectura)
+        self.assertIn('<img class="camara"', html)
+        self.assertNotIn("<script", html)
+        self.assertNotIn("onload", html)
+
+    def test_76_la_direccion_de_la_camara_no_vive_en_el_codigo(self):
+        fuente = (AQUI / "sensores" / "observe.py").read_text(encoding="utf-8")
+        self.assertNotIn("http://", fuente)
+        self.assertIn("os.environ.get(VARIABLE)", fuente)
+
+    def test_77_el_cliente_sigue_sin_saber_de_nada_de_esto(self):
+        """La restriccion que sostiene todo: el JS solo coloca lo que llega."""
+        js = (AQUI / "estatico" / "static" / "nexo.js").read_text(encoding="utf-8")
+        for palabra in ("camara", "mjpeg", "malla", "cerebro", "silueta",
+                        "engrama", "observe"):
+            self.assertNotIn(palabra, js.lower())
 
 
 if __name__ == "__main__":
