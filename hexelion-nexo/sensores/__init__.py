@@ -19,9 +19,18 @@ def ahora():
     return datetime.now().astimezone().isoformat(timespec="seconds")
 
 
-def hueco(causa):
-    """Un hueco declarado, con su motivo. La unica forma legitima de no tener dato."""
-    return {"estado": NO_DATA, "causa": causa, "medido": ahora()}
+def hueco(causa, detalle=""):
+    """Un hueco declarado, con su motivo. La unica forma legitima de no tener dato.
+
+    `causa` es una frase para una persona: que falta y, si se puede, que hacer.
+    `detalle` es para quien depura -- el nombre de la excepcion, la ruta que no
+    estaba--. Van separados porque mezclarlos convierte la causa en jerga:
+    «ModuleNotFoundError» tiene la FORMA de una explicacion y no explica nada a
+    quien esta mirando el panel. Y porque una causa que acaba en «Error» no se
+    distingue de una causa que no se escribio.
+    """
+    return {"estado": NO_DATA, "causa": causa, "detalle": detalle,
+            "medido": ahora()}
 
 
 def dato(**campos):
@@ -41,7 +50,8 @@ def a_prueba_de_balas(fn):
         try:
             salida = fn(*a, **k)
         except Exception as e:                                   # noqa: BLE001
-            return hueco(f"el sensor fallo al leer · {type(e).__name__}")
+            return hueco("este sensor no pudo completar su lectura",
+                         type(e).__name__)
         if not isinstance(salida, dict) or "estado" not in salida:
             return hueco("el sensor devolvio algo que no es una lectura")
         return salida

@@ -156,7 +156,8 @@ def leer():
         vivos = _tailscale()
     except Exception as e:                                       # noqa: BLE001
         vivos = {}
-        aviso_ts = f"el tailnet no se pudo consultar · {type(e).__name__}"
+        aviso_ts = ("la red malla no contesta en esta maquina · de quien "
+                    f"responde no hay dato ({type(e).__name__})")
     else:
         aviso_ts = "" if vivos else "el tailnet no declara ningun nodo"
 
@@ -171,8 +172,9 @@ def leer():
                 salud[n.get("node_id")] = n
             antena = _json_remoto(base, "/api/antenna/health")
         except Exception as e:                                   # noqa: BLE001
-            aviso_gw = (f"el gateway no contesta · {type(e).__name__} · "
-                        "lo de los nodos remotos sale solo del tailnet")
+            aviso_gw = ("el gateway no contesta · las sondas profundas de "
+                        "nodo no llegan, y lo que se sabe sale solo de la red "
+                        f"malla ({type(e).__name__})")
 
     declarados = rack()
     if not declarados:

@@ -49,8 +49,10 @@ def cifra(valor, pie, viva=False):
 
 def sin_dato(lectura):
     motivo = (lectura or {}).get("causa") or "el sensor no devolvio nada"
+    detalle = (lectura or {}).get("detalle") or ""
     return {"chip": NO_DATA, "clase": "c-warn",
-            "html": f'<div class="cifra">{hueco()}</div>' + causa(motivo)}
+            "html": f'<div class="cifra">{hueco()}</div>' + causa(motivo)
+                    + (f'<p class="detalle">{e(detalle)}</p>' if detalle else "")}
 
 
 # ── un fragmento por sensor ─────────────────────────────────────────────────

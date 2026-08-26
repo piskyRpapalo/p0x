@@ -32,7 +32,8 @@ def leer():
         sob = _guardian()
     except Exception as e:                                       # noqa: BLE001
         return sensores.hueco(
-            f"el guardian del nucleo no se pudo cargar · {type(e).__name__}")
+            "el nucleo publico no esta junto a este panel · sin el no hay "
+            "nivel que leer, y no se supone uno", type(e).__name__)
 
     # argv vacio a proposito: la bandera de corte gobierna el proceso que la
     # recibio, y el proceso que la recibio no es este panel.

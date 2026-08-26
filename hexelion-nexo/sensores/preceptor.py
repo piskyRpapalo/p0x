@@ -102,7 +102,9 @@ def leer():
     try:
         corta, larga = _version()
     except Exception as e:                                       # noqa: BLE001
-        return sensores.hueco(f"el nucleo no se pudo leer · {type(e).__name__}")
+        return sensores.hueco(
+            "el nucleo publico no esta junto a este panel · su version se lee "
+            "de su arbol, y sin arbol no hay version", type(e).__name__)
     return sensores.dato(version=corta, huella=larga, tanda=tanda(),
                          ruta="preceptor-os-core/")
 

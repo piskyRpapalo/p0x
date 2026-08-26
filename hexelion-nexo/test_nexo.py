@@ -99,7 +99,12 @@ class ElContratoDelSensor(unittest.TestCase):
         def roto():
             raise RuntimeError("el disco se fue")
         self.assertEqual(roto()["estado"], sensores.NO_DATA)
-        self.assertIn("RuntimeError", roto()["causa"])
+        # La causa es para una persona; el nombre de la excepcion, para quien
+        # depura. Separados a proposito: mezclarlos convierte la causa en jerga,
+        # y ademas hace que toda causa acabe pareciendose a un fallo generico.
+        self.assertIn("no pudo completar su lectura", roto()["causa"])
+        self.assertEqual(roto()["detalle"], "RuntimeError")
+        self.assertNotIn("Error", roto()["causa"])
 
     def test_4_un_sensor_que_devuelve_basura_sale_como_hueco(self):
         for basura in (None, 42, "texto", [], {"sin": "estado"}):
