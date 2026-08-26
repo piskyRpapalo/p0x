@@ -1195,3 +1195,39 @@ estaba vacío. Se creó en esta sesión. Se anexa el dato medido, no el recibido
   producto **carga el modelo entero en cada turno**, porque `motor_llama` lanza un proceso
   hijo por diseño (D68, sin socket). Querer el 27B en la conversación no es un ajuste de
   configuración: es exactamente la decisión que `FRONTERA_D68.md` deja abierta y sin firmar.
+
+---
+
+## Misión «Capas de Soberanía + Kill Switch» · 2026-08-26 · repo PreceptorOS
+
+Suite al cierre: **520/520 · 36 suites** · sabotajes 4/4 y 6/6.
+
+- **S1 · El badge del README miente sobre la tanda.** (Coste S.) Dice
+  `tests 479/479 · 35 suites`; la máquina dice 520/520 · 36. Ya estaba
+  desfasado antes de esta misión (481). Un badge es un dato o no es nada.
+
+- **S2 · `MANIFIESTO.md` no es el manifiesto del proyecto.** (Coste M.) Su H1
+  es «M2 · closing the Water · the memory manifest» y su cuerpo documenta
+  `manifest.py`. La doctrina de capas se escribió ahí porque la orden nombró
+  ese fichero por su cuenta de líneas, y encaja mal. Merece fichero propio
+  (`ARQUITECTURA.md` o `DOCTRINA.md`) con `MANIFIESTO.md` volviendo a hablar
+  solo de la huella de la memoria.
+
+- **S3 · El Nivel 1 está definido de dos formas incompatibles.** (Coste S.) El
+  Despertar decía «arnés / cerebro externo · puede consultar APIs externas»; la
+  Parte 2 dice «arnés (cerebro local) · inferencia 100 % local, zero-cloud». Se
+  implementó la Parte 2. La contradicción debe resolverse **en el canon**, no
+  en dos prompts, o la próxima sesión la reabre.
+
+- **S4 · `--santuario` todavía no lo ve nadie más que su módulo.** (Coste M.)
+  Hoy la bandera solo la mira `soberania.py`. El día que exista un punto de
+  entrada único, tiene que reconocerse ahí — si llega a un `argparse` que no la
+  conoce, el botón de pánico se convierte en un error de uso.
+
+- **S5 · Falta el candado de arquitectura sobre `@exige`.** (Coste M.) Hoy no
+  hay ni una función que cruce el borde de la máquina, y por eso es el momento
+  barato de escribir la prueba que exija el decorador en todas las que vengan.
+  Después de la primera ya es una auditoría.
+
+- **S6 · Sin entrada en `CHANGELOG.md`.** (Coste S.) Cuatro commits de doctrina
+  y mecanismo sin línea en el registro público.
