@@ -27,13 +27,49 @@
 
   <main class="rejilla">
 
-    <section class="mod mod--ancho" style="--accent:var(--ac-prove)" id="m-soberania">
+    <section class="mod mod--ancho mod--figura" style="--accent:var(--ac-prove)" id="m-soberania">
       <div class="mod__head">
-        <span class="mod__title"><span style="color:var(--glow)">▸</span> Nivel de soberanía</span>
+        <span class="mod__title"><span style="color:var(--glow)">▸</span> Capas de soberanía</span>
         <span class="mod__spacer"></span>
         <span class="chip c-mut" data-chip>—</span>
       </div>
-      <div class="mod__body" data-cuerpo>
+      <div class="mod__body">
+        <svg class="capas" viewBox="0 0 1000 344" role="img"
+             aria-label="Las cuatro capas de soberanía, de la 3 arriba a la 0 abajo, con la capa en vigor destacada">
+        <g class="brujula">
+          <text class="eyebrow" x="40" y="52">alcance</text>
+          <path d="M 56 200 L 56 76 M 48 92 L 56 76 L 64 92"/>
+          <text class="eyebrow" x="40" y="272">suelo</text>
+        </g>
+      <g class="banda" data-nivel="3">
+        <rect x="96" y="24" width="800" height="64" rx="0"/>
+        <text class="eyebrow" x="112" y="60">L3</text>
+        <text class="nombre"  x="192" y="60">ECOSISTEMA</text>
+        <text class="nota"    x="880" y="60" text-anchor="end">hardware · complementos · fuera del build</text>
+      </g>
+      <g class="banda" data-nivel="2">
+        <rect x="96" y="88" width="800" height="64" rx="0"/>
+        <text class="eyebrow" x="112" y="124">L2</text>
+        <text class="nombre"  x="192" y="124">EXPANSIÓN</text>
+        <text class="nota"    x="880" y="124" text-anchor="end">todo lo que cruza el borde · consentido uno a uno</text>
+      </g>
+      <g class="banda" data-nivel="1">
+        <rect x="96" y="152" width="800" height="64" rx="0"/>
+        <text class="eyebrow" x="112" y="188">L1</text>
+        <text class="nombre"  x="192" y="188">ARNÉS</text>
+        <text class="nota"    x="880" y="188" text-anchor="end">un modelo en este disco · no sale de la máquina</text>
+      </g>
+      <g class="banda" data-nivel="0">
+        <rect x="96" y="216" width="800" height="64" rx="0"/>
+        <text class="eyebrow" x="112" y="252">L0</text>
+        <text class="nombre"  x="192" y="252">SANTUARIO</text>
+        <text class="nota"    x="880" y="252" text-anchor="end">el suelo · no pide permiso a nadie</text>
+      </g>
+        <rect class="silueta" x="96" y="24" width="800" height="256"/>
+        <text class="pie" x="96" y="308" data-pie>—</text>
+      </svg>
+      </div>
+      <div class="mod__body mod__body--anexo" data-cuerpo>
         <p class="mod__lead">Cargando…</p>
       </div>
     </section>

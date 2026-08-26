@@ -32,6 +32,7 @@
   --mod-drop:0 8px 22px rgba(0,0,0,0.5);
   --ac-listen:#00e5ff; --ac-prove:#36f59a; --ac-sustain:#1fb39a;
   --ac-harvest:#FFB300; --ac-alert:#ff4455; --ac-mind:#7aa2ff;
+  --linea-mod:rgba(214,236,222,.14);
   --radius:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px;
   --fs-mod:11px; --fs-sec:13px; --fs-body:12.5px; --fs-meta:9.5px;
   --mono:"JetBrains Mono","DejaVu Sans Mono",ui-monospace,"Share Tech Mono",monospace;
@@ -63,9 +64,15 @@ h1 em{font-style:normal;color:var(--glow)}
 
 /* ── modulos ────────────────────────────────────────────────── */
 .rejilla{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+/* Borde de 1px y NADA de glow en el marco. El neon cian que rodeaba cada
+   modulo esta sentenciado por nombre en el inventario: competia con los datos y
+   desgastaba el contraste. El glow queda reservado a las cifras vivas --y solo
+   a las vivas--, que es donde un halo significa algo. Coincide con la regla de
+   diagram-design: hairline de 1px, sin sombras. */
 .mod{position:relative;border-radius:var(--radius);overflow:hidden;
      background:var(--panel-bg);min-width:0;
-     box-shadow:0 0 0 1px var(--mod-edge),var(--mod-glow),var(--mod-drop)}
+     border:1px solid var(--linea-mod);box-shadow:none}
+.mod__head{border-left:2px solid var(--accent,var(--glow))}
 .mod--ancho{grid-column:span 2}
 @media(max-width:820px){.mod--ancho{grid-column:span 1}}
 .mod__head{display:flex;align-items:center;gap:8px;padding:var(--sp-2) var(--sp-3);
@@ -87,6 +94,8 @@ h1 em{font-style:normal;color:var(--glow)}
 .fila--sangrada .k{padding-left:12px;color:var(--ink-4)}
 .cifra{font-family:var(--serif);font-size:30px;line-height:1.05;letter-spacing:.04em;
        margin:2px 0 4px;color:var(--ink)}
+/* Aqui si: una cifra viva lleva halo. Es el unico sitio del panel que lo lleva. */
+.cifra.viva{color:var(--glow);text-shadow:0 0 14px color-mix(in oklch,var(--glow),transparent 55%)}
 .cifra small{display:block;font-family:var(--mono);font-size:var(--fs-meta);
              letter-spacing:.16em;color:var(--ink-4);margin-top:6px;font-weight:400}
 
@@ -127,9 +136,41 @@ h1 em{font-style:normal;color:var(--glow)}
    Se apaga el brillo y se pierde el color, que es lo que un ojo lee como
    «esto ya no esta pasando» sin tener que leer una sola palabra. */
 body.rancio .mod{filter:saturate(.35) brightness(.82);
-                 box-shadow:0 0 0 1px rgba(255,255,255,.06),0 8px 22px rgba(0,0,0,.5)}
+                 border-color:rgba(214,236,222,.08)}
 body.rancio .mod__head{background:linear-gradient(180deg,#22261f,#14170f)}
 body.rancio h1 em{color:var(--amber)}
+
+/* ── el layer stack · gramatica de diagram-design ──────────────
+   Bandas de ancho completo apiladas, 4 niveles, altura 64, hairline de 1px
+   entre ellas, un solo acento sobre UNA banda focal --la que esta en vigor--,
+   y cada coordenada divisible por 4. Las familias son las locales: Geist e
+   Instrument Serif no estan instaladas y no se descargan, asi que el papel de
+   cada una lo hace su pila de respaldo. Se pierde ceremonia; no se pierde nada
+   que importe. */
+.mod--figura .mod__body{padding:var(--sp-3) var(--sp-2) 0}
+.mod__body--anexo{padding-top:var(--sp-3)}
+.capas{width:100%;height:auto;display:block}
+.capas .banda rect{fill:rgba(255,255,255,.018);stroke:var(--linea-mod);stroke-width:1}
+.capas .banda:nth-child(odd) rect{fill:rgba(255,255,255,.038)}
+.capas .silueta{fill:none;stroke:var(--ink-4);stroke-width:1}
+.capas text{font-family:var(--mono);fill:var(--ink-2)}
+.capas .eyebrow{font-size:9px;letter-spacing:.16em;fill:var(--ink-4);text-transform:uppercase}
+.capas .nombre{font-family:var(--serif);font-size:15px;font-weight:700;
+               letter-spacing:.14em;fill:var(--ink)}
+.capas .nota{font-size:10px;fill:var(--ink-4)}
+.capas .pie{font-size:10px;fill:var(--ink-3)}
+.capas .brujula path{fill:none;stroke:var(--ink-4);stroke-width:1}
+
+/* El unico acento del diagrama, sobre una sola banda. Dos focos borran el foco. */
+.capas .banda.focal rect{fill:color-mix(in oklch,var(--glow),transparent 90%);
+                         stroke:var(--glow);stroke-width:1.2}
+.capas .banda.focal .nombre{fill:var(--glow)}
+.capas .banda.focal .eyebrow,.capas .banda.focal .nota{fill:var(--gold)}
+/* Lo que queda por encima del nivel en vigor: presente, pero apagado. Se ve que
+   existe y se ve que no esta concedido, sin escribirlo. */
+.capas .banda.dormida rect{fill:rgba(255,255,255,.012)}
+.capas .banda.dormida .nombre{fill:var(--ink-4)}
+.capas .banda.dormida .nota{fill:rgba(214,236,222,.16)}
 
 footer{margin-top:22px;padding-top:14px;border-top:1px solid var(--hair);
        color:var(--ink-4);font-size:var(--fs-meta);line-height:1.7}

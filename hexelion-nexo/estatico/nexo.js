@@ -46,21 +46,29 @@ function sinDato(id, lectura) {
 const PINTORES = {
 
   soberania(d) {
-    const escalera = (d.niveles || []).map(n =>
-      `<div class="peldano${n.activo ? ' activo' : ''}${n.n === 0 ? ' suelo' : ''}">` +
-      `<b>${n.n}</b><span>${esc(n.nombre)}</span></div>`).join('');
+    // El diagrama manda: la banda focal se mueve con el nivel en vigor. Un
+    // layer stack pintado a mano se quedaria diciendo «0» el dia que suba, y
+    // una figura que miente es peor que ninguna figura.
+    const mod = document.getElementById('m-soberania');
+    mod.querySelectorAll('.banda').forEach(b => {
+      const n = Number(b.dataset.nivel);
+      b.classList.toggle('focal', n === d.nivel);
+      b.classList.toggle('dormida', n > d.nivel);
+    });
+    const pie = mod.querySelector('[data-pie]');
+    if (pie) {
+      pie.textContent = d.cortado
+        ? 'corte activo · el centinela manda sobre lo declarado en el estado'
+        : 'nivel ' + d.nivel + ' en vigor · nada por encima esta concedido';
+    }
     const caps = (d.capacidades || []).map(c =>
       fila(c.nombre, c.concedida ? 'concedida' : 'no concedida',
-           c.concedida ? 'c-ok' : 'c-mut', true) ).join('');
+           c.concedida ? 'c-ok' : 'c-mut')).join('');
     pinta('m-soberania',
-      d.cortado ? 'santuario · corte activo' : 'nivel ' + d.nivel,
+      d.cortado ? 'santuario · corte' : 'nivel ' + d.nivel,
       d.cortado ? 'c-warn' : (d.nivel === 0 ? 'c-ok' : 'c-gold'),
-      `<div class="cifra">Nivel ${esc(d.nivel)}<small>${esc(d.nombre)}</small></div>` +
-      `<div class="escalera">${escalera}</div>` +
-      `<div style="margin-top:12px">${caps}</div>` +
-      causa(d.cortado
-        ? 'el centinela o la bandera mandan sobre lo declarado en el estado'
-        : 'ninguna capacidad por encima del suelo esta concedida'));
+      caps + causa('el nivel 0 no aparece en la tabla: lo que el suelo ya hace '
+                 + 'no pide permiso'));
   },
 
   preceptor(d) {

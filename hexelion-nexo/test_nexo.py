@@ -433,5 +433,63 @@ class ElRefrescoVivo(unittest.TestCase):
         self.assertIn("sinDato(id,", bucle.split("catch")[1])
 
 
+class ElDiagramaDeCapas(unittest.TestCase):
+    """Layer stack segun la gramatica de diagram-design, y viva."""
+
+    def html(self):
+        return (AQUI / "estatico" / "index.html").read_text(encoding="utf-8")
+
+    def css(self):
+        return (AQUI / "estatico" / "hexelion.css").read_text(encoding="utf-8")
+
+    def test_44_cuatro_bandas_y_ni_una_mas(self):
+        """4-6 capas dice la gramatica. Aqui son exactamente los cuatro niveles."""
+        niveles = re.findall(r'class="banda" data-nivel="(\d)"', self.html())
+        self.assertEqual(sorted(niveles), ["0", "1", "2", "3"])
+
+    def test_45_toda_coordenada_es_divisible_por_cuatro(self):
+        """La regla dura de la retícula. Lo que la rompe se ve generado."""
+        svg = self.html().split('<svg class="capas"')[1].split("</svg>")[0]
+        for attr in ("x", "y", "width", "height"):
+            for valor in re.findall(rf'\b{attr}="(\d+)"', svg):
+                with self.subTest(attr=attr, valor=valor):
+                    self.assertEqual(int(valor) % 4, 0,
+                                     f"{attr}={valor} no cae en la retícula de 4")
+
+    def test_46_todas_las_bandas_tienen_la_misma_altura(self):
+        svg = self.html().split('<svg class="capas"')[1].split("</svg>")[0]
+        alturas = set(re.findall(r'height="(\d+)"', svg))
+        self.assertEqual(len(alturas - {"256"}), 1,
+                         "alturas distintas sin motivo hacen invisible la jerarquia")
+
+    def test_47_un_solo_acento_sobre_una_sola_banda(self):
+        """Dos focos borran el foco. El acento vive en `.focal` y en ningun sitio mas."""
+        css = self.css()
+        reglas = [l for l in css.splitlines() if "var(--glow)" in l and ".capas" in l]
+        for r in reglas:
+            self.assertIn("focal", r, f"acento fuera de la banda focal: {r.strip()}")
+
+    def test_48_el_marco_de_neon_esta_retirado(self):
+        """Sentenciado por nombre: competia con los datos y desgastaba contraste."""
+        css = self.css()
+        mod = css.split(".mod{")[1].split("}")[0]
+        self.assertIn("box-shadow:none", mod)
+        self.assertIn("1px solid", mod)
+        self.assertNotIn("--mod-glow", mod)
+
+    def test_49_el_glow_queda_reservado_a_las_cifras_vivas(self):
+        css = self.css()
+        for linea in css.splitlines():
+            if "text-shadow" in linea or ("box-shadow" in linea and "0 0 1" in linea):
+                self.assertIn("viva", linea,
+                              f"halo fuera de una cifra viva: {linea.strip()}")
+
+    def test_50_la_banda_focal_la_pone_el_dato_no_el_html(self):
+        """Un diagrama pintado a mano seguiria diciendo 0 el dia que suba."""
+        self.assertNotIn("banda focal", self.html())
+        js = (AQUI / "estatico" / "nexo.js").read_text(encoding="utf-8")
+        self.assertIn("classList.toggle('focal', n === d.nivel)", js)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
