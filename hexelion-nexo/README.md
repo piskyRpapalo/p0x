@@ -10,7 +10,7 @@
 
 <img src="https://img.shields.io/badge/front--end-14%20KiB-3DF58F?style=flat-square&labelColor=060B09" alt="Front end: 14 KiB">
 <img src="https://img.shields.io/badge/dependencies-0-3DF58F?style=flat-square&labelColor=060B09" alt="Dependencies: 0">
-<img src="https://img.shields.io/badge/tests-123%2F123-3DF58F?style=flat-square&labelColor=060B09" alt="Tests: 123 of 123">
+<img src="https://img.shields.io/badge/tests-126%2F126-3DF58F?style=flat-square&labelColor=060B09" alt="Tests: 126 of 126">
 <img src="https://img.shields.io/badge/python-stdlib%20only-C6A664?style=flat-square&labelColor=060B09" alt="Python: standard library only">
 <img src="https://img.shields.io/badge/cloud-none-C6A664?style=flat-square&labelColor=060B09" alt="Cloud: none">
 
@@ -58,7 +58,7 @@ aparte y deliberado.
 ```
 cp .env.example .env                    # gateway + which node is this machine
 cp rack.conf.example estado/rack.conf   # one line per node
-bash pruebas                            # 123/123 · 2 suites
+bash pruebas                            # 126/126 · 2 suites
 ```
 
 🇬🇧 All optional. With nothing configured the panel still starts and the cards
@@ -80,19 +80,29 @@ todos medidos — incluidos los dos que no están en verde.
 | Node | Metal | State | |
 |---|---|---|---|
 | `soberano` | Mini PC · 8 cores · 64 GB | `ONLINE` | 🇬🇧 core, local inference · 🇪🇸 núcleo, inferencia local |
-| `la-fragua` | ARM SBC · 16 GB · NVMe | `ONLINE` | 🇬🇧 gateway, attestation, voice · 🇪🇸 gateway, atestación, voz |
-| `el-vigia` | SBC · software-defined radio | `CRITICO` | 🇬🇧 ADS-B receiving · AIS service down, port closed · 🇪🇸 ADS-B recibiendo · servicio AIS caído |
+| `la-fragua` | ARM SBC · 16 GB · NVMe | `CRITICO` | 🇬🇧 gateway, attestation, RF · AIS probe aimed at the wrong host · 🇪🇸 gateway, atestación, RF · la sonda de AIS mira al nodo equivocado |
+| `el-vigia` | SBC · camera · ESP32 | `ONLINE` | 🇬🇧 MJPEG camera, sensors · 🇪🇸 cámara MJPEG, sensores |
 | `la-torre` | GPU module · CUDA | `ONLINE` | 🇬🇧 inference served · accelerated stack idle · 🇪🇸 inferencia servida · pila acelerada parada |
 
-🇬🇧 `el-vigia` is red with a **measured** cause, not a convenient one. The easy
-label was "radio disconnected" — but ADS-B is receiving through that same radio
-with sub-second message ages, so the hardware is present and the *service* is
-down. Same red, different repair.
+🇬🇧 That red went through two wrong diagnoses before it was right, and both are
+worth the telling. First: "the radio is disconnected" — false, ADS-B is
+receiving through it with sub-second message ages. Then: "the AIS service is
+down on this node" — precise, and about **the wrong machine**. The chain had
+moved, and the gateway's probe was still aimed where it used to live. A precise
+diagnosis about the wrong host sends you to repair what is not broken.
 
-🇪🇸 `el-vigia` va en rojo con una causa **medida**, no con una cómoda. La
-etiqueta fácil era «radio desconectada» — pero ADS-B recibe por esa misma radio
-con mensajes de hace menos de un segundo, así que el hardware está y lo caído es
-el *servicio*. Mismo rojo, distinta reparación.
+🇪🇸 Ese rojo pasó por dos diagnósticos equivocados antes de acertar, y los dos
+merecen contarse. Primero: «la radio está desconectada» — falso, ADS-B recibe
+por ella con mensajes de hace menos de un segundo. Después: «el servicio de AIS
+está caído en este nodo» — preciso, y sobre **la máquina equivocada**. La cadena
+se había movido y la sonda seguía apuntando a donde vivía antes. Un diagnóstico
+preciso sobre el nodo equivocado te manda a arreglar lo que no está roto.
+
+🇬🇧 The panel now reports **where the probe is looking**, which is the only thing
+it actually knows, and warns when that is not the node on the card.
+
+🇪🇸 El panel ahora dice **a dónde mira la sonda**, que es lo único que sabe de
+verdad, y avisa cuando eso no es el nodo de la tarjeta.
 
 ## Honest Sensors
 

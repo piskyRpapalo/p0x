@@ -114,6 +114,24 @@ def _json_remoto(base, ruta):
         return json.loads(r.read().decode("utf-8"))
 
 
+def _host(url):
+    """La primera etiqueta del host de una URL. Sin dominio y sin puerto.
+
+    Se recorta a proposito: lo que hace falta enseñar es a que MAQUINA apunta
+    una sonda, y el dominio de la red privada no pinta nada en una pantalla.
+    """
+    try:
+        # Sin `://` no hay host. `file:/run/algo.json` es el caso real -- la
+        # cadena de ADS-B se lee de un fichero LOCAL del gateway-- y sin esta
+        # linea se reportaba una maquina llamada «file», que no existe.
+        if "://" not in url:
+            return ""
+        autoridad = url.split("://", 1)[1].split("/")[0]
+        return autoridad.split("@")[-1].split(":")[0].split(".")[0]
+    except Exception:                                            # noqa: BLE001
+        return ""
+
+
 def _nombre(entrada):
     """El nombre del tailnet, que NO siempre es el de la maquina.
 
@@ -210,8 +228,25 @@ def leer():
             adsb = (antena.get("adsb") or {})
             if arriba and not ais.get("live"):
                 estado = "CRITICO"
-                alerta = "ais-catcher caido · puerto 10110 cerrado"
-                # El matiz que separa un servicio caido de una radio ausente.
+                # CICATRIZ. Aqui ponia «ais-catcher caido» a secas, y eso
+                # atribuia la averia AL NODO DE ESTA TARJETA. Falso: la sonda
+                # de AIS del gateway apunta a un host propio, que puede no ser
+                # este -- y medido el 2026-08-27, no lo era: seguia mirando al
+                # nodo donde la cadena vivia ANTES de moverla. Una alerta que
+                # senala la maquina equivocada manda a arreglar lo que no esta
+                # roto, y deja lo roto donde estaba.
+                #
+                # Ahora la alerta dice a DONDE MIRA la sonda, que es lo unico
+                # que este panel sabe de verdad, y avisa cuando ese sitio no es
+                # el nodo de la tarjeta.
+                mira = _host(ais.get("origin") or "")
+                alerta = "la sonda de AIS no recibe · mira a " + (mira or sensores.NO_DATA)
+                if mira and mira != nombre:
+                    alerta += f" · que NO es {nombre}"
+                    correcciones.append(
+                        f"la sonda de AIS apunta a «{mira}» y la tarjeta es de "
+                        f"«{nombre}» · uno de los dos esta desfasado, y no es "
+                        "algo que este panel pueda decidir")
                 nota = (f"ADS-B vivo · {adsb.get('aircraft', sensores.NO_DATA)} "
                         f"aeronaves · AIS 0 buques")
         if arriba and "INFERENCIA" in papel.upper() and nombre != yo:

@@ -713,6 +713,40 @@ class ElRack(unittest.TestCase):
                     fila["estado"], "EN ESPERA",
                     f"{fila['nodo']} declarado dormido sin haberlo medido")
 
+    def test_56f_una_sonda_que_mira_a_otro_nodo_se_declara(self):
+        """CICATRIZ. La alerta decia «ais-catcher caido» a secas y atribuia la
+        averia al nodo de la tarjeta. La sonda del gateway apunta a un host
+        propio, que puede no ser ese -- y medido, no lo era. Una alerta que
+        senala la maquina equivocada manda a arreglar lo que no esta roto.
+        """
+        import sensores.nodos as N
+        rack = [("nodo-a", "metal", "adquisicion RF · ADS-B y AIS", "a")]
+        antena = {"ais": {"live": False, "origin": "http://otro-nodo:10110/x"},
+                  "adsb": {"live": True, "aircraft": 3}}
+
+        def remoto(_b, ruta):
+            return antena if "antenna" in ruta else {"nodes": []}
+
+        with mock.patch.object(N, "rack", return_value=rack), \
+             mock.patch.object(N, "propio", return_value=""), \
+             mock.patch.object(N, "gateway", return_value="http://x"), \
+             mock.patch.object(N, "_tailscale", return_value={"nodo-a": True}), \
+             mock.patch.object(N, "_json_remoto", side_effect=remoto):
+            lectura = N.leer()
+        fila = lectura["nodos"][0]
+        self.assertEqual(fila["estado"], "CRITICO")
+        self.assertIn("otro-nodo", fila["alerta"], "la alerta dice a donde mira")
+        self.assertIn("NO es nodo-a", fila["alerta"])
+        self.assertTrue(any("desfasado" in a for a in lectura["avisos"]))
+
+    def test_56g_el_host_de_una_sonda_se_recorta_al_nombre(self):
+        """Ni dominio ni puerto: lo que hace falta enseñar es a que MAQUINA."""
+        import sensores.nodos as N
+        self.assertEqual(N._host("http://un-nodo.una-red.example:10110/s.json"),
+                         "un-nodo")
+        self.assertEqual(N._host(""), "")
+        self.assertEqual(N._host("file:/run/algo/x.json"), "")
+
     def test_57_el_rack_es_una_tira_no_una_rejilla_fija(self):
         """Un quinto nodo tiene que alargar la fila, no re-maquetarla."""
         css = (AQUI / "estatico" / "static" / "hexelion.css").read_text(encoding="utf-8")

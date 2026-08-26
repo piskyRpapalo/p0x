@@ -110,11 +110,15 @@ default, not a measurement. A timer armed for days and never fired would have
 rendered green, identical to one that just finished cleanly. When there is no
 last run, the result is `NO_DATA` too.
 
-**A dead service is not absent hardware.** One node's AIS chain is down. The
-convenient label is "SDR disconnected". But ADS-B is receiving through that same
-radio with sub-second message ages — so the radio is present and the *service*
-is down. Same red, different repair. A red without a measured cause cannot be
-fixed.
+**A dead service is not absent hardware — and a precise diagnosis can still
+name the wrong machine.** The AIS chain is down. The convenient label was "SDR
+disconnected": false, since ADS-B receives through that same radio with
+sub-second message ages. The second answer — "the AIS service is down on this
+node" — was precise and still wrong: the chain had moved, and the gateway's
+probe was still aimed at its old home. The panel now reports *where the probe is
+looking*, the only thing it actually knows, and warns when that is not the node
+on the card. A red that names the wrong host sends you to repair what is not
+broken.
 
 A test enforces the last one generally: no node may report `CRITICO` without
 carrying an alert string.
@@ -158,7 +162,7 @@ htmx minified is roughly 14 KB, and it renders nothing on its own. **This entire
 | Update path | **push, not poll** | SSE · the browser never asks |
 | Bytes per quiet update | **~386 B** | only changed sections travel |
 | Sensor reads per viewer | **0** | one refresher serves every open tab |
-| Tests | **123** | two suites, one runner · 20 of them chaos |
+| Tests | **126** | two suites, one runner · 20 of them chaos |
 | Build step | **none** | clone, `python3 servidor.py` |
 
 On latency: updates are pushed the moment the refresher notices a change, so the

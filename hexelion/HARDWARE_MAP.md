@@ -22,8 +22,8 @@ anota la contradicción en la §5 y **manda la medida**.
 | Nodo | Usuario | Metal | Estado medido |
 |---|---|---|---|
 | **soberano** | `pisky` | Beelink · Ryzen 7 255 · 64 GB DDR5 · 1 TB NVMe · Radeon 780M | **en pie** · es esta máquina |
-| **la-fragua** | `ubuntu` | Orange Pi 5 Plus · RK3588 8 núcleos ARM · 16 GB · 4 TB NVMe | **en pie** · 3 754 GiB montados, 57,6 usados |
-| **el-vigia** | `pi` | Raspberry Pi + SDR + ESP32 | **en pie, con un sentido caído** (§3) |
+| **la-fragua** | `ubuntu` | Orange Pi 5 Plus · RK3588 8 núcleos ARM · 16 GB · 4 TB NVMe | **en pie, con un sentido a medias** (§4) · 3 754 GiB montados |
+| **el-vigia** | `pi` | Raspberry Pi + cámara + ESP32 | **en pie** · sirve la cámara (§4) |
 | **la-torre** | `jetson` | Jetson Orin Nano Super 8 GB · CUDA 12.6 | **en pie y sirviendo** (§5.1) |
 
 ## 2 · Los nodos que no responden
@@ -57,7 +57,7 @@ diferencia se dice en vez de resolverse a ojo.
 | Puerto | Qué hay | Estado |
 |---|---|---|
 | 80 · 8080 · 8090 | HTTP | abiertos · 200 los tres |
-| 10110 | salida de `ais-catcher` | **cerrado** · es el flanco caído (§4) |
+| 10110 | la sonda de AIS del gateway apunta aquí | **cerrado** · y aquí ya no vive la cadena (§4) |
 | 1883 | MQTT | cerrado desde el tailnet · el broker vive en la LAN |
 | 6379 | Redis | cerrado desde el tailnet |
 
@@ -72,24 +72,46 @@ diferencia se dice en vez de resolverse a ojo.
 `la maquina del broker:1883` · broker MQTT · **abierto**. No cuelga de ningún nodo del
 tailnet: vive en la LAN y se alcanza por ahí.
 
-## 4 · El flanco caído · la RF del vigía
+## 4 · El flanco caído · la RF, y dónde vive de verdad
 
-Medido por `/api/antenna/health` del gateway, no por lectura de un registro:
+**Corregido el 2026-08-27.** Este documento decía que la cadena de RF colgaba de
+`el-vigia`. **No cuelga.** Lo corrigió el carbono y lo confirma el propio
+gateway:
 
-| Cadena | Vivo | Lo que dice el dato |
+| Cadena | Vivo | Dónde corre, medido |
 |---|---|---|
-| **ADS-B** · `dump1090.service` · 1090 MHz | **sí** | 6 aeronaves · 1 351 mensajes · última hace 0,0 s |
-| **AIS** · `ais-catcher.service` · 162 MHz | **no** | 0 buques · inalcanzable · `ais_port_10110_open: false` |
+| **ADS-B** · `dump1090.service` | **sí** | En **la forja**. Su origen es `file:/run/dump1090/aircraft.json` — un fichero **local** del gateway, así que el gateway y dump1090 comparten máquina. Eso no admite interpretación. |
+| **AIS** · `ais-catcher.service` | **no** | En **la forja** también, según el carbono. Pero la sonda del gateway sigue apuntando al **vigía**, al puerto 10110 — que es donde vivía **antes**. |
 
-**El diagnóstico del parte no cuadra con la medida.** El parte dice «el dongle
-NO está conectado o falló». Si el dongle estuviera ausente, ADS-B tampoco
-recibiría — y ADS-B está recibiendo ahora mismo, con mensajes de hace menos de
-un segundo. Lo que está caído es **`ais-catcher` y su puerto 10110**, no la
-radio entera. Es otro fallo y pide otra reparación: mirar el servicio antes de
-tocar el hardware.
+### La avería es la sonda, no el servicio
 
-Sigue siendo **crítico** y sigue pintándose en ámbar. Cambia la causa, no la
-gravedad.
+Esto es lo que cambia con la corrección, y cambia la reparación entera:
+
+- El puerto `10110` está cerrado en **los dos** nodos vistos desde `soberano`.
+- La sonda de AIS del gateway declara como origen el **vigía**, puerto 10110, ruta `ships.json`.
+- Si la cadena se movió a la forja, esa sonda **no puede** recibir nada: está
+  mirando a una máquina que ya no la sirve.
+
+Así que hay **dos fallos apilados y solo uno era visible**: una configuración
+desfasada en el gateway (segura), y por debajo, un `ais-catcher` cuyo estado
+real **no se sabe** — el 10110 podría estar atado a loopback en la forja y estar
+perfectamente sano. `NO_DATA` hasta que la sonda mire al sitio correcto.
+
+> **Lo que este documento afirmaba y era falso.** Decía «lo caído es
+> `ais-catcher` y su puerto 10110, no la radio entera», y presentaba eso como
+> una corrección al parte. Era una corrección a medias: acertaba en que no
+> faltaba hardware y fallaba en **de qué máquina** hablaba. Un diagnóstico
+> preciso sobre el nodo equivocado manda a arreglar lo que no está roto.
+
+El panel ya no atribuye la avería a un nodo: dice **a dónde mira la sonda**, que
+es lo único que sabe de verdad, y avisa cuando ese sitio no coincide con el nodo
+de la tarjeta.
+
+### Y `el-vigia`, entonces, ¿qué hace?
+
+Lo que está **medido** desde aquí: sirve una cámara. `µStreamer v5.4` en el
+`:8080`, `multipart/x-mixed-replace`, 1280×720, comprobado abriendo el flujo. De
+sus otros servicios no hay dato desde fuera.
 
 ## 5 · Cuatro contradicciones entre el parte y el disco
 

@@ -20,6 +20,6 @@ The numbers come from refusals. One thread reads the sensors and composes
 finished HTML; Server-Sent Events push only the sections that changed; the
 browser's native `EventSource` places a string and computes nothing. No React,
 no htmx, no Alpine — not even vendored. No write verb, no SSH, no cloud, no
-build step. 123 tests, one runner.
+build step. 126 tests, one runner.
 
 I build Edge systems that put the truth of the data above empty aesthetics.
