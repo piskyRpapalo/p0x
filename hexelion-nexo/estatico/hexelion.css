@@ -1,0 +1,136 @@
+/* El Nexo · sistema de diseño SOVEREIGN, tomado del panel v9 del orquestador.
+   Se traen las variables y el cromado de modulo --.mod, .mod__head, .chip, los
+   colores de estado-- y NO se traen las tres cosas que aquel fichero cargaba de
+   fuera: la hoja de Google Fonts, el CSS de Leaflet y el truco del <base>. Un
+   panel soberano que necesita internet para dibujarse es una contradiccion, y
+   la elegancia estaba en la paleta, no en la CDN.
+
+   De ahi que las familias sean pilas locales con respaldo: la voz de Cinzel la
+   hace un serif del sistema. Se pierde un poco de ceremonia; no se pierde nada
+   que importe. */
+
+:root{
+  --bg-grad:radial-gradient(80% 60% at 18% 12%,rgba(0,229,255,0.07),transparent 45%),
+            radial-gradient(70% 60% at 88% 90%,rgba(31,138,91,0.16),transparent 50%),
+            radial-gradient(130% 120% at 50% 40%,#0f1814 0%,#0a110d 55%,#050807 100%);
+  --bg-tex:linear-gradient(rgba(40,120,80,0.16) 1px,transparent 1px),
+           linear-gradient(90deg,rgba(40,120,80,0.16) 1px,transparent 1px);
+  --tex-size:30px 30px;
+  --panel-bg:rgba(7,18,14,0.84);
+  --head-bg:repeating-linear-gradient(91deg,rgba(255,255,255,0.045) 0 1.5px,transparent 1.5px 5px),
+            linear-gradient(180deg,#1d3a2a,#10241a);
+  --head-line:rgba(0,0,0,0.55); --head-text:#8fe0b4;
+  --ink:#e4f0e6; --ink-2:rgba(214,236,222,0.66);
+  --ink-3:rgba(214,236,222,0.44); --ink-4:rgba(214,236,222,0.27);
+  --neon:#00e5ff; --neon-soft:#9bf2ff; --glow:#36f59a; --gold:#9cd6a8;
+  --amber:#ffaa00; --red:#ff5566;
+  --hair:rgba(0,229,255,0.13); --hair2:rgba(54,245,154,0.28);
+  --inset-line:rgba(0,0,0,0.6);
+  --rule:linear-gradient(90deg,transparent,var(--glow) 22%,var(--neon) 50%,var(--glow) 78%,transparent);
+  --mod-edge:color-mix(in oklch,var(--accent,var(--glow)),transparent 32%);
+  --mod-glow:0 0 10px color-mix(in oklch,var(--accent,var(--glow)),transparent 55%);
+  --mod-drop:0 8px 22px rgba(0,0,0,0.5);
+  --ac-listen:#00e5ff; --ac-prove:#36f59a; --ac-sustain:#1fb39a;
+  --ac-harvest:#FFB300; --ac-alert:#ff4455; --ac-mind:#7aa2ff;
+  --radius:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px;
+  --fs-mod:11px; --fs-sec:13px; --fs-body:12.5px; --fs-meta:9.5px;
+  --mono:"JetBrains Mono","DejaVu Sans Mono",ui-monospace,"Share Tech Mono",monospace;
+  --serif:"Cinzel","DejaVu Serif",Georgia,"Times New Roman",serif;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--mono); font-size:var(--fs-body); color:var(--ink);
+  background:var(--bg-grad) fixed; min-height:100vh;
+  -webkit-font-smoothing:antialiased; padding:22px 18px 56px;
+}
+body::before{
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:var(--bg-tex); background-size:var(--tex-size);
+  opacity:.45; mix-blend-mode:screen;
+}
+
+/* ── cabecera ───────────────────────────────────────────────── */
+.marco{max-width:1420px;margin:0 auto}
+header{border-bottom:1px solid var(--hair);padding-bottom:14px;margin-bottom:20px}
+h1{font-family:var(--serif);font-size:18px;font-weight:700;letter-spacing:.22em;
+   text-transform:uppercase;margin:0;color:var(--ink)}
+h1 em{font-style:normal;color:var(--glow)}
+.regla{height:1px;background:var(--rule);margin:10px 0 12px;opacity:.7}
+.cabecera-filas{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.meta{font-size:var(--fs-meta);color:var(--ink-4);letter-spacing:.06em}
+
+/* ── modulos ────────────────────────────────────────────────── */
+.rejilla{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.mod{position:relative;border-radius:var(--radius);overflow:hidden;
+     background:var(--panel-bg);min-width:0;
+     box-shadow:0 0 0 1px var(--mod-edge),var(--mod-glow),var(--mod-drop)}
+.mod--ancho{grid-column:span 2}
+@media(max-width:820px){.mod--ancho{grid-column:span 1}}
+.mod__head{display:flex;align-items:center;gap:8px;padding:var(--sp-2) var(--sp-3);
+           background:var(--head-bg);border-bottom:1px solid var(--head-line)}
+.mod__title{font-family:var(--serif);font-size:var(--fs-mod);font-weight:700;
+            letter-spacing:.1em;color:var(--head-text);text-transform:uppercase;
+            display:inline-flex;align-items:center;gap:6px}
+.mod__spacer{flex:1}
+.mod__body{padding:var(--sp-4) var(--sp-3) var(--sp-3)}
+.mod__lead{font-size:var(--fs-body);color:var(--ink-2);line-height:1.6;
+           margin:0 0 var(--sp-3)}
+
+/* ── datos ──────────────────────────────────────────────────── */
+.fila{display:flex;justify-content:space-between;gap:14px;padding:5px 0;
+      border-top:1px solid rgba(255,255,255,.045);min-width:0}
+.fila:first-child{border-top:0}
+.fila .k{color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fila .v{text-align:right;white-space:nowrap;font-weight:600}
+.fila--sangrada .k{padding-left:12px;color:var(--ink-4)}
+.cifra{font-family:var(--serif);font-size:30px;line-height:1.05;letter-spacing:.04em;
+       margin:2px 0 4px;color:var(--ink)}
+.cifra small{display:block;font-family:var(--mono);font-size:var(--fs-meta);
+             letter-spacing:.16em;color:var(--ink-4);margin-top:6px;font-weight:400}
+
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:9px;letter-spacing:.1em;
+      text-transform:uppercase;padding:3px 9px;border-radius:999px;
+      border:1px solid var(--hair2);color:var(--ink-2);background:rgba(0,0,0,.14);
+      white-space:nowrap}
+.chip.c-ok{color:var(--glow);border-color:color-mix(in oklch,var(--glow),transparent 50%)}
+.chip.c-warn{color:var(--amber);border-color:color-mix(in oklch,var(--amber),transparent 50%)}
+.chip.c-crit{color:var(--red);border-color:color-mix(in oklch,var(--red),transparent 50%)}
+.chip.c-mut{color:var(--ink-4)}
+
+.c-ok{color:var(--glow)} .c-warn{color:var(--amber)} .c-crit{color:var(--red)}
+.c-mut{color:var(--ink-3)} .c-gold{color:var(--gold)}
+
+/* NO_DATA nunca se pinta como un valor. Ambar, versalitas y su causa debajo. */
+.nodata{color:var(--amber);letter-spacing:.08em;font-size:11px}
+.causa{color:var(--ink-4);font-size:var(--fs-meta);line-height:1.5;
+       margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,.07)}
+
+/* ── la escalera de niveles ─────────────────────────────────── */
+.escalera{display:flex;gap:6px;margin:12px 0 4px}
+.peldano{flex:1;padding:8px 6px;border-radius:3px;text-align:center;
+         border:1px solid rgba(255,255,255,.07);background:rgba(0,0,0,.22)}
+.peldano b{display:block;font-family:var(--serif);font-size:16px;color:var(--ink-4)}
+.peldano span{font-size:8.5px;letter-spacing:.1em;color:var(--ink-4)}
+.peldano.activo{border-color:color-mix(in oklch,var(--glow),transparent 45%);
+                background:rgba(54,245,154,.08)}
+.peldano.activo b,.peldano.activo span{color:var(--glow)}
+.peldano.suelo{border-color:color-mix(in oklch,var(--neon),transparent 40%)}
+
+.barra{height:3px;border-radius:2px;background:rgba(255,255,255,.07);overflow:hidden;
+       margin-top:6px}
+.barra i{display:block;height:100%;background:var(--glow)}
+
+footer{margin-top:22px;padding-top:14px;border-top:1px solid var(--hair);
+       color:var(--ink-4);font-size:var(--fs-meta);line-height:1.7}
+code{color:var(--neon-soft);font-size:.95em}
+
+/* El Doogee: 1080x2408 en tres columnas no cabe. Una, y las filas sin cortar. */
+@media(max-width:520px){
+  body{padding:14px 10px 40px}
+  .rejilla{grid-template-columns:1fr}
+  h1{font-size:14px;letter-spacing:.14em}
+  .fila{flex-wrap:wrap}
+  .fila .v{text-align:left}
+}

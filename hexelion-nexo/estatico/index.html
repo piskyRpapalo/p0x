@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EL NEXO · orquestador</title>
+<link rel="stylesheet" href="/hexelion.css">
+</head>
+<body>
+<div class="marco">
+
+  <header>
+    <div class="cabecera-filas">
+      <h1>EL NEXO <em>·</em> ORQUESTADOR</h1>
+      <span class="mod__spacer"></span>
+      <span class="chip c-mut" id="chip-conexion">conectando…</span>
+      <span class="meta" id="meta-medido">—</span>
+    </div>
+    <div class="regla"></div>
+    <p class="meta" style="margin:0;max-width:96ch;line-height:1.7">
+      Ventana de lectura sobre el ecosistema. No ejecuta, no arranca, no para y
+      no firma: el servidor no tiene un solo verbo que escriba. Cada tarjeta trae
+      la hora en que se midió, y lo que no se pudo medir se declara con su causa
+      en vez de rellenarse con un cero.
+    </p>
+  </header>
+
+  <main class="rejilla">
+
+    <section class="mod mod--ancho" style="--accent:var(--ac-prove)" id="m-soberania">
+      <div class="mod__head">
+        <span class="mod__title"><span style="color:var(--glow)">▸</span> Nivel de soberanía</span>
+        <span class="mod__spacer"></span>
+        <span class="chip c-mut" data-chip>—</span>
+      </div>
+      <div class="mod__body" data-cuerpo>
+        <p class="mod__lead">Cargando…</p>
+      </div>
+    </section>
+
+    <section class="mod" style="--accent:var(--ac-listen)" id="m-preceptor">
+      <div class="mod__head">
+        <span class="mod__title"><span style="color:var(--neon)">▸</span> Núcleo público</span>
+        <span class="mod__spacer"></span>
+        <span class="chip c-mut" data-chip>—</span>
+      </div>
+      <div class="mod__body" data-cuerpo><p class="mod__lead">Cargando…</p></div>
+    </section>
+
+    <section class="mod" style="--accent:var(--ac-mind)" id="m-timers">
+      <div class="mod__head">
+        <span class="mod__title"><span style="color:var(--ac-mind)">▸</span> Bucles de agentes</span>
+        <span class="mod__spacer"></span>
+        <span class="chip c-mut" data-chip>—</span>
+      </div>
+      <div class="mod__body" data-cuerpo><p class="mod__lead">Cargando…</p></div>
+    </section>
+
+    <section class="mod" style="--accent:var(--ac-harvest)" id="m-lora">
+      <div class="mod__head">
+        <span class="mod__title"><span style="color:var(--amber)">▸</span> La forja · adapters</span>
+        <span class="mod__spacer"></span>
+        <span class="chip c-mut" data-chip>—</span>
+      </div>
+      <div class="mod__body" data-cuerpo><p class="mod__lead">Cargando…</p></div>
+    </section>
+
+    <section class="mod" style="--accent:var(--ac-alert)" id="m-cinek">
+      <div class="mod__head">
+        <span class="mod__title"><span style="color:var(--red)">▸</span> Pipeline de vídeo</span>
+        <span class="mod__spacer"></span>
+        <span class="chip c-mut" data-chip>—</span>
+      </div>
+      <div class="mod__body" data-cuerpo><p class="mod__lead">Cargando…</p></div>
+    </section>
+
+    <section class="mod" style="--accent:var(--ac-sustain)" id="m-jardin">
+      <div class="mod__head">
+        <span class="mod__title"><span style="color:var(--ac-sustain)">▸</span> Jardín · permacultura</span>
+        <span class="mod__spacer"></span>
+        <span class="chip c-mut" data-chip>—</span>
+      </div>
+      <div class="mod__body" data-cuerpo><p class="mod__lead">Cargando…</p></div>
+    </section>
+
+  </main>
+
+  <footer>
+    Seis sensores · lectura por <code>/api/estado</code> · ninguna petición sale
+    de esta máquina · para medir la tanda del núcleo:
+    <code>python3 -m sensores.preceptor --medir</code>
+  </footer>
+
+</div>
+<script src="/nexo.js"></script>
+</body>
+</html>

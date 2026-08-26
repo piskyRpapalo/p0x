@@ -8,6 +8,7 @@ no responde 501 a un POST por su cuenta.
 """
 
 import json
+import re
 import tempfile
 import threading
 import unittest
@@ -318,6 +319,70 @@ class SensoresDeProyecto(unittest.TestCase):
                     self.assertEqual(codigo, 200)
                     self.assertIn(json.loads(cuerpo)["estado"],
                                   ("ok", sensores.NO_DATA))
+
+
+class LaCara(unittest.TestCase):
+    """Lo que tiene que ser verdad de una pagina que no puede salir a la red."""
+
+    def cara(self, nombre):
+        return (AQUI / "estatico" / nombre).read_text(encoding="utf-8")
+
+    def test_31_la_cara_no_carga_nada_de_fuera(self):
+        """v9 traia Google Fonts y Leaflet por CDN. Aqui eso no entra."""
+        for nombre in ("index.html", "hexelion.css", "nexo.js"):
+            texto = self.cara(nombre)
+            with self.subTest(fichero=nombre):
+                for fuera in ("http://", "https://", "//unpkg", "//cdn",
+                              "fonts.googleapis", "@import url("):
+                    self.assertNotIn(fuera, texto,
+                                     "un panel que necesita internet para "
+                                     "dibujarse es una contradiccion")
+
+    def test_32_la_cara_no_abre_ningun_socket_que_no_sea_su_propia_api(self):
+        js = self.cara("nexo.js")
+        for prohibido in ("WebSocket", "EventSource", "sendBeacon",
+                          "XMLHttpRequest", "import("):
+            self.assertNotIn(prohibido, js)
+        for llamada in re.findall(r"fetch\(\s*'([^']*)'", js):
+            self.assertTrue(llamada.startswith("/api/"),
+                            f"la cara pide fuera de su api: {llamada}")
+
+    def test_33_todo_lo_que_se_pinta_pasa_por_el_escapador(self):
+        js = self.cara("nexo.js")
+        self.assertIn("const esc =", js)
+        # `innerHTML` solo se escribe desde `pinta`, que recibe html ya escapado.
+        self.assertEqual(js.count(".innerHTML"), 1,
+                         "un segundo innerHTML es un segundo sitio donde revisar")
+
+    def test_34_no_data_no_se_pinta_como_un_valor(self):
+        js = self.cara("nexo.js")
+        self.assertIn('class="nodata"', js)
+        css = self.cara("hexelion.css")
+        self.assertIn(".nodata{", css.replace(" ", ""))
+
+    def test_35_cada_modulo_del_html_tiene_su_pintor_y_al_reves(self):
+        html = self.cara("index.html")
+        js = self.cara("nexo.js")
+        en_html = set(re.findall(r'id="m-([a-z]+)"', html))
+        pintores = set(re.findall(r"^  ([a-z]+)\(d\) \{", js, re.M))
+        self.assertEqual(en_html, pintores,
+                         "una tarjeta sin pintor se queda en «Cargando…» "
+                         "para siempre y nadie se entera")
+
+    def test_36_los_sensores_y_las_tarjetas_son_los_mismos(self):
+        html = self.cara("index.html")
+        en_html = set(re.findall(r'id="m-([a-z]+)"', html))
+        self.assertEqual(en_html, set(registro.SENSORES),
+                         "un sensor sin tarjeta es un dato que nadie ve")
+
+    def test_37_la_pagina_se_sirve_entera_desde_el_nexo(self):
+        with ServidorEnPie() as s:
+            for ruta in ("/", "/hexelion.css", "/nexo.js"):
+                with self.subTest(ruta=ruta):
+                    codigo, cuerpo, cab = s.get(ruta)
+                    self.assertEqual(codigo, 200)
+                    self.assertTrue(cuerpo.strip())
+                    self.assertEqual(cab["X-Frame-Options"], "DENY")
 
 
 if __name__ == "__main__":
