@@ -1,0 +1,28 @@
+{
+  "fecha": "2026-08-29T16:39:59+00:00",
+  "version": "v7-linea-a",
+  "dataset": "./data/sft_cot.jsonl",
+  "hiper": {
+    "rank": 16,
+    "alpha": 32,
+    "dropout": 0.05,
+    "lr": 0.0001,
+    "epocas": 2,
+    "validacion": 0.15,
+    "subidas_para_abortar": 2,
+    "max_len": 1024,
+    "cada_cuantos_evalua": 10,
+    "min_tokens": 20,
+    "objetivo": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj"
+    ],
+    "cada": 10
+  },
+  "tren": 93,
+  "validacion": 16,
+  "mejor_paso": 180,
+  "mejor_val_loss": 1.0989533960819244
+}
