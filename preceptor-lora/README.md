@@ -1,6 +1,6 @@
 # preceptor-lora · la forja
 
-> **Estado: STAGING · nada se ha ejecutado, nada se ha instalado.**
+> **Estado: ENTRENANDO · v7 lineas A y B en Ollama, 15 adapters producidos**
 > Plan del Arquitecto recuperado del canon (`mente/backlog/BACKLOG_UI.md`,
 > Apéndice A.6: *«`~/aurelius-lora/` → EN ESPERA»*, 2026-08-02) y sellado con
 > hardware medido el **2026-08-20**.
