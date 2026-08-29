@@ -12,7 +12,7 @@ from pathlib import Path
 import sensores
 from sensores import registro
 
-FORJA = Path(__file__).resolve().parents[2] / "aurelius-lora"
+FORJA = Path(__file__).resolve().parents[2] / "preceptor-lora"
 # Lo que convierte una carpeta en un adapter de verdad. Una carpeta vacia con
 # nombre prometedor no es un adapter, y contarla inflaria la cifra.
 PESO = "adapter_model.safetensors"
