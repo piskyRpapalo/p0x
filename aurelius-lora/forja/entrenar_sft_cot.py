@@ -35,7 +35,10 @@ RAIZ = Path(__file__).resolve().parent.parent
 DATASET = RAIZ / "data" / "sft_cot.jsonl"
 SALIDA = RAIZ / "salida"
 
-BASE_HF = "Qwen/Qwen3-4B-Instruct-2507"
+# La base ya no esta cableada: la linea A es Qwen3-4B y la linea B es
+# Llama-3.2-3B, y el mismo trainer sirve a las dos. El defecto se
+# mantiene en la linea A para que lo ya entrenado se reproduzca igual.
+BASE_POR_DEFECTO = "Qwen/Qwen3-4B-Instruct-2507"
 
 HIPER = {
     "rank": 16,
@@ -88,6 +91,8 @@ def main(argv=None):
     ap.add_argument("--ejecutar", action="store_true")
     ap.add_argument("--dataset", type=Path, default=DATASET)
     ap.add_argument("--version", default="sft-cot-v1")
+    ap.add_argument("--base", default=BASE_POR_DEFECTO,
+                    help="repo HF de la base (linea A: Qwen3-4B · linea B: Llama-3.2-3B)")
     ap.add_argument("--hilos", type=int, default=8)
     ap.add_argument("--epocas", type=int, default=HIPER["epocas"])
     ap.add_argument("--cada", type=int, default=HIPER["cada_cuantos_evalua"])
@@ -100,7 +105,7 @@ def main(argv=None):
     muestras = cargar(a.dataset)
     tren, val = partir(muestras, HIPER["validacion"])
 
-    print(f"[sft-cot] base: {BASE_HF} (pesos sin cuantizar, bf16)")
+    print(f"[sft-cot] base: {a.base} (pesos sin cuantizar, bf16)")
     print(f"[sft-cot] LoRA r={HIPER['rank']} alpha={HIPER['alpha']} "
           f"lr={HIPER['lr']} · {a.epocas} épocas · "
           f"validación {HIPER['validacion']:.0%}")
@@ -111,13 +116,13 @@ def main(argv=None):
         return 0
 
     torch.set_num_threads(a.hilos)
-    tok = AutoTokenizer.from_pretrained(BASE_HF, trust_remote_code=True)
+    tok = AutoTokenizer.from_pretrained(a.base, trust_remote_code=True)
     if tok.pad_token is None:
         tok.pad_token = tok.eos_token
     tok.padding_side = "right"
 
     modelo = AutoModelForCausalLM.from_pretrained(
-        BASE_HF, torch_dtype=torch.bfloat16, trust_remote_code=True
+        a.base, torch_dtype=torch.bfloat16, trust_remote_code=True
     )
     config = LoraConfig(
         r=HIPER["rank"], lora_alpha=HIPER["alpha"],
@@ -205,6 +210,7 @@ def main(argv=None):
         # Un adapter que no sabe con que se entreno obliga a adivinar a quien
         # lo mida despues, y adivinar fue la averia de R9 del 2026-08-22.
         "dataset": str(a.dataset),
+        "base": a.base,
         "hiper": {**HIPER, "epocas": a.epocas, "cada": a.cada},
         "tren": len(tren), "validacion": len(val),
         "mejor_paso": mejor["paso"],
