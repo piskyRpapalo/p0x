@@ -1,29 +1,0 @@
-Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
-[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
-[sft-cot] base: Qwen/Qwen3-4B-Instruct-2507 (pesos sin cuantizar, bf16)
-[sft-cot] LoRA r=16 alpha=32 lr=0.0001 · 2 épocas · validación 15%
-[sft-cot] muestras: 109 (tren 93, val 16)
-Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:  89%|████████▉ | 354/398 [00:00<00:00, 3509.66it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 3525.63it/s]
-[sft-cot] parámetros entrenables: 11,796,480
-  paso   10 · val 3.4564  ← mejor
-  paso   20 · val 2.9846  ← mejor
-  paso   30 · val 2.4306  ← mejor
-  paso   40 · val 2.0348  ← mejor
-  paso   50 · val 1.8155  ← mejor
-  paso   60 · val 1.7123  ← mejor
-  paso   70 · val 1.6166  ← mejor
-  paso   80 · val 1.5426  ← mejor
-  paso   90 · val 1.4560  ← mejor
-  paso  100 · val 1.4031  ← mejor
-  paso  110 · val 1.3103  ← mejor
-  paso  120 · val 1.2423  ← mejor
-  paso  130 · val 1.2070  ← mejor
-  paso  140 · val 1.1677  ← mejor
-  paso  150 · val 1.1754
-  paso  160 · val 1.1573  ← mejor
-  paso  170 · val 1.1401  ← mejor
-  paso  180 · val 1.0990  ← mejor
-[sft-cot] entrenamiento completado en 553s
-[sft-cot] mejor paso: 180 · val 1.0990
-[sft-cot] adapter guardado en ./salida/v7-linea-a
-[sft-cot] VERDE
