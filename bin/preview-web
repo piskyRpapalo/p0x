@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# preview-web · sirve preceptoros-web/public en local, y se recoge la mesa.
+#
+# POR QUE EXISTE
+# --------------
+# El 2026-08-30 el Ojo destapo DIEZ `python3 -m http.server` huerfanos en los
+# puertos 8792-8808, sirviendo esta misma carpeta, reparentados a systemd
+# porque su shell habia muerto. El mas viejo llevaba siete horas. Uno por
+# sesion: cada una levantaba su previsualizacion y ninguna la apagaba.
+#
+# Es el «servicio fantasma» del canon por la puerta de atras -- sin unidad, sin
+# firma y sin registro. Nadie lo sabia porque estaban en loopback y porque
+# nadie mira `ss` entero.
+#
+# Este guion arregla las tres causas:
+#   * PUERTO FIJO. Uno, no uno nuevo por sesion.
+#   * FICHERO DE PID. Antes de arrancar, mata el suyo anterior si sigue vivo.
+#   * --stop. Apagarlo es un comando, no un arqueo de procesos.
+#
+# Y se ata a 127.0.0.1 explicitamente: el `:8080` de aquel dia estaba en
+# 0.0.0.0, sin auth y sin logs, expuesto a la red entera.
+set -uo pipefail
+
+PUERTO="${PUERTO_PREVIEW:-8791}"
+DIR="$HOME/preceptoros-web/public"
+PIDF="${XDG_RUNTIME_DIR:-/tmp}/p0x-preview-web.pid"
+
+matar_anterior () {
+  [ -f "$PIDF" ] || return 0
+  local viejo; viejo="$(cat "$PIDF" 2>/dev/null || true)"
+  if [ -n "$viejo" ] && kill -0 "$viejo" 2>/dev/null; then
+    # Se comprueba que el PID sea NUESTRO antes de matarlo. Un fichero de pid
+    # rancio puede apuntar a un proceso que reuso ese numero, y matar a ciegas
+    # por un pid reciclado es peor que dejar una preview colgada.
+    if tr '\0' ' ' < "/proc/$viejo/cmdline" 2>/dev/null | grep -q "http.server $PUERTO"; then
+      kill "$viejo" && echo "· preview anterior (pid $viejo) apagada"
+      sleep 0.4
+    fi
+  fi
+  rm -f "$PIDF"
+}
+
+if [ "${1:-}" = "--stop" ]; then
+  matar_anterior
+  echo "✅ preview detenida"
+  exit 0
+fi
+
+if [ ! -d "$DIR" ]; then
+  echo "🔴 NO_DATA: no existe $DIR" >&2
+  exit 1
+fi
+
+matar_anterior
+cd "$DIR"
+setsid python3 -m http.server "$PUERTO" --bind 127.0.0.1 >/dev/null 2>&1 < /dev/null &
+echo $! > "$PIDF"
+sleep 0.6
+
+if curl -s -o /dev/null --max-time 3 "http://127.0.0.1:$PUERTO/"; then
+  echo "✅ http://127.0.0.1:$PUERTO/   (pid $(cat "$PIDF"))"
+  echo "   apagar: ~/p0x/bin/preview-web --stop"
+else
+  echo "🔴 arrancó pero no responde en :$PUERTO" >&2
+  exit 1
+fi
