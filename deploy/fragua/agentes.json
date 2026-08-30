@@ -1,0 +1,65 @@
+{
+  "esquema": 1,
+  "nota": "El catalogo de companeros. `disponible` dice si HAY adaptador servido de verdad; lo que no existe se declara, no se esconde. Un catalogo que ofrece ocho companeros cuando hay dos es un escaparate con cajas vacias.",
+  "agentes": [
+    {
+      "id": "instalador", "nombre": "El Instalador", "orden": 0,
+      "disponible": true, "adaptador": "preceptor-v7:latest",
+      "mision": "Te acompana hasta que la app funciona y has elegido companero. Es el primero que habla y el que te presenta a los demas.",
+      "ejemplo": {
+        "tu": "Acabo de instalarla. ¿Y ahora?",
+        "el": "Quedate conmigo un momento. Te explico como elegir al companero que mejor encaja con lo que quieres hacer, y luego te dejo con el."
+      }
+    },
+    {
+      "id": "aprendiz", "nombre": "El Aprendiz", "orden": 1,
+      "disponible": false, "adaptador": null,
+      "causa": "sin adaptador entrenado todavia",
+      "mision": "Aprende contigo: convierte lo que haces en memoria que puedas volver a usar.",
+      "ejemplo": {"tu": "Explicame esto otra vez.", "el": "NO_DATA — todavia no existe este companero."}
+    },
+    {
+      "id": "coder", "nombre": "El Artesano", "orden": 2,
+      "disponible": false, "adaptador": null,
+      "causa": "sin adaptador entrenado todavia",
+      "mision": "Trabaja con tu codigo en tu maquina, sin que salga de ella.",
+      "ejemplo": {"tu": "Este script falla.", "el": "NO_DATA — todavia no existe este companero."}
+    },
+    {
+      "id": "escritor", "nombre": "El Escritor", "orden": 3,
+      "disponible": false, "adaptador": null,
+      "causa": "sin adaptador entrenado todavia",
+      "mision": "Escribe contigo, en tu voz y no en la suya.",
+      "ejemplo": {"tu": "Ayudame con este texto.", "el": "NO_DATA — todavia no existe este companero."}
+    },
+    {
+      "id": "analista", "nombre": "El Analista", "orden": 4,
+      "disponible": false, "adaptador": null,
+      "causa": "sin adaptador entrenado todavia",
+      "mision": "Mira tus datos y te dice lo que ve, incluido lo que no puede medir.",
+      "ejemplo": {"tu": "¿Que dice esta tabla?", "el": "NO_DATA — todavia no existe este companero."}
+    },
+    {
+      "id": "traductor", "nombre": "El Traductor", "orden": 5,
+      "disponible": false, "adaptador": null,
+      "causa": "sin adaptador entrenado todavia",
+      "mision": "Pasa lo tuyo a otro idioma sin que salga de tu maquina.",
+      "ejemplo": {"tu": "Traduce esto al frances.", "el": "NO_DATA — todavia no existe este companero."}
+    },
+    {
+      "id": "bibliotecario", "nombre": "El Bibliotecario", "orden": 6,
+      "disponible": false, "adaptador": null,
+      "causa": "sin adaptador entrenado todavia",
+      "colision_evitada": "el encargo lo llamaba «Curador», que ya es el nombre de un bucle del enjambre (higiene de la memoria, solo lectura). Dos curadores en el mismo ecosistema es la clase de confusion que este proyecto ya pago una vez.",
+      "mision": "Ordena tu memoria y te propone que sobra y que falta.",
+      "ejemplo": {"tu": "¿Tengo esto repetido?", "el": "NO_DATA — todavia no existe este companero."}
+    },
+    {
+      "id": "privacidad", "nombre": "El Aduanero", "orden": 7,
+      "disponible": false, "adaptador": null,
+      "causa": "sin adaptador entrenado todavia",
+      "mision": "Revisa que sale de tu maquina antes de que salga, y te dice donde el filtro no llega.",
+      "ejemplo": {"tu": "¿Puedo pegar esto fuera?", "el": "NO_DATA — todavia no existe este companero."}
+    }
+  ]
+}
