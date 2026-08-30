@@ -87,3 +87,5 @@ hexelion-nexo/estado/
 # puede rehacer los masters. Meterlos son 14 MB en el repo; dejarlos fuera es
 # confiar en una copia local. Lo firma el Soberano, no el silicio.
 Alejandria/Images-preceptorOS-head/
+Alejandria/marca/originals/*.jpeg
+Alejandria/marca/originals/*.jpeg
