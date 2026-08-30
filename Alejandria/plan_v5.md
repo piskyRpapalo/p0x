@@ -76,3 +76,48 @@ mantiene NO_DATA «especificado, no construido». No es bug del detector.
 
 EL CENTRO: donde el Soberano habla con su Instalador. El silicio pinta el
 refugio; el carbono lo habita.
+
+---
+
+# ANEXO WEB · ARQUITECTURA DEL AGORA (firmado 2026-08-30, transcrito del encargo)
+
+FILOSOFIA: «Call Center» de companeros. Se entra al Hub, se ve la galeria y se
+interactua en 2 clics. Estetica Liquid Glass Solar-punk (--violeta, --bronce,
+--marmol, backdrop-filter blur, border-radius 0). Cara de marmol y paleta
+canonica INTACTAS: solo reorganizacion espacial.
+
+5 RUTAS (el techo de 7 paginas del gate ya esta al limite: no caben mas):
+ 1 index.html   · el Hub. Chat + grid de widgets, uno por companero. Clic 1
+                  carga el modelo (window.ai o WebLLM), clic 2 abre el input.
+                  Skeleton UI si tarda >1,5 s. Enlace sutil a instalar.html.
+ 2 instalar.html· el Bucle. Android/Termux/Escritorio. CTA de vuelta al Hub.
+ 3 board.html   · el Tablon. Perfiles Ed25519 locales + Tasks firmadas
+                  -> POST api.preceptoros.org/api/v1. Avatar determinista,
+                  comentarios, [Probar este Benchmark] -> benchmark.html#hash.
+                  Offline-first: stale-while-revalidate desde IndexedDB.
+ 4 benchmark.html· el Coliseo. Ejecuta las metricas de las Tasks del Tablon.
+ 5 playground.html· la Aduana. Sanea texto en el cliente antes de ir a IAs
+                  ajenas.
+
+TRANSFERENCIA (chat-core.js): el Instalador es el recepcionista. La intencion
+de transferencia (detectada en la respuesta o por clic en el grid) rutea a otro
+companero. View Transitions API nativa, cero librerias: cambia avatar y carga
+el LoRA sin recargar. Respetar prefers-reduced-motion.
+
+IDENTIDAD: Ed25519 en IndexedDB. Web Crypto (SubtleCrypto) primero; fallback a
+@noble/curves (5 KB, auditada) solo si el origen bloquea la API nativa.
+Escribir SIEMPRE a IndexedDB antes de intentar el sync; si falla, a la cola.
+
+DOCTRINA TECNICA:
+ 1 Tope 10.240 B por .html/.js/.css en public/ (capa Agora, no Alejandria).
+   Split modular si excede (chat-core + chat-ui + chat-router).
+ 2 Cero fetch bloqueante en load. Hidratar bajo interaccion o scroll.
+ 3 CSS atomico: base.css + canon.css (tokens y cristal) + widget.css.
+ 4 test_web.py actualizado en el MISMO commit que el split o la ruta nueva.
+ 5 Presupuestos 2026: LCP < 2,5 s · INP < 200 ms (FID obsoleto) · CLS < 0,1 ·
+   respetar prefers-reduced-data (no bajar WebLLM en red movil).
+ 6 PWA nativo: manifest.webmanifest + sw.js con App Shell de los 5 HTML,
+   cache-first para estaticos, network-first para API, respaldo sin conexion.
+
+REGLAS: un commit por puerta · gate verde antes/despues · sin push hasta
+«Empuja a produccion» · reporte por puerta.
