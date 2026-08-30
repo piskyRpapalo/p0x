@@ -17,15 +17,38 @@ defecto `/mnt/nvme/agora_db`). <!-- guardia:permitir ruta del nodo de destino,
 parte del contrato de este artefacto de despliegue -->
 Escucha en **loopback**.
 
-## Lo que NO hace
+## Cómo se prueba quién eres
 
-**No verifica firmas Ed25519.** Guarda la clave pública y la trata como
-identificador. Verificar exigiría una dependencia de criptografía que no está
-en este venv, y meterla a escondidas sería peor que el hueco.
+Con un **reto de un solo uso**:
 
-Consecuencia, y va también en cada respuesta: cualquiera puede crear un perfil
-con la clave pública de otro. Sirve para vincular un aparato propio, no para
-autenticar frente a terceros.
+    GET  /api/v1/reto            -> {reto, vive_s, firma_sobre}
+    firma = Ed25519( "pseudonimo|clave_publica|reto" )
+    POST /api/v1/profiles        {pseudonimo, clave_publica, reto, firma}
+    POST /api/v1/agents/select   {pseudonimo, agente, reto, firma}
+
+Los tres campos van dentro del mensaje firmado a propósito: firmar solo el reto
+dejaría reusar esa firma para otro pseudónimo, y firmar solo el pseudónimo la
+dejaría valer para siempre.
+
+El nonce **caduca a los 300 s y se quema al usarse**, incluso si el intento
+falla. Sin esas dos cosas, una firma capturada una vez vale para siempre y el
+reto no es un reto: es una contraseña larga viajando en claro.
+
+`select` verifica contra la clave que **ya está guardada**, no contra una que
+venga en la petición: si no, elegir compañero por otro sería mandar su
+pseudónimo con la clave propia.
+
+**Dependencia declarada:** `pynacl`. La promesa de «stdlib only» rige la Bóveda
+—el producto que se instala la gente—, no el Ágora, que corre en el rack del
+Soberano. Escribir Ed25519 a mano sería mucho peor que declararla.
+
+## Pruebas
+
+    ~/venvs/agora/bin/python test_agora.py
+
+Siete casos contra la API viva, y firman de verdad: una prueba que simulara la
+firma estaría comprobando el simulador. Cubren el camino honrado, el reto
+reusado, la firma corrupta, la clave de otro y elegir en nombre ajeno.
 
 ## Arrancar y parar
 

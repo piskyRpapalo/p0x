@@ -7,18 +7,26 @@ Tres endpoints y nada mas. El canon del nodo soberano dice «propose-only hacia
 otros nodos»; la mision para desplegar aqui esta firmada y esta ACOTADA a esto.
 Cualquier cosa que no sean estos tres caminos necesita palabra nueva.
 
-QUE NO HACE, Y SE DICE ANTES
------------------------------
-NO verifica firmas Ed25519. Guarda la clave publica que le mandan y la trata
-como un identificador, no como una prueba. Verificar exigiria una dependencia
-de criptografia que hoy no esta en este venv, y meterla a escondidas seria
-peor que el hueco.
+COMO SE PRUEBA QUIEN ERES
+--------------------------
+Con un reto de un solo uso. `GET /reto` devuelve un nonce; quien quiera crear
+un perfil o elegir companero firma `pseudonimo|clave_publica|reto` con su
+clave privada Ed25519 y manda la firma. El servidor la verifica con la clave
+publica que le dan: eso demuestra POSESION de la privada, que es lo unico que
+hace falta aqui.
 
-Consecuencia real, y va tambien en la respuesta de la API: **cualquiera puede
-crear un perfil con la clave publica de otro**. Sirve para vincular un aparato
-propio, no para autenticar a nadie frente a terceros. La misma frase esta ya
-en la pagina de onboarding, y aqui se repite porque quien lea la API puede no
-haber leido la web.
+Hasta ayer esto no existia y la API lo declaraba en cada respuesta --
+«cualquiera puede crear un perfil con la clave publica de otro». Ya no: sin la
+privada no se pasa de la puerta.
+
+El nonce es de UN SOLO USO y caduca. Sin las dos cosas, una firma capturada
+una vez vale para siempre, y entonces el reto no es un reto: es una
+contrasena larga viajando en claro.
+
+`pynacl` es la unica dependencia de este servicio y es deliberada: la promesa
+de «stdlib only» rige la Boveda -- el producto que se instala la gente -- no
+el Agora, que corre en el rack del Soberano. Meter criptografia a mano seria
+mucho peor que declarar la dependencia.
 
 Escucha en LOOPBACK. Al exterior solo sale por el tunel, que se crea aparte y
 con firma.
@@ -35,6 +43,9 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
+from nacl.exceptions import BadSignatureError
+from nacl.signing import VerifyKey
+
 # guardia:permitir es la ruta de datos del nodo de destino, no de este
 # La monta el Soberano en la-fragua y es parte del contrato de este artefacto:
 # un deploy/<nodo>/ que no dice donde escribe obliga a leerse el codigo para
@@ -43,6 +54,7 @@ DATOS = Path(os.environ.get("AGORA_DATOS", "/mnt/nvme/agora_db"))  # guardia:per
 DB = DATOS / "agora.db"
 CATALOGO = Path(__file__).resolve().parent / "agentes.json"
 VERSION = "v1"
+RETO_VIVE_S = 300      # cinco minutos: lo que tarda una persona, no una cola
 
 app = FastAPI(title="PreceptorOS · El Agora", version="1.0.0",
               docs_url=f"/api/{VERSION}/docs", openapi_url=f"/api/{VERSION}/openapi.json")
@@ -80,6 +92,12 @@ def init():
         -- cambio de companero, y cuando, es informacion; sobrescribir la
         -- borra.
         CREATE INDEX IF NOT EXISTS idx_sel ON selecciones(pseudonimo, cuando);
+        -- Los retos: uno por peticion, y se queman al usarse. Guardarlos en la
+        -- base y no en memoria es lo que hace que un reinicio no invalide los
+        -- que hay en vuelo -- y que dos procesos no se contradigan.
+        CREATE TABLE IF NOT EXISTS retos (
+          reto TEXT PRIMARY KEY, creado REAL NOT NULL,
+          usado INTEGER NOT NULL DEFAULT 0);
         """)
         c.commit()
 
@@ -96,11 +114,48 @@ def catalogo():
 class NuevoPerfil(BaseModel):
     pseudonimo: str = Field(min_length=3, max_length=64)
     clave_publica: str = Field(min_length=64, max_length=64)
+    reto: str
+    firma: str
 
 
 class Seleccion(BaseModel):
     pseudonimo: str
     agente: str
+    reto: str
+    firma: str
+
+
+def quemar_reto(c, reto):
+    """Un reto vale UNA vez y dura poco. Devuelve el motivo del rechazo o None.
+
+    Se marca usado en la MISMA transaccion que lo comprueba: si se hiciera
+    despues de verificar la firma, dos peticiones simultaneas con el mismo
+    reto pasarian las dos.
+    """
+    fila = c.execute("select creado, usado from retos where reto=?", (reto,)).fetchone()
+    if not fila:
+        return "ese reto no existe: pide uno en GET /api/v1/reto"
+    if fila["usado"]:
+        return "ese reto ya se uso: los retos valen una sola vez"
+    if time.time() - fila["creado"] > RETO_VIVE_S:
+        return f"ese reto caduco (vive {RETO_VIVE_S} s)"
+    c.execute("update retos set usado=1 where reto=?", (reto,))
+    return None
+
+
+def verificar(pseudonimo, clave_publica, reto, firma):
+    """Ed25519 sobre `pseudonimo|clave_publica|reto`. Falla CERRADO.
+
+    Los tres campos van en el mensaje a proposito: firmar solo el reto dejaria
+    reusar esa firma para otro pseudonimo, y firmar solo el pseudonimo la
+    dejaria valer para siempre.
+    """
+    mensaje = f"{pseudonimo}|{clave_publica.lower()}|{reto}".encode("utf-8")
+    try:
+        VerifyKey(bytes.fromhex(clave_publica)).verify(mensaje, bytes.fromhex(firma))
+        return True
+    except (BadSignatureError, ValueError, TypeError):
+        return False
 
 
 @app.get(f"/api/{VERSION}/salud")
@@ -108,8 +163,22 @@ def salud():
     with abrir() as c:
         n = c.execute("select count(*) from perfiles").fetchone()[0]
     return {"estado": "OK", "version": VERSION, "perfiles": n,
-            "firmas_verificadas": False,
-            "aviso": "esta API identifica, no autentica: no verifica firmas Ed25519"}
+            "firmas_verificadas": True, "reto_vive_s": RETO_VIVE_S,
+            "aviso": "las escrituras exigen firma Ed25519 sobre un reto de un solo uso"}
+
+
+@app.get(f"/api/{VERSION}/reto")
+def reto():
+    """Un nonce para firmar. De un solo uso y con caducidad."""
+    n = os.urandom(16).hex()
+    with abrir() as c:
+        c.execute("insert into retos (reto, creado) values (?,?)", (n, time.time()))
+        # Se barren los viejos aqui y no con un timer: el unico momento en que
+        # esta tabla crece es este, asi que es donde toca podarla.
+        c.execute("delete from retos where creado < ?", (time.time() - RETO_VIVE_S * 4,))
+        c.commit()
+    return {"estado": "OK", "reto": n, "vive_s": RETO_VIVE_S,
+            "firma_sobre": "pseudonimo|clave_publica|reto"}
 
 
 @app.post(f"/api/{VERSION}/profiles", status_code=201)
@@ -117,9 +186,17 @@ def crear_perfil(p: NuevoPerfil):
     if not HEX64.match(p.clave_publica):
         raise HTTPException(422, "clave_publica: 64 caracteres hexadecimales")
     with abrir() as c:
+        motivo = quemar_reto(c, p.reto)
+        if motivo:
+            c.commit()
+            raise HTTPException(403, {"estado": "RECHAZADO", "causa": motivo})
+        if not verificar(p.pseudonimo, p.clave_publica, p.reto, p.firma):
+            c.commit()      # el reto se quema igual: un intento fallido lo gasta
+            raise HTTPException(403, {"estado": "RECHAZADO",
+                                      "causa": "la firma no corresponde a esa clave publica"})
         try:
-            c.execute("insert into perfiles (pseudonimo, clave_publica, creado_en) "
-                      "values (?,?,?)",
+            c.execute("insert into perfiles (pseudonimo, clave_publica, creado_en, "
+                      "firma_verificada) values (?,?,?,1)",
                       (p.pseudonimo, p.clave_publica.lower(), time.time()))
             c.commit()
         except sqlite3.IntegrityError:
@@ -131,7 +208,7 @@ def crear_perfil(p: NuevoPerfil):
                 return {"estado": "OK", "pseudonimo": p.pseudonimo, "nuevo": False}
             raise HTTPException(409, "ese pseudonimo ya es de otra clave")
     return {"estado": "OK", "pseudonimo": p.pseudonimo, "nuevo": True,
-            "aviso": "la firma NO se ha verificado: esto identifica, no autentica"}
+            "firma_verificada": True}
 
 
 @app.get(f"/api/{VERSION}/agents")
@@ -156,9 +233,21 @@ def elegir(s: Seleccion):
         raise HTTPException(409, {"estado": "NO_DATA", "agente": s.agente,
                                   "causa": a.get("causa", "no disponible")})
     with abrir() as c:
-        if not c.execute("select 1 from perfiles where pseudonimo=?",
-                         (s.pseudonimo,)).fetchone():
+        fila = c.execute("select clave_publica from perfiles where pseudonimo=?",
+                         (s.pseudonimo,)).fetchone()
+        if not fila:
             raise HTTPException(404, "ese perfil no existe: crealo primero")
+        motivo = quemar_reto(c, s.reto)
+        if motivo:
+            c.commit()
+            raise HTTPException(403, {"estado": "RECHAZADO", "causa": motivo})
+        # Se firma contra la clave que YA esta guardada, no contra una que
+        # venga en la peticion: si no, elegir companero por otro seria mandar
+        # su pseudonimo con la clave propia.
+        if not verificar(s.pseudonimo, fila["clave_publica"], s.reto, s.firma):
+            c.commit()
+            raise HTTPException(403, {"estado": "RECHAZADO",
+                                      "causa": "la firma no es de quien dice ser ese perfil"})
         c.execute("insert into selecciones (pseudonimo, agente, cuando) values (?,?,?)",
                   (s.pseudonimo, s.agente, time.time()))
         c.commit()
