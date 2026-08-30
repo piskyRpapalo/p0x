@@ -44,6 +44,12 @@ ESTADO = AQUI.parent / "estado.json"
 
 ESTATICOS = {
     "/": ("ojo.html", "text/html; charset=utf-8"),
+    # El Ojo-Vivo convive con la consola de texto en vez de sustituirla: la
+    # de texto se lee por SSH y en una terminal, el refugio no.
+    "/vivo": ("vivo.html", "text/html; charset=utf-8"),
+    "/vivo.html": ("vivo.html", "text/html; charset=utf-8"),
+    "/vivo.css": ("vivo.css", "text/css; charset=utf-8"),
+    "/vivo.js": ("vivo.js", "application/javascript; charset=utf-8"),
     "/ojo.html": ("ojo.html", "text/html; charset=utf-8"),
     "/ojo.css": ("ojo.css", "text/css; charset=utf-8"),
     "/ojo.js": ("ojo.js", "application/javascript; charset=utf-8"),
@@ -54,6 +60,8 @@ ESTATICOS = {
 
 CAPA = AQUI.parent
 GLOSARIO = AQUI / "glosario.json"
+FASES = CAPA / "fases.json"
+IDENTIDAD = CAPA / "identidad_publica.json"
 ACTA = CAPA / "mensajes" / "mensajes.jsonl"
 DIGESTOS = CAPA / "digesto"
 
@@ -75,11 +83,11 @@ class Ojo(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(cuerpo)
 
-    def _fichero_json(self, ruta, nombre, causa):
+    def _fichero_json(self, ruta, nombre, causa, remedio=None):
         """Sirve un JSON de disco tal cual, o declara por que no puede."""
         if not ruta.exists():
             return self._json(200, {"estado": "NO_DATA", "causa": causa,
-                                    "remedio": f"crear {nombre}"})
+                                    "remedio": remedio or f"crear {nombre}"})
         try:
             return self._responder(200, ruta.read_bytes(),
                                    "application/json; charset=utf-8")
@@ -135,6 +143,48 @@ class Ojo(BaseHTTPRequestHandler):
                 return self._json(200, {
                     "estado": "NO_DATA", "causa": f"{type(e).__name__}: {e}",
                     "remedio": "python3 ~/p0x/Alejandria/test_alejandria.py"})
+
+        if ruta == "/api/fases":
+            return self._fichero_json(
+                FASES, "fases.json",
+                "no existe fases.json; es SALIDA de continuidad.db, no un "
+                "fichero escrito a mano",
+                remedio="python3 ~/p0x/Alejandria/fases.py")
+
+        if ruta == "/api/identidad":
+            # Lo unico de esta consola pensado para ser publico. Va envuelto
+            # en {"identidad": ...} y no crudo: asi el fichero puede crecer
+            # con claves nuevas sin que el render tenga que adivinar si lo
+            # que le llega es el dato o el parte de que no lo hay.
+            if not IDENTIDAD.exists():
+                return self._json(200, {
+                    "estado": "NO_DATA",
+                    "causa": "no existe identidad_publica.json",
+                    "remedio": "crear ~/p0x/Alejandria/identidad_publica.json"})
+            try:
+                datos = json.loads(IDENTIDAD.read_text(encoding="utf-8"))
+            except (OSError, ValueError) as e:
+                return self._json(200, {
+                    "estado": "NO_DATA",
+                    "causa": f"identidad_publica.json ilegible: {e}",
+                    "remedio": "revisar el JSON a mano"})
+            return self._json(200, {"estado": "OK", "identidad": datos,
+                                    "fuente": "identidad_publica.json"})
+
+        if ruta == "/api/companero":
+            # El compañero ACTIVO no tiene fuente todavia. Devolver aqui un
+            # "Instalador" a secas seria fabricar el dato: el panel diria que
+            # el Soberano eligio compañero cuando nadie ha elegido nada.
+            # Lo que si es contrato --el compañero POR DEFECTO-- se sirve, y
+            # lo elegido se declara NO_DATA con su causa.
+            return self._json(200, {
+                "estado": "OK",
+                "por_defecto": "el Instalador",
+                "elegido": None,
+                "causa": "ninguna fuente registra el compañero elegido",
+                "nota": "El Centro esta dibujado; hablar con el companero es "
+                        "V4 («centro vivo») del contrato visual. Hasta "
+                        "entonces esto declara el hueco en vez de rellenarlo."})
 
         if ruta == "/api/digesto":
             ds = sorted(DIGESTOS.glob("digesto-*.md")) if DIGESTOS.exists() else []

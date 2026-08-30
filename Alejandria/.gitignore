@@ -25,3 +25,10 @@ mensajes/mensajes.jsonl
 # ese fichero -- la doctrina y el glosario -- ya vive en semilla.py, que si
 # esta en git y reconstruye continuidad.db.
 ALEJANDRIA_CONTEXTO.md
+
+# fases.json es SALIDA de `fases.py`, que lo traduce de la tabla `fases` de
+# continuidad.db. Versionarlo crearia la segunda verdad que el exportador
+# existe para impedir: la tabla cambia cada cierre de sesion y el JSON
+# commiteado se quedaria pintando fases viejas en verde. Se regenera con
+# `python3 Alejandria/fases.py`; si falta, el Ojo pinta NO_DATA con remedio.
+fases.json

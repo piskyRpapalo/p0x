@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El Ojo-Vivo · refugio del Soberano</title>
+<link rel="stylesheet" href="/vivo.css">
+</head>
+<body>
+
+<!-- ==================================================================
+     SPRITE. Doce simbolos, viewBox 16x16, shape-rendering crispEdges y
+     relleno con currentColor: asi el color lo pone la TRIBU desde CSS y
+     un simbolo sirve para las tres. Va en linea y no en /sprite.svg
+     porque `currentColor` no cruza el limite de documento en <use> con
+     href externo: fuera, los iconos saldrian negros.
+     Cero emojis en toda la consola -- un emoji lo pinta la fuente del
+     sistema y cambia de forma entre maquinas; un <symbol> no.
+     ================================================================== -->
+<svg id="sprite" aria-hidden="true" focusable="false"
+     xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+ <defs>
+  <symbol id="i-ojo" viewBox="0 0 16 16"><path fill="currentColor" d="M1 8q7-6 14 0-7 6-14 0zm7-3a3 3 0 100 6 3 3 0 100-6zm0 2a1 1 0 110 2 1 1 0 110-2z"/></symbol>
+  <symbol id="i-busto" viewBox="0 0 16 16"><path fill="currentColor" d="M6 2h4v1h1v3h-1v1H9v1h2v1h1v3h1v3H2v-3h1v-3h1V8h2V7H5V6H4V3h1V2zm0 2v2h4V4H6z"/></symbol>
+  <symbol id="i-mascara-ok" viewBox="0 0 16 16"><path fill="currentColor" d="M2 3h12v6H2V3zm2 2v2h3V5H4zm5 0v2h3V5H9zM5 11h6v2H5v-2z"/></symbol>
+  <symbol id="i-mascara-mal" viewBox="0 0 16 16"><path fill="currentColor" d="M2 3h12v6H2V3zm2 2v2h3V5H4zm5 0v2h3V5H9zM5 13h6v-2H5v2z"/></symbol>
+  <symbol id="i-antena" viewBox="0 0 16 16"><path fill="currentColor" d="M7 2h2v9H7V2zM3 4h1v2H3V4zM2 6h1v2H2V6zm10-2h1v2h-1V4zm1 2h1v2h-1V6zM4 13h8v2H4v-2z"/></symbol>
+  <symbol id="i-memoria" viewBox="0 0 16 16"><path fill="currentColor" d="M3 3h10v2H3V3zm0 3h10v2H3V6zm0 3h10v2H3V9zm0 3h10v2H3v-2z"/></symbol>
+  <symbol id="i-chip" viewBox="0 0 16 16"><path fill="currentColor" d="M4 4h8v8H4V4zm2 2v4h4V6H6zM7 1h2v2H7V1zM7 13h2v2H7v-2zM1 7h2v2H1V7zm12 0h2v2h-2V7z"/></symbol>
+  <symbol id="i-gate" viewBox="0 0 16 16"><path fill="currentColor" d="M8 1l6 2v6q0 4-6 6-6-2-6-6V3l6-2zm3 4L7 9 5 7 4 8l3 3 5-5-1-1z"/></symbol>
+  <symbol id="i-agora" viewBox="0 0 16 16"><path fill="currentColor" d="M2 3h12v2H2V3zm2 3h2v6H4V6zm3 0h2v6H7V6zm3 0h2v6h-2V6zM2 13h12v2H2v-2z"/></symbol>
+  <symbol id="i-repo" viewBox="0 0 16 16"><path fill="currentColor" d="M4 2h2v5h4V5h2v4H6v5H4V2z"/></symbol>
+  <symbol id="i-disco" viewBox="0 0 16 16"><path fill="currentColor" d="M2 4h12v3H2V4zm2 1v1h6V5H4zm-2 4h12v3H2V9zm2 1v1h6v-1H4z"/></symbol>
+  <symbol id="i-acta" viewBox="0 0 16 16"><path fill="currentColor" d="M3 1h8l2 2v12H3V1zm2 3v1h6V4H5zm0 3v1h6V7H5zm0 3v1h4v-1H5z"/></symbol>
+  <symbol id="i-candado" viewBox="0 0 16 16"><path fill="currentColor" d="M5 6V4a3 3 0 016 0v2h1v8H4V6h1zm2 0h2V4a1 1 0 10-2 0v2z"/></symbol>
+ </defs>
+</svg>
+
+<header id="hud" class="panel">
+  <h1 class="marca"><svg class="ic ic-ojo"><use href="#i-ojo"></use></svg>El Ojo-Vivo</h1>
+  <div id="hud-cifras" class="cifras" role="status" aria-live="polite">
+    <span class="nodata">leyendo el rack…</span>
+  </div>
+</header>
+
+<!-- El aviso de frescura va arriba del todo y antes que el refugio: si el
+     dato esta rancio, es lo primero que hay que saber. Un refugio dibujado
+     con medidas viejas se ve exactamente igual que uno con medidas de hace
+     un segundo, y esa es justo la trampa. -->
+<p id="frescura" class="frescura panel" role="status" aria-live="polite">…</p>
+
+<div id="lienzo">
+<main id="refugio">
+
+  <!-- ============ SUPERFICIE ============ -->
+  <section class="fila superficie" aria-labelledby="h-superficie">
+    <h2 id="h-superficie" class="fila-rotulo">Superficie · el cielo</h2>
+    <div class="fila-cuerpo">
+      <article class="cuarto tribu-core" id="c-tailnet">
+        <h3><svg class="ic"><use href="#i-antena"></use></svg>Tailnet</h3>
+        <div class="cuerpo">…</div>
+      </article>
+      <!-- La cupula y su laboratorio de sensores NO estan aqui por decision
+           16 del Soberano (2026-08-30): los tres uvicorn de la-fragua y la
+           capa de sensores quedan congelados hasta despues del lanzamiento.
+           Se declara el hueco en vez de borrarlo: un hueco aplazado y un
+           hueco que nadie penso se dibujan distinto. -->
+      <article class="cuarto tribu-hexelion aplazado" id="c-cupula">
+        <h3><svg class="ic"><use href="#i-antena"></use></svg>Cúpula HEXELION</h3>
+        <div class="cuerpo">
+          <p class="aplazado-sello">APLAZADO</p>
+          <!-- El «16» de aqui abajo es lo unico numerico escrito a mano en
+               todo el marcado, y va marcado como CITA: no es una medida, es
+               la referencia al registro firmado que congela estos sensores.
+               El gate distingue las dos cosas -- una medida a mano miente
+               cuando el rack cambia, una cita sigue apuntando a lo mismo. -->
+          <p class="prosa">Sensores congelados por
+             <span class="cita" data-cita="continuidad.db · decisiones">decisión
+             16 del Soberano</span> hasta después del lanzamiento. No es un
+             fallo de medida: es una firma. El Faro no se toca por canon.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ ALAS + CENTRO ============ -->
+  <section class="fila medio" aria-labelledby="h-medio">
+    <h2 id="h-medio" class="fila-rotulo">Alas y centro</h2>
+    <div class="fila-cuerpo medio-cuerpo">
+
+      <div class="ala" aria-labelledby="h-ala-izq">
+        <h3 id="h-ala-izq" class="ala-rotulo">La Bóveda · MVP</h3>
+        <div id="ala-izq"></div>
+      </div>
+
+      <!-- El centro es piramidal: la corona lleva clip-path y el cuerpo no.
+           Recortar tambien el cuerpo cortaria el texto del Acta y del chat,
+           que es exactamente lo que nadie quiere leer en diagonal. -->
+      <div class="centro" aria-labelledby="h-centro">
+        <div class="corona">
+          <svg class="ic ic-busto"><use href="#i-busto"></use></svg>
+        </div>
+        <h3 id="h-centro" class="centro-rotulo">El Centro</h3>
+
+        <article class="cuarto tribu-ojo" id="c-acta">
+          <h3><svg class="ic"><use href="#i-acta"></use></svg>El Acta</h3>
+          <div class="cuerpo">…</div>
+        </article>
+
+        <article class="cuarto tribu-preceptor" id="c-companero">
+          <h3><svg class="ic"><use href="#i-ojo"></use></svg>Compañero activo</h3>
+          <div class="cuerpo">…</div>
+        </article>
+      </div>
+
+      <div class="ala" aria-labelledby="h-ala-der">
+        <h3 id="h-ala-der" class="ala-rotulo">El Ágora · WEB</h3>
+        <div id="ala-der"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ SOTANO ============ -->
+  <section class="fila sotano" aria-labelledby="h-sotano">
+    <h2 id="h-sotano" class="fila-rotulo">Sótano · el hardware medido</h2>
+    <div class="fila-cuerpo" id="sotano-cuerpo">…</div>
+  </section>
+
+</main>
+
+<aside id="margen">
+  <section class="panel" id="p-fases">
+    <h2>Fases</h2>
+    <div class="cuerpo">…</div>
+  </section>
+
+  <section class="panel" id="p-identidad">
+    <h2>Identidad pública</h2>
+    <div class="cuerpo">…</div>
+  </section>
+
+  <section class="panel" id="p-tribus">
+    <h2>Tribus</h2>
+    <ul class="leyenda">
+      <li><i class="muestra tribu-preceptor"></i>PRECEPTOR · compañeros y producto</li>
+      <li><i class="muestra tribu-hexelion"></i>HEXELION · hardware y sensores</li>
+      <li><i class="muestra tribu-core"></i>P0X-CORE · enjambre y operaciones</li>
+      <li><i class="muestra tribu-ojo"></i>Mármol · el cromo del Ojo</li>
+    </ul>
+    <p class="prosa">El borde dice la tribu. La máscara dirá el estado y el
+       mobiliario la ubicación: eso llega en V2 y V3.</p>
+  </section>
+</aside>
+</div>
+
+<footer class="panel">
+  <p class="prosa"><svg class="ic"><use href="#i-candado"></use></svg>
+     Escucha solo en <code>127.0.0.1</code>. Esta consola enseña el rack
+     entero: atarla a otra interfaz sería repartirlo.</p>
+  <p class="prosa">El Ojo <strong>no mide, pinta</strong>. Para volver a
+     medir el metal: <code>~/p0x/Alejandria/verificar_sesion.sh</code></p>
+</footer>
+
+<script src="/vivo.js"></script>
+</body>
+</html>

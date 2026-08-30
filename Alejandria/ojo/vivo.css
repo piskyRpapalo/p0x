@@ -1,0 +1,189 @@
+/* El Ojo-Vivo · V1 topologia. Contrato: ANEXO VISUAL de plan_v5.md.
+ *
+ * R-WIDGET -- todo texto visible vive dentro de un elemento que declara
+ * --panel-bg y --panel-fg. Un texto flotando sobre el fondo del refugio es
+ * defecto de render, no eleccion de estilo: el fondo del refugio cambia con
+ * la fila y el contraste deja de estar garantizado en cuanto alguien mueve
+ * un color.
+ *
+ * R-TIPOGRAFIA -- dos niveles y cero fuentes externas (una consola de
+ * operaciones que espera a fonts.googleapis.com es una consola que no
+ * arranca cuando cae la red, o sea justo cuando hace falta):
+ *   --display -> titulos, heroes y prosa humana.
+ *   --mono    -> datos, logs, HUD, cifras. Todo lo que se compara en columna.
+ */
+:root{
+  --void:#0b0a11; --panel-bg:#161320; --panel-fg:#e4e8ec;
+  --hondo:#100e18; --linea:rgba(120,98,76,.42);
+
+  /* Tribus. El tono FUERTE es para bordes y rellenos; el tono CLARO es el
+     unico que se pone sobre texto: #6d5ae0 sobre #161320 da 3,2:1 y no
+     llega al 4,5:1 que exige el contrato. */
+  --violeta:#6d5ae0; --violeta-txt:#9b8cf0;
+  --phosphor:#43f5a0; --phosphor-txt:#43f5a0;
+  --bronce:#78624c;   --bronce-txt:#c9a86a;
+  --marmol:#e8e0d8;
+
+  --ok:#6ee7a0; --red:#ff7b7b; --nodata:#c9a86a; --tenue:#a99fbb;
+
+  --display:"Iowan Old Style","Palatino Linotype",Palatino,"URW Palladio L",
+            "Book Antiqua",Georgia,"DejaVu Serif",serif;
+  --mono:ui-monospace,SFMono-Regular,"JetBrains Mono","DejaVu Sans Mono",
+         Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; padding:1rem clamp(.7rem,2.5vw,1.8rem) 2rem;
+  background:var(--void); color:var(--panel-fg);
+  font:15px/1.5 var(--mono);
+  image-rendering:pixelated;
+}
+#sprite{position:absolute;width:0;height:0;overflow:hidden}
+
+.ic{width:16px;height:16px;flex:0 0 16px;vertical-align:-2px;color:inherit}
+.ic-ojo{width:22px;height:22px;flex-basis:22px}
+.ic-busto{width:34px;height:34px;flex-basis:34px;color:var(--marmol)}
+
+/* --- el panel, unidad minima de texto legible --- */
+.panel,.cuarto{
+  background:var(--panel-bg); color:var(--panel-fg);
+  border:1px solid var(--linea); border-radius:9px; padding:.7rem .85rem;
+}
+h1,h2,h3{margin:0 0 .45rem; font-family:var(--display); font-weight:600}
+h1{font-size:1.3rem} h2{font-size:1.02rem} h3{font-size:.95rem}
+.cuarto h3,.marca{display:flex;align-items:center;gap:.45rem}
+.prosa{font-family:var(--display);font-size:.94rem;color:var(--tenue);margin:.4rem 0 0}
+/* Una cita apunta a un registro firmado; una medida sale de un sensor. Se
+   subrayan distinto porque el gate las trata distinto. */
+.cita{border-bottom:1px dotted currentColor}
+code{font-family:var(--mono);color:var(--violeta-txt)}
+
+/* --- HUD --- */
+#hud{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1.1rem;margin-bottom:.7rem}
+#hud h1{margin:0;color:var(--marmol);margin-right:auto}
+.cifras{display:flex;flex-wrap:wrap;gap:.55rem}
+.cifra{border:1px solid var(--linea);border-radius:6px;padding:.12rem .5rem;
+       font-size:.83rem;background:var(--hondo)}
+.cifra b{color:var(--ok);font-weight:700}
+.cifra.mala b{color:var(--red)}
+.cifra .rot{color:var(--tenue);margin-right:.35rem}
+
+/* --- frescura --- */
+.frescura{margin:0 0 .9rem;font-size:.9rem;font-weight:600;border-left-width:4px;border-left-style:solid;border-left-color:var(--nodata)}
+.frescura.fresca{border-left-color:var(--ok);color:var(--ok)}
+.frescura.rancia{border-left-color:var(--nodata);color:var(--nodata)}
+.frescura.perdida{border-left-color:var(--red);color:var(--red)}
+
+/* --- rejilla general --- */
+#lienzo{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:.9rem;
+        max-width:1500px;margin:0 auto}
+#refugio{display:flex;flex-direction:column;gap:.9rem;min-width:0}
+#margen{display:flex;flex-direction:column;gap:.9rem}
+
+/* --- filas del corte transversal --- */
+.fila{display:flex;flex-direction:column;gap:.45rem}
+.fila-rotulo{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;
+  font-family:var(--mono);margin:0;align-self:start;
+  background:var(--panel-bg);color:var(--bronce-txt);
+  border:1px solid var(--linea);border-radius:6px;padding:.16rem .55rem}
+.fila-cuerpo{display:grid;gap:.6rem;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.medio-cuerpo{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) minmax(0,1fr);align-items:start}
+.superficie .fila-cuerpo{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}
+
+/* --- alas --- */
+.ala{display:flex;flex-direction:column;gap:.55rem;min-width:0}
+.ala-rotulo{font-family:var(--display);font-size:.92rem;margin:0;align-self:start;
+  background:var(--panel-bg);color:var(--violeta-txt);
+  border:1px solid var(--linea);border-radius:6px;padding:.1rem .5rem}
+.ala>div{display:flex;flex-direction:column;gap:.55rem}
+
+/* --- el centro piramidal --- */
+.centro{display:flex;flex-direction:column;gap:.55rem;min-width:0;
+  border:1px solid var(--marmol);border-radius:9px;padding:.6rem;
+  background:linear-gradient(180deg,rgba(232,224,216,.07),transparent 55%)}
+.corona{
+  /* La piramide es la corona, no el cuerpo: recortar el cuerpo cortaria el
+     texto del Acta en diagonal. */
+  clip-path:polygon(50% 0,100% 100%,0 100%);
+  background:rgba(232,224,216,.13);
+  display:flex;align-items:flex-end;justify-content:center;
+  height:62px;padding-bottom:.3rem;
+}
+.centro-rotulo{text-align:center;margin:0;align-self:center;
+  background:var(--panel-bg);color:var(--marmol);
+  border:1px solid var(--linea);border-radius:6px;padding:.1rem .7rem}
+
+/* --- tribus: el BORDE dice la tribu --- */
+.tribu-preceptor{border-color:var(--violeta)}
+.tribu-preceptor>h3{color:var(--violeta-txt)}
+.tribu-hexelion{border-color:var(--phosphor)}
+.tribu-hexelion>h3{color:var(--phosphor-txt)}
+.tribu-core{border-color:var(--bronce)}
+.tribu-core>h3{color:var(--bronce-txt)}
+.tribu-ojo{border-color:var(--marmol)}
+.tribu-ojo>h3{color:var(--marmol)}
+.muestra{display:inline-block;width:11px;height:11px;margin-right:.45rem;
+  border:2px solid;vertical-align:-1px}
+.muestra.tribu-preceptor{background:var(--violeta)}
+.muestra.tribu-hexelion{background:var(--phosphor)}
+.muestra.tribu-core{background:var(--bronce)}
+.muestra.tribu-ojo{background:var(--marmol)}
+
+/* --- contenido de un cuarto --- */
+.cuarto .cuerpo{font-size:.85rem}
+.dato{display:flex;justify-content:space-between;gap:.6rem;
+      padding:.18rem 0;border-bottom:1px dotted rgba(120,98,76,.28)}
+.dato:last-child{border-bottom:0}
+.dato .k{color:var(--tenue)}
+.dato .v{text-align:right;word-break:break-word}
+.v.ok{color:var(--ok)} .v.red{color:var(--red)}
+.nodata{color:var(--nodata)}
+.sello{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+  border:1px solid currentColor;border-radius:4px;padding:0 .35rem}
+.sello.ok{color:var(--ok)} .sello.red{color:var(--red)}
+.sello.nodata{color:var(--nodata)}
+
+/* --- el hueco aplazado se dibuja distinto de un hueco sin medir --- */
+.aplazado{border-style:dashed;border-color:var(--linea)}
+.aplazado-sello{margin:0;font-size:.75rem;letter-spacing:.14em;
+  color:var(--nodata);border:1px dashed var(--nodata);border-radius:4px;
+  padding:.1rem .4rem;display:inline-block}
+
+/* --- sotano: barras medidas --- */
+.barra{height:8px;background:var(--hondo);border:1px solid var(--linea);
+  border-radius:3px;overflow:hidden;margin-top:.3rem}
+.barra i{display:block;height:100%;background:var(--phosphor)}
+.barra i.tibia{background:var(--nodata)} .barra i.mala{background:var(--red)}
+
+/* --- margen --- */
+.leyenda{list-style:none;margin:0;padding:0;font-size:.83rem}
+.leyenda li{padding:.15rem 0}
+.fase{padding:.3rem 0;border-bottom:1px dotted rgba(120,98,76,.28)}
+.fase:last-child{border-bottom:0}
+.fase b{font-family:var(--display);font-weight:600}
+.fase .est{font-size:.74rem;letter-spacing:.06em;text-transform:uppercase}
+.fase .est.curso{color:var(--phosphor-txt)}
+.fase .est.pend{color:var(--tenue)}
+.fase .est.hecha{color:var(--ok)}
+.fase .entrega,.dato .entrega{display:block;color:var(--tenue);font-size:.8rem}
+.dato .v b{display:block}
+#p-identidad a{color:var(--violeta-txt)}
+#p-identidad .dato .v{font-size:.82rem}
+
+/* --- acta --- */
+.msg{border-top:1px solid rgba(120,98,76,.3);padding:.45rem 0}
+.msg:first-child{border-top:0}
+.msg .de{background:var(--violeta);color:#fff;border-radius:4px;
+  padding:.02rem .38rem;font-size:.74rem;font-weight:700}
+.msg .de.soberano{background:var(--ok);color:var(--void)}
+.msg .de.cowork{background:var(--bronce-txt);color:var(--void)}
+.msg .humano{font-family:var(--display);font-size:.88rem;margin:.3rem 0 0}
+
+footer{margin-top:1rem;font-size:.83rem}
+footer p{margin:.25rem 0}
+
+@media (max-width:1050px){
+  #lienzo{grid-template-columns:minmax(0,1fr)}
+  .medio-cuerpo{grid-template-columns:minmax(0,1fr)}
+  .superficie .fila-cuerpo{grid-template-columns:minmax(0,1fr)}
+}

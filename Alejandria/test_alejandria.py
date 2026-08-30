@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sys
 import tempfile
 import unittest
@@ -241,6 +242,145 @@ class GateDelEnlace(unittest.TestCase):
         """Si el modelo no respondio, el digesto sale con los hechos y ya.
         Juzgar la ausencia como fallo perderia la medida por culpa del adorno."""
         self.assertEqual(self.D.gate(None, self.lista, self.huecos), [])
+
+
+class ElOjoVivo(unittest.TestCase):
+    """V1 del Ojo-Vivo: la topologia y sus fuentes.
+
+    Lo que se prueba aqui NO es que el refugio «se vea bien» -- eso no lo
+    puede decir un test. Es que ninguna cifra visible este escrita a mano, que
+    ninguna direccion del rack viaje dentro de la pagina y que cada icono que
+    se usa exista. Los tres son defectos que se ven identicos a lo correcto
+    cuando el rack esta sano, y solo se notan el dia que deja de estarlo.
+    """
+
+    VIVO = ("vivo.html", "vivo.css", "vivo.js")
+    IPV4 = re.compile(r"\b\d{1,3}(?:\.\d{1,3}){3}\b")
+    # Emoji y pictogramas. Un emoji lo dibuja la fuente del sistema: cambia de
+    # forma entre maquinas y no obedece a `currentColor`, asi que no puede
+    # llevar el color de una tribu. El contrato pide <symbol> del sprite.
+    EMOJI = re.compile("[\U0001F000-\U0001FAFF\u2190-\u21FF\u2300-\u27BF"
+                       "\uFE0F\u2B00-\u2BFF]")
+
+    def piezas(self):
+        for n in self.VIVO:
+            yield n, (CONSOLA / n).read_text(encoding="utf-8")
+
+    def test_las_piezas_del_ojo_vivo_estan_servidas(self):
+        codigo = (CONSOLA / "ojo.py").read_text(encoding="utf-8")
+        for ruta in ("/vivo", "/vivo.html", "/vivo.css", "/vivo.js"):
+            with self.subTest(ruta=ruta):
+                self.assertIn(f'"{ruta}"', codigo,
+                              f"{ruta} no esta en ESTATICOS: el navegador la "
+                              "pedira y el Ojo devolvera 404")
+        for n in self.VIVO:
+            self.assertTrue((CONSOLA / n).exists(), f"falta {n}")
+
+    def test_las_fuentes_del_ojo_vivo_estan_cableadas(self):
+        """Cada panel del margen y del centro necesita su endpoint."""
+        codigo = (CONSOLA / "ojo.py").read_text(encoding="utf-8")
+        js = (CONSOLA / "vivo.js").read_text(encoding="utf-8")
+        for api in ("/api/rack", "/api/acta", "/api/fases",
+                    "/api/identidad", "/api/companero"):
+            with self.subTest(api=api):
+                self.assertIn(f'"{api}"', js, f"{api} no se pide desde vivo.js")
+                self.assertIn(f'"{api}"', codigo, f"{api} no lo sirve ojo.py")
+
+    def test_el_ojo_vivo_no_escribe_ninguna_cifra_a_mano(self):
+        """«Todo numero o fase escrita a mano es defecto del render».
+
+        Tres cosas quedan fuera del barrido, y por motivos distintos:
+        el SPRITE (sus coordenadas son geometria, no medidas), los
+        COMENTARIOS (no se pintan) y lo marcado como `class="cita"` (una
+        referencia a un registro firmado -- «decision 16» -- sigue apuntando
+        a lo mismo pase lo que pase en el rack, que es justo lo contrario de
+        una medida a mano).
+        """
+        html = (CONSOLA / "vivo.html").read_text(encoding="utf-8")
+        html = re.sub(r"<svg id=\"sprite\".*?</svg>", "", html, flags=re.S)
+        html = re.sub(r"<!--.*?-->", "", html, flags=re.S)
+        html = re.sub(r'<span class="cita".*?</span>', "", html, flags=re.S)
+        sobran = [c for c in re.findall(r"\d{2,}", html) if c != "127"]
+        self.assertEqual(
+            [], sobran,
+            f"vivo.html trae cifras en el marcado: {sobran}. Toda cifra sale "
+            "de estado.json, fases.json o identidad_publica.json; una escrita "
+            "aqui sigue en verde cuando el rack ya no lo esta.")
+
+    def test_el_ojo_vivo_no_incrusta_direcciones_del_rack(self):
+        """D8_JAMAS: la tabla de direcciones de la tailnet no viaja en la pagina.
+
+        Que el Ojo escuche en loopback no basta: una direccion escrita en el
+        HTML se copia con un ctrl-C, viaja en una captura de pantalla y acaba
+        en un repo publico. La unica direccion admitida es el propio loopback.
+        """
+        for n, t in self.piezas():
+            with self.subTest(fichero=n):
+                ajenas = [i for i in self.IPV4.findall(t) if i != "127.0.0.1"]
+                self.assertEqual([], ajenas,
+                                 f"{n} lleva direcciones del rack: {ajenas}")
+
+    def test_el_ojo_vivo_no_usa_emojis(self):
+        for n, t in self.piezas():
+            with self.subTest(fichero=n):
+                self.assertEqual(
+                    [], sorted(set(self.EMOJI.findall(t))),
+                    f"{n} usa emojis; el contrato pide <symbol> del sprite")
+
+    def test_cada_icono_usado_existe_en_el_sprite(self):
+        """Un <use> a un id que no existe no falla: no pinta nada.
+
+        Ese es el problema. El cuarto sale sin icono, nadie ve un error en la
+        consola del navegador y el fallo puede vivir meses en la pantalla.
+        """
+        html = (CONSOLA / "vivo.html").read_text(encoding="utf-8")
+        js = (CONSOLA / "vivo.js").read_text(encoding="utf-8")
+        definidos = set(re.findall(r'<symbol id="(i-[\w-]+)"', html))
+        usados = set(re.findall(r'href="#(i-[\w-]+)"', html))
+        usados |= set(re.findall(r'icono\("(i-[\w-]+)"\)', js))
+        usados |= set(re.findall(r'ic: "(i-[\w-]+)"', js))
+        self.assertTrue(definidos, "el sprite quedo vacio")
+        self.assertEqual(set(), usados - definidos,
+                         f"iconos usados y no definidos: {usados - definidos}")
+
+    def test_fases_json_es_salida_y_no_un_fichero_a_mano(self):
+        """La tabla `fases` de continuidad.db es la fuente; el JSON, su copia.
+
+        Si el JSON existe tiene que decir de donde salio. Un fases.json sin
+        `fuente` es un fichero que alguien escribio a mano, y entonces hay dos
+        verdades sobre las fases del proyecto -- que es justo lo que el
+        exportador existe para impedir.
+        """
+        self.assertTrue((RAIZ / "fases.py").exists(),
+                        "falta el exportador fases.py")
+        j = RAIZ / "fases.json"
+        if not j.exists():
+            self.skipTest("fases.json es salida; se regenera con fases.py")
+        d = json.loads(j.read_text(encoding="utf-8"))
+        self.assertIn("continuidad.db", d.get("fuente", ""),
+                      "fases.json no declara continuidad.db como fuente")
+        self.assertIsInstance(d.get("fases"), list)
+
+    def test_la_identidad_publica_solo_lleva_lo_publico(self):
+        """El unico fichero de esta capa pensado para salir a la calle.
+
+        Por eso se comprueba al reves que los demas: no que tenga lo que hace
+        falta, sino que NO tenga lo que no debe -- claves, tokens, correos ni
+        direcciones del rack.
+        """
+        j = RAIZ / "identidad_publica.json"
+        if not j.exists():
+            self.skipTest("identidad_publica.json todavia no existe")
+        crudo = j.read_text(encoding="utf-8")
+        d = json.loads(crudo)
+        self.assertIsInstance(d, dict)
+        for prohibido in ("BEGIN ", "PRIVATE KEY", "ssh-ed25519", "token",
+                          "password", "secret", "api_key"):
+            with self.subTest(prohibido=prohibido):
+                self.assertNotIn(prohibido.lower(), crudo.lower(),
+                                 f"identidad_publica.json lleva «{prohibido}»")
+        ips = [i for i in self.IPV4.findall(crudo) if i != "127.0.0.1"]
+        self.assertEqual([], ips, f"lleva direcciones del rack: {ips}")
 
 
 class ElGlosario(unittest.TestCase):
