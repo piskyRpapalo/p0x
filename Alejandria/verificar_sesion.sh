@@ -12,6 +12,7 @@
 #   3. absorber y calcular delta (continuidad.py absorber)
 #   4. regenerar el arranque     (continuidad.py bootstrap)
 #   5. delta.md + resumen.html   (resumen.py)
+#   6. el digesto del Enlace     (digesto.py) -> acta + Ojo + continuidad.db
 #
 # El paso 3 va DESPUES del 1 porque el delta se calcula contra la instantanea
 # anterior de la base: hay que meter la nueva para saber que cambio. Y el 4 va
@@ -49,11 +50,15 @@ paso () {  # paso <rotulo> <comando...>
   echo
 }
 
-paso "1/5 · midiendo el metal"        python3 "$RAIZ/recolector.py" $MODO --historial
-paso "2/5 · renderizando el snapshot" python3 "$RAIZ/informe.py"
-paso "3/5 · absorbiendo el delta"     python3 "$CONT/continuidad.py" absorber --sesion "$SESION"
-paso "4/5 · regenerando el arranque"  python3 "$CONT/continuidad.py" bootstrap
-paso "5/5 · delta y resumen"          python3 "$RAIZ/resumen.py" --sesion "$SESION" "${EMAIL[@]+"${EMAIL[@]}"}"
+paso "1/6 · midiendo el metal"        python3 "$RAIZ/recolector.py" $MODO --historial
+paso "2/6 · renderizando el snapshot" python3 "$RAIZ/informe.py"
+paso "3/6 · absorbiendo el delta"     python3 "$CONT/continuidad.py" absorber --sesion "$SESION"
+paso "4/6 · regenerando el arranque"  python3 "$CONT/continuidad.py" bootstrap
+paso "5/6 · delta y resumen"          python3 "$RAIZ/resumen.py" --sesion "$SESION" "${EMAIL[@]+"${EMAIL[@]}"}"
+# El 6 va el ULTIMO porque lee lo que dejaron los cinco anteriores: el
+# estado.json del 1 y los deltas del 3. Traducir antes de medir seria traducir
+# la sesion anterior.
+paso "6/6 · el Enlace traduce"        python3 "$RAIZ/digesto/digesto.py" --sesion "$SESION"
 
 echo "─────────────────────────────────────────"
 if [ "$fallo" -eq 0 ]; then
@@ -64,5 +69,6 @@ fi
 echo "   snapshot : $RAIZ/ALEJANDRIA_ESTADO_ACTUAL.md"
 echo "   delta    : $RAIZ/delta.md"
 echo "   arranque : $CONT/bootstrap_continuidad.md"
+echo "   digesto  : $RAIZ/digesto/  ·  acta: $RAIZ/mensajes/mensajes.jsonl"
 echo "   el Ojo   : http://127.0.0.1:8790/"
 exit "$fallo"

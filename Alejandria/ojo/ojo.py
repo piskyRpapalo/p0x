@@ -34,6 +34,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -46,7 +47,15 @@ ESTATICOS = {
     "/ojo.html": ("ojo.html", "text/html; charset=utf-8"),
     "/ojo.css": ("ojo.css", "text/css; charset=utf-8"),
     "/ojo.js": ("ojo.js", "application/javascript; charset=utf-8"),
+    "/glosario.js": ("glosario.js", "application/javascript; charset=utf-8"),
+    "/acta.js": ("acta.js", "application/javascript; charset=utf-8"),
+    "/digesto.js": ("digesto.js", "application/javascript; charset=utf-8"),
 }
+
+CAPA = AQUI.parent
+GLOSARIO = AQUI / "glosario.json"
+ACTA = CAPA / "mensajes" / "mensajes.jsonl"
+DIGESTOS = CAPA / "digesto"
 
 
 class Ojo(BaseHTTPRequestHandler):
@@ -65,6 +74,18 @@ class Ojo(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")
         self.end_headers()
         self.wfile.write(cuerpo)
+
+    def _fichero_json(self, ruta, nombre, causa):
+        """Sirve un JSON de disco tal cual, o declara por que no puede."""
+        if not ruta.exists():
+            return self._json(200, {"estado": "NO_DATA", "causa": causa,
+                                    "remedio": f"crear {nombre}"})
+        try:
+            return self._responder(200, ruta.read_bytes(),
+                                   "application/json; charset=utf-8")
+        except OSError as e:
+            return self._json(200, {"estado": "NO_DATA",
+                                    "causa": f"{type(e).__name__}"})
 
     def _json(self, codigo, datos):
         self._responder(codigo, json.dumps(datos, ensure_ascii=False),
@@ -92,6 +113,43 @@ class Ojo(BaseHTTPRequestHandler):
             # script y el panel no pueden discrepar sobre si el dato esta viejo.
             d["frescura_segundos"] = int(time.time() - d.get("epoch", 0))
             return self._json(200, d)
+
+        if ruta == "/api/glosario":
+            return self._fichero_json(GLOSARIO, "glosario.json",
+                                      "no hay glosario en esta consola")
+
+        if ruta == "/api/acta":
+            # La cadena se verifica AL SERVIR, no al escribir solamente. Un
+            # acta se rompe editando el fichero por fuera, y eso no pasa por
+            # ninguna funcion de escritura: si no se comprueba aqui, no se
+            # comprueba nunca en la pantalla de quien la lee.
+            sys.path.insert(0, str(CAPA / "mensajes"))
+            try:
+                import mensajes as M
+                problemas = M.verificar(ACTA)
+                return self._json(200, {"estado": "OK",
+                                        "mensajes": M.leer(ACTA),
+                                        "cadena_sana": not problemas,
+                                        "problemas": problemas})
+            except Exception as e:                 # noqa: BLE001
+                return self._json(200, {
+                    "estado": "NO_DATA", "causa": f"{type(e).__name__}: {e}",
+                    "remedio": "python3 ~/p0x/Alejandria/test_alejandria.py"})
+
+        if ruta == "/api/digesto":
+            ds = sorted(DIGESTOS.glob("digesto-*.md")) if DIGESTOS.exists() else []
+            if not ds:
+                return self._json(200, {
+                    "estado": "NO_DATA", "causa": "todavia no hay ningun digesto",
+                    "remedio": "~/p0x/Alejandria/verificar_sesion.sh"})
+            ult = ds[-1]
+            texto = ult.read_text(encoding="utf-8")
+            cuerpo = texto.split("## Los hechos", 1)[0]
+            return self._json(200, {
+                "estado": "OK", "fichero": ult.name,
+                "frescura_segundos": int(time.time() - ult.stat().st_mtime),
+                "bronze": "BRONZE · en cuarentena" in texto,
+                "cuerpo": cuerpo.split("\n", 4)[-1].strip()})
 
         pieza = ESTATICOS.get(ruta)
         if not pieza:

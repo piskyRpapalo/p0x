@@ -12,3 +12,16 @@ historial/
 resumenes/
 delta.md
 ALEJANDRIA_ESTADO_ACTUAL.md
+
+# Los digestos y el acta son salida, no codigo. Se regeneran en cada cierre y
+# llevan medidas del rack -- incluidas las direcciones que el guardia de
+# higiene rechaza sin excepcion. El CODIGO que los produce si esta versionado.
+digesto/digesto-*.md
+mensajes/mensajes.jsonl
+
+# El contexto del nodo lleva la tabla de direcciones del rack: el guardia de
+# higiene lo rechaza y no admite excepcion (IP-TAILNET esta en D8_JAMAS). Es
+# documento local del Soberano, no contenido del proyecto. Lo versionable de
+# ese fichero -- la doctrina y el glosario -- ya vive en semilla.py, que si
+# esta en git y reconstruye continuidad.db.
+ALEJANDRIA_CONTEXTO.md

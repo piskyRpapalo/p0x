@@ -230,6 +230,12 @@
       });
   }
 
+  /* Los modulos de las otras vistas cuelgan de aqui. Se exportan las piezas
+     comunes en vez de copiarlas: `edad()` ya existe dos veces en esta capa
+     (aqui y en informe.py) con redondeos distintos, y una tercera copia seria
+     la tercera verdad sobre el mismo hecho. */
+  window.Ojo = { esc: esc, edad: edad, sello: sello, clase: clase, plural: plural };
+
   refrescar();
   setInterval(refrescar, 60000);
 })();
