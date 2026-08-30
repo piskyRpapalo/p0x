@@ -1,0 +1,14 @@
+# Salidas del recolector. No se versionan por dos motivos, y el segundo es
+# vinculante:
+#
+#  1. Se regeneran midiendo el metal. Versionarlas seria guardar una foto del
+#     rack en el repo y que envejeciera en silencio -- justo lo que este
+#     directorio existe para impedir.
+#  2. Contienen IPs de tailnet (la tabla de puertos, el host de Ollama). El
+#     guardia de higiene las rechaza y NO admite excepcion (D8_JAMAS).
+estado.json
+estado.json.partial
+historial/
+resumenes/
+delta.md
+ALEJANDRIA_ESTADO_ACTUAL.md

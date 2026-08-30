@@ -1,0 +1,19 @@
+# PLANTILLA · copiar a ~/.config/environment.d/50-p0x.conf y poner la IP real.
+#
+# El valor real NO se versiona: el guardia de higiene del repo rechaza IPs de
+# tailnet y no admite excepcion (D8_JAMAS). Es la regla correcta -- la
+# direccion del rack es configuracion del nodo, no contenido del proyecto.
+#
+# POR QUE HACE FALTA ESTE FICHERO
+# --------------------------------
+# OLLAMA_HOST vivia solo en ~/.bashrc, que NO se carga en shells no
+# interactivas. La variable existia para el carbono y no para las maquinas:
+# timers, unidades systemd y sondas la buscaban, no la encontraban, y
+# concluian «Ollama no responde» con el servidor perfectamente vivo.
+#
+# Es la misma familia del footgun ya canonizado «PATH de systemd != PATH
+# interactivo». El manager de usuario SI lee environment.d.
+#
+# Tras crearlo: systemctl --user daemon-reexec
+# Comprobar:    systemd-run --user --pipe --wait sh -c 'echo $OLLAMA_HOST'
+OLLAMA_HOST=http://<IP-TAILNET-DEL-BEELINK>:11434
