@@ -209,6 +209,24 @@ class GateDelEnlace(unittest.TestCase):
         self.assertEqual([f for f in self.D.gate(buena, self.lista, self.huecos)
                           if f.startswith("B3")], [])
 
+    def test_un_corchete_sin_cerrar_no_inventa_una_cita(self):
+        """Medido en una corrida real del cierre.
+
+        El modelo dejo `[loops.db:latidos/afinador` sin cerrar, y el patron se
+        trago texto hasta el `]` de otro parrafo: B3 denuncio como fuente
+        inventada un trozo de prosa («37 suites confirmadas,
+        docs/bandeja_firmas»). No se puede exigir la fuente de algo que el
+        modelo no llego a declarar como cita.
+        """
+        rota = ("## Qué pasó\n- El afinador certificó. [loops.db:latidos/afinador\n"
+                "- 37 suites confirmadas. [estado.json:mvp_gate]\n"
+                "\n## Qué piensa cada agente\n- guardian: 77. "
+                "[loops.db:latidos/guardian]\n"
+                "\n## Qué necesita tu firma\n¿Firmas?\n"
+                "\n## NO_DATA\n- no existe [dead_path.jsonl]\n")
+        self.assertEqual([f for f in self.D.gate(rota, self.lista, self.huecos)
+                          if f.startswith("B3")], [])
+
     def test_B2_muerde_si_hay_huecos_y_no_se_declaran(self):
         sin = self._prosa().replace("## NO_DATA\n- no existe [dead_path.jsonl]\n", "")
         self.assertTrue(any(f.startswith("B2")

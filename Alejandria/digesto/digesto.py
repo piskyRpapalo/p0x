@@ -367,7 +367,15 @@ def gate(prosa, lista, huecos):
     # preceptor]» es una cita legitima cuando una vinieta resume cuatro
     # hechos. El gate leia la cadena entera como una sola fuente y tumbaba
     # parafrasis correctas. Se separan por coma.
-    citadas = {t.strip() for grupo in re.findall(r"\[([^\]]+)\]", prosa)
+    # Una cita NO cruza el salto de linea. Sin esa restriccion, un corchete
+    # que el modelo deja sin cerrar hace que el patron se trague texto hasta
+    # el siguiente `]` de otro parrafo, y B3 denuncia como «fuente inventada»
+    # un trozo de prosa. Medido: «37 suites confirmadas, docs/bandeja_firmas».
+    #
+    # Con `[^\]\n]`, un corchete sin cerrar sencillamente no es una cita --
+    # que es lo correcto: no se puede exigir la fuente de algo que el modelo
+    # no llego a declarar como cita.
+    citadas = {t.strip() for grupo in re.findall(r"\[([^\]\n]+)\]", prosa)
                for t in grupo.split(",") if t.strip()}
 
     # B1 · toda cifra con el comando que la produjo.

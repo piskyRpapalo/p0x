@@ -22,16 +22,34 @@ set -uo pipefail
 RAIZ="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONT="$HOME/p0x/preceptor-internal/continuidad"
 
-SESION="${1:-$(date +%Y-%m-%d)-sesion}"
+# El nombre de sesion es el primer argumento QUE NO SEA UNA BANDERA.
+#
+# Antes era `${1:-...}` a secas, y eso convertia la primera bandera en el
+# nombre: llamar `verificar_sesion.sh --email --a x@y.z` dejaba
+# SESION="--email", que viajaba a los pasos 3, 5 y 6 como
+# `--sesion --email` y argparse lo cortaba con «expected one argument».
+#
+# El fallo no tumbaba el cierre -- `paso()` declara y sigue -- asi que los tres
+# pasos que escriben la continuidad, el resumen y el digesto caian a la vez y
+# el cierre terminaba diciendo que habia fallado, sin mas. Un cierre a medias
+# es exactamente como se pierde la linea.
+SESION=""
 MODO="--completo"
 EMAIL=()
-for arg in "$@"; do
-  case "$arg" in
+while [ $# -gt 0 ]; do
+  case "$1" in
     --rapido) MODO="--rapido" ;;
     --email)  EMAIL+=(--email) ;;
-    --a=*)    EMAIL+=(--a "${arg#--a=}") ;;
+    --a=*)    EMAIL+=(--a "${1#--a=}") ;;
+    # `--a valor` separado por espacio, que es como se teclea de verdad.
+    --a)      shift; [ $# -gt 0 ] || { echo "🔴 --a sin dirección" >&2; exit 2; }
+              EMAIL+=(--a "$1") ;;
+    -*)       echo "🔴 bandera desconocida: $1" >&2; exit 2 ;;
+    *)        [ -z "$SESION" ] && SESION="$1" ;;
   esac
+  shift
 done
+SESION="${SESION:-$(date +%Y-%m-%d)-sesion}"
 
 echo "🏛  Cierre de sesión · $SESION"
 echo
