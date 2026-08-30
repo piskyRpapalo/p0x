@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
@@ -50,10 +51,14 @@ PROOF = re.compile(r'(<p class="proof">.*?</p>)', re.S)
 CIFRA = re.compile(r"<b>(\d[\d.  ]*)</b>")
 
 
-def _gate(cwd, cmd, patron, nombre):
+def _gate(cwd, cmd, patron, nombre, entorno=None):
     try:
+        env = None
+        if entorno:
+            env = dict(os.environ)
+            env.update(entorno)
         p = subprocess.run(cmd, cwd=str(cwd), capture_output=True, text=True,
-                           timeout=600)
+                           timeout=600, env=env)
     except (OSError, subprocess.TimeoutExpired) as e:
         return None, f"{nombre}: {type(e).__name__}"
     salida = (p.stdout or "") + (p.stderr or "")
@@ -86,8 +91,20 @@ def medir():
     # advierte en su primera linea.
     app, e1 = _gate(MVP, ["bash", "bin/pruebas", "--rapido"],
                     r"VERDE · (\d+)/\d+", "corredor certificado (bin/pruebas)")
+    # P0X_MIDIENDO_CONTADORES rompe una circularidad real, y por eso existe.
+    #
+    # El gate de la web tiene una prueba que compara counters.json contra
+    # cuantas pruebas tiene el propio fichero -- la que cierra el agujero por
+    # el que la portada anuncio 19 durante seis commits mientras el gate ya
+    # media 25. Pero al añadir una prueba, esa comparacion pone el gate en
+    # ROJO, y un gate rojo aqui arriba no publica cifra. Resultado: el
+    # contador no se puede refrescar nunca, justo cuando hace falta.
+    #
+    # Durante la MEDICION esa comparacion se salta, y solo esa: lo que se
+    # esta midiendo no puede ser tambien el juez de la medida. En cualquier
+    # otra ejecucion del gate --a mano, en CI-- la comparacion manda.
     web, e2 = _gate(WEB, ["python3", "test_web.py"], r"Ran (\d+) tests?",
-                    "gate de la web")
+                    "gate de la web", {"P0X_MIDIENDO_CONTADORES": "1"})
     return {"app": (app, e1), "web": (web, e2)}
 
 
