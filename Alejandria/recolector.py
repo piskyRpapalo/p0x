@@ -64,7 +64,26 @@ HISTORIAL = RAIZ / "historial"
 
 REPO_MVP = CASA / "p0x" / "preceptor"
 REPO_WEB = CASA / "preceptoros-web"
-MEMORIA = CASA / ".aurelius" / "memory.db"
+def _casa_del_producto():
+    """Donde vive la memoria, PREGUNTANDOSELO al producto.
+
+    Escrito a mano decia `~/.aurelius`, que tras la mudanza del 2026-08-30 es un
+    symlink de compatibilidad. Habria seguido funcionando -- y ese es justo el
+    problema: el informe habria enseñado durante meses la ruta vieja como si
+    fuera la verdad, y nadie se habria enterado hasta que alguien borrase el
+    symlink. `casa.raiz()` es el unico sitio del proyecto que decide esto.
+    """
+    try:
+        sys.path.insert(0, str(CASA / "p0x" / "preceptor"))
+        import casa as _casa
+        return _casa.raiz() / "memory.db"
+    except Exception:                              # noqa: BLE001
+        # Si el producto no se puede importar, se declara y se sigue: el resto
+        # del rack no depende de esto.
+        return None
+
+
+MEMORIA = _casa_del_producto()
 
 ENV_P0X = CASA / ".config" / "environment.d" / "50-p0x.conf"
 
@@ -450,9 +469,13 @@ def _servidores_huerfanos():
 
 def sonda_memoria():
     """Cuenta engramas SIN tocar la base. `mode=ro` no es cortesia: es la regla."""
+    if MEMORIA is None:
+        return _declarar("NO_DATA",
+                         causa="no se pudo importar casa.py del producto",
+                         remedio="comprobar ~/p0x/preceptor/casa.py")
     if not MEMORIA.exists():
         return _declarar("NO_DATA", causa=f"{MEMORIA} no existe",
-                         remedio="revisar la migracion de ~/.aurelius")
+                         remedio="python3 ~/p0x/preceptor/preceptoros.py --view")
     try:
         import sqlite3
         con = sqlite3.connect(f"file:{MEMORIA}?mode=ro", uri=True, timeout=5)
