@@ -57,10 +57,34 @@ setsid python3 -m http.server "$PUERTO" --bind 127.0.0.1 >/dev/null 2>&1 < /dev/
 echo $! > "$PIDF"
 sleep 0.6
 
-if curl -s -o /dev/null --max-time 3 "http://127.0.0.1:$PUERTO/"; then
-  echo "✅ http://127.0.0.1:$PUERTO/   (pid $(cat "$PIDF"))"
-  echo "   apagar: ~/p0x/bin/preview-web --stop"
-else
-  echo "🔴 arrancó pero no responde en :$PUERTO" >&2
+# Se comprueba que responde EL NUESTRO, no que responde alguien.
+#
+# La version anterior hacia `curl` al puerto y daba verde si contestaba algo.
+# Medido el 2026-08-30: habia otro `http.server` ajeno ocupando el 8791 desde
+# hacia media hora, sirviendo OTRA carpeta. El nuestro no pudo enlazar y murio;
+# el curl contesto 200 desde el intruso, y el guion anuncio exito. Media hora
+# de verificaciones habrian sido contra la carpeta equivocada.
+#
+# Es el mismo error que se corrigio esta sesion en el recolector y en el
+# guardian: comprobar la propiedad que no informa.
+MIO="$(cat "$PIDF" 2>/dev/null)"
+DUENO="$(ss -tlnpH 2>/dev/null | grep "127.0.0.1:$PUERTO" | grep -oP 'pid=\K[0-9]+' | head -1)"
+
+if [ -z "$DUENO" ]; then
+  echo "🔴 nadie escucha en :$PUERTO — el servidor no arrancó" >&2
   exit 1
 fi
+if [ "$DUENO" != "$MIO" ]; then
+  echo "🔴 el puerto :$PUERTO lo ocupa OTRO proceso (pid $DUENO), no el nuestro:" >&2
+  tr '\0' ' ' < "/proc/$DUENO/cmdline" 2>/dev/null | sed 's/^/     /' >&2; echo >&2
+  echo "     sirviendo: $(readlink "/proc/$DUENO/cwd" 2>/dev/null)" >&2
+  echo "     Remedio: PUERTO_PREVIEW=8793 ~/p0x/bin/preview-web   (o apagar ese)" >&2
+  rm -f "$PIDF"
+  exit 1
+fi
+if ! curl -s -o /dev/null --max-time 3 "http://127.0.0.1:$PUERTO/"; then
+  echo "🔴 el nuestro enlazó el puerto pero no responde" >&2
+  exit 1
+fi
+echo "✅ http://127.0.0.1:$PUERTO/   (pid $MIO · $DIR)"
+echo "   apagar: ~/p0x/bin/preview-web --stop"
