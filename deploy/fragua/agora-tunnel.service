@@ -1,0 +1,19 @@
+[Unit]
+Description=Tunel del Agora · expone 127.0.0.1:9002 como api.preceptoros.org
+Documentation=file://%h/agora/README.md
+After=network-online.target
+
+[Service]
+Type=simple
+# --config EXPLICITO. Sin el, cloudflared busca en varios sitios por orden y
+# el dia que aparezca otro fichero en uno de ellos, el tunel arrancara con una
+# configuracion que nadie eligio. La ruta escrita es la unica que manda.
+ExecStart=%h/bin/cloudflared --no-autoupdate --config %h/.cloudflared/config.yml tunnel run agora
+Restart=on-failure
+RestartSec=15
+# El tunel es una puerta al exterior: se le da lo justo.
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=default.target

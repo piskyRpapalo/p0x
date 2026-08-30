@@ -68,3 +68,33 @@ que ofrece ocho cuando hay dos es un escaparate con cajas vacías.
 Nota de nombres: el encargo llamaba «Curador» a uno, y eso ya es el nombre de
 un bucle del enjambre. Aquí es **El Bibliotecario**, con la colisión anotada en
 el propio JSON.
+
+## El túnel
+
+`config.yml` → `~/.cloudflared/config.yml` · unidad de usuario
+`agora-tunnel.service` → `~/.config/systemd/user/`.
+
+**Qué hace:** publica `http://127.0.0.1:9002` como `https://api.preceptoros.org`.
+El origen sigue en loopback; nada abre un puerto al exterior.
+
+**Qué toca:** el túnel `agora`
+(`bbe3c9be-06b9-4fb6-b368-2cebe65f1dbe`), su fichero de credenciales en
+`~/.cloudflared/`, y un registro DNS en `preceptoros.org`.
+
+**Cómo se apaga:**
+
+```bash
+systemctl --user stop agora-tunnel.service
+systemctl --user disable agora-tunnel.service
+```
+
+El `--config` va **explícito** en el `ExecStart`: sin él, `cloudflared` busca en
+varios sitios por orden, y el día que aparezca otro fichero en uno de ellos el
+túnel arrancaría con una configuración que nadie eligió.
+
+La regla `catch-all` (`http_status:404`) del ingress no es relleno: decide qué
+pasa con cualquier host que apunte aquí por error. Sin ella, un hostname mal
+configurado serviría esta API.
+
+**Verificado desde fuera:** Beelink y Doogee, por internet y sin `adb reverse`,
+reciben `1/8 disponibles`.
