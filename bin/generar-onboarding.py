@@ -33,9 +33,14 @@ RELEASES = "https://github.com/piskyRpapalo/PreceptorOS/releases/latest/download
 # El boton apunta ya a su URL definitiva -- lo pide el gate -- pero la pagina
 # DICE que aun no estan. Un boton que promete una descarga que da 404 es
 # exactamente el sensor deshonesto que esta casa no admite.
-DESCARGAS = [("android", f"{RELEASES}/preceptoros.apk"),
+# Android HOY es Termux, y el APK queda declarado futuro: lo fija plan_v5 en
+# su seccion TERMINOLOGIA, y el Soberano lo firmo al resolver el PARO 1. No se
+# construye un APK sin cadena de herramientas ni sudo; y un boton que ofrece un
+# APK que no existe es peor que no tener boton. El camino de Android ya
+# funciona y esta escrito: la guia de Termux de esta misma web.
+DESCARGAS = [("android", "./instalar.html#android"),
              ("pc", f"{RELEASES}/install.sh"),
-             ("mac", f"{RELEASES}/install.sh")]
+             ("win", f"{RELEASES}/install.ps1")]
 
 COPY = {
  "es": {
@@ -48,7 +53,7 @@ COPY = {
   "obQue": "PreceptorOS es la aduana entre tus datos y las IAs de la nube.",
   "obPriv": "Esto no es una promesa: es un filtro que puedes probar ahora mismo.",
   "obDesc": "Elige tu sistema. La app es el taller; yo sigo contigo dentro.",
-  "obConec": "Este código enlaza tu identidad de la web con la app. Es tuyo y solo tuyo.",
+  "obConec": "Este código de vinculación enlaza tu identidad de la web con la app. Es tuyo y solo tuyo.",
   "obVinculado": "Ahí lo tienes. Ábrelo en la app y seguimos: te presento a tus compañeros.",
   "obSinIdentidad": "Antes necesitas una identidad. Púlsala arriba: se genera en tu navegador y no sale de ahí.",
   "obFalloCodigo": "NO_DATA — no se pudo derivar el código:",
@@ -56,15 +61,15 @@ COPY = {
   "s1p": "Tu IA en tu máquina, sin nube obligatoria. Memoria persistente que es tuya, y un Privacy Gateway que sanea el contexto antes de que salga hacia cualquier IA externa. Sin cuentas, sin telemetría.",
   "s1b": "Empezar",
   "s2t": "Tu privacidad, tu control",
-  "s2p": "Pega tu contexto y mira qué sale antes de dárselo a nadie. Ocurre en tu navegador, sin instalar nada, y te dice también dónde NO llega el filtro.",
+  "s2p": "El filtro es el que tacha lo privado. Pega tu contexto y mira qué sale antes de dárselo a nadie: ocurre en tu navegador, sin instalar nada, y te dice también dónde NO llega.",
   "s2b": "Probar el filtro ahora",
   "s3t": "Descarga la app",
   "s3p": "La web es el escaparate. La app es el taller: es donde el compañero que elijas trabaja con tus ficheros de verdad, sin que salgan de tu máquina.",
-  "s3and": "Android · APK", "s3pc": "Linux · install.sh", "s3mac": "macOS · install.sh",
-  "s3aviso": "NO_DATA — los instaladores todavía no están publicados. Los botones apuntan a su dirección definitiva en GitHub Releases; hasta que la primera versión se publique darán 404. Se dice antes de que lo pulses.",
-  "s4t": "Conecta tu cuenta",
-  "s4p": "Tu identidad se genera en el navegador y la clave privada no sale de él. Este código se deriva de tu clave pública: es siempre el mismo para ti, y no lleva ningún secreto dentro.",
-  "s4b": "Generar mi código",
+  "s3and": "Android · por Termux", "s3pc": "Linux o macOS · install.sh", "s3win": "Windows · install.ps1",
+  "s3aviso": "NO_DATA — Android va hoy por Termux, con la guía de esta web; el APK está declarado como futuro y no existe todavía. Los instaladores de escritorio apuntan a su dirección definitiva en GitHub Releases y darán 404 hasta que se publique la primera versión. Windows y macOS NO están probados en este rack: no hay ninguna máquina de esos sistemas aquí.",
+  "s4t": "Tu código de vinculación",
+  "s4p": "Tu identidad se genera en el navegador y la clave privada no sale de él. Este código de vinculación se deriva de tu clave pública: es siempre el mismo para ti, y no lleva ningún secreto dentro.",
+  "s4b": "Generar mi código de vinculación",
   "s4aviso": "Este código te IDENTIFICA, no te autentica: cualquiera que conozca tu clave pública puede calcularlo. Vincular de verdad exigirá además una firma, y eso llega con el backend.",
   "pieVolver": "← Volver a la portada", "piePlay": "Probador", "pieInst": "Guía de instalación",
  },
@@ -78,7 +83,7 @@ COPY = {
   "obQue": "PreceptorOS is the customs house between your data and cloud AIs.",
   "obPriv": "This isn't a promise: it's a filter you can try right now.",
   "obDesc": "Pick your system. The app is the workshop; I come with you inside.",
-  "obConec": "This code links your web identity to the app. It's yours and only yours.",
+  "obConec": "This pairing code links your web identity to the app. It's yours and only yours.",
   "obVinculado": "There it is. Open it in the app and we carry on: I'll introduce your companions.",
   "obSinIdentidad": "You need an identity first. Tap it above: it's generated in your browser and never leaves it.",
   "obFalloCodigo": "NO_DATA — the code could not be derived:",
@@ -86,15 +91,15 @@ COPY = {
   "s1p": "Your AI on your machine, no cloud required. Persistent memory that belongs to you, and a Privacy Gateway that sanitises context before it reaches any external AI. No accounts, no telemetry.",
   "s1b": "Get started",
   "s2t": "Your privacy, your control",
-  "s2p": "Paste your context and see what comes out before you hand it to anyone. It happens in your browser, nothing to install, and it also tells you where the filter does NOT reach.",
+  "s2p": "The filter is the one that crosses out what is private. Paste your context and see what comes out before you hand it to anyone: it happens in your browser, nothing to install, and it also tells you where it does NOT reach.",
   "s2b": "Try the filter now",
   "s3t": "Download the app",
   "s3p": "The web is the shop window. The app is the workshop: that's where the companion you choose works on your real files, without them leaving your machine.",
-  "s3and": "Android · APK", "s3pc": "Linux · install.sh", "s3mac": "macOS · install.sh",
-  "s3aviso": "NO_DATA — the installers are not published yet. The buttons point at their final address on GitHub Releases; until the first version ships they will return 404. Said before you press.",
-  "s4t": "Connect your account",
-  "s4p": "Your identity is generated in the browser and the private key never leaves it. This code is derived from your public key: always the same for you, and it carries no secret inside.",
-  "s4b": "Generate my code",
+  "s3and": "Android · via Termux", "s3pc": "Linux or macOS · install.sh", "s3win": "Windows · install.ps1",
+  "s3aviso": "NO_DATA — Android runs through Termux today, following this site's guide; the APK is declared future work and does not exist yet. The desktop installers point at their final address on GitHub Releases and will return 404 until the first version ships. Windows and macOS are NOT tested on this rack: there is no machine of either system here.",
+  "s4t": "Your pairing code",
+  "s4p": "Your identity is generated in the browser and the private key never leaves it. This pairing code is derived from your public key: always the same for you, and it carries no secret inside.",
+  "s4b": "Generate my pairing code",
   "s4aviso": "This code IDENTIFIES you, it does not authenticate you: anyone who knows your public key can compute it. Real linking will also require a signature, and that arrives with the backend.",
   "pieVolver": "← Back to home", "piePlay": "Playground", "pieInst": "Install guide",
  },
@@ -108,7 +113,7 @@ COPY = {
   "obQue": "PreceptorOS est la douane entre tes données et les IA du nuage.",
   "obPriv": "Ce n'est pas une promesse : c'est un filtre que tu peux essayer tout de suite.",
   "obDesc": "Choisis ton système. L'app est l'atelier ; je viens avec toi à l'intérieur.",
-  "obConec": "Ce code relie ton identité web à l'app. Il est à toi et à toi seul.",
+  "obConec": "Ce code de liaison relie ton identité web à l'app. Il est à toi et à toi seul.",
   "obVinculado": "Le voilà. Ouvre-le dans l'app et on continue : je te présente tes compagnons.",
   "obSinIdentidad": "Il te faut d'abord une identité. Appuie ci-dessus : elle est générée dans ton navigateur et n'en sort jamais.",
   "obFalloCodigo": "NO_DATA — le code n'a pas pu être dérivé :",
@@ -116,15 +121,15 @@ COPY = {
   "s1p": "Ton IA sur ta machine, sans nuage obligatoire. Une mémoire persistante qui t'appartient, et un Privacy Gateway qui assainit le contexte avant qu'il ne parte vers une IA externe. Sans comptes, sans télémétrie.",
   "s1b": "Commencer",
   "s2t": "Ta vie privée, ton contrôle",
-  "s2p": "Colle ton contexte et vois ce qui sort avant de le donner à qui que ce soit. Tout se passe dans ton navigateur, rien à installer, et il te dit aussi où le filtre N'ARRIVE PAS.",
+  "s2p": "Le filtre est celui qui raye ce qui est privé. Colle ton contexte et vois ce qui sort avant de le donner à qui que ce soit : tout se passe dans ton navigateur, rien à installer, et il te dit aussi où il N'ARRIVE PAS.",
   "s2b": "Essayer le filtre",
   "s3t": "Télécharge l'app",
   "s3p": "Le web est la vitrine. L'app est l'atelier : c'est là que le compagnon que tu choisis travaille sur tes vrais fichiers, sans qu'ils quittent ta machine.",
-  "s3and": "Android · APK", "s3pc": "Linux · install.sh", "s3mac": "macOS · install.sh",
-  "s3aviso": "NO_DATA — les installateurs ne sont pas encore publiés. Les boutons pointent vers leur adresse définitive sur GitHub Releases ; jusqu'à la première version ils renverront 404. C'est dit avant que tu appuies.",
-  "s4t": "Connecte ton compte",
-  "s4p": "Ton identité est générée dans le navigateur et la clé privée n'en sort jamais. Ce code dérive de ta clé publique : toujours le même pour toi, et il ne contient aucun secret.",
-  "s4b": "Générer mon code",
+  "s3and": "Android · via Termux", "s3pc": "Linux ou macOS · install.sh", "s3win": "Windows · install.ps1",
+  "s3aviso": "NO_DATA — Android passe aujourd'hui par Termux, avec le guide de ce site ; l'APK est déclaré comme travail futur et n'existe pas encore. Les installateurs de bureau pointent vers leur adresse définitive sur GitHub Releases et renverront 404 jusqu'à la première version. Windows et macOS NE sont PAS testés sur ce rack : aucune machine de ces systèmes n'est ici.",
+  "s4t": "Ton code de liaison",
+  "s4p": "Ton identité est générée dans le navigateur et la clé privée n'en sort jamais. Ce code de liaison dérive de ta clé publique : toujours le même pour toi, et il ne contient aucun secret.",
+  "s4b": "Générer mon code de liaison",
   "s4aviso": "Ce code t'IDENTIFIE, il ne t'authentifie pas : quiconque connaît ta clé publique peut le calculer. Un vrai lien exigera aussi une signature, et cela arrive avec le backend.",
   "pieVolver": "← Retour à l'accueil", "piePlay": "Testeur", "pieInst": "Guide d'installation",
  },
@@ -169,6 +174,7 @@ def pagina(idi):
 <meta name="description" content="{t['desc']}">
 <link rel="stylesheet" href="/assets/base.css">
 <link rel="stylesheet" href="/assets/movil.css">
+<link rel="stylesheet" href="/assets/canon.css">
 <link rel="stylesheet" href="/assets/onboarding.css">
 </head>
 <body>
@@ -208,7 +214,7 @@ def pagina(idi):
   <div class="ob-descargas">
     <a class="boton" href="{d['android']}">{t['s3and']}</a>
     <a class="boton" href="{d['pc']}">{t['s3pc']}</a>
-    <a class="boton" href="{d['mac']}">{t['s3mac']}</a>
+    <a class="boton" href="{d['win']}">{t['s3win']}</a>
   </div>
   <p class="ob-aviso nodata">{t['s3aviso']}</p>
   <p class="tenue"><a href="./instalar.html">{t['pieInst']} →</a></p>

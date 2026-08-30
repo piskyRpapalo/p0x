@@ -28,6 +28,10 @@ FAVICON = '<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">'
 # habria sido tirar el 29 % del fichero que explica por que es como es.
 MOVIL = '<link rel="stylesheet" href="/assets/movil.css">'
 
+# El canon visual va DESPUES de movil.css: R-WIDGET y R-TIPOGRAFIA corrigen lo
+# que las dos anteriores dejan, y el orden de la cascada es el que decide.
+CANON = '<link rel="stylesheet" href="/assets/canon.css">'
+
 
 # Solo las páginas que alguien comparte llevan tarjeta social. Ponerla en las
 # diecisiete engordaría ficheros que ya rozan los 10 KB sin que nadie llegue a
@@ -103,6 +107,15 @@ def procesar(p: Path, aplicar: bool):
         if m:
             t = t[:m.end()] + MOVIL + "\n" + t[m.end():]
             hechos.append("movil.css")
+
+    if "canon.css" not in t:
+        m = (re.search(r'<link rel="stylesheet" href="([^"]*assets/)movil\.css">\n?', t)
+             or re.search(r'<link rel="stylesheet" href="([^"]*assets/)base\.css">\n?', t))
+        if m:
+            base = m.group(1)      # se hereda la forma del fichero: / o ./ o ../
+            t = (t[:m.end()] +
+                 f'<link rel="stylesheet" href="{base}canon.css">\n' + t[m.end():])
+            hechos.append("canon.css")
 
     if p.name in CON_TARJETA and "og:title" in t:
         arreglado = re.sub(r'(og:url" content="[^"]*?)index\.html(")', r"\1\2", t)
