@@ -109,6 +109,31 @@ ENJAMBRE = ("guardian", "curador", "afinador")
 # tailnet, y merece decirse en voz alta.
 LOCALES = ("127.", "::1", "[::1]")
 
+# Puertos que SE ESPERA que esten expuestos, con su motivo. Sin esta lista, el
+# recolector marcaba en rojo los nueve puertos expuestos del nodo -- incluidos
+# sshd, el demonio de la red superpuesta y el propio Ollama, que estan
+# expuestos a proposito y por canon. Nueve rojos permanentes son cero rojos:
+# a la tercera sesion nadie los
+# mira, y el dia que aparezca uno de verdad se pierde entre ellos.
+#
+# Lo que esta lista permite es que el rojo signifique SORPRESA.
+EXPUESTOS_ESPERADOS = {
+    22: "sshd",
+    53: "systemd-resolved",
+    443: "demonio de la red superpuesta (DERP/HTTPS)",
+    631: "cups",
+    9001: "API Guia",
+    11434: "Ollama (canon: escucha en la IP de tailnet, nunca en localhost)",
+}
+
+# El rango efimero no cuenta como sorpresa. Un puerto >= 32768 no es un
+# servicio que alguien dejo encendido: es una asignacion dinamica del kernel --
+# aqui, el demonio de la red superpuesta abriendo sus escuchas. Meterlos en la
+# lista de sorpresas
+# haria que el numero cambiase solo entre corridas y volveria el rojo inutil.
+# Se siguen listando; simplemente no disparan la alarma.
+EFIMERO_DESDE = 32768
+
 
 # --------------------------------------------------------------------------
 # Utilidades: nunca lanzan, siempre devuelven algo que se puede declarar.
@@ -324,20 +349,80 @@ def sonda_puertos():
     if not ok:
         return _declarar("NO_DATA", causa="ss no disponible o sin permisos",
                          remedio="ss -tlnp")
-    filas, expuestos = [], 0
+    filas, expuestos, sorpresas = [], 0, []
     for linea in salida.splitlines()[1:]:
         partes = linea.split()
         if len(partes) < 4:
             continue
         addr = partes[3]
         proc = partes[-1] if "users:" in partes[-1] else ""
+        proc = re.sub(r'users:\(\("([^"]+)",pid=(\d+).*', r"\1 pid=\2", proc) or "NO_DATA"
         local = any(addr.startswith(p) for p in LOCALES)
+        try:
+            puerto = int(addr.rsplit(":", 1)[1])
+        except (IndexError, ValueError):
+            puerto = 0
+        esperado = puerto in EXPUESTOS_ESPERADOS or puerto >= EFIMERO_DESDE
         if not local:
             expuestos += 1
-        filas.append({"addr": addr, "expuesto": not local,
-                      "proceso": re.sub(r'users:\(\("([^"]+)",pid=(\d+).*',
-                                        r"\1 pid=\2", proc) or "NO_DATA"})
-    return _declarar("OK", total=len(filas), expuestos=expuestos, lista=filas)
+            if not esperado:
+                sorpresas.append({"addr": addr, "proceso": proc, "puerto": puerto})
+        filas.append({"addr": addr, "expuesto": not local, "proceso": proc,
+                      "puerto": puerto,
+                      "motivo": (EXPUESTOS_ESPERADOS.get(puerto) or
+                                 ("rango efimero del kernel" if puerto >= EFIMERO_DESDE else None))
+                                if not local else None})
+
+    huerfanos = _servidores_huerfanos()
+
+    causa = None
+    if sorpresas:
+        causa = ("puerto expuesto fuera de la lista esperada: " +
+                 ", ".join(f"{x['addr']} ({x['proceso']})" for x in sorpresas))
+    elif huerfanos:
+        causa = (f"{len(huerfanos)} servidor(es) http.server huerfanos: su shell "
+                 "murio y quedaron reparentados")
+
+    return _declarar("RED" if causa else "OK", causa=causa,
+                     total=len(filas), expuestos=expuestos,
+                     sorpresas=sorpresas or None,
+                     huerfanos=huerfanos or None, lista=filas)
+
+
+def _servidores_huerfanos():
+    """`http.server` cuyo shell murio y quedaron reparentados a systemd/init.
+
+    Existe esta sonda porque la primera corrida del Ojo destapo CATORCE, en
+    puertos 8792-8808, sirviendo `preceptoros-web/public`, algunos con siete
+    horas de vida. Uno por sesion: cada una levantaba su previsualizacion de la
+    web y ninguna la apagaba. Nadie lo sabia porque estaban en loopback y
+    porque nadie mira `ss` entero.
+
+    Es el «servicio fantasma» del canon, pero por la puerta de atras: sin
+    unidad, sin firma y sin registro. Un proceso que sobrevive al shell que lo
+    lanzo es exactamente lo que nadie recuerda haber arrancado.
+    """
+    ok, salida = _corre(["bash", "-lc",
+                         "ps -eo pid,ppid,etimes,args --no-headers 2>/dev/null "
+                         "| grep -F 'http.server' | grep -v grep"], timeout=8)
+    if not ok:
+        return []
+    fuera = []
+    for linea in salida.splitlines():
+        campos = linea.split(None, 3)
+        if len(campos) < 4:
+            continue
+        pid, ppid, etimes, args = campos
+        # ppid 1 (init) o el manager de usuario: su padre real ya no existe.
+        try:
+            padre_vivo = int(ppid) > 1 and "systemd" not in Path(
+                f"/proc/{ppid}/comm").read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            padre_vivo = False
+        if not padre_vivo:
+            fuera.append({"pid": int(pid), "edad_s": int(etimes),
+                          "cmd": args.strip()})
+    return fuera
 
 
 def sonda_memoria():

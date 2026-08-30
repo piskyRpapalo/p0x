@@ -1,0 +1,68 @@
+/* El Ojo del Soberano · canon violeta/bronce sobre void.
+   Los tokens --violeta y --bronce son los mismos del Agora (base.css); --nx-void
+   y --nx-phosphor son de esta consola: un log de operaciones se lee mejor en
+   oscuro y el ojo lo distingue al instante del producto, que es claro. */
+:root{
+  --nx-void:#12101a; --nx-void-hondo:#0b0a11; --nx-phosphor:#b8f0c8;
+  --violeta:#6d5ae0; --violeta-claro:#9b8cf0; --bronce:#78624c; --bronce-claro:#93705c;
+  --marmol:#e4e8ec; --tenue:#8b8399;
+  --ok:#6ee7a0; --red:#ff7b7b; --nodata:#c9a86a;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; padding:1.2rem clamp(.8rem,3vw,2rem) 2rem;
+  background:var(--nx-void-hondo); color:var(--marmol);
+  font:16px/1.55 ui-sans-serif,system-ui,"Segoe UI",Roboto,sans-serif;
+}
+header{border-bottom:3px solid var(--bronce); padding-bottom:.6rem; margin-bottom:1rem}
+h1{margin:0; font-size:1.35rem; letter-spacing:.01em}
+h1::first-letter{font-size:1.1em}
+.sub{margin:.25rem 0 0; color:var(--tenue); font-size:.9rem}
+h2{font-size:1rem; color:var(--bronce-claro); margin:1.4rem 0 .5rem;
+   border-bottom:1px solid var(--bronce); padding-bottom:.3rem}
+.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
+
+/* --- banner de frescura --- */
+.frescura{
+  padding:.6rem .9rem; border-radius:8px; font-size:.92rem; font-weight:600;
+  border:1px solid var(--bronce); background:rgba(120,98,76,.14); margin-bottom:1rem;
+}
+.frescura.fresca{border-color:var(--ok); background:rgba(110,231,160,.10); color:var(--ok)}
+.frescura.rancia{border-color:var(--nodata); background:rgba(201,168,106,.13); color:var(--nodata)}
+.frescura.perdida{border-color:var(--red); background:rgba(255,123,123,.14); color:var(--red)}
+.frescura code{background:rgba(0,0,0,.35); padding:.1rem .35rem; border-radius:4px}
+
+/* --- el bloque terminal --- */
+.terminal-caja{border:1px solid var(--bronce); border-radius:10px; overflow:hidden;
+               box-shadow:0 6px 26px rgba(0,0,0,.45)}
+.terminal{
+  margin:0; padding:1rem;
+  background:var(--nx-void); color:var(--nx-phosphor);
+  font-family:ui-monospace,"JetBrains Mono","DejaVu Sans Mono",monospace;
+  font-size:.86rem; line-height:1.65;
+  /* Solo scroll vertical, como se pidio: el horizontal en un log parte las
+     lineas y obliga a barrer con el raton para leer una frase. */
+  max-height:60vh; overflow-y:auto; overflow-x:hidden;
+  white-space:pre-wrap; word-break:break-word;
+}
+.terminal:focus{outline:2px solid var(--violeta); outline-offset:-2px}
+.terminal b{font-weight:700}
+.t-ok{color:var(--ok)} .t-red{color:var(--red)} .t-nodata{color:var(--nodata)}
+.t-sello{color:var(--tenue)} .t-clave{color:var(--violeta-claro)}
+
+/* --- detalle --- */
+.detalle{margin-top:.5rem}
+.detalle table{width:100%; border-collapse:collapse; font-size:.85rem}
+.detalle th,.detalle td{text-align:left; padding:.35rem .5rem;
+                        border-bottom:1px solid rgba(120,98,76,.35)}
+.detalle th{color:var(--bronce-claro); font-weight:600}
+.detalle td code{color:var(--violeta-claro)}
+.expuesto{color:var(--red); font-weight:700}
+.local{color:var(--tenue)}
+
+footer{margin-top:1.6rem; border-top:1px solid var(--bronce); padding-top:.7rem;
+       font-size:.82rem; color:var(--tenue)}
+footer code{color:var(--violeta-claro)}
+.tenue{opacity:.75}
+
+@media (max-width:600px){ .terminal{font-size:.78rem; max-height:52vh} }

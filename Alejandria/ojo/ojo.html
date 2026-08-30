@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El Ojo del Soberano · rack P0X</title>
+<link rel="stylesheet" href="/ojo.css">
+</head>
+<body>
+
+<header>
+  <h1>👁 El Ojo del Soberano</h1>
+  <p class="sub">Consola de operaciones del rack. No es el producto: es el taller.</p>
+</header>
+
+<!-- El banner de frescura va ARRIBA y no al pie a proposito: si el dato esta
+     viejo, eso es lo primero que hay que saber, antes de leer una sola linea
+     del log. Un panel con datos rancios que parecen frescos es peor que un
+     panel apagado. -->
+<div id="frescura" class="frescura" role="status" aria-live="polite">cargando…</div>
+
+<main>
+  <section class="terminal-caja">
+    <h2 class="sr">Registro del rack</h2>
+    <pre id="log" class="terminal" tabindex="0" aria-label="Registro del rack">…</pre>
+  </section>
+
+  <section id="detalle" class="detalle" hidden>
+    <h2>Lo que no cabe en una línea</h2>
+    <div id="detalle-cuerpo"></div>
+  </section>
+</main>
+
+<footer>
+  <p>Refresco cada 60 s. El Ojo <strong>no mide</strong>: pinta lo que
+     <code>recolector.py</code> dejó escrito. Para medir de nuevo:
+     <code>~/p0x/Alejandria/verificar_sesion.sh</code></p>
+  <p class="tenue">Escucha solo en <code>127.0.0.1</code>. Esta consola enseña el
+     rack entero — atarla a <code>0.0.0.0</code> sería repartirlo.</p>
+</footer>
+
+<script src="/ojo.js"></script>
+</body>
+</html>
