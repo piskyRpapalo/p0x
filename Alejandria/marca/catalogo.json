@@ -1,0 +1,107 @@
+{
+ "nota": "Masters de la cara de PreceptorOS. PNG 512x512 con alfa de verdad. Los JPEG de origen traian la transparencia DIBUJADA -- un damero de dos grises horneado en pixeles. El alfa se deduce por la ESTRUCTURA del damero (alterna al periodo en los dos ejes) y no por su color, que se comia el marmol del busto y el pelo. Dentro de cada grupo los fotogramas comparten POSICION pero no contorno: imponer un contorno unico les hacia mordiscos, porque cada cuadro es un render aparte.",
+ "fuente": "Alejandria/Images-preceptorOS-head",
+ "genera": "Alejandria/marca/marca.py",
+ "piezas": {
+  "busto-despierto": {
+   "fichero": "busto-despierto.png",
+   "nota": "el busto identidad · ojo violeta encendido",
+   "bytes": 336783
+  },
+  "busto-corazon": {
+   "fichero": "busto-corazon.png",
+   "nota": "ojo violeta con corazon · cierra el despertar",
+   "bytes": 342317
+  },
+  "busto-dormido": {
+   "fichero": "busto-dormido.png",
+   "nota": "marmol intacto, sin grieta ni ojo · reposo",
+   "bytes": 317372
+  },
+  "busto-grieta": {
+   "fichero": "busto-grieta.png",
+   "nota": "la grieta se abre · despertar 2 de 4",
+   "bytes": 348405
+  },
+  "busto-rompe": {
+   "fichero": "busto-rompe.png",
+   "nota": "la cascara salta · despertar 3 de 4",
+   "bytes": 368727
+  },
+  "busto-ojo": {
+   "fichero": "busto-ojo.png",
+   "nota": "ojo violeta liso, con cascotes",
+   "bytes": 357178
+  },
+  "busto-oscuro": {
+   "fichero": "busto-oscuro.png",
+   "nota": "nacido sobre Tinta · fuente de los iconos",
+   "bytes": 354658
+  },
+  "busto-halo": {
+   "fichero": "busto-halo.png",
+   "nota": "con halo violeta, sobre fondo oscuro",
+   "bytes": 364359
+  },
+  "ojo-bombilla": {
+   "fichero": "ojo-bombilla.png",
+   "nota": "agente · ojo con simbolo y neon de mejilla a juego",
+   "bytes": 319481
+  },
+  "ojo-libro": {
+   "fichero": "ojo-libro.png",
+   "nota": "agente · ojo con simbolo y neon de mejilla a juego",
+   "bytes": 326878
+  },
+  "ojo-birrete": {
+   "fichero": "ojo-birrete.png",
+   "nota": "agente · ojo con simbolo y neon de mejilla a juego",
+   "bytes": 314695
+  },
+  "ojo-cerebro": {
+   "fichero": "ojo-cerebro.png",
+   "nota": "agente · ojo con simbolo y neon de mejilla a juego",
+   "bytes": 317133
+  },
+  "ojo-rojo": {
+   "fichero": "ojo-rojo.png",
+   "nota": "agente · ojo liso de color y neon de mejilla a juego",
+   "bytes": 322085
+  },
+  "ojo-verde": {
+   "fichero": "ojo-verde.png",
+   "nota": "agente · ojo liso de color y neon de mejilla a juego",
+   "bytes": 322340
+  },
+  "ojo-azul": {
+   "fichero": "ojo-azul.png",
+   "nota": "agente · ojo liso de color y neon de mejilla a juego",
+   "bytes": 297896
+  },
+  "ojo-ambar": {
+   "fichero": "ojo-ambar.png",
+   "nota": "agente · ojo liso de color y neon de mejilla a juego",
+   "bytes": 298981
+  },
+  "habla-1": {
+   "fichero": "habla-1.png",
+   "nota": "habla · 1 cerrada, 2 entreabierta, 3 abierta, 4 apretada",
+   "bytes": 314071
+  },
+  "habla-2": {
+   "fichero": "habla-2.png",
+   "nota": "habla · 1 cerrada, 2 entreabierta, 3 abierta, 4 apretada",
+   "bytes": 308998
+  },
+  "habla-3": {
+   "fichero": "habla-3.png",
+   "nota": "habla · 1 cerrada, 2 entreabierta, 3 abierta, 4 apretada",
+   "bytes": 306428
+  },
+  "habla-4": {
+   "fichero": "habla-4.png",
+   "nota": "habla · 1 cerrada, 2 entreabierta, 3 abierta, 4 apretada",
+   "bytes": 295021
+  }
+ }
+}

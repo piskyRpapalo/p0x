@@ -80,3 +80,10 @@ aurelius/
 
 # La tanda medida del Nexo: estado local de esta maquina, no historia.
 hexelion-nexo/estado/
+
+# Los JPEG originales de Gemini (~14 MB). No se versionan TODAVIA y esto es
+# una pregunta abierta, no una decision cerrada: son irremplazables --no se
+# pueden volver a generar iguales-- y sin ellos `Alejandria/marca/marca.py` no
+# puede rehacer los masters. Meterlos son 14 MB en el repo; dejarlos fuera es
+# confiar en una copia local. Lo firma el Soberano, no el silicio.
+Alejandria/Images-preceptorOS-head/
