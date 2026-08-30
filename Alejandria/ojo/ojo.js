@@ -38,6 +38,7 @@
   var ROTULOS = {
     PUERTOS:  { OK: 'LIMPIO', RED: 'EXPUESTO' },
     HUERFANOS:{ RED: 'FANTASMA' },
+    REPOS:    { OK: 'AL DÍA', RED: 'SIN EMPUJAR' },
     MEMORIA: { OK: 'OK', RED: 'ROTA' },
     DISCO:   { OK: 'OK', RED: 'LLENO' },
     MVP_GATE:{ OK: 'GREEN', RED: 'RED' },
@@ -166,6 +167,20 @@
         L.push(fila(m, 'HUERFANOS', 'RED',
           p.huerfanos.length + ' × http.server sin padre · el más viejo lleva ' + edad(vh)));
       }
+    }
+
+    var rp = c.repos || {};
+    if (rp.arboles) {
+      // Cuantos commits esperan la firma de «Empuja a produccion». Va en el log
+      // porque es una decision pendiente del Soberano, no una estadistica.
+      var n = rp.pendientes_total || 0;
+      L.push(fila(m, 'REPOS', n ? 'RED' : 'OK', n
+        ? n + ' commit(s) sin empujar · ' + Object.keys(rp.arboles).filter(function (k) {
+            return (rp.arboles[k].sin_push || 0) > 0;
+          }).map(function (k) {
+            return k + ':' + rp.arboles[k].sin_push + '@' + rp.arboles[k].rama;
+          }).join(', ')
+        : 'todo empujado'));
     }
 
     L.push('');

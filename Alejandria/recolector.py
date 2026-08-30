@@ -105,6 +105,13 @@ OLLAMA, OLLAMA_ORIGEN = _host_ollama()
 
 ENJAMBRE = ("guardian", "curador", "afinador")
 
+# Los cuatro arboles de trabajo. La rama NO se escribe: se pregunta. El volcado
+# viejo comparaba contra `origin/main` a mano y p0x esta en `master`, asi que
+# para ese repo la cuenta de commits sin empujar era literalmente incomparable
+# -- y salia como si estuviera todo al dia.
+REPOS = (CASA / "p0x", CASA / "p0x" / "preceptor", CASA / "preceptoros-web",
+         CASA / "p0x" / "preceptor-internal")
+
 # Loopback y nada mas. Todo lo que no este aqui esta expuesto a la LAN y a la
 # tailnet, y merece decirse en voz alta.
 LOCALES = ("127.", "::1", "[::1]")
@@ -407,6 +414,22 @@ def _servidores_huerfanos():
                          "| grep -F 'http.server' | grep -v grep"], timeout=8)
     if not ok:
         return []
+
+    # Un proceso DESACOPLADO no es lo mismo que un proceso ABANDONADO.
+    # `bin/preview-web` se desacopla a proposito -- asi sobrevive a la terminal
+    # que lo lanzo -- pero deja fichero de pid y tiene `--stop`. Si el
+    # recolector lo contase como huerfano, la herramienta que se escribio para
+    # curar esta plaga apareceria cada dia como uno de sus casos, y a la tercera
+    # vez nadie mira la linea. Lo que define al huerfano es que NADIE responda
+    # por el, no que su padre sea init.
+    gestionados = set()
+    for base in (os.environ.get("XDG_RUNTIME_DIR", "/tmp"), "/tmp"):
+        try:
+            crudo = Path(base, "p0x-preview-web.pid").read_text(encoding="utf-8")
+            gestionados.add(int(crudo.strip()))
+        except (OSError, ValueError):
+            pass
+
     fuera = []
     for linea in salida.splitlines():
         campos = linea.split(None, 3)
@@ -419,7 +442,7 @@ def _servidores_huerfanos():
                 f"/proc/{ppid}/comm").read_text(encoding="utf-8", errors="replace")
         except OSError:
             padre_vivo = False
-        if not padre_vivo:
+        if not padre_vivo and int(pid) not in gestionados:
             fuera.append({"pid": int(pid), "edad_s": int(etimes),
                           "cmd": args.strip()})
     return fuera
@@ -504,6 +527,53 @@ def sonda_lora():
     return _declarar("OK", adaptadores=adaptadores)
 
 
+def sonda_repos():
+    """Commits sin empujar y suciedad, por arbol.
+
+    Se resuelve la rama de seguimiento con `@{upstream}` en vez de suponer
+    `origin/main`. Suponerla es como el volcado viejo daba p0x por limpio: esta
+    en `master`, la comparacion no existia, y el cero significaba «no lo se»
+    disfrazado de «no hay nada pendiente».
+
+    Y `rev-list` mide contra la copia LOCAL de la rama remota. Si nadie ha
+    hecho fetch, un cero sigue significando «que yo sepa». Por eso viaja
+    `fetch_edad_s`: un cero con una referencia de hace tres dias no es la misma
+    afirmacion que un cero recien comprobado.
+    """
+    fuera, pendientes = {}, 0
+    for ruta in REPOS:
+        if not (ruta / ".git").exists():
+            fuera[ruta.name] = {"estado": "NO_DATA", "causa": "no es repo git"}
+            continue
+        ok_r, rama = _corre(["git", "-C", str(ruta), "rev-parse",
+                             "--abbrev-ref", "HEAD"], timeout=8)
+        ok_u, arriba = _corre(["git", "-C", str(ruta), "rev-parse",
+                               "--abbrev-ref", "@{upstream}"], timeout=8)
+        rama, arriba = rama.strip(), arriba.strip()
+        if not ok_u:
+            fuera[ruta.name] = {"rama": rama, "estado": "NO_DATA",
+                                "causa": "la rama no tiene upstream"}
+            continue
+        ok_n, n = _corre(["git", "-C", str(ruta), "rev-list", "--count",
+                          f"{arriba}..HEAD"], timeout=10)
+        ok_s, sucio = _corre(["git", "-C", str(ruta), "status", "--porcelain"],
+                             timeout=15)
+        # Cuando se refresco por ultima vez la referencia remota.
+        edad = None
+        cabeza = ruta / ".git" / "FETCH_HEAD"
+        try:
+            edad = int(time.time() - cabeza.stat().st_mtime)
+        except OSError:
+            pass
+        cuenta = int(n.strip()) if ok_n and n.strip().isdigit() else None
+        pendientes += cuenta or 0
+        fuera[ruta.name] = {
+            "rama": rama, "upstream": arriba, "sin_push": cuenta,
+            "sucios": len([l for l in sucio.splitlines() if l.strip()]) if ok_s else None,
+            "fetch_edad_s": edad}
+    return _declarar("OK", pendientes_total=pendientes, arboles=fuera)
+
+
 def _gate(cwd, cmd, patron):
     ok, salida = _corre(cmd, timeout=300, cwd=str(cwd))
     cola = "\n".join(salida.strip().splitlines()[-3:])
@@ -575,6 +645,7 @@ def recolectar(completo=False):
         "doogee": sonda_doogee(),
         "tailscale": sonda_tailscale(),
         "disco": sonda_disco(),
+        "repos": sonda_repos(),
     }
     if completo:
         componentes["mvp_gate"] = sonda_gate_mvp()
