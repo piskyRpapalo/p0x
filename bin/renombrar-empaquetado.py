@@ -37,6 +37,14 @@ MUEVE = [("empaquetado/aurelius.ico", "empaquetado/preceptoros.ico"),
 # Sustituciones de texto, en orden. Las mas especificas PRIMERO: si
 # `aurelius` -> `preceptoros` corriera antes, se llevaria por delante
 # `~/.aurelius` y `aurelius.ico` y el resto no encontraria nada que arreglar.
+# Lo que NO se toca: los nombres de variable de entorno `AURELIUS_*`. Son
+# fallbacks deliberados -- `${PRECEPTOROS_REPO:-${AURELIUS_REPO:-...}}` -- y
+# existen para que a quien los tenga exportados de antes no se le rompa nada.
+# Renombrarlos no seria saldar una deuda: seria romper la compatibilidad que
+# alguien escribio a proposito. Se protegen antes de sustituir y se restauran
+# despues.
+PROTEGIDO = "\x00AURELIUSVAR\x00"
+
 CAMBIOS = [
     # la casa de datos: a la nueva, que es la que el producto usa ya
     (r"~/\.aurelius\b", "~/.preceptoros"),
@@ -59,7 +67,11 @@ CAMBIOS = [
 FICHEROS = ["empaquetado/construir_pc.sh", "empaquetado/lanzador.py",
             "INSTALACION_ANDROID.md", "INSTALL_ANDROID.md",
             "INSTALACION_PC.md", "INSTALL_PC.md",
-            "test_pwa.py", "test_compass.py"]
+            "test_pwa.py", "test_compass.py",
+            "bin/instalar-pc", "bin/instalar-android",
+            "bin/crear-acceso-directo-android", "bin/detectar-termux-boot",
+            "bin/preceptoros-servicio", "bin/preceptoros-servicio-pc",
+            "bin/preceptoros-puente", "bin/preceptoros-pwa", "bin/eco-remoto"]
 
 
 def main(argv=None):
@@ -84,8 +96,10 @@ def main(argv=None):
         if not p.exists():
             print(f"  ⬜ {rel} no existe"); continue
         t = original = p.read_text(encoding="utf-8")
+        t = re.sub(r"AURELIUS_([A-Z_]+)", lambda m: PROTEGIDO + m.group(1), t)
         for patron, sust in CAMBIOS:
             t = re.sub(patron, sust, t)
+        t = t.replace(PROTEGIDO, "AURELIUS_")
         if t == original:
             continue
         n = sum(1 for _ in re.finditer(r"(?i)aurelius", original))
