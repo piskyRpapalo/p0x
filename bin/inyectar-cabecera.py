@@ -23,6 +23,12 @@ ORIGEN = "https://preceptoros.org"
 
 FAVICON = '<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">'
 
+# La hoja de movil va DESPUES de base.css en toda pagina que la cargue. Vive
+# aparte porque base.css toca su tope de 10 KB, y recortar sus comentarios
+# habria sido tirar el 29 % del fichero que explica por que es como es.
+MOVIL = '<link rel="stylesheet" href="/assets/movil.css">'
+
+
 # Solo las páginas que alguien comparte llevan tarjeta social. Ponerla en las
 # diecisiete engordaría ficheros que ya rozan los 10 KB sin que nadie llegue a
 # verla: nadie pega en un chat el enlace de una guía de instalación.
@@ -89,6 +95,14 @@ def procesar(p: Path, aplicar: bool):
         if m:
             t = t[:m.end()] + FAVICON + "\n" + t[m.end():]
             hechos.append("favicon")
+
+    if "movil.css" not in t and "base.css" in t:
+        # Justo tras base.css: el orden importa, las reglas de movil
+        # sobreescriben las de escritorio y una hoja anterior no puede.
+        m = re.search(r'<link rel="stylesheet" href="/assets/base\.css">\n?', t)
+        if m:
+            t = t[:m.end()] + MOVIL + "\n" + t[m.end():]
+            hechos.append("movil.css")
 
     if p.name in CON_TARJETA and "og:title" in t:
         arreglado = re.sub(r'(og:url" content="[^"]*?)index\.html(")', r"\1\2", t)

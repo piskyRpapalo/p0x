@@ -84,6 +84,7 @@ def _casa_del_producto():
 
 
 MEMORIA = _casa_del_producto()
+LATIDOS = (MEMORIA.parent / "loops.db") if MEMORIA else None
 
 ENV_P0X = CASA / ".config" / "environment.d" / "50-p0x.conf"
 
@@ -345,6 +346,29 @@ def sonda_enjambre():
 
         resultado = svc.get("Result", "")
         arranque = svc.get("ExecMainStartTimestamp", "") or None
+
+        # EL LATIDO MANDA SOBRE systemd.
+        #
+        # `Result=success` solo dice que el proceso salio con codigo 0. No dice
+        # si HIZO algo. Medido el 2026-08-30: el guardian llevaba dos corridas
+        # devolviendo `success` con «0 ficheros mirados» porque su arbol
+        # vigilado habia dejado de existir -- y este recolector lo pintaba
+        # SANO en el Ojo, sesion tras sesion.
+        #
+        # Es el tercer agujero del mismo tipo en esta capa, y siempre el mismo:
+        # medir la propiedad que no informa. El bucle deja su propio latido con
+        # su resultado y su nota; eso es lo que hay que leer.
+        latido = _ultimo_latido(nombre)
+        if latido:
+            if latido.get("resultado") and latido["resultado"] != "ok":
+                fuera[nombre] = _declarar(
+                    "RED", causa=f"su ultimo latido dice '{latido['resultado']}': "
+                                 f"{latido.get('nota') or 'sin nota'}",
+                    cadencia=cadencia, ultima=latido.get("cuando"),
+                    nota_latido=latido.get("nota"),
+                    proxima=tim.get("NextElapseUSecRealtime") or "NO_DATA")
+                continue
+
         if not svc:
             fuera[nombre] = _declarar("NO_DATA",
                                       causa="la unidad no existe en el manager de usuario",
@@ -358,10 +382,35 @@ def sonda_enjambre():
                 ultima=arranque or "sin corridas en este arranque",
                 proxima=tim.get("NextElapseUSecRealtime") or "NO_DATA",
                 timer=tim.get("UnitFileState", "NO_DATA"),
+                nota_latido=(latido or {}).get("nota"),
                 # Un oneshot sano esta inactive entre disparos. Se dice aqui
                 # para que nadie vuelva a leerlo como una caida.
                 nota="oneshot: 'inactive' entre disparos es el estado sano")
     return fuera
+
+
+def _ultimo_latido(nombre):
+    """El ultimo latido de salida de un bucle, en solo lectura.
+
+    Devuelve {resultado, nota, cuando} o None. `mode=ro` no es cortesia: los
+    latidos son append-only por cuatro disparadores de SQLite, y abrir en
+    escritura para leer es pedirle al motor que nos deje romper su promesa.
+    """
+    if not LATIDOS or not LATIDOS.exists():
+        return None
+    try:
+        import sqlite3
+        con = sqlite3.connect(f"file:{LATIDOS}?mode=ro", uri=True, timeout=5)
+        fila = con.execute(
+            "select resultado, nota, datetime(momento,'unixepoch','localtime') "
+            "from latidos where bucle=? and evento='sale' "
+            "order by momento desc limit 1", (nombre,)).fetchone()
+        con.close()
+    except Exception:                              # noqa: BLE001
+        return None
+    if not fila:
+        return None
+    return {"resultado": fila[0], "nota": fila[1], "cuando": fila[2]}
 
 
 def sonda_puertos():

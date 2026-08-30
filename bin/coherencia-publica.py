@@ -71,8 +71,21 @@ def medir():
     Publicar «429 en verde» cuando el gate esta en rojo seria exactamente el
     tipo de cifra que este guion existe para erradicar.
     """
-    app, e1 = _gate(MVP, ["python3", "-m", "pytest", "--tb=no", "-q"],
-                    r"(\d+) passed", "gate del MVP")
+    # `bin/pruebas` y NO `pytest`. El propio corredor lo explica en su cabecera:
+    # «El numero de pruebas de Preceptor sale de AQUI, y de un solo sitio. Por
+    # que existe: `python3 -m unittest discover` dice OK habiendo corrido la
+    # mitad de la suite, porque cinco ficheros traen corredor propio y discover
+    # no los ve. Un OK que solo cubre el 55% no es un OK.»
+    #
+    # La primera version de este guion uso pytest y bajo la cifra publicada de
+    # 526 a 429 creyendo que corregia una invencion. No lo era: 526 lo producia
+    # el corredor certificado, y pytest es el parcial. Se cambio un numero
+    # correcto por uno peor, con un test que ademas imponia la fuente
+    # equivocada. Publicar la cifra del corredor que no lo corre todo es
+    # exactamente la media medida presentada como entera que el corredor
+    # advierte en su primera linea.
+    app, e1 = _gate(MVP, ["bash", "bin/pruebas", "--rapido"],
+                    r"VERDE · (\d+)/\d+", "corredor certificado (bin/pruebas)")
     web, e2 = _gate(WEB, ["python3", "test_web.py"], r"Ran (\d+) tests?",
                     "gate de la web")
     return {"app": (app, e1), "web": (web, e2)}
@@ -90,7 +103,8 @@ def escribir_contadores(medidas):
     d = json.loads(CONTADORES.read_text(encoding="utf-8"))
     nuevas = [
         _metrica("pruebas_app", medidas["app"][0], medidas["app"][1],
-                 "python3 -m pytest -q en el repo del MVP, cifra 'N passed'"),
+                 "bash bin/pruebas --rapido en el repo del MVP, cifra 'N/N pruebas'. "
+                 "Es la fuente unica declarada: pytest solo corre parte de la suite"),
         _metrica("pruebas_web", medidas["web"][0], medidas["web"][1],
                  "python3 test_web.py en este repo, cifra 'Ran N tests'"),
     ]
