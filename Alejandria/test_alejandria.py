@@ -25,15 +25,22 @@ RAIZ = Path(__file__).resolve().parent
 sys.path.insert(0, str(RAIZ / "mensajes"))
 import mensajes as M  # noqa: E402
 
-# D1-bis, firmada el 2026-08-30: el mismo tope que el Agora para la consola.
-# El alcance es HTML/JS/CSS, como D1; el Python queda fuera.
+# El tope de la capa Alejandria: 32 KB por fichero.
 #
-# El motivo no es el peso de descarga -- el Ojo se sirve en loopback y no paga
-# latencia de red, igual que la interfaz de la app, que por eso quedo exenta de
-# D1. El motivo es que se lea: `ojo.js` llego al 94,5 % del cupo y la respuesta
-# correcta fue partir en modulos, no engordar. Cuatro ficheros pequenos se leen;
-# uno de 25 KB no, y `dashboard.js` es la prueba de a donde lleva no tener tope.
-TOPE = 10 * 1024
+# CORRIGE a la D1-bis de 10 KB que se firmo antes: `plan_v5.md` -- el contrato
+# visual y de prioridades vigente -- abre con «Capa Alejandria: tope 32 KB/
+# fichero», y ese contrato manda sobre una regla mia anterior.
+#
+# El motivo del cambio es el Ojo-Vivo: la topologia, los estados y el
+# mobiliario que vienen en V1-V4 no caben en 10 KB por fichero sin trocear la
+# consola en una docena de modulos, y una docena de ficheros de 800 bytes no se
+# lee mejor que cuatro de 8 KB -- se lee peor.
+#
+# Lo que NO cambia es por que hay tope: el Ojo se sirve en loopback y no paga
+# latencia de red, asi que esto no protege una descarga; protege que el fichero
+# se pueda leer entero. `dashboard.js` con 25 KB es la prueba de a donde lleva
+# no tener ninguno.
+TOPE = 32 * 1024
 CONSOLA = RAIZ / "ojo"
 
 
@@ -140,6 +147,82 @@ class ElActa(unittest.TestCase):
         if not viva.exists():
             self.skipTest("todavia no hay acta en este nodo")
         self.assertEqual(M.verificar(viva), [])
+
+
+class GateDelEnlace(unittest.TestCase):
+    """B1-B5 del Medallon, comprobados sin llamar al modelo.
+
+    Se le pasa prosa sintetica a `gate()` y se mira que veredicto da. No hace
+    falta Ollama: el gate es codigo determinista, y una prueba que necesitara
+    el modelo para comprobar el gate del modelo seria su propia contradiccion.
+    """
+
+    def setUp(self):
+        sys.path.insert(0, str(RAIZ / "digesto"))
+        import digesto
+        self.D = digesto
+        self.lista = [
+            {"clave": "bucle guardian", "valor": "ok · 77 ficheros mirados",
+             "fuente": "loops.db:latidos/guardian"},
+            {"clave": "mvp_gate", "valor": "436 pruebas en verde",
+             "fuente": "estado.json:mvp_gate"},
+        ]
+        self.huecos = [("dead_path.jsonl", "no existe; fase F1 pendiente",
+                        "construir F1")]
+
+    def _prosa(self, firma="¿Firmas la F1?", extra=""):
+        return ("## Qué pasó\n- El guardián miró 77 ficheros. "
+                "[loops.db:latidos/guardian]\n" + extra +
+                "\n## Qué piensa cada agente\n- guardian: 77 ficheros. "
+                "[loops.db:latidos/guardian]\n"
+                "\n## Qué necesita tu firma\n" + firma +
+                "\n\n## NO_DATA\n- no existe [dead_path.jsonl]\n")
+
+    def test_una_parafrasis_limpia_pasa(self):
+        self.assertEqual(self.D.gate(self._prosa(), self.lista, self.huecos), [])
+
+    def test_B3_muerde_con_una_fuente_inventada(self):
+        mala = self._prosa(extra="- Segun el informe. [informe_secreto.md]\n")
+        fallos = self.D.gate(mala, self.lista, self.huecos)
+        self.assertTrue(any(f.startswith("B3") for f in fallos), fallos)
+        self.assertIn("informe_secreto.md", " ".join(fallos))
+
+    def test_B3_admite_varias_fuentes_en_un_corchete(self):
+        """Una viñeta que resume dos hechos cita los dos. Es legitimo.
+
+        El gate leia el corchete entero como UNA fuente y tumbaba parafrasis
+        correctas. Este caso existe para que no vuelva a pasar.
+        """
+        buena = self._prosa(extra="- Todo verde. "
+                            "[loops.db:latidos/guardian, estado.json:mvp_gate]\n")
+        self.assertEqual([f for f in self.D.gate(buena, self.lista, self.huecos)
+                          if f.startswith("B3")], [])
+
+    def test_B3_admite_citar_algo_que_venia_DENTRO_de_un_hecho(self):
+        """El material entregado incluye el TEXTO de los huecos, no solo su clave.
+
+        La primera corrida real tumbo una parafrasis correcta porque el modelo
+        cito `F1`, que estaba dentro de la causa de un hueco que se le habia
+        dado. Citar lo que se leyo es lo que B3 pide, no lo que prohibe.
+        """
+        buena = self._prosa(extra="- Falta la fase. [construir F1]\n")
+        self.assertEqual([f for f in self.D.gate(buena, self.lista, self.huecos)
+                          if f.startswith("B3")], [])
+
+    def test_B2_muerde_si_hay_huecos_y_no_se_declaran(self):
+        sin = self._prosa().replace("## NO_DATA\n- no existe [dead_path.jsonl]\n", "")
+        self.assertTrue(any(f.startswith("B2")
+                            for f in self.D.gate(sin, self.lista, self.huecos)))
+
+    def test_B4_muerde_con_dos_preguntas(self):
+        dos = self._prosa(firma="¿Firmas la F1? ¿Y el puerto?")
+        self.assertTrue(any(f.startswith("B4")
+                            for f in self.D.gate(dos, self.lista, self.huecos)))
+
+    def test_sin_prosa_no_hay_nada_que_juzgar(self):
+        """Si el modelo no respondio, el digesto sale con los hechos y ya.
+        Juzgar la ausencia como fallo perderia la medida por culpa del adorno."""
+        self.assertEqual(self.D.gate(None, self.lista, self.huecos), [])
 
 
 class ElGlosario(unittest.TestCase):
