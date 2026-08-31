@@ -88,7 +88,6 @@ hexelion-nexo/estado/
 # confiar en una copia local. Lo firma el Soberano, no el silicio.
 Alejandria/Images-preceptorOS-head/
 Alejandria/marca/originals/*.jpeg
-Alejandria/marca/originals/*.jpeg
 preceptor/
 preceptor-lora/*.log
 preceptor-internal/
