@@ -89,3 +89,7 @@ hexelion-nexo/estado/
 Alejandria/Images-preceptorOS-head/
 Alejandria/marca/originals/*.jpeg
 Alejandria/marca/originals/*.jpeg
+preceptor/
+preceptor-lora/*.log
+preceptor-internal/
+Web dashboard design/
