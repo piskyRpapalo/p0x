@@ -59,3 +59,29 @@ del carbono aplica) · voz/texto jamás salen del rack · fragua encolada + paci
 térmico · torre intocable (receta certificada, tags instruct explícitos) ·
 backup `.bak-YYYYMMDD` + screenshot antes/después en todo lo visible ·
 commit por bloque, push soberano (p0x→jetson, hexelion→torre).
+
+## Release v1.3 en BORRADOR · esperando firma (2026-08-31)
+
+Existe un release **draft** en `piskyRpapalo/PreceptorOS` con tres assets.
+**No está publicado, y publicarlo es firma del carbono.**
+
+- Ver: `gh release view v1.3 --repo piskyRpapalo/PreceptorOS`
+- Publicar: `gh release edit v1.3 --draft=false --repo piskyRpapalo/PreceptorOS`
+
+**El tag `v1.3` NO existe todavía en el remoto** — comprobado, 0 refs. GitHub
+lo crea al publicar, no al guardar el borrador. Por eso un draft no viola la
+regla de «sin push»: no hay ni un objeto nuevo en la historia del repo.
+
+Estado de pruebas de los assets, medido y no supuesto:
+
+| Asset | Estado |
+|---|---|
+| `install.sh` · Linux | **PROBADO** el 2026-08-31 de punta a punta, con `HOME` aislado y clonando del árbol local: requisitos → clon → entrada de escritorio → instrucciones. El `HOME` real quedó intacto |
+| `install.sh` · macOS | NO PROBADO · no hay máquina macOS en el rack |
+| `install.ps1` · Windows | NO PROBADO · no hay `pwsh` ni máquina Windows en el rack |
+| `INSTALACION_ANDROID.md` | Termux funciona; el APK no existe y la guía lo dice en su §3 |
+
+**Lo que la web sigue diciendo es correcto y no hay que tocarlo**: un borrador
+no es público, así que `releases/latest/download/install.sh` sigue dando 404 y
+los dos NO_DATA de `instalar.html` siguen siendo ciertos. El día que se firme
+la publicación, ESE es el momento de revisarlos — no antes.
