@@ -1231,3 +1231,41 @@ Suite al cierre: **520/520 · 36 suites** · sabotajes 4/4 y 6/6.
 
 - **S6 · Sin entrada en `CHANGELOG.md`.** (Coste S.) Cuatro commits de doctrina
   y mecanismo sin línea en el registro público.
+
+---
+
+## Puerta 4 · el Hub del Ágora (2026-08-31)
+
+Tres bloqueantes **físicos**. Ninguno se construyó ni se simuló: el panel del
+rack los pinta como NO_DATA con su causa, y quedan aquí para cuando el metal
+esté. Firmada la regla en esta sesión: *lo que dependa de hardware que no está
+se registra, no se finge.*
+
+- **P4-1 · La batería solar no existe todavía.** (Coste L, bloqueante físico.)
+  `P0X_BATTERY_PRESENT` es `false` por defecto → Era `SOL_SINCRONO`. El «Anker
+  al 50 %» que se ve en el Hub es maqueta declarada, y al lado se pinta el
+  estado real. Cuando llegue la batería, se cae la columna de la izquierda y
+  los umbrales se re-derivan **con dato**, no se improvisan.
+
+- **P4-2 · `energia_era.py` no está desplegado en la-fragua.** (Coste M,
+  bloqueante físico.) El módulo vive en `deploy/fragua/` del repo, pero ningún
+  proceso lo lee en el nodo, así que `ENERGY_ERA` no se puede consultar. Y
+  `mente/telemetria/reflejos.jsonl` **no existe**: el reflejo de batería nunca
+  ha escrito una línea. Sin esas dos cosas no hay telemetría energética real.
+
+- **P4-3 · Cero adaptadores servidos, ocho compañeros ofrecidos.** (Coste L,
+  bloqueante de entrenamiento.) El catálogo vivo da 1 disponible de 8. El Hub
+  no finge la carga: al abrir un compañero sin adaptador declara la causa.
+  Depende de la Forja (Jetson), que es Dominio 3 y está aparte.
+
+Y dos que no son físicos, salieron midiendo y no entraban en esta puerta:
+
+- **P4-4 · `fr/index.html` a 152 B del tope de 10 KB.** (Coste S.) La siguiente
+  frase traducida rompe el gate. Dos palancas medidas: minificar el bloque
+  `#i18n` devuelve ~290 B, o sacar `papel` —el prompt del sistema, 771 B, que
+  no es copia de interfaz— fuera del bloque, lo que obliga a tocar `chat.js`.
+
+- **P4-5 · `despierta.webp` y `habla.webp` siguen sin cablear.** (Coste M.) La
+  cara animada que se ve es todavía `seal-*.gif`. Cablear las hojas de sprite
+  cambia cómo se anima la cara del producto y `seal-think` no tiene secuencia
+  origen entre las 14 imágenes.
