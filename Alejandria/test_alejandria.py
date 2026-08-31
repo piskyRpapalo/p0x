@@ -387,6 +387,51 @@ class ElOjoVivo(unittest.TestCase):
         self.assertEqual([], ips, f"lleva direcciones del rack: {ips}")
 
 
+class ElOjoSeComprueba(unittest.TestCase):
+    """`ojo.py --check`: decir si el Ojo puede servir, SIN levantarlo.
+
+    Hasta el 2026-08-31 la unica forma de saber si el Ojo estaba entero era
+    arrancarlo y pedirle rutas a mano. Eso mezcla dos preguntas --¿estan los
+    ficheros? y ¿arranca el servidor?-- y cuando falla no distingue cual de las
+    dos fallo. `--check` responde solo la primera, y por eso puede correr en un
+    gate sin abrir un puerto.
+    """
+
+    def setUp(self):
+        self.ojo = CONSOLA / "ojo.py"
+        if not self.ojo.exists():
+            self.skipTest("no hay ojo.py")
+
+    def _check(self):
+        import subprocess
+        return subprocess.run([sys.executable, str(self.ojo), "--check"],
+                              capture_output=True, text=True, timeout=60)
+
+    def test_check_existe_y_no_abre_puerto(self):
+        r = self._check()
+        self.assertNotEqual(2, r.returncode,
+                            "argparse no conoce --check: " + r.stderr[-200:])
+
+    def test_declara_cada_pieza_de_la_topologia_v1(self):
+        """Las tres filas del contrato visual, nombradas una a una.
+
+        Si manana alguien borra `vivo.css`, el Ojo servira un esqueleto sin
+        estilo y con 200 en todas las rutas. El unico sitio donde eso se nota
+        antes de verlo con los ojos es aqui.
+        """
+        r = self._check()
+        for pieza in ("vivo.html", "vivo.css", "vivo.js"):
+            with self.subTest(pieza=pieza):
+                self.assertIn(pieza, r.stdout)
+
+    def test_lo_que_falta_sale_declarado_y_el_codigo_lo_dice(self):
+        """Sin fuentes, NO_DATA con causa; y el codigo de salida lo repite."""
+        r = self._check()
+        self.assertRegex(r.stdout, r"MEDIDO|NO_DATA")
+        self.assertIn(r.returncode, (0, 1),
+                      "un --check solo puede decir sirve (0) o no sirve (1)")
+
+
 class ElGlosario(unittest.TestCase):
 
     def test_cada_entrada_declara_su_fuente(self):

@@ -212,10 +212,65 @@ class Ojo(BaseHTTPRequestHandler):
         return self._responder(200, crudo, pieza[1])
 
 
+def comprobar():
+    """Dice si el Ojo puede servir, SIN abrir un puerto. Devuelve 0 o 1.
+
+    Responde UNA pregunta --¿esta entero lo que hay que servir?-- y deja la
+    otra --¿arranca el servidor?-- para quien lo arranque. Mezclarlas es lo que
+    hacia que un fallo no dijese cual de las dos habia fallado.
+
+    Un fichero que falta NO se convierte en un cero ni en un aviso suave: sale
+    NO_DATA con su causa, y el codigo de salida lo repite para que un gate
+    pueda leerlo sin parsear texto.
+    """
+    filas = []
+    # Las tres piezas de la topologia V1 del contrato visual. Se nombran una a
+    # una a proposito: si manana desaparece `vivo.css`, el Ojo seguiria
+    # devolviendo 200 en todas las rutas y sirviendo un esqueleto sin estilo.
+    for nombre, _ in sorted({v for v in ESTATICOS.values()}):
+        ruta = AQUI / nombre
+        filas.append((nombre, ruta.is_file(), ruta.stat().st_size if ruta.is_file() else 0,
+                      "fichero estatico"))
+    # Las fuentes de datos. Que falten NO impide servir: el Ojo pinta NO_DATA.
+    # Por eso se declaran aparte y no cuentan para el codigo de salida.
+    fuentes = [("estado.json", ESTADO), ("fases.json", FASES),
+               ("glosario.json", GLOSARIO), ("identidad_publica.json", IDENTIDAD),
+               ("mensajes.jsonl", ACTA)]
+
+    ancho = max(len(n) for n, *_ in filas)
+    print("== lo que el Ojo tiene que servir ==")
+    faltan = 0
+    for nombre, hay, tam, _ in filas:
+        if hay:
+            print(f"  MEDIDO   {nombre:<{ancho}}  {tam} B")
+        else:
+            faltan += 1
+            print(f"  NO_DATA  {nombre:<{ancho}}  no existe en {AQUI}")
+
+    print("== las fuentes que lee (su ausencia se pinta, no rompe) ==")
+    for nombre, ruta in fuentes:
+        existe = Path(str(ruta)).is_file()
+        print(f"  {'MEDIDO ' if existe else 'NO_DATA'}  {nombre}"
+              + ("" if existe else "  · el Ojo lo declarara en pantalla"))
+
+    if faltan:
+        print(f"NO SIRVE · faltan {faltan} pieza(s) de la topologia V1")
+        return 1
+    print(f"SIRVE · {len(filas)} piezas presentes")
+    return 0
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--check", action="store_true",
+                    help="dice si el Ojo puede servir y sale; no abre puerto")
     ap.add_argument("--puerto", type=int, default=8790)
     a = ap.parse_args(argv)
+
+    # `--check` responde y sale: no abre puerto, asi que puede vivir en un
+    # gate sin ocupar un puerto ni dejar un proceso suelto.
+    if a.check:
+        return comprobar()
     # 127.0.0.1 clavado y sin bandera para cambiarlo. Una consola que enseña el
     # rack no debe poder atarse a 0.0.0.0 "sin querer".
     srv = ThreadingHTTPServer(("127.0.0.1", a.puerto), Ojo)
