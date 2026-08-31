@@ -85,3 +85,19 @@ Estado de pruebas de los assets, medido y no supuesto:
 no es público, así que `releases/latest/download/install.sh` sigue dando 404 y
 los dos NO_DATA de `instalar.html` siguen siendo ciertos. El día que se firme
 la publicación, ESE es el momento de revisarlos — no antes.
+
+## Panel de herramientas del Ágora · para qué es (2026-08-31)
+
+Bajo el chat hay un `#herramientas` que crea `chat-router.js` (no está en el
+marcado: las tres portadas van justas de bytes). Hoy aloja lo que se sacó del
+chat por no ser conversación — descargar modelo, motor, IA local, dictado.
+
+**Lo que va a alojar, firmado por el Soberano:** los datos del modelo activo
+junto a sus «available tools», una caja de descripción, y debajo **cajas de
+palabras clave que son DISPARADORES del LoRA**. No son metadatos: son el
+interfaz por el que el usuario arma qué activa a su compañero.
+
+Eso lo ata a `mente/doctrina/LORATELIER_P0X.md` por el extremo contrario al
+botón «corregir esta respuesta»: uno recoge correcciones, el otro define
+disparos. Con D1-D4 abiertas, **el panel puede existir vacío; los disparadores
+no se activan sin firma**.
