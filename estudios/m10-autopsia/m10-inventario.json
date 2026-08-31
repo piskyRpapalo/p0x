@@ -1,0 +1,93 @@
+{
+ "esquema": 1,
+ "generado": "2026-08-31T11:02:35+00:00",
+ "estado": "MEDIDO",
+ "fuente": {
+  "base": "https://raw.githubusercontent.com/OpenBekenIOT/webapp/master/devices.json",
+  "version_esquema": 0.1,
+  "dispositivos": 889
+ },
+ "inventario_fisico": {
+  "modelo": "M10-EM-2",
+  "vendedor": "Simatop",
+  "ecosistema": "Tuya",
+  "chip": "BK7231N",
+  "driver_medicion": "BL0937",
+  "gemelo_declarado": "F1s202-EU",
+  "fuente": "inspeccion_fisica",
+  "nota": "chip y sensor leidos abriendo el aparato; no hay via software para confirmarlos sin flashear, y flashear esta prohibido por decision del carbono (2026-08-31)"
+ },
+ "chip": {
+  "estado": "MEDIDO",
+  "valor": "BK7231N",
+  "como": "inspeccion fisica; la base trae 427 dispositivos con ese chip"
+ },
+ "driver_medicion": {
+  "estado": "MEDIDO",
+  "valor": "BL0937",
+  "como": "inspeccion fisica; 113 dispositivos de la base lo usan"
+ },
+ "compatibilidad_cloudcutter": {
+  "estado": "MEDIDO",
+  "valor": false,
+  "como": "el modelo no aparece en la base de OpenBeken (0 coincidencias para 'm10') y el firmware Tuya esta parcheado post-feb-2022",
+  "barrera_dominante": "administrativa",
+  "detalle": "Tuya bloquea la API del wizard tras una vinculacion fallida. La barrera dejo de ser tecnica: ninguna via de extraccion sobrevive a una puerta cerrada desde la cuenta, por muy conocido que sea el chip."
+ },
+ "gemelo": {
+  "estado": "MEDIDO",
+  "coincidencias": [
+   {
+    "vendor": "ANTELA",
+    "model": "F1s202-EU",
+    "chip": "BK7231N",
+    "board": "CB2S",
+    "wiki": "https://www.elektroda.com/rtvforum/topic4043082.html"
+   },
+   {
+    "vendor": "Antela",
+    "model": "F1s202-EU",
+    "chip": "BK7231T",
+    "board": "WB2S",
+    "wiki": "https://www.elektroda.com/rtvforum/topic3935136.html"
+   }
+  ],
+  "chips_distintos": [
+   "BK7231N",
+   "BK7231T"
+  ],
+  "concluyente": false,
+  "aviso": "el gemelo declarado aparece con 2 chips distintos (BK7231N, BK7231T): NO prueba el chip del M10. El mismo numero de modelo se fabrica con silicio distinto, que es precisamente por lo que un perfil de cloudcutter no es transferible entre gemelos."
+ },
+ "vecindario": {
+  "estado": "MEDIDO",
+  "bk7231n_total": 427,
+  "bl0937_total": 113,
+  "bk7231n_con_bl0937": 52,
+  "como": "recuento sobre la base completa; el perfil del M10 es comun, y aun asi el M10 no esta"
+ },
+ "alternativas_soberanas": [
+  {
+   "modelo": "Shelly Plug S",
+   "via": "API local HTTP/MQTT",
+   "abrir_aparato": false,
+   "nube_obligatoria": false,
+   "estado": "elegido por el carbono 2026-08-31, pendiente de compra"
+  }
+ ],
+ "lecciones_doctrina": [
+  "Una barrera administrativa derrota a una via tecnica que funciona: al fabricante no le hizo falta un chip inexpugnable, le basto con cerrar la cuenta.",
+  "El coste de un aparato cerrado no se paga al comprarlo sino al intentar liberarlo, y es tiempo, no dinero.",
+  "Un gemelo con el mismo numero de modelo no garantiza el mismo chip: la equivalencia hay que medirla, no suponerla.",
+  "Cuando el obstaculo se mueve del silicio al contrato, la respuesta correcta es cambiar de proveedor, no insistir."
+ ],
+ "prohibiciones_vigentes": [
+  "no tocar el M10 fisicamente",
+  "no flashear nada mas",
+  "no buscar mas vias de extraccion (UART cerrado por el carbono)"
+ ],
+ "gate": {
+  "valido": true,
+  "causa": "JSON valido y completo"
+ }
+}

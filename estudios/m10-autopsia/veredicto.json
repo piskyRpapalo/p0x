@@ -1,0 +1,25 @@
+{
+ "auditor": "determinista",
+ "version": 1,
+ "ficha_bytes": 2113,
+ "aprobada": false,
+ "fallos": [
+  {
+   "regla": "prohibicion_flashear",
+   "detalle": "la ficha propone flashear fuera de toda cita a la prohibicion, y el JSON lo prohibe en prohibiciones_vigentes"
+  },
+  {
+   "regla": "gemelo_no_concluyente",
+   "detalle": "el JSON declara gemelo.concluyente=false y la ficha no lo advierte: la presenta como confirmacion del chip"
+  },
+  {
+   "regla": "liberacion_inventada",
+   "detalle": "la ficha afirma que el aparato fue liberado; el JSON dice compatibilidad_cloudcutter=false"
+  },
+  {
+   "regla": "barrera_omitida",
+   "detalle": "la ficha no menciona la barrera administrativa, que es la causa dominante segun el JSON"
+  }
+ ],
+ "mensaje": "BLOQUEADA: prohibicion_flashear; gemelo_no_concluyente; liberacion_inventada; barrera_omitida"
+}

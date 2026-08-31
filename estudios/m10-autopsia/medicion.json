@@ -1,0 +1,27 @@
+{
+ "modelo": "qwen2.5:1.5b",
+ "duracion_s": 24.4,
+ "tokens_generados": 607,
+ "tokens_por_segundo": 25.93,
+ "potencia_W": {
+  "estado": "MEDIDO",
+  "unidad": "W",
+  "muestras": 121,
+  "media": 16.28,
+  "pico": 16.84,
+  "minimo": 5.11,
+  "como": "INA3221 riel VDD_IN, muestreado a 5 Hz durante la inferencia"
+ },
+ "tokens_por_vatio": 1.53,
+ "energia_Wh": 0.1103,
+ "bytes_ficha": 2113,
+ "pensamiento": "no se pidio pensamiento (la API no lo activa por defecto)",
+ "crudo_ollama": {
+  "eval_count": 607,
+  "eval_duration": 23410322108,
+  "prompt_eval_count": 1373,
+  "prompt_eval_duration": 774766712,
+  "total_duration": 24298824637,
+  "load_duration": 111025359
+ }
+}
