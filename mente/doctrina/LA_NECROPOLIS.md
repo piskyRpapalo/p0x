@@ -19,6 +19,13 @@
 - **Reemplazo soberano:** **Shelly Plug S** (API local HTTP/MQTT, sin nube
   obligatoria, sin abrir el aparato). Para el camino crítico batería→pared:
   Shelly siempre. **Pendiente de compra.**
+- **Corrección de alcance (2026-08-31, dato del Soberano):** la **Anker Solix
+  está en WiFi y se gobierna desde el Doogee**, así que el lado de la *batería*
+  del camino crítico **ya reporta** por su propia vía. Lo que el M10 iba a medir
+  y hoy nadie mide es el lado de la *pared* — la toma. Eso reduce el Shelly de
+  «pieza que desbloquea el camino» a «pieza que cierra el tramo que falta»:
+  sigue haciendo falta, pero **no es un bloqueante**, y conviene no comprarlo
+  con prisa de urgencia que no tiene.
 - **Destino físico:** caja «NECRÓPOLIS».
 - **Lección:** los plugs mini EU con BL0937 recientes están mayoritariamente
   parcheados, y la liberación OTA es cada vez más rara. Pero la lección cara no
