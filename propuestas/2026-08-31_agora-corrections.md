@@ -106,15 +106,29 @@ mal construido.
 ```
 [2] corregir.js (navegador, firma Ed25519)   ← construido, sin salida de red
 [3] POST /api/v1/corrections  → correcciones.jsonl (Bronze)   ← ESTA PROPUESTA
-[4] curador.py  Bronze → Silver (dataset por modelo_base × skill)  ← YA ESCRITO
+[4] Bronze → Silver (dataset por modelo_base × skill)         ← NO EXISTE
 [5] forja/entrenar_lora.py + pruebas/guardian_tester.py (12 edge cases)  ← YA ESCRITO
 [6] modelos.json  (derivado de los Modelfile + Ollama)  ← construido
 [7] la web ensena el LoRA y sus metricas → vuelve a [1]
 ```
 
-**Tres de los siete eslabones ya estaban escritos y desconectados.** Este
-endpoint es la unica pieza de fontaneria que falta entre el navegador y el
-Curador. No hay que construir un enjambre: hay que enchufar el que hay.
+**CORRECCION (2026-08-31, posterior a la primera version de este documento):**
+la primera redaccion decia que `curador.py` era el eslabon [4] y que por tanto
+«tres de los siete eslabones ya estaban escritos». **Es falso, y el error es
+mio.** `preceptor-internal/agentes/bucles/curador.py` lee `engrams` y `links`:
+es higiene de la memoria --duplicados y enlaces rotos--, y no toca ni una
+correccion. Comparte nombre con el Curador que `LORATELIER_P0X.md` describe
+para el flywheel, y ese parecido fue lo que me confundio.
+
+Lo que SI estaba escrito y desconectado son dos cosas, no tres: el esquema del
+par (`preceptor/captura.py`, tabla `turnos`) y la Forja
+(`preceptor-lora/forja/entrenar_lora.py` + los 12 edge cases de
+`pruebas/guardian_tester.py`).
+
+Asi que faltan DOS piezas entre el navegador y un LoRA, no una: este endpoint,
+y un curador de correcciones que no existe todavia. Decirlo importa porque la
+version anterior de este documento hacia parecer el camino mas corto de lo que
+es.
 
 ## Estado de pruebas
 
