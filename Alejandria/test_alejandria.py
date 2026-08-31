@@ -168,8 +168,10 @@ class GateDelEnlace(unittest.TestCase):
             {"clave": "mvp_gate", "valor": "436 pruebas en verde",
              "fuente": "estado.json:mvp_gate"},
         ]
-        self.huecos = [("dead_path.jsonl", "no existe; fase F1 pendiente",
-                        "construir F1")]
+        # Un hueco cualquiera sirve de ejemplo; se usa uno REAL para que el
+        # fixture no documente un concepto retirado.
+        self.huecos = [("bandeja_firmas.md", "no existe",
+                        "revisar director.py")]
 
     def _prosa(self, firma="¿Firmas la F1?", extra=""):
         return ("## Qué pasó\n- El guardián miró 77 ficheros. "
@@ -177,7 +179,7 @@ class GateDelEnlace(unittest.TestCase):
                 "\n## Qué piensa cada agente\n- guardian: 77 ficheros. "
                 "[loops.db:latidos/guardian]\n"
                 "\n## Qué necesita tu firma\n" + firma +
-                "\n\n## NO_DATA\n- no existe [dead_path.jsonl]\n")
+                "\n\n## NO_DATA\n- no existe [bandeja_firmas.md]\n")
 
     def test_una_parafrasis_limpia_pasa(self):
         self.assertEqual(self.D.gate(self._prosa(), self.lista, self.huecos), [])
@@ -203,10 +205,12 @@ class GateDelEnlace(unittest.TestCase):
         """El material entregado incluye el TEXTO de los huecos, no solo su clave.
 
         La primera corrida real tumbo una parafrasis correcta porque el modelo
-        cito `F1`, que estaba dentro de la causa de un hueco que se le habia
-        dado. Citar lo que se leyo es lo que B3 pide, no lo que prohibe.
+        cito un trozo de texto que estaba dentro de la causa de un hueco que se
+        le habia dado. Citar lo que se leyo es lo que B3 pide, no lo que
+        prohibe. El ejemplo sigue al fixture: cita el REMEDIO del hueco, que
+        viaja en el material y no es una clave de fuente.
         """
-        buena = self._prosa(extra="- Falta la fase. [construir F1]\n")
+        buena = self._prosa(extra="- Falta revisar. [revisar director.py]\n")
         self.assertEqual([f for f in self.D.gate(buena, self.lista, self.huecos)
                           if f.startswith("B3")], [])
 
@@ -224,12 +228,12 @@ class GateDelEnlace(unittest.TestCase):
                 "\n## Qué piensa cada agente\n- guardian: 77. "
                 "[loops.db:latidos/guardian]\n"
                 "\n## Qué necesita tu firma\n¿Firmas?\n"
-                "\n## NO_DATA\n- no existe [dead_path.jsonl]\n")
+                "\n## NO_DATA\n- no existe [bandeja_firmas.md]\n")
         self.assertEqual([f for f in self.D.gate(rota, self.lista, self.huecos)
                           if f.startswith("B3")], [])
 
     def test_B2_muerde_si_hay_huecos_y_no_se_declaran(self):
-        sin = self._prosa().replace("## NO_DATA\n- no existe [dead_path.jsonl]\n", "")
+        sin = self._prosa().replace("## NO_DATA\n- no existe [bandeja_firmas.md]\n", "")
         self.assertTrue(any(f.startswith("B2")
                             for f in self.D.gate(sin, self.lista, self.huecos)))
 
@@ -396,11 +400,47 @@ class ElGlosario(unittest.TestCase):
                     self.assertTrue(e.get(campo),
                                     f"falta `{campo}`: sin fuente es prosa inventada")
 
+    def test_dead_path_esta_retirado_y_no_se_busca(self):
+        """Retirado por el Soberano el 2026-08-31. F1 no se construye.
+
+        Mientras `digesto.py` lo tuviera en su lista de fuentes, el hueco se
+        reportaba en CADA digesto -- once veces en el historial de un solo dia--
+        con el mismo remedio: «construir F1, o retirarlo de la lista». Se
+        eligio retirarlo. Un hueco que se declara para siempre y que nadie va a
+        tapar deja de ser un sensor honesto y pasa a ser ruido: entrena a quien
+        lee el informe a saltarse la seccion NO_DATA, que es justo la que
+        importa.
+
+        Este test existe para que no vuelva por la puerta de atras: si alguien
+        reintroduce la constante, el gate lo dice antes que el digesto numero
+        doce.
+        """
+        # Se mide el CODIGO, no los comentarios: el propio digesto.py explica
+        # en prosa por que se retiro, y esa explicacion nombra lo retirado.
+        # Es la tercera vez en esta sesion que un test se tropieza con la cita
+        # que hay dentro de un comentario; la cura ya esta establecida.
+        crudo = (RAIZ / "digesto" / "digesto.py").read_text(encoding="utf-8")
+        codigo = re.sub(r'\"\"\".*?\"\"\"', "", crudo, flags=re.S)
+        codigo = re.sub(r"(?m)#.*$", "", codigo)
+        self.assertNotIn("DEAD_PATH", codigo,
+                         "digesto.py vuelve a buscar dead_path.jsonl")
+        self.assertNotIn("dead_path", codigo,
+                         "queda una referencia viva a dead_path en digesto.py")
+        glos = json.loads((CONSOLA / "glosario.json").read_text(encoding="utf-8"))
+        terminos = {e.get("termino") for e in glos["entradas"]}
+        self.assertNotIn("dead_path", terminos,
+                         "el glosario sigue declarando un concepto retirado")
+        # Y la retirada no puede vaciar la seccion: si se queda sin NO_DATA,
+        # el test de al lado dejaria de vigilar nada.
+        sin_dato = [e for e in glos["entradas"] if e.get("estado") == "NO_DATA"]
+        self.assertGreaterEqual(len(sin_dato), 2,
+                                "al retirar dead_path el glosario se queda sin "
+                                "huecos declarados que vigilar")
+
     def test_lo_que_no_existe_se_declara_no_data(self):
         """El glosario incluye conceptos NO construidos a proposito.
 
-        `dead_path`, el director cronificado y S0 estan especificados y no
-        existen. Un glosario que solo cuenta lo que hay deja creer que lo demas
+        El director cronificado y S0 estan especificados y no existen. Un glosario que solo cuenta lo que hay deja creer que lo demas
         funciona -- y son justo las piezas que vigilan a las otras.
         """
         ruta = CONSOLA / "glosario.json"

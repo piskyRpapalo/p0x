@@ -50,7 +50,6 @@ CAPA = AQUI.parent
 ESTADO = CAPA / "estado.json"
 CONT = Path.home() / "p0x" / "preceptor-internal" / "continuidad"
 BANDEJA = Path.home() / "p0x" / "preceptor-internal" / "docs" / "bandeja_firmas.md"
-DEAD_PATH = Path.home() / "p0x" / "preceptor-internal" / "agentes" / "bucles" / "dead_path.jsonl"
 
 sys.path.insert(0, str(CAPA / "mensajes"))
 import mensajes as ACTA  # noqa: E402
@@ -159,13 +158,13 @@ def hechos(desde=None):
     else:
         huecos.append(("bandeja_firmas.md", "no existe", "revisar director.py"))
 
-    # --- dead_path: declarado, no rellenado ---
-    if not DEAD_PATH.exists():
-        huecos.append((
-            "dead_path.jsonl",
-            "no existe; especificado en MISION_TENEDOR.md, fase F1 pendiente. "
-            "Ningun bucle lo escribe todavia",
-            "construir F1, o retirarlo de la lista de fuentes"))
+    # `dead_path.jsonl` estuvo aqui hasta el 2026-08-31, y se retiro por firma
+    # del Soberano. Se declaraba como hueco en CADA digesto --once veces en el
+    # historial de un solo dia-- con el mismo remedio: «construir F1, o
+    # retirarlo de la lista». Se eligio retirarlo. Un hueco que se repite para
+    # siempre y que nadie va a tapar deja de ser un sensor honesto: entrena a
+    # quien lee el informe a saltarse la seccion NO_DATA, que es la unica que
+    # no se puede permitir que nadie se salte.
 
     return fuera, huecos
 
