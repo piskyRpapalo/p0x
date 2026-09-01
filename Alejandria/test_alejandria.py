@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import os
+import inspect
 import re
 import sys
 import tempfile
@@ -630,3 +631,51 @@ class ElGlosario(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=1)
+
+
+class ElOjoNoSirveDatoRancioComoActual(unittest.TestCase):
+    """El fallo del 2026-09-01, convertido en gate.
+
+    `estado.json` declaraba ocho modelos y `ollama list` daba dos: la lectura
+    tenia 37 horas y se servia como si fuera de ahora. Sobre ese dato viejo, la
+    web publica llego a declarar servido un adaptador que ya no existia. Un
+    dato viejo presentado como actual es peor que un hueco declarado.
+    """
+
+    def setUp(self):
+        sys.path.insert(0, str(Path(__file__).resolve().parent / "ojo"))
+        import ojo
+        self.ojo = ojo
+
+    def test_los_modelos_se_leen_en_vivo_y_por_loopback(self):
+        """En vivo, y sin salir de la maquina."""
+        self.assertTrue(hasattr(self.ojo.Ojo, "_modelos_vivos"),
+                        "el Ojo no sabe leer los modelos en vivo")
+        self.assertTrue(self.ojo.OLLAMA.startswith("http://127.0.0.1"),
+                        "la consola pregunta por la red en vez de por loopback")
+        fuente = inspect.getsource(self.ojo.Ojo._modelos_vivos)
+        # Un timeout corto es lo que separa «leer un servicio local» de
+        # «colgar la consola justo cuando el rack cae», que es lo que la regla
+        # «no mide, pinta» existe para impedir.
+        self.assertIn("timeout=", fuente, "sonda sin timeout: puede colgar la consola")
+        self.assertIn("NO_DATA", fuente, "no declara la causa cuando no puede leer")
+
+    def test_un_snapshot_viejo_se_declara_rancio(self):
+        """La edad se dice con una palabra, no solo con un entero de seis cifras."""
+        self.assertLessEqual(self.ojo.RANCIO_S, 3600,
+                             "el umbral de rancio es demasiado generoso")
+        fuente = inspect.getsource(self.ojo.Ojo.do_GET)
+        self.assertIn("RANCIO", fuente, "la respuesta no etiqueta la frescura")
+        self.assertIn("ollama_vivo", fuente,
+                      "los modelos en vivo no llegan a /api/rack")
+
+    def test_el_vivo_no_pisa_el_snapshot(self):
+        """Dos hechos distintos, dos claves distintas.
+
+        Escribir los modelos de ahora dentro de `componentes.ollama` borraria
+        la prueba de que el snapshot esta viejo, que es justo el dato que hace
+        falta para no volver a fiarse de el.
+        """
+        fuente = inspect.getsource(self.ojo.Ojo.do_GET)
+        self.assertNotIn('componentes"]["ollama', fuente,
+                         "el dato en vivo pisa el snapshot")

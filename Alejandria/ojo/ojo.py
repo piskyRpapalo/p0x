@@ -37,6 +37,8 @@ import json
 import sqlite3
 import sys
 import time
+import urllib.error
+import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -45,6 +47,12 @@ ESTADO = AQUI.parent / "estado.json"
 # El libro de latidos de los bucles. Vive fuera del repo, en el mismo sitio al
 # que se mudo la memoria del producto.
 LOOPS = Path.home() / ".preceptoros" / "loops.db"
+# Ollama por LOOPBACK a proposito: escucha en `*:11434`, asi que 127.0.0.1
+# llega sin salir de la maquina. Preguntarle por la tailnet seria una sonda de
+# red, y esta consola no hace sondas de red.
+OLLAMA = "http://127.0.0.1:11434"
+# Por encima de esto, un snapshot deja de poder leerse como «lo que hay».
+RANCIO_S = 3600
 
 ESTATICOS = {
     "/": ("ojo.html", "text/html; charset=utf-8"),
@@ -98,6 +106,38 @@ class Ojo(BaseHTTPRequestHandler):
         except OSError as e:
             return self._json(200, {"estado": "NO_DATA",
                                     "causa": f"{type(e).__name__}"})
+
+    @staticmethod
+    def _modelos_vivos():
+        """Que modelos hay AHORA, no cuando alguien midio por ultima vez.
+
+        EL FALLO QUE LO ORIGINA (2026-09-01). `estado.json` declaraba ocho
+        modelos; `ollama list` daba dos. La lectura tenia 37 horas y se leia
+        como si fuera de ahora: la web publica llego a declarar servido un
+        adaptador que ya no existia, y esta consola lo respaldaba. Un dato
+        viejo presentado como actual es peor que un hueco declarado.
+
+        No rompe la regla «no mide, pinta», que prohibe SONDAR EL RACK al
+        pintar --red, ssh, esperas--. Esto es loopback contra un servicio de
+        esta misma maquina, con `timeout` de segundo y medio y NO_DATA con su
+        causa si no contesta. Nunca deja la consola colgada, que es lo que la
+        regla protege.
+        """
+        url = f"{OLLAMA}/api/tags"
+        try:
+            with urllib.request.urlopen(url, timeout=1.5) as r:
+                datos = json.loads(r.read().decode("utf-8"))
+        except (urllib.error.URLError, OSError, ValueError) as e:
+            return {"estado": "NO_DATA", "causa": f"{type(e).__name__} contra {url}",
+                    "remedio": "comprobar que Ollama escucha en 11434"}
+        nombres = sorted(m.get("name", "?") for m in datos.get("models", []))
+        pelados = [n for n in nombres if n.endswith(":latest")]
+        return {"estado": "OK", "medido_en": "ahora", "modelos": len(nombres),
+                "nombres": nombres,
+                # El canon del nodo prohibe los tags pelados. Se cuentan aqui
+                # para que se vean, no para juzgarlos: quien decide es el
+                # Soberano, y esta consola solo se lo pone delante.
+                "tags_pelados": pelados}
 
     @staticmethod
     def _trabajando():
@@ -173,6 +213,15 @@ class Ojo(BaseHTTPRequestHandler):
             # AL VUELO y no del recolector: ver `_trabajando`. Es el unico
             # campo de esta respuesta que describe el instante en que se pide.
             d["trabajando"] = self._trabajando()
+            # Y los modelos, EN VIVO. El resto de esta respuesta es un snapshot;
+            # esta clave no lo es, y por eso va aparte en vez de pisar
+            # `componentes.ollama.nombres`: dos hechos distintos, dos sitios.
+            d["ollama_vivo"] = self._modelos_vivos()
+            # Un snapshot rancio deja de poder leerse como «lo que hay». Se
+            # dice con una palabra, al lado de los segundos, porque nadie mira
+            # un entero de seis cifras y calcula horas de cabeza. Me paso a mi.
+            d["frescura"] = ("RANCIO" if d["frescura_segundos"] > RANCIO_S
+                             else "FRESCO")
             return self._json(200, d)
 
         if ruta == "/api/glosario":
