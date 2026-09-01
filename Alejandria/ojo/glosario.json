@@ -252,7 +252,7 @@
     },
     {
       "termino": "6 Agentes Caza-Nido (Mapeo Opcion C)",
-      "que_hace": "Los 8 IDs del tunel se mantienen fijos en hub.json. Los 6 prompts Caza-Nido se mapean dinamicamente en chat-router.js: instalador->guia, privacidad->filtro, analista->analista, bibliotecario->archivero, escritor->cronista, coder->estratega. Traductor y aprendiz caen a T.papel (fallback). Regla de Euros y Medidas: agentesCifras se inyecta solo en analista y estratega.",
+      "que_hace": "Los 8 IDs del tunel se mantienen fijos en hub.json. Los 6 prompts Caza-Nido se mapean dinamicamente en chat-router.js: instalador->guia, privacidad->filtro, analista->analista, bibliotecario->archivero, escritor->cronista, coder->estratega. Traductor y aprendiz caen a T.papel (fallback).",
       "donde_verlo": "grep -n 'agentesCifras' ~/preceptoros-web/public/assets/chat-router.js",
       "fuente": "Decision Soberano 2026-09-01"
     },
@@ -261,6 +261,60 @@
       "que_hace": "Refugio 2D estilo Game Boy/Zelda. 4 filas: superficie (cúpula HEXELION), alas (MVP izq violeta, WEB der violeta), pirámide central (Ojo + Acta + busto), sótano (5 cajones de laboratorio en fila, bronce). Lienzo 320x208, coordenadas enteras, imageSmoothingEnabled=false. Los datos del grafo (sala, tribu) viven en grafo.json, no en el render.",
       "donde_verlo": "curl -s http://127.0.0.1:8790/vivo",
       "fuente": "plan_v5.md + mockup Gemini_Generated_Image"
+    },
+    {
+      "termino": "SAVE GAME · Sesion Fable 5.1 (Proxima)",
+      "que_hace": "OBJETIVO: 1) Sincronizar 16 sprites (8 bustos + 8 ojos) de ~/p0x/Alejandria/marca/ a 3 destinos: Web (preceptoros-web/public/assets/), App (preceptor/assets/), GitHub (push). 2) Crear profile.html (estilo GitHub: pseudonimo Ed25519, avatar del busto, benchmark scores, contribuciones LoRA). 3) Crear community.html como marketplace (retos, tareas, cómputo cedido, hilos). 4) Refactorizar la App MVP para ser 'kill-switch database' plug&play.",
+      "donde_verlo": "cat ~/p0x/Alejandria/ojo/glosario.json | grep 'SAVE GAME'",
+      "fuente": "Plan Soberano 2026-09-01"
+    },
+    {
+      "termino": "Sprites Pendientes de Sincronizar",
+      "que_hace": "16 PNG 512x512 en ~/p0x/Alejandria/marca/: busto-{corazon,despierto,dormido,grieta,halo,ojo,oscuro,rompe}.png + ojo-{ambar,azul,birrete,bombilla,cerebro,libro,rojo,verde}.png. Ninguno esta en la web ni en la app ni en GitHub. Todos deben copiarse, comprimirse (webp o png optimizado) y versionarse.",
+      "donde_verlo": "ls -lh ~/p0x/Alejandria/marca/busto*.png ~/p0x/Alejandria/marca/ojo*.png",
+      "fuente": "Inventario 2026-09-01"
+    },
+    {
+      "termino": "Web: profile.html (No existe)",
+      "que_hace": "No hay pagina de perfil. auth.js genera clave Ed25519 en el navegador (no extraible) y pseudonimo por hash de la clave publica. Falta: profile.html que muestre el pseudonimo, el avatar (busto seleccionado por el usuario), sus scores de benchmark, y sus contribuciones (datasets LoRA compartidos). Estilo: GitHub profile, honesto y sin alardes.",
+      "donde_verlo": "grep -n 'identity' ~/preceptoros-web/public/assets/auth.js",
+      "fuente": "Analisis 2026-09-01"
+    },
+    {
+      "termino": "Web: community.html (Es board.html primitivo)",
+      "que_hace": "board.html hoy es texto plano: 'termina el modo historia y comenta en Benchmark'. No es marketplace. Falta: community.html con retos (alguien pide una medida, alguien la mide y firma), tareas firmadas, computo cedido, hilos generales. Estilo: marketplace honesto, sin fingir actividad.",
+      "donde_verlo": "cat ~/preceptoros-web/public/es/board.html",
+      "fuente": "Analisis 2026-09-01"
+    },
+    {
+      "termino": "App MVP: Refactor Pendiente",
+      "que_hace": "El MVP (~/p0x/preceptor) tiene base solida: memory.py (SQLite+FTS5), guardrails.py (filtro), captura.py (turnos). Falta: hacer la app 'plug&play' para que el usuario personalice su experiencia (elegir agente, elegir avatar/busto, conectar loops). La app debe ser el 'kill-switch database' del usuario: todo pasa por aqui antes de salir.",
+      "donde_verlo": "ls ~/p0x/preceptor/interface/",
+      "fuente": "Vision Soberano 2026-09-01"
+    },
+    {
+      "termino": "Arquitectura 3 Capas (Definitiva)",
+      "que_hace": "1) WEB PUBLICA (preceptoros-web): PWA instalable. Marketing, Hub de agentes, Community (marketplace), Profile (GitHub-like). Habla con Ollama del Beelink via tunel Cloudflare. 2) APP MVP (~/p0x/preceptor): Herramienta real. Kill-switch database (memory.db, guardrails, FTS5). Plug&play. Instalable en Android via termux-widget.apk. Corre en :8740. 3) OJO DEL SOBERANO (~/p0x/Alejandria/ojo): Dashboard local en :8790. Informa a la IA (arranque, glosario) y pinta el Ojo-Vivo (juego pixel-art V5).",
+      "donde_verlo": "curl -s http://127.0.0.1:8790/api/arranque | python3 -m json.tool",
+      "fuente": "Doctrina firmada 2026-09-01"
+    },
+    {
+      "termino": "Bug LoRA Thinking (qwen3:4b) - BLOQUEANTE",
+      "que_hace": "El modelo base Qwen3-4B-Instruct es Thinking: razonamiento sale ENTERO en response sin delimitadores, gasta 700 tokens en ingles, think:false no lo apaga. El LoRA Caza-Nido cumple doctrina (dice NO_DATA) pero NO se puede servir en publico. SOLUCION: reentrenar sobre Llama-3.2-3B o Qwen2.5-3B (no-thinking).",
+      "donde_verlo": "ollama run preceptor-cazanido:latest 'pregunta de mercado'",
+      "fuente": "Hallazgo medido 2026-09-01"
+    },
+    {
+      "termino": "Doctrina Caza-Nido (Vision Completa)",
+      "que_hace": "Los agentes locales NO compiten con la nube, la esclavizan. Son 'avispones': cazan conocimiento en IAs externas gratuitas (Gemini/ChatGPT) y lo traen al disco local (el Nido) para anidar un Second Brain soberano. El NO_DATA es un Kill Switch pedagogico: el agente delega al usuario a la nube y le ensena a traer la respuesta de vuelta para archivarla de forma privada. Regla de Euros y Medidas: agentesCifras se inyecta solo en analista y estratega.",
+      "donde_verlo": "cat ~/p0x/preceptor-lora/data/sft_cazanido_v1.jsonl",
+      "fuente": "Doctrina firmada 2026-09-01"
+    },
+    {
+      "termino": "Ojo-Vivo V5 (Pixel-Art Game Boy)",
+      "que_hace": "Refugio 2D estilo Game Boy/Zelda. 4 filas: superficie (cupula HEXELION), alas (MVP izq violeta, WEB der violeta), piramide central (Ojo + Acta + busto), sotano (5 cajones de laboratorio en fila, bronce). Lienzo 320x208, coordenadas enteras, imageSmoothingEnabled=false. Datos del grafo en grafo.json. Referencia visual: ~/p0x/Cuarentena/Gemini_Generated_Image_7uow1q7uow1q7uow.jpeg",
+      "donde_verlo": "curl -s http://127.0.0.1:8790/vivo",
+      "fuente": "plan_v5.md + mockup Gemini"
     }
   ]
 }
