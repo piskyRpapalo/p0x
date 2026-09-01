@@ -1,236 +1,266 @@
 {
- "titulo": "Cómo funciona el enjambre",
- "entrada": "Lo que el panel dice en jerga, dicho en palabras. Cada entrada lleva dónde verlo con tus propios ojos: si no hay comando que lo enseñe, no es conocimiento, es una creencia.",
- "medido": "2026-09-01",
- "entradas": [
-  {
-   "termino": "el enjambre",
-   "estado": "OK",
-   "que_hace": "Cinco bucles que se despiertan solos, miran una cosa cada uno y anotan lo que ven. Ninguno arregla nada: proponen y registran. Lo que tiene consecuencia lo firmas tú.",
-   "donde_verlo": "bash ~/p0x/preceptor-internal/agentes/estado_bucles.sh",
-   "fuente": "ARQ_LOOPS.md · agentes/bucles/"
-  },
-  {
-   "termino": "guardian",
-   "estado": "OK",
-   "que_hace": "Vigila que en el árbol del producto no entre un `import` de algo que no sea biblioteca estándar. Es quien sostiene la promesa pública de «stdlib only». Corre cada noche a las 04:00.",
-   "donde_verlo": "python3 ~/p0x/preceptor-internal/agentes/bucles/guardian.py --informe",
-   "fuente": "guardian.py:2,6-7 · guardian.timer:5",
-   "nota": "El 2026-08-30 estuvo dos días devolviendo «ok» sin mirar ni un fichero: su árbol por defecto había dejado de existir. Ahora, si mira cero ficheros, el turno es fallo."
-  },
-  {
-   "termino": "curador",
-   "estado": "OK",
-   "que_hace": "Busca recuerdos duplicados y enlaces rotos en tu memoria, y los propone. No borra, no fusiona, no edita: abre la base en solo lectura. Corre los domingos a las 05:00 — es SEMANAL, no diario.",
-   "donde_verlo": "systemctl --user list-timers curador.timer",
-   "fuente": "curador.py:2,7-8 · curador.timer:7",
-   "nota": "Su cadencia semanal se confundió una vez con una avería, por compararla con los dos diarios. Cinco días sin correr es su ritmo normal."
-  },
-  {
-   "termino": "afinador",
-   "estado": "OK",
-   "que_hace": "Corre la tanda de pruebas entera y vigila que siga midiendo. Lo que busca no es el rojo: son las tres formas de romperse que dan VERDE — que el recuento baje, que la cobertura se ensanche, que los sabotajes dejen de sabotear.",
-   "donde_verlo": "journalctl --user -u afinador.service -n 30",
-   "fuente": "afinador.py:2,11 · afinador.timer:7",
-   "nota": "De aquí sale la cifra de pruebas que publica la portada. No de pytest, que solo corre parte de la suite."
-  },
-  {
-   "termino": "director",
-   "estado": "NO_DATA",
-   "que_hace": "Debería leer los latidos, mirar la carga y la hora, repartir las ventanas y detectar bucles muertos. **No corre desde el 2026-08-23**: no tiene unidad systemd, y cronificarlo exige tu firma.",
-   "donde_verlo": "systemctl --user list-timers | grep director   (no devuelve nada)",
-   "fuente": "director.py:2,11-12 · ARQ_LOOPS.md:165",
-   "nota": "Consecuencia medida: la tabla `estados` de loops.db tiene CERO filas. Nadie ha detectado nunca un bucle muerto en este nodo."
-  },
-  {
-   "termino": "s0",
-   "estado": "NO_DATA",
-   "que_hace": "El que vigila a los vigilantes. Su regla: «si nada supera el filtro en 7 días, sospecha del filtro». **Nunca ha corrido aquí**: cero filas en la tabla de bucles.",
-   "donde_verlo": "python3 -c \"import sqlite3;c=sqlite3.connect('file:'+__import__('os').path.expanduser('~/.preceptoros/loops.db')+'?mode=ro',uri=True);print(c.execute(\\\"select count(*) from bucles where nombre='s0'\\\").fetchone())\"",
-   "fuente": "s0.py:11,22",
-   "nota": "Es el modo de fallo que ninguna alarma detecta, porque no produce ninguna alarma. El guardián ciego de esta semana es exactamente lo que S0 habría cazado."
-  },
-  {
-   "termino": "latido",
-   "estado": "OK",
-   "que_hace": "No es un bucle: es la biblioteca de la que cuelgan todos. Cada turno late al entrar y al salir pase lo que pase — si un bucle revienta, deja su latido de fallo con la excepción escrita. Sin eso, una excepción no controlada es indistinguible de un bucle que nunca arrancó.",
-   "donde_verlo": "python3 -c \"import sqlite3,os;c=sqlite3.connect('file:'+os.path.expanduser('~/.preceptoros/loops.db')+'?mode=ro',uri=True);[print(f) for f in c.execute(\\\"select bucle,datetime(momento,'unixepoch','localtime'),resultado,nota from latidos order by momento desc limit 8\\\")]\"",
-   "fuente": "latido.py:2 · ARQ_LOOPS.md:48-60"
-  },
-  {
-   "termino": "oneshot",
-   "estado": "OK",
-   "que_hace": "Un servicio que arranca, hace su trabajo y termina. **Entre disparos está «inactive», y ése es el estado sano.** Preguntarle `is-active` a un oneshot es la propiedad que no informa: lo que dice la verdad es su último latido.",
-   "donde_verlo": "systemctl --user show guardian.service -p Result -p ExecMainStartTimestamp",
-   "fuente": "guardian.service:5 · medido 2026-08-30",
-   "nota": "Este malentendido pintó de rojo a los tres agentes durante una sesión entera. No estaban caídos: estaban entre turnos."
-  },
-  {
-   "termino": "timer",
-   "estado": "OK",
-   "que_hace": "El reloj que despierta a un bucle. Cada uno tiene su cadencia y no son iguales: guardián 04:00 diario, afinador 03:00 diario, curador **domingos** 05:00. Comparar un semanal con dos diarios fabrica averías que no existen.",
-   "donde_verlo": "systemctl --user list-timers --all",
-   "fuente": "*.timer · medido 2026-08-30"
-  },
-  {
-   "termino": "loopback vs expuesto",
-   "estado": "OK",
-   "que_hace": "`127.0.0.1` solo lo alcanza esta máquina. Cualquier otra dirección la alcanza la red de casa y la red superpuesta entera. El número de puerto no dice nada: lo que importa es la interfaz.",
-   "donde_verlo": "ss -tlnp",
-   "fuente": "recolector.py · sonda_puertos",
-   "nota": "Un `http.server` sin auth ni registro estuvo seis horas en 0.0.0.0:8080 sin que nadie lo viera, porque todo el mundo miraba el número y nadie la interfaz."
-  },
-  {
-   "termino": "STALE",
-   "estado": "OK",
-   "que_hace": "El panel no mide: pinta lo que el recolector dejó escrito. Si eso tiene más de una hora, avisa en naranja; más de un día, en rojo y te manda a medir de nuevo. Un dato viejo con cara de fresco es peor que no tener panel.",
-   "donde_verlo": "~/p0x/Alejandria/verificar_sesion.sh",
-   "fuente": "ojo.js · pintarFrescura"
-  },
-  {
-   "termino": "NO_DATA",
-   "estado": "OK",
-   "que_hace": "No se pudo medir. Es distinto de ROJO, que es «se midió y está mal». Todo NO_DATA lleva obligatoriamente causa y remedio; si falta alguno, el recolector se acusa a sí mismo en el informe. Ausencia no es cero.",
-   "donde_verlo": "python3 ~/p0x/Alejandria/recolector.py --stdout | head -20",
-   "fuente": "recolector.py:21-31 · voces/enlace.md:55-61"
-  },
-  {
-   "termino": "gate",
-   "estado": "OK",
-   "que_hace": "La tanda de pruebas que decide si algo entra o no. Hay DOS y no miden lo mismo: `bin/pruebas` corre los seis corredores y es la fuente única declarada; `pytest` solo ve parte de la suite.",
-   "donde_verlo": "cd ~/p0x/preceptor && bash bin/pruebas --rapido",
-   "fuente": "bin/pruebas:1-9",
-   "nota": "La cifra de la portada sale del corredor certificado. Publicar la del parcial es media medida presentada como entera."
-  },
-  {
-   "termino": "Bronze · Silver · Gold",
-   "estado": "OK",
-   "que_hace": "Tres estantes. **Bronze**: lo que llegó tal cual, con fecha y origen, en cuarentena — aquí aterriza todo lo que escribe un modelo. **Silver**: lo que pasó una validación DETERMINISTA, hecha por un script y no juzgada por un modelo. **Gold**: lo que tú leíste y sellaste. Ninguna máquina promueve a Gold.",
-   "donde_verlo": "~/p0x/Cuarentena/ENJAMBRE_MEDALLON.txt",
-   "fuente": "ENJAMBRE_MEDALLON.txt:38-73",
-   "nota": "«Aquí es donde muere la alucinación: un modelo puede escribir que una función existe; el script comprueba si el fichero está. Solo lo segundo cuenta.»"
-  },
-  {
-   "termino": "bandeja de firmas",
-   "estado": "OK",
-   "que_hace": "Donde el enjambre deja lo que necesita tu palabra. Antes de escribir, se lee: una propuesta que ya está ahí no se repite, porque un aviso que reaparece cada noche es la forma educada de apagar la bandeja.",
-   "donde_verlo": "cat ~/p0x/preceptor-internal/docs/bandeja_firmas.md",
-   "fuente": "director.py:174-208 · ARQ_LOOPS.md:112-118",
-   "nota": "Tiene 2 filas, y una es un artefacto de la suite de pruebas: `director.py` escribe en las rutas reales aunque se le pase otra base."
-  },
-  {
-   "termino": "la web habla con el rack",
-   "estado": "RED",
-   "que_hace": "Desde el 2026-09-01 la portada de preceptoros.org NO ofrece descargar un modelo ni buscar una Ollama: el modelo lo pone el rack. Quien elige es el companero activo — `agentes[].real.adaptador` de hub.json ES el nombre del modelo en Ollama. Hoy el camino NO llega y la pagina lo declara con NO_DATA y su causa, mas el JSON para llevarselo a otra IA. Esta en RED porque falta el otro extremo, no porque este roto lo de aqui.",
-   "donde_verlo": "curl -s -o /dev/null -w '%{http_code}\\n' https://api.preceptoros.org/api/tags   # hoy 404",
-   "fuente": "preceptoros-web/public/assets/rack.js · p0x/propuestas/la-fragua-agora-api-contrato-turno.md"
-  },
-  {
-   "termino": "api.preceptoros.org",
-   "estado": "RED",
-   "que_hace": "El tunel SI esta arriba y enruta a 127.0.0.1:9002 de la-fragua, donde corre `uvicorn agora_api:app` (FastAPI). El 404 no es de red ni de DNS: esa app no publica las rutas. Faltan DOS cosas, no una: (1) exponer POST /api/generate con el contrato NDJSON de Ollama, (2) CORSMiddleware con allow_origins=https://preceptoros.org — como contesta FastAPI y no Ollama, OLLAMA_ORIGINS ahi no pinta nada. la-fragua es propose-only desde soberano: NO se toca por SSH.",
-   "donde_verlo": "curl -s https://api.preceptoros.org/openapi.json   # {'detail':'Not Found'}",
-   "fuente": "p0x/propuestas/la-fragua-agora-api-contrato-turno.md"
-  },
-  {
-   "termino": "api-guia (:9001) es un falso verde",
-   "estado": "RED",
-   "que_hace": "El Ojo lo declara OK y `unidad: active`, y NO ESCUCHA NADIE. El script vive en ~/p0x/preceptor/api-guia pero no hay unidad systemd creada (`Unit api-guia.service could not be found`). Es un fallo de MEDICION del recolector, de la misma familia que los cuatro rojos que no existian, solo que al reves: aqui fabrica un verde. Mientras no se arregle, no te fies de esa fila.",
-   "donde_verlo": "ss -ltn | grep 9001   # sin resultado · systemctl --user status api-guia",
-   "fuente": "Alejandria/estado.json:componentes.api_guia"
-  },
-  {
-   "termino": "los dos techos de la web",
-   "estado": "OK",
-   "que_hace": "10 KB POR FICHERO (.html/.css/.js/.json/.webmanifest bajo public/) y 7 paginas de contenido, las dos cosas las hace cumplir test_web.py. Cuando un fichero se pasa, la doctrina es PARTIR, no recortar comentarios: asi salieron fallback.js, localai.js, engine.js y hub-cola.js de sus padres. El 2026-09-01 las portadas bajaron de ~200 B libres a ~3,2 KB al mudar 50 claves i18n con la funcion a la que servian.",
-   "donde_verlo": "cd ~/preceptoros-web && python3 -m pytest test_web.py -q",
-   "fuente": "preceptoros-web/test_web.py:TOPE_FICHERO"
-  },
-  {
-   "termino": "hidden no escondia nada",
-   "estado": "OK",
-   "que_hace": "`base.css` declaraba `button,.boton{...display:inline-block}` — regla de AUTOR, que pisa la del navegador que apaga los `[hidden]`. Consecuencia: ningun boton con atributo `hidden` se escondia EN TODA LA WEB. Arreglado el 2026-09-01 con `[hidden]{display:none}` en base.css, que es de donde venia el fallo. Si vuelves a ver un boton oculto que se ve, mira primero si alguien declaro `display` sobre el.",
-   "donde_verlo": "grep -n '\\[hidden\\]' ~/preceptoros-web/public/assets/base.css",
-   "fuente": "preceptoros-web/public/assets/base.css"
-  },
-  {
-   "termino": "counters.json tiene dos duenos",
-   "estado": "RED",
-   "que_hace": "`contadores.py` (en el repo web) y `p0x/bin/coherencia-publica.py` escriben AMBOS public/counters.json, y el primero no conoce las claves del segundo: al correr contadores.py desaparecen `pruebas_app` y `pruebas_web` y el gate se pone en rojo. Remedio inmediato: volver a correr `coherencia-publica.py --si` CON EL GATE YA EN VERDE (si el gate esta rojo escribe NO_DATA en la cifra de la web). Deuda anotada, no arreglada.",
-   "donde_verlo": "python3 ~/p0x/bin/coherencia-publica.py   # dry-run, no toca nada",
-   "fuente": "preceptoros-web/contadores.py · p0x/bin/coherencia-publica.py"
-  },
-  {
-   "termino": "el service worker te ensena codigo viejo",
-   "estado": "OK",
-   "que_hace": "Verificando en el Doogee, la pagina seguia mostrando CSS y JS de antes del cambio: `sw.js` cachea los assets por origen. Subir `VERSION` en sw.js es lo correcto para produccion, pero para comprobar YA, lo barato es servir en OTRO PUERTO — otro origen, ningun worker registrado. Se perdieron tres capturas creyendo que un arreglo no funcionaba cuando si funcionaba.",
-   "donde_verlo": "cd ~/preceptoros-web/public && python3 -m http.server 8830 --bind 127.0.0.1 && adb reverse tcp:8830 tcp:8830",
-   "fuente": "preceptoros-web/public/sw.js:VERSION"
-  },
-  {
-   "termino": "que modelos viven en el Beelink",
-   "estado": "OK",
-   "que_hace": "DOS, y no ocho. Medido el 2026-09-01 por tres vias que coinciden (`ollama list`, /api/tags por loopback y por tailnet): `oficial-inventario:latest` (16 GB) y `qwen3-coder-30b:latest` (18 GB). `estado.json` todavia declara ocho porque es una lectura de hace dia y medio — NO te fies de esa lista sin volver a medir. Se perdieron seis modelos en ese intervalo.",
-   "donde_verlo": "ollama list",
-   "fuente": "medicion directa 2026-09-01"
-  },
-  {
-   "termino": "qwen3-coder-30b:latest",
-   "estado": "OK",
-   "que_hace": "SIRVE como Instalador de la web. Se le da el `papel` del i18n y se queda en el personaje: pregunta el sistema, pide el mensaje de error exacto, remite a la guia. ~4,7 tok/s (91 tokens en 19,5 s) con `think:false`. CUIDADO CON LA FRONTERA: INVENTA URLs — se saco `preceptoros.com/guia-instalacion-linux`, con el TLD equivocado y una ruta que no existe, que es justo lo que la regla 2 del papel prohibe. Si se sirve al publico, hay que endurecer el prompt o filtrar enlaces en la salida.",
-   "donde_verlo": "curl -s http://127.0.0.1:11434/api/generate -d '{\"model\":\"qwen3-coder-30b:latest\",\"prompt\":\"<papel>\",\"stream\":false,\"think\":false}'",
-   "fuente": "preceptoros-web/public/hub.json:agentes[instalador].real.modelo"
-  },
-  {
-   "termino": "oficial-inventario:latest",
-   "estado": "RED",
-   "que_hace": "NO sirve para dar un papel. IGNORA el system prompt: se le dio el papel del Instalador y contesto como asistente de inventario, escupiendo JSON (`\"comando\": \"iniciar_diagnostico_sistema\"`, `\"servicio_afectado\"`). Su propio afinado manda sobre lo que le pidas. Ademas es lento para chat: 120 tokens en 48 s (~2,5 tok/s). Uselo para lo suyo — inventario — y no como base de un companero.",
-   "donde_verlo": "mismo curl con model=oficial-inventario:latest y compara la respuesta",
-   "fuente": "medicion directa 2026-09-01"
-  },
-  {
-   "termino": "el Beelink SI entrena LoRAs",
-   "estado": "OK",
-   "que_hace": "Entrenar LoRAs en este nodo SI es viable, y esta hecho: `torch 2.13.0+cpu` + `peft 0.20.0` en `~/.venvs/aurelius-forja`, CPU pura, `cuda.is_available()` False. Los adaptadores `v7-linea-a` y `v7-linea-b` salieron el 29 ago 2026 de `~/p0x/preceptor-lora/salida/`: rank 16, alpha 32, 2 epocas, 93 ejemplos de tren y 16 de validacion. MEDIDO: 553 s la linea A y 445 s la linea B — bajo diez minutos, no veinte ni treinta. Que no haya CUDA y que ROCm no soporte gfx1103 impide SERVIR un 27B por GPU; no impide AFINAR un 3B por CPU. Son dos hechos distintos y estuvieron confundidos en este glosario.",
-   "donde_verlo": "tail -4 ~/p0x/preceptor-lora/entrenamiento-v7-linea-a.log && ~/.venvs/aurelius-forja/bin/python -c \"import torch;print(torch.__version__, torch.cuda.is_available())\"",
-   "fuente": "preceptor-lora/salida/v7-linea-a/informe.json · entrenamiento-v7-linea-a.log:553s · salida/v7-linea-b.log:445s",
-   "nota": "Esta entrada decia lo contrario hasta el 2026-09-01 y era FALSA: heredaba «no hay CUDA» de la decision de servir y la aplicaba a entrenar. La correccion la firmo el Soberano y la confirmo la maquina. Lo que SI sigue en pie es la separacion de `hub.json`: `real.modelo` (con que se contesta) y `real.afinado` (el LoRA, null si no hay) son dos hechos, y un companero puede servir sobre modelo base. `preceptor-v7:latest` vuelve a estar en `ollama list` (2,0 GB). DEUDA: `mente/feedback/PENDIENTES.md:1290` repite la version falsa. Y una segunda correccion del mismo dia: «no hay CUDA en el rack» tambien es falso — lo es en SOBERANO, pero `la-torre` es una Jetson Orin Nano Super con CUDA 12.6 (hexelion/HARDWARE_MAP.md §1). Si alguna vez hace falta afinar algo que no quepa en la CPU, el hierro existe; es propose-only, no inexistente."
-  },
-  {
-   "termino": "Nous A1T",
-   "estado": "OK",
-   "que_hace": "El enchufe medidor del rack, con firmware Tasmota en 192[.]168[.]50[.]162. Se le pide `GET /cm?cmnd=Status+8` y devuelve `StatusSNS.ENERGY.Power` en vatios: el consumo instantáneo de todo lo que cuelga de él. Es la única cifra física del panel que no sale de /sys ni de /proc — cruza la LAN, y por eso lleva `timeout=2` y devuelve NO_DATA con causa si no contesta.",
-   "donde_verlo": "curl -s 'http://192[.]168[.]50[.]162/cm?cmnd=Status+8'",
-   "fuente": "preceptor/metricas.py:_consumo_w · Alejandria/ojo/ojo.py:_consumo · /api/rack → clave `consumo_w`",
-   "nota": "NO entra en `paquete()` de METRICAS_NORMA a propósito: los once campos comparan PAQUETES DE MODELO entre máquinas, y el vatiaje describe el rack. Meterlo dentro rompería la comparación con cualquier máquina sin enchufe."
-  },
-  {
-   "termino": "99% solar",
-   "estado": "OK",
-   "que_hace": "El rack se alimenta de la instalación fotovoltaica del Soberano. Es una condición DECLARADA, no medida por este nodo: el Nous A1T mide cuántos vatios se gastan, no de dónde vienen. Las dos cifras se leen juntas y son distintas — `consumo_w` es medida, el origen solar es declaración.",
-   "donde_verlo": "curl -s http://127.0.0.1:9000/api/rack | python3 -m json.tool | grep -A4 consumo_w",
-   "fuente": "declaración del Soberano · el vatiaje sale de [Nous A1T]",
-   "nota": "Para que el origen fuera MEDIDO haría falta un sensor en el lado de generación (inversor o medidor DC), no en el enchufe. Mientras no lo haya, la web dice «servido por IA 99% solar» como declaración de quien monta el rack, y así queda escrito."
-  },
-  {
-   "termino": "Doctrina Caza-Nido",
-   "que_hace": "Modelo donde la IA local esclaviza a la nube. El agente local declara NO_DATA y delega al usuario a cazar en IAs externas (Gemini/ChatGPT) y traer el dato al disco local para anidar un Second Brain soberano.",
-   "donde_verlo": "cat ~/p0x/preceptor-lora/data/sft_cazanido_v1.jsonl",
-   "fuente": "Doctrina firmada 2026-09-01"
-  },
-  {
-   "termino": "Mapeo Opcion C (Agentes)",
-   "que_hace": "Los IDs del tunel (8 en hub.json) se mantienen fijos por contrato con la-fragua, pero los prompts Caza-Nido (6) se mapean dinamicamente en hub.js sobre ellos. instalador->guia, privacidad->filtro, analista->analista, bibliotecario->archivero, escritor->cronista, coder->estratega.",
-   "donde_verlo": "grep -n 'agentes' ~/preceptoros-web/public/assets/hub.js",
-   "fuente": "Decision Soberano 2026-09-01"
-  },
-  {
-   "termino": "preceptor-cazanido:latest",
-   "estado": "RED",
-   "que_hace": "El primer LoRA Caza-Nido, desplegado el 2026-09-01 sobre base `qwen3:4b`. LA DOCTRINA LA CUMPLE: con el papel del Analista delante y preguntandole una cifra de mercado de 2026 responde NO_DATA y se niega a inventar. Medido, no supuesto.\nLO QUE NO SE PUEDE SERVIR EN PUBLICO TODAVIA: el tag es PELADO sobre una base Thinking, y el razonamiento sale ENTERO dentro de `response`, sin etiquetas `<think>` que lo delimiten. En 700 tokens no llego a la respuesta: los gasto todos pensando, en INGLES, en una pagina en castellano. Y dentro de ese pensamiento cita doctrina interna («Cahier recuerda, Libro de Cabecera ensena») y la regla de negarse a revelar el system prompt. Eso es fuga de contexto a un visitante.\nSIN DELIMITADOR NO HAY NADA QUE RECORTAR: `rack.js` no puede filtrarlo, porque no hay marca donde cortar. `think:false` y el sufijo `/no_think` NO lo apagan; se probaron los dos.",
-   "donde_verlo": "curl -s http://127.0.0.1:11434/api/generate -d '{\"model\":\"preceptor-cazanido:latest\",\"prompt\":\"<el papel del Analista> Cuota de mercado del cafe de especialidad en Espana en 2026\",\"stream\":false,\"options\":{\"num_predict\":700}}'",
-   "fuente": "medicion directa 2026-09-01 · 25,6 tok/s en este nodo",
-   "nota": "Es exactamente el footgun que el canon ya tenia escrito: «los tags pelados apuntan a variantes Thinking con razonamiento no desactivable». Remedios, en orden de coste: darle tag explicito con una plantilla que suprima el pensamiento; o servirlo solo detras del Agora, que puede cortar antes de devolver. Mientras tanto, `hub.json` NO debe declararlo servido: seria otro falso verde."
-  }
- ]
+  "titulo": "Cómo funciona el enjambre",
+  "entrada": "Lo que el panel dice en jerga, dicho en palabras. Cada entrada lleva dónde verlo con tus propios ojos: si no hay comando que lo enseñe, no es conocimiento, es una creencia.",
+  "medido": "2026-09-01",
+  "entradas": [
+    {
+      "termino": "el enjambre",
+      "estado": "OK",
+      "que_hace": "Cinco bucles que se despiertan solos, miran una cosa cada uno y anotan lo que ven. Ninguno arregla nada: proponen y registran. Lo que tiene consecuencia lo firmas tú.",
+      "donde_verlo": "bash ~/p0x/preceptor-internal/agentes/estado_bucles.sh",
+      "fuente": "ARQ_LOOPS.md · agentes/bucles/"
+    },
+    {
+      "termino": "guardian",
+      "estado": "OK",
+      "que_hace": "Vigila que en el árbol del producto no entre un `import` de algo que no sea biblioteca estándar. Es quien sostiene la promesa pública de «stdlib only». Corre cada noche a las 04:00.",
+      "donde_verlo": "python3 ~/p0x/preceptor-internal/agentes/bucles/guardian.py --informe",
+      "fuente": "guardian.py:2,6-7 · guardian.timer:5",
+      "nota": "El 2026-08-30 estuvo dos días devolviendo «ok» sin mirar ni un fichero: su árbol por defecto había dejado de existir. Ahora, si mira cero ficheros, el turno es fallo."
+    },
+    {
+      "termino": "curador",
+      "estado": "OK",
+      "que_hace": "Busca recuerdos duplicados y enlaces rotos en tu memoria, y los propone. No borra, no fusiona, no edita: abre la base en solo lectura. Corre los domingos a las 05:00 — es SEMANAL, no diario.",
+      "donde_verlo": "systemctl --user list-timers curador.timer",
+      "fuente": "curador.py:2,7-8 · curador.timer:7",
+      "nota": "Su cadencia semanal se confundió una vez con una avería, por compararla con los dos diarios. Cinco días sin correr es su ritmo normal."
+    },
+    {
+      "termino": "afinador",
+      "estado": "OK",
+      "que_hace": "Corre la tanda de pruebas entera y vigila que siga midiendo. Lo que busca no es el rojo: son las tres formas de romperse que dan VERDE — que el recuento baje, que la cobertura se ensanche, que los sabotajes dejen de sabotear.",
+      "donde_verlo": "journalctl --user -u afinador.service -n 30",
+      "fuente": "afinador.py:2,11 · afinador.timer:7",
+      "nota": "De aquí sale la cifra de pruebas que publica la portada. No de pytest, que solo corre parte de la suite."
+    },
+    {
+      "termino": "director",
+      "estado": "NO_DATA",
+      "que_hace": "Debería leer los latidos, mirar la carga y la hora, repartir las ventanas y detectar bucles muertos. **No corre desde el 2026-08-23**: no tiene unidad systemd, y cronificarlo exige tu firma.",
+      "donde_verlo": "systemctl --user list-timers | grep director   (no devuelve nada)",
+      "fuente": "director.py:2,11-12 · ARQ_LOOPS.md:165",
+      "nota": "Consecuencia medida: la tabla `estados` de loops.db tiene CERO filas. Nadie ha detectado nunca un bucle muerto en este nodo."
+    },
+    {
+      "termino": "s0",
+      "estado": "NO_DATA",
+      "que_hace": "El que vigila a los vigilantes. Su regla: «si nada supera el filtro en 7 días, sospecha del filtro». **Nunca ha corrido aquí**: cero filas en la tabla de bucles.",
+      "donde_verlo": "python3 -c \"import sqlite3;c=sqlite3.connect('file:'+__import__('os').path.expanduser('~/.preceptoros/loops.db')+'?mode=ro',uri=True);print(c.execute(\\\"select count(*) from bucles where nombre='s0'\\\").fetchone())\"",
+      "fuente": "s0.py:11,22",
+      "nota": "Es el modo de fallo que ninguna alarma detecta, porque no produce ninguna alarma. El guardián ciego de esta semana es exactamente lo que S0 habría cazado."
+    },
+    {
+      "termino": "latido",
+      "estado": "OK",
+      "que_hace": "No es un bucle: es la biblioteca de la que cuelgan todos. Cada turno late al entrar y al salir pase lo que pase — si un bucle revienta, deja su latido de fallo con la excepción escrita. Sin eso, una excepción no controlada es indistinguible de un bucle que nunca arrancó.",
+      "donde_verlo": "python3 -c \"import sqlite3,os;c=sqlite3.connect('file:'+os.path.expanduser('~/.preceptoros/loops.db')+'?mode=ro',uri=True);[print(f) for f in c.execute(\\\"select bucle,datetime(momento,'unixepoch','localtime'),resultado,nota from latidos order by momento desc limit 8\\\")]\"",
+      "fuente": "latido.py:2 · ARQ_LOOPS.md:48-60"
+    },
+    {
+      "termino": "oneshot",
+      "estado": "OK",
+      "que_hace": "Un servicio que arranca, hace su trabajo y termina. **Entre disparos está «inactive», y ése es el estado sano.** Preguntarle `is-active` a un oneshot es la propiedad que no informa: lo que dice la verdad es su último latido.",
+      "donde_verlo": "systemctl --user show guardian.service -p Result -p ExecMainStartTimestamp",
+      "fuente": "guardian.service:5 · medido 2026-08-30",
+      "nota": "Este malentendido pintó de rojo a los tres agentes durante una sesión entera. No estaban caídos: estaban entre turnos."
+    },
+    {
+      "termino": "timer",
+      "estado": "OK",
+      "que_hace": "El reloj que despierta a un bucle. Cada uno tiene su cadencia y no son iguales: guardián 04:00 diario, afinador 03:00 diario, curador **domingos** 05:00. Comparar un semanal con dos diarios fabrica averías que no existen.",
+      "donde_verlo": "systemctl --user list-timers --all",
+      "fuente": "*.timer · medido 2026-08-30"
+    },
+    {
+      "termino": "loopback vs expuesto",
+      "estado": "OK",
+      "que_hace": "`127.0.0.1` solo lo alcanza esta máquina. Cualquier otra dirección la alcanza la red de casa y la red superpuesta entera. El número de puerto no dice nada: lo que importa es la interfaz.",
+      "donde_verlo": "ss -tlnp",
+      "fuente": "recolector.py · sonda_puertos",
+      "nota": "Un `http.server` sin auth ni registro estuvo seis horas en 0.0.0.0:8080 sin que nadie lo viera, porque todo el mundo miraba el número y nadie la interfaz."
+    },
+    {
+      "termino": "STALE",
+      "estado": "OK",
+      "que_hace": "El panel no mide: pinta lo que el recolector dejó escrito. Si eso tiene más de una hora, avisa en naranja; más de un día, en rojo y te manda a medir de nuevo. Un dato viejo con cara de fresco es peor que no tener panel.",
+      "donde_verlo": "~/p0x/Alejandria/verificar_sesion.sh",
+      "fuente": "ojo.js · pintarFrescura"
+    },
+    {
+      "termino": "NO_DATA",
+      "estado": "OK",
+      "que_hace": "No se pudo medir. Es distinto de ROJO, que es «se midió y está mal». Todo NO_DATA lleva obligatoriamente causa y remedio; si falta alguno, el recolector se acusa a sí mismo en el informe. Ausencia no es cero.",
+      "donde_verlo": "python3 ~/p0x/Alejandria/recolector.py --stdout | head -20",
+      "fuente": "recolector.py:21-31 · voces/enlace.md:55-61"
+    },
+    {
+      "termino": "gate",
+      "estado": "OK",
+      "que_hace": "La tanda de pruebas que decide si algo entra o no. Hay DOS y no miden lo mismo: `bin/pruebas` corre los seis corredores y es la fuente única declarada; `pytest` solo ve parte de la suite.",
+      "donde_verlo": "cd ~/p0x/preceptor && bash bin/pruebas --rapido",
+      "fuente": "bin/pruebas:1-9",
+      "nota": "La cifra de la portada sale del corredor certificado. Publicar la del parcial es media medida presentada como entera."
+    },
+    {
+      "termino": "Bronze · Silver · Gold",
+      "estado": "OK",
+      "que_hace": "Tres estantes. **Bronze**: lo que llegó tal cual, con fecha y origen, en cuarentena — aquí aterriza todo lo que escribe un modelo. **Silver**: lo que pasó una validación DETERMINISTA, hecha por un script y no juzgada por un modelo. **Gold**: lo que tú leíste y sellaste. Ninguna máquina promueve a Gold.",
+      "donde_verlo": "~/p0x/Cuarentena/ENJAMBRE_MEDALLON.txt",
+      "fuente": "ENJAMBRE_MEDALLON.txt:38-73",
+      "nota": "«Aquí es donde muere la alucinación: un modelo puede escribir que una función existe; el script comprueba si el fichero está. Solo lo segundo cuenta.»"
+    },
+    {
+      "termino": "bandeja de firmas",
+      "estado": "OK",
+      "que_hace": "Donde el enjambre deja lo que necesita tu palabra. Antes de escribir, se lee: una propuesta que ya está ahí no se repite, porque un aviso que reaparece cada noche es la forma educada de apagar la bandeja.",
+      "donde_verlo": "cat ~/p0x/preceptor-internal/docs/bandeja_firmas.md",
+      "fuente": "director.py:174-208 · ARQ_LOOPS.md:112-118",
+      "nota": "Tiene 2 filas, y una es un artefacto de la suite de pruebas: `director.py` escribe en las rutas reales aunque se le pase otra base."
+    },
+    {
+      "termino": "la web habla con el rack",
+      "estado": "RED",
+      "que_hace": "Desde el 2026-09-01 la portada de preceptoros.org NO ofrece descargar un modelo ni buscar una Ollama: el modelo lo pone el rack. Quien elige es el companero activo — `agentes[].real.adaptador` de hub.json ES el nombre del modelo en Ollama. Hoy el camino NO llega y la pagina lo declara con NO_DATA y su causa, mas el JSON para llevarselo a otra IA. Esta en RED porque falta el otro extremo, no porque este roto lo de aqui.",
+      "donde_verlo": "curl -s -o /dev/null -w '%{http_code}\\n' https://api.preceptoros.org/api/tags   # hoy 404",
+      "fuente": "preceptoros-web/public/assets/rack.js · p0x/propuestas/la-fragua-agora-api-contrato-turno.md"
+    },
+    {
+      "termino": "api.preceptoros.org",
+      "estado": "RED",
+      "que_hace": "El tunel SI esta arriba y enruta a 127.0.0.1:9002 de la-fragua, donde corre `uvicorn agora_api:app` (FastAPI). El 404 no es de red ni de DNS: esa app no publica las rutas. Faltan DOS cosas, no una: (1) exponer POST /api/generate con el contrato NDJSON de Ollama, (2) CORSMiddleware con allow_origins=https://preceptoros.org — como contesta FastAPI y no Ollama, OLLAMA_ORIGINS ahi no pinta nada. la-fragua es propose-only desde soberano: NO se toca por SSH.",
+      "donde_verlo": "curl -s https://api.preceptoros.org/openapi.json   # {'detail':'Not Found'}",
+      "fuente": "p0x/propuestas/la-fragua-agora-api-contrato-turno.md"
+    },
+    {
+      "termino": "api-guia (:9001) es un falso verde",
+      "estado": "RED",
+      "que_hace": "El Ojo lo declara OK y `unidad: active`, y NO ESCUCHA NADIE. El script vive en ~/p0x/preceptor/api-guia pero no hay unidad systemd creada (`Unit api-guia.service could not be found`). Es un fallo de MEDICION del recolector, de la misma familia que los cuatro rojos que no existian, solo que al reves: aqui fabrica un verde. Mientras no se arregle, no te fies de esa fila.",
+      "donde_verlo": "ss -ltn | grep 9001   # sin resultado · systemctl --user status api-guia",
+      "fuente": "Alejandria/estado.json:componentes.api_guia"
+    },
+    {
+      "termino": "los dos techos de la web",
+      "estado": "OK",
+      "que_hace": "10 KB POR FICHERO (.html/.css/.js/.json/.webmanifest bajo public/) y 7 paginas de contenido, las dos cosas las hace cumplir test_web.py. Cuando un fichero se pasa, la doctrina es PARTIR, no recortar comentarios: asi salieron fallback.js, localai.js, engine.js y hub-cola.js de sus padres. El 2026-09-01 las portadas bajaron de ~200 B libres a ~3,2 KB al mudar 50 claves i18n con la funcion a la que servian.",
+      "donde_verlo": "cd ~/preceptoros-web && python3 -m pytest test_web.py -q",
+      "fuente": "preceptoros-web/test_web.py:TOPE_FICHERO"
+    },
+    {
+      "termino": "hidden no escondia nada",
+      "estado": "OK",
+      "que_hace": "`base.css` declaraba `button,.boton{...display:inline-block}` — regla de AUTOR, que pisa la del navegador que apaga los `[hidden]`. Consecuencia: ningun boton con atributo `hidden` se escondia EN TODA LA WEB. Arreglado el 2026-09-01 con `[hidden]{display:none}` en base.css, que es de donde venia el fallo. Si vuelves a ver un boton oculto que se ve, mira primero si alguien declaro `display` sobre el.",
+      "donde_verlo": "grep -n '\\[hidden\\]' ~/preceptoros-web/public/assets/base.css",
+      "fuente": "preceptoros-web/public/assets/base.css"
+    },
+    {
+      "termino": "counters.json tiene dos duenos",
+      "estado": "RED",
+      "que_hace": "`contadores.py` (en el repo web) y `p0x/bin/coherencia-publica.py` escriben AMBOS public/counters.json, y el primero no conoce las claves del segundo: al correr contadores.py desaparecen `pruebas_app` y `pruebas_web` y el gate se pone en rojo. Remedio inmediato: volver a correr `coherencia-publica.py --si` CON EL GATE YA EN VERDE (si el gate esta rojo escribe NO_DATA en la cifra de la web). Deuda anotada, no arreglada.",
+      "donde_verlo": "python3 ~/p0x/bin/coherencia-publica.py   # dry-run, no toca nada",
+      "fuente": "preceptoros-web/contadores.py · p0x/bin/coherencia-publica.py"
+    },
+    {
+      "termino": "el service worker te ensena codigo viejo",
+      "estado": "OK",
+      "que_hace": "Verificando en el Doogee, la pagina seguia mostrando CSS y JS de antes del cambio: `sw.js` cachea los assets por origen. Subir `VERSION` en sw.js es lo correcto para produccion, pero para comprobar YA, lo barato es servir en OTRO PUERTO — otro origen, ningun worker registrado. Se perdieron tres capturas creyendo que un arreglo no funcionaba cuando si funcionaba.",
+      "donde_verlo": "cd ~/preceptoros-web/public && python3 -m http.server 8830 --bind 127.0.0.1 && adb reverse tcp:8830 tcp:8830",
+      "fuente": "preceptoros-web/public/sw.js:VERSION"
+    },
+    {
+      "termino": "que modelos viven en el Beelink",
+      "estado": "OK",
+      "que_hace": "DOS, y no ocho. Medido el 2026-09-01 por tres vias que coinciden (`ollama list`, /api/tags por loopback y por tailnet): `oficial-inventario:latest` (16 GB) y `qwen3-coder-30b:latest` (18 GB). `estado.json` todavia declara ocho porque es una lectura de hace dia y medio — NO te fies de esa lista sin volver a medir. Se perdieron seis modelos en ese intervalo.",
+      "donde_verlo": "ollama list",
+      "fuente": "medicion directa 2026-09-01"
+    },
+    {
+      "termino": "qwen3-coder-30b:latest",
+      "estado": "OK",
+      "que_hace": "SIRVE como Instalador de la web. Se le da el `papel` del i18n y se queda en el personaje: pregunta el sistema, pide el mensaje de error exacto, remite a la guia. ~4,7 tok/s (91 tokens en 19,5 s) con `think:false`. CUIDADO CON LA FRONTERA: INVENTA URLs — se saco `preceptoros.com/guia-instalacion-linux`, con el TLD equivocado y una ruta que no existe, que es justo lo que la regla 2 del papel prohibe. Si se sirve al publico, hay que endurecer el prompt o filtrar enlaces en la salida.",
+      "donde_verlo": "curl -s http://127.0.0.1:11434/api/generate -d '{\"model\":\"qwen3-coder-30b:latest\",\"prompt\":\"<papel>\",\"stream\":false,\"think\":false}'",
+      "fuente": "preceptoros-web/public/hub.json:agentes[instalador].real.modelo"
+    },
+    {
+      "termino": "oficial-inventario:latest",
+      "estado": "RED",
+      "que_hace": "NO sirve para dar un papel. IGNORA el system prompt: se le dio el papel del Instalador y contesto como asistente de inventario, escupiendo JSON (`\"comando\": \"iniciar_diagnostico_sistema\"`, `\"servicio_afectado\"`). Su propio afinado manda sobre lo que le pidas. Ademas es lento para chat: 120 tokens en 48 s (~2,5 tok/s). Uselo para lo suyo — inventario — y no como base de un companero.",
+      "donde_verlo": "mismo curl con model=oficial-inventario:latest y compara la respuesta",
+      "fuente": "medicion directa 2026-09-01"
+    },
+    {
+      "termino": "el Beelink SI entrena LoRAs",
+      "estado": "OK",
+      "que_hace": "Entrenar LoRAs en este nodo SI es viable, y esta hecho: `torch 2.13.0+cpu` + `peft 0.20.0` en `~/.venvs/aurelius-forja`, CPU pura, `cuda.is_available()` False. Los adaptadores `v7-linea-a` y `v7-linea-b` salieron el 29 ago 2026 de `~/p0x/preceptor-lora/salida/`: rank 16, alpha 32, 2 epocas, 93 ejemplos de tren y 16 de validacion. MEDIDO: 553 s la linea A y 445 s la linea B — bajo diez minutos, no veinte ni treinta. Que no haya CUDA y que ROCm no soporte gfx1103 impide SERVIR un 27B por GPU; no impide AFINAR un 3B por CPU. Son dos hechos distintos y estuvieron confundidos en este glosario.",
+      "donde_verlo": "tail -4 ~/p0x/preceptor-lora/entrenamiento-v7-linea-a.log && ~/.venvs/aurelius-forja/bin/python -c \"import torch;print(torch.__version__, torch.cuda.is_available())\"",
+      "fuente": "preceptor-lora/salida/v7-linea-a/informe.json · entrenamiento-v7-linea-a.log:553s · salida/v7-linea-b.log:445s",
+      "nota": "Esta entrada decia lo contrario hasta el 2026-09-01 y era FALSA: heredaba «no hay CUDA» de la decision de servir y la aplicaba a entrenar. La correccion la firmo el Soberano y la confirmo la maquina. Lo que SI sigue en pie es la separacion de `hub.json`: `real.modelo` (con que se contesta) y `real.afinado` (el LoRA, null si no hay) son dos hechos, y un companero puede servir sobre modelo base. `preceptor-v7:latest` vuelve a estar en `ollama list` (2,0 GB). DEUDA: `mente/feedback/PENDIENTES.md:1290` repite la version falsa. Y una segunda correccion del mismo dia: «no hay CUDA en el rack» tambien es falso — lo es en SOBERANO, pero `la-torre` es una Jetson Orin Nano Super con CUDA 12.6 (hexelion/HARDWARE_MAP.md §1). Si alguna vez hace falta afinar algo que no quepa en la CPU, el hierro existe; es propose-only, no inexistente."
+    },
+    {
+      "termino": "Nous A1T",
+      "estado": "OK",
+      "que_hace": "El enchufe medidor del rack, con firmware Tasmota en 192[.]168[.]50[.]162. Se le pide `GET /cm?cmnd=Status+8` y devuelve `StatusSNS.ENERGY.Power` en vatios: el consumo instantáneo de todo lo que cuelga de él. Es la única cifra física del panel que no sale de /sys ni de /proc — cruza la LAN, y por eso lleva `timeout=2` y devuelve NO_DATA con causa si no contesta.",
+      "donde_verlo": "curl -s 'http://192[.]168[.]50[.]162/cm?cmnd=Status+8'",
+      "fuente": "preceptor/metricas.py:_consumo_w · Alejandria/ojo/ojo.py:_consumo · /api/rack → clave `consumo_w`",
+      "nota": "NO entra en `paquete()` de METRICAS_NORMA a propósito: los once campos comparan PAQUETES DE MODELO entre máquinas, y el vatiaje describe el rack. Meterlo dentro rompería la comparación con cualquier máquina sin enchufe."
+    },
+    {
+      "termino": "99% solar",
+      "estado": "OK",
+      "que_hace": "El rack se alimenta de la instalación fotovoltaica del Soberano. Es una condición DECLARADA, no medida por este nodo: el Nous A1T mide cuántos vatios se gastan, no de dónde vienen. Las dos cifras se leen juntas y son distintas — `consumo_w` es medida, el origen solar es declaración.",
+      "donde_verlo": "curl -s http://127.0.0.1:9000/api/rack | python3 -m json.tool | grep -A4 consumo_w",
+      "fuente": "declaración del Soberano · el vatiaje sale de [Nous A1T]",
+      "nota": "Para que el origen fuera MEDIDO haría falta un sensor en el lado de generación (inversor o medidor DC), no en el enchufe. Mientras no lo haya, la web dice «servido por IA 99% solar» como declaración de quien monta el rack, y así queda escrito."
+    },
+    {
+      "termino": "Doctrina Caza-Nido",
+      "que_hace": "Modelo donde la IA local esclaviza a la nube. El agente local declara NO_DATA y delega al usuario a cazar en IAs externas (Gemini/ChatGPT) y traer el dato al disco local para anidar un Second Brain soberano.",
+      "donde_verlo": "cat ~/p0x/preceptor-lora/data/sft_cazanido_v1.jsonl",
+      "fuente": "Doctrina firmada 2026-09-01"
+    },
+    {
+      "termino": "Mapeo Opcion C (Agentes)",
+      "que_hace": "Los IDs del tunel (8 en hub.json) se mantienen fijos por contrato con la-fragua, pero los prompts Caza-Nido (6) se mapean dinamicamente en hub.js sobre ellos. instalador->guia, privacidad->filtro, analista->analista, bibliotecario->archivero, escritor->cronista, coder->estratega.",
+      "donde_verlo": "grep -n 'agentes' ~/preceptoros-web/public/assets/hub.js",
+      "fuente": "Decision Soberano 2026-09-01"
+    },
+    {
+      "termino": "preceptor-cazanido:latest",
+      "estado": "RED",
+      "que_hace": "El primer LoRA Caza-Nido, desplegado el 2026-09-01 sobre base `qwen3:4b`. LA DOCTRINA LA CUMPLE: con el papel del Analista delante y preguntandole una cifra de mercado de 2026 responde NO_DATA y se niega a inventar. Medido, no supuesto.\nLO QUE NO SE PUEDE SERVIR EN PUBLICO TODAVIA: el tag es PELADO sobre una base Thinking, y el razonamiento sale ENTERO dentro de `response`, sin etiquetas `<think>` que lo delimiten. En 700 tokens no llego a la respuesta: los gasto todos pensando, en INGLES, en una pagina en castellano. Y dentro de ese pensamiento cita doctrina interna («Cahier recuerda, Libro de Cabecera ensena») y la regla de negarse a revelar el system prompt. Eso es fuga de contexto a un visitante.\nSIN DELIMITADOR NO HAY NADA QUE RECORTAR: `rack.js` no puede filtrarlo, porque no hay marca donde cortar. `think:false` y el sufijo `/no_think` NO lo apagan; se probaron los dos.",
+      "donde_verlo": "curl -s http://127.0.0.1:11434/api/generate -d '{\"model\":\"preceptor-cazanido:latest\",\"prompt\":\"<el papel del Analista> Cuota de mercado del cafe de especialidad en Espana en 2026\",\"stream\":false,\"options\":{\"num_predict\":700}}'",
+      "fuente": "medicion directa 2026-09-01 · 25,6 tok/s en este nodo",
+      "nota": "Es exactamente el footgun que el canon ya tenia escrito: «los tags pelados apuntan a variantes Thinking con razonamiento no desactivable». Remedios, en orden de coste: darle tag explicito con una plantilla que suprima el pensamiento; o servirlo solo detras del Agora, que puede cortar antes de devolver. Mientras tanto, `hub.json` NO debe declararlo servido: seria otro falso verde."
+    },
+    {
+      "termino": "Modelo Caza-Nido (Vision Completa)",
+      "que_hace": "Los agentes locales NO compiten con la nube, la esclavizan. Son 'avispones': cazan conocimiento en IAs externas gratuitas (Gemini/ChatGPT) y lo traen al disco local (el Nido) para anidar un Second Brain soberano. El NO_DATA es un Kill Switch pedagogico: el agente delega al usuario a la nube y le ensena a traer la respuesta de vuelta para archivarla de forma privada.",
+      "donde_verlo": "cat ~/p0x/preceptor-lora/data/sft_cazanido_v1.jsonl",
+      "fuente": "Doctrina firmada 2026-09-01"
+    },
+    {
+      "termino": "Arquitectura de 3 Capas",
+      "que_hace": "1) WEB PUBLICA (preceptoros-web): Marketing, Hub de agentes, PWA instalable. Habla con Ollama del Beelink via tunel Cloudflare. 2) MVP LOCAL (~/p0x/preceptor): Herramienta real de memoria (memory.db, guardrails, FTS5). Corre en :8740 o se instala en Android via termux-widget.apk. 3) OJO DEL SOBERANO (~/p0x/Alejandria/ojo): Dashboard local en :8790 que informa a la IA y pinta el Ojo-Vivo (juego pixel-art).",
+      "donde_verlo": "curl -s http://127.0.0.1:8790/api/arranque | python3 -m json.tool",
+      "fuente": "Arquitectura firmada 2026-09-01"
+    },
+    {
+      "termino": "Bug LoRA Thinking (qwen3:4b)",
+      "que_hace": "El modelo base Qwen3-4B-Instruct es un modelo Thinking: su razonamiento sale ENTERO en la respuesta sin delimitadores, gasta 700 tokens en ingles y pi: false no lo apaga. El LoRA Caza-Nido funciona doctrinalmente (dice NO_DATA y no inventa), pero NO se puede servir en publico hasta que se reentrene sobre un modelo no-thinking (Llama-3.2-3B o Qwen2.5-3B).",
+      "donde_verlo": "ollama run preceptor-cazanido:latest 'pregunta de mercado'",
+      "fuente": "Hallazgo medido 2026-09-01"
+    },
+    {
+      "termino": "6 Agentes Caza-Nido (Mapeo Opcion C)",
+      "que_hace": "Los 8 IDs del tunel se mantienen fijos en hub.json. Los 6 prompts Caza-Nido se mapean dinamicamente en chat-router.js: instalador->guia, privacidad->filtro, analista->analista, bibliotecario->archivero, escritor->cronista, coder->estratega. Traductor y aprendiz caen a T.papel (fallback). Regla de Euros y Medidas: agentesCifras se inyecta solo en analista y estratega.",
+      "donde_verlo": "grep -n 'agentesCifras' ~/preceptoros-web/public/assets/chat-router.js",
+      "fuente": "Decision Soberano 2026-09-01"
+    },
+    {
+      "termino": "Ojo-Vivo V5 (Pixel-Art)",
+      "que_hace": "Refugio 2D estilo Game Boy/Zelda. 4 filas: superficie (cúpula HEXELION), alas (MVP izq violeta, WEB der violeta), pirámide central (Ojo + Acta + busto), sótano (5 cajones de laboratorio en fila, bronce). Lienzo 320x208, coordenadas enteras, imageSmoothingEnabled=false. Los datos del grafo (sala, tribu) viven en grafo.json, no en el render.",
+      "donde_verlo": "curl -s http://127.0.0.1:8790/vivo",
+      "fuente": "plan_v5.md + mockup Gemini_Generated_Image"
+    }
+  ]
 }
