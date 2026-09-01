@@ -387,6 +387,77 @@ class ElOjoVivo(unittest.TestCase):
         self.assertEqual([], ips, f"lleva direcciones del rack: {ips}")
 
 
+class OjoVivoV2(unittest.TestCase):
+    """V2 · los estados humanos: la MASCARA es el estado, el BORDE la tribu.
+
+    V1 dejo el borde hecho (`.tribu-*`). V2 pone la otra mitad: que se lea de
+    un vistazo COMO esta cada agente sin leer una palabra, que es lo que un
+    refugio 2D hace y una tabla no.
+    """
+
+    def setUp(self):
+        self.css = (CONSOLA / "vivo.css").read_text(encoding="utf-8")
+        self.js = (CONSOLA / "vivo.js").read_text(encoding="utf-8")
+        self.html = (CONSOLA / "vivo.html").read_text(encoding="utf-8")
+
+    def test_las_mascaras_del_sprite_se_usan_de_verdad(self):
+        """Estaban dibujadas en el sprite desde V1 y no las pintaba nadie.
+
+        Un `<symbol>` que nadie referencia es peso muerto que ademas MIENTE:
+        quien lee el fichero cree que esa pieza esta viva.
+        """
+        for sym in ("i-mascara-ok", "i-mascara-mal"):
+            with self.subTest(symbol=sym):
+                self.assertIn(sym, self.html, "el sprite perdio " + sym)
+                self.assertIn(sym, self.js, sym + " sigue sin usarse")
+
+    def test_sin_dato_es_sin_mascara_y_en_gris(self):
+        """La ausencia de mascara ES el dato: no sabemos como esta.
+
+        Pintar una mascara verde cuando no hay medida seria fabricar salud, y
+        una roja seria fabricar averia. La cara vacia y gris no afirma nada.
+        """
+        self.assertIn("sin-mascara", self.css)
+        self.assertIn("grayscale", self.css)
+        self.assertIn("sin-mascara", self.js)
+
+    def test_el_anillo_de_seleccion_usa_su_variable(self):
+        """`outline 2px var(--sol)` del contrato visual, y `--sol` definida."""
+        plano = self.css.replace(" ", "").replace("\n", "")
+        self.assertIn("--sol:", plano, "`--sol` no esta definida")
+        self.assertIn("outline:2pxsolidvar(--sol)", plano)
+
+    def test_el_bocadillo_de_log_sale_del_latido_medido(self):
+        """El bocadillo lleva `nota_latido`, que es lo que el bucle DIJO.
+
+        No se compone una frase a partir del estado: eso seria prosa generada
+        sobre un dato, y el Ojo pinta el dato.
+        """
+        self.assertIn("nota_latido", self.js)
+        self.assertIn("bocadillo", self.js)
+        self.assertIn("bocadillo", self.css)
+
+    def test_el_borde_de_tribu_sobrevive_a_v2(self):
+        """V2 no puede pisar V1: las cuatro tribus siguen en el borde."""
+        for t in ("tribu-preceptor", "tribu-hexelion", "tribu-core", "tribu-ojo"):
+            with self.subTest(tribu=t):
+                self.assertIn("." + t, self.css)
+
+    def test_no_se_pinta_is_active_ni_en_v2(self):
+        """Decision 2 del Soberano, y V2 es donde mas facil seria romperla.
+
+        Un agente `Type=oneshot` esta `inactive` entre disparos y ESE es su
+        estado sano. Colgar la mascara de la actividad del timer fabricaria un
+        rojo cada vez que el bucle NO esta corriendo, que es casi siempre.
+        """
+        # Cuarta vez en dos sesiones que un test se tropieza con la cita de
+        # un comentario: `vivo.js` EXPLICA por que no pinta `is-active`, y esa
+        # explicacion lo nombra. Se mide el codigo.
+        codigo = re.sub(r"/\*.*?\*/", "", self.js, flags=re.S)
+        codigo = re.sub(r"(?m)//.*$", "", codigo)
+        self.assertNotIn("is-active", codigo)
+
+
 class ElOjoSeComprueba(unittest.TestCase):
     """`ojo.py --check`: decir si el Ojo puede servir, SIN levantarlo.
 

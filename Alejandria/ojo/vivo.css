@@ -23,6 +23,10 @@
   --phosphor:#43f5a0; --phosphor-txt:#43f5a0;
   --bronce:#78624c;   --bronce-txt:#c9a86a;
   --marmol:#e8e0d8;
+  /* El sol: el unico color que no pertenece a ninguna tribu. Marca lo que el
+     Soberano esta MIRANDO, no lo que el rack esta haciendo -- por eso no puede
+     ser el de una tribu: se confundiria seleccion con pertenencia. */
+  --sol:#f2c14e;
 
   --ok:#6ee7a0; --red:#ff7b7b; --nodata:#c9a86a; --tenue:#a99fbb;
 
@@ -187,3 +191,40 @@ footer p{margin:.25rem 0}
   .medio-cuerpo{grid-template-columns:minmax(0,1fr)}
   .superficie .fila-cuerpo{grid-template-columns:minmax(0,1fr)}
 }
+
+/* === V2 · los estados humanos ==========================================
+   La MASCARA es el estado y el BORDE es la tribu. Se leen a la vez y sin
+   leer: una cara verde en un cuarto de borde violeta dice «companero, bien»
+   antes de que nadie procese una palabra. Es lo que un refugio 2D hace y una
+   tabla no.
+
+   El vocabulario del contrato visual era busy/stale/sleep. Los datos que hay
+   son OK/RED/NO_DATA sobre bucles `Type=oneshot`, que entre disparos estan
+   inactivos y sanos. Se pinta lo MEDIDO, no lo imaginado: mapear «sleep» a la
+   inactividad del timer fabricaria un rojo cada vez que el bucle no corre,
+   que es casi siempre. */
+.mascara{width:18px;height:18px;flex:none;vertical-align:-3px;margin-right:.35rem}
+.mascara.ok{color:var(--phosphor)}
+.mascara.mal{color:var(--stop,#e0554e)}
+
+/* SIN DATO = SIN CARA. La ausencia de mascara ES el dato: no sabemos como
+   esta. Una mascara verde ahi fabricaria salud y una roja fabricaria averia;
+   el hueco gris no afirma nada, que es lo unico cierto. */
+.sin-mascara{filter:grayscale(1);opacity:.55}
+.sin-mascara .hueco-cara{display:inline-block;width:18px;height:18px;
+  flex:none;margin-right:.35rem;vertical-align:-3px;
+  border:1px dashed currentColor;border-radius:3px}
+
+/* El bocadillo lleva lo que el bucle DIJO --`nota_latido`--, no una frase
+   compuesta a partir de su estado. Componerla seria prosa generada sobre un
+   dato, y el Ojo pinta el dato. */
+.bocadillo{display:block;margin:.25rem 0 0 1.3rem;padding:.3rem .5rem;
+  border:1px solid var(--bronce);border-radius:6px;
+  background:var(--panel-bg);color:var(--bronce-txt);
+  font-family:var(--mono);font-size:.7rem;line-height:1.3;
+  overflow-wrap:anywhere}
+
+/* El anillo de seleccion. `outline` y no `border`: un borde cambiaria la caja
+   y movería el refugio entero al elegir un cuarto -- y ademas el borde ya
+   esta ocupado diciendo la tribu. */
+.cuarto:focus-visible,.cuarto.sel{outline:2px solid var(--sol);outline-offset:2px}

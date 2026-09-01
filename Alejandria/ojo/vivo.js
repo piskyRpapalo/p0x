@@ -122,13 +122,39 @@ function peor(lista) {
    ESE es su estado sano (decision 2 del Soberano). Por eso aqui se pinta el
    RESULTADO y la proxima cita, y no se pinta `is-active` en ninguna parte:
    es la propiedad que no informa, y pintarla fabrica rojos que no existen. */
+/* V2 · la cara del agente. Tres estados y ni uno mas, porque tres son los que
+   el dato distingue: OK, RED, y no lo se. El contrato visual hablaba de
+   busy/stale/sleep; eso describe procesos que corren, y estos son `oneshot`
+   que casi siempre estan parados y sanos. Se pinta lo medido. */
+function mascara(estado) {
+  if (estado !== "OK" && estado !== "RED") return null;   // sin dato: sin cara
+  var ns = "http://www.w3.org/2000/svg";
+  var svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("class", "mascara " + (estado === "OK" ? "ok" : "mal"));
+  svg.setAttribute("aria-hidden", "true");
+  var use = document.createElementNS(ns, "use");
+  use.setAttribute("href", estado === "OK" ? "#i-mascara-ok" : "#i-mascara-mal");
+  svg.appendChild(use);
+  return svg;
+}
+
 function agente(nombre, a) {
   var v = el("span");
+  var m = mascara(a.estado);
+  if (m) {
+    v.appendChild(m);
+  } else {
+    // El hueco se DIBUJA. Un espacio en blanco se lee como un fallo de
+    // maquetado; un recuadro punteado y gris se lee como «aqui no hay medida».
+    v.className = "sin-mascara";
+    v.appendChild(el("i", "hueco-cara"));
+  }
   v.appendChild(el("b", a.estado === "OK" ? "v ok" : "v red",
     a.resultado || a.estado || "NO_DATA"));
   v.appendChild(el("span", "entrega",
     (a.cadencia || "cadencia NO_DATA") + " · próxima " + (a.proxima || "NO_DATA")));
-  if (a.nota_latido) v.appendChild(el("span", "entrega", a.nota_latido));
+  // El bocadillo: lo que el bucle dijo de si mismo en su ultimo latido.
+  if (a.nota_latido) v.appendChild(el("span", "bocadillo", a.nota_latido));
   return fila(nombre, v);
 }
 
@@ -422,6 +448,7 @@ function refrescar() {
     ALA_IZQ.forEach(function (p) { izq.appendChild(cuarto(p, c)); });
     ALA_DER.forEach(function (p) { der.appendChild(cuarto(p, c)); });
     pintarSotano(c);
+    seleccionable();          // los cuartos nuevos tambien se pueden mirar
   });
   traer("/api/acta").then(pintarActa);
   traer("/api/fases").then(pintarFases);
@@ -431,3 +458,45 @@ function refrescar() {
 
 refrescar();
 setInterval(refrescar, REFRESCO_MS);
+
+/* --- V2 · la seleccion ---------------------------------------------------
+   El anillo del contrato visual no servia de nada mientras nada pudiera
+   recibirlo: `.cuarto:focus-visible` y `.cuarto.sel` estaban en la hoja y
+   ningun cuarto era enfocable, asi que era CSS que no podia aparecer jamas.
+
+   Se resuelve con `tabindex` en vez de con un manejador de teclas propio: el
+   navegador ya sabe recorrer, y reimplementar las flechas seria romper el
+   recorrido que quien usa un lector de pantalla ya tiene aprendido. El clic
+   solo marca; NO abre nada, porque el Ojo no ejecuta -- ninguna puerta se abre
+   sin la palabra del Soberano, y eso vale tambien para su consola. */
+var SELECCIONADO = null;
+
+function seleccionable() {
+  // IDEMPOTENTE a proposito: `refrescar()` reconstruye las alas cada ciclo,
+  // asi que esto corre una y otra vez sobre los cuartos fijos del marcado. Sin
+  // la marca, cada pasada colgaria otro par de oyentes sobre los mismos nodos
+  // y en una hora habria cientos. Una fuga de memoria lenta en una consola que
+  // se deja abierta todo el dia es justo la que nadie atribuye a su causa.
+  Array.prototype.forEach.call(document.querySelectorAll(".cuarto"), function (c) {
+    if (c.dataset.selEnchufado) return;
+    c.dataset.selEnchufado = "1";
+    if (!c.hasAttribute("tabindex")) c.setAttribute("tabindex", "0");
+    c.addEventListener("click", function () { marcar(c); });
+    c.addEventListener("focus", function () { marcar(c); });
+  });
+  // La seleccion sobrevive al repintado. Los cuartos de las alas se destruyen
+  // y se crean de nuevo cada ciclo: sin esto, el anillo se caeria solo cada
+  // pocos segundos y quien estuviera mirando un cuarto lo perderia sin tocar
+  // nada.
+  if (SELECCIONADO) {
+    var vuelto = document.getElementById(SELECCIONADO);
+    if (vuelto) vuelto.classList.add("sel");
+  }
+}
+
+function marcar(cual) {
+  Array.prototype.forEach.call(document.querySelectorAll(".cuarto.sel"),
+    function (c) { if (c !== cual) c.classList.remove("sel"); });
+  cual.classList.add("sel");
+  SELECCIONADO = cual.id || null;
+}
