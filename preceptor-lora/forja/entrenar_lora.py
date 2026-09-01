@@ -39,7 +39,7 @@ HIPER = {
                               # evidencia para un umbral que aborta una corrida.
     "subidas_para_abortar": 2,  # FIRMADO v2. Era 1 (implicito).
     "max_len": 512,
-    "cada_cuantos_evalua": 20,
+    "cada_cuantos_evalua": 2,
     "min_tokens": 4,           # ver `descartar_degeneradas`
 
     "objetivo": ["q_proj", "k_proj", "v_proj", "o_proj"],
