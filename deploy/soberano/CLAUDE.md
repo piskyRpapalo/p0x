@@ -12,6 +12,27 @@ el nuevo cerebro central de cómputo/comunicación del rack P0X. Ejecutas; no di
 artefactos validados por el Preceptor (Fable 5, fuera del rack) son fuente de verdad — despliegas,
 no reescribes por iniciativa.
 
+## Lo primero de cada sesión: el Ojo del Soberano
+
+**Firmado 2026-09-01.** El Ojo (`~/p0x/Alejandria/ojo/`) deja de ser un panel y
+pasa a ser **el nexo de arranque de toda sesión de IA en este nodo** — Claude
+Code, `cc-local` o una voz del Sínodo. Antes de tocar nada:
+
+```
+python3 ~/p0x/Alejandria/ojo/ojo.py --arranque
+```
+
+Una sola llamada y sale: qué reparto de cerebro te toca (`P0X_BRAIN` leído del
+entorno, no de la memoria de nadie), las seis reglas que más se rompen con su
+comando de comprobación, **qué recursos tienes a mano** —el Doogee enchufado por
+ADB, el enchufe que da vatios, la Orange Pi por clave, los cuatro gates— y el
+pulso del rack ahora mismo. Con el Ojo levantado, lo mismo en `/api/arranque`.
+
+Existe porque cada sesión empieza en frío y **lo que no se sabe que existe se
+supone en vez de medirse**. Y por eso es de doble sentido: toda sesión que use
+un recurso nuevo, o que descubra que uno declarado ya no responde, **actualiza
+`recursos.json` antes de cerrar**. Un inventario que solo se lee envejece.
+
 ## Regla de oro: escalada por coste (el token caro se gasta último)
 
 Antes de gastar un token de frontera, pregúntate en orden:

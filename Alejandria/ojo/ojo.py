@@ -73,6 +73,8 @@ ESTATICOS = {
     "/ojo.css": ("ojo.css", "text/css; charset=utf-8"),
     "/ojo.js": ("ojo.js", "application/javascript; charset=utf-8"),
     "/glosario.js": ("glosario.js", "application/javascript; charset=utf-8"),
+    "/grafo.js": ("grafo.js", "application/javascript; charset=utf-8"),
+    "/arranque.js": ("arranque.js", "application/javascript; charset=utf-8"),
     "/acta.js": ("acta.js", "application/javascript; charset=utf-8"),
     "/digesto.js": ("digesto.js", "application/javascript; charset=utf-8"),
 }
@@ -80,6 +82,8 @@ ESTATICOS = {
 CAPA = AQUI.parent
 GLOSARIO = AQUI / "glosario.json"
 RECURSOS = AQUI / "recursos.json"
+ARRANQUE = AQUI / "arranque.json"
+GRAFO = AQUI / "grafo.json"
 FASES = CAPA / "fases.json"
 IDENTIDAD = CAPA / "identidad_publica.json"
 ACTA = CAPA / "mensajes" / "mensajes.jsonl"
@@ -224,6 +228,59 @@ class Ojo(BaseHTTPRequestHandler):
                     "unidad": "W",
                     "causa": f"metricas.py no se pudo cargar: {type(e).__name__}: {e}"}
 
+    @staticmethod
+    def _arranque():
+        """LA PUERTA DE ENTRADA. Una sola peticion y una sesion fria sabe donde
+        esta, que reglas la atan, que tiene a mano y como esta el rack AHORA.
+
+        POR QUE ES UNA SOLA RUTA Y NO CUATRO
+        ------------------------------------
+        Porque una sesion que tiene que acordarse de pedir cuatro cosas pedira
+        tres. La orientacion que hay que juntar a mano no se junta: se supone.
+        Aqui se compone lo que ya existe --`arranque.json` las reglas,
+        `recursos.json` lo que hay a mano-- y se le añade el pulso del rack en
+        el mismo objeto, para que nadie razone con un dato de anteayer creyendo
+        que es de ahora.
+
+        Cada trozo que falte se declara en su sitio y no tumba el resto: una
+        puerta que no abre porque le falta una hoja es peor que media puerta.
+        """
+        import os
+
+        def leer(ruta, nombre):
+            try:
+                return json.loads(ruta.read_text(encoding="utf-8"))
+            except (OSError, ValueError) as e:
+                return {"estado": "NO_DATA", "causa": f"{nombre}: {type(e).__name__}"}
+
+        d = {"esquema": 1,
+             "lee_esto_primero": leer(ARRANQUE, "arranque.json"),
+             "lo_que_tienes_a_mano": leer(RECURSOS, "recursos.json")}
+
+        # LAS FRONTERAS, DERIVADAS DEL MAPA Y NO COPIADAS A MANO. Son las
+        # aristas `no_es` de grafo.json: si manana se anade una, aparece aqui
+        # sola. Copiarlas seria crear una segunda verdad sobre el mismo hecho,
+        # que es lo que este rack lleva un mes pagando.
+        #
+        # Van en el arranque y no en una ruta aparte porque confundir dos
+        # productos no es un error que se cometa por falta de detalle: se
+        # comete por no haber mirado. Si hay que pedirlas, no se piden.
+        g = leer(GRAFO, "grafo.json")
+        nombres = {n["id"]: n["nombre"] for n in g.get("nodos", [])}
+        d["fronteras_que_no_se_cruzan"] = [
+            {"esto": nombres.get(e["de"], e["de"]),
+             "no_es": nombres.get(e["a"], e["a"]),
+             "por_que": e.get("nota", "")}
+            for e in g.get("aristas", []) if e.get("tipo") == "no_es"
+        ] or {"estado": "NO_DATA", "causa": "grafo.json no declara fronteras"}
+        # El reparto de cerebros NO se lee de la memoria de nadie: vive en el
+        # entorno, y una sesion nunca debe poder confundirse de cerebro.
+        d["cerebro"] = {"P0X_BRAIN": os.environ.get("P0X_BRAIN"),
+                        "eres": "local · NO tocas canon ni doctrina"
+                        if os.environ.get("P0X_BRAIN") == "local"
+                        else "frontera · antes de un refactor mecanico, propon cc-local"}
+        return d
+
     def _json(self, codigo, datos):
         self._responder(codigo, json.dumps(datos, ensure_ascii=False),
                         "application/json; charset=utf-8")
@@ -271,6 +328,21 @@ class Ojo(BaseHTTPRequestHandler):
         if ruta == "/api/glosario":
             return self._fichero_json(GLOSARIO, "glosario.json",
                                       "no hay glosario en esta consola")
+
+        if ruta == "/api/arranque":
+            d = self._arranque()
+            # El pulso va DENTRO del mismo objeto a proposito: si hubiera que
+            # pedirlo aparte, media sesion arrancaria sin el.
+            d["rack_ahora"] = {"consumo_w": self._consumo(),
+                               "ollama_vivo": self._modelos_vivos(),
+                               "trabajando": self._trabajando()}
+            return self._json(200, d)
+
+        if ruta == "/api/grafo":
+            # El mapa de productos. Es DATO, no dibujo: el dibujo lo hace
+            # grafo.js y podria ser otro manana sin tocar esta topologia.
+            return self._fichero_json(GRAFO, "grafo.json",
+                                      "no hay mapa de productos en esta consola")
 
         if ruta == "/api/recursos":
             # QUE TIENE A MANO una sesion en este nodo. Vive aqui y no en la
@@ -390,7 +462,11 @@ def comprobar():
     # Por eso se declaran aparte y no cuentan para el codigo de salida.
     fuentes = [("estado.json", ESTADO), ("fases.json", FASES),
                ("glosario.json", GLOSARIO), ("identidad_publica.json", IDENTIDAD),
-               ("mensajes.jsonl", ACTA)]
+               ("mensajes.jsonl", ACTA),
+               # Los dos del arranque. Que falte uno no impide servir, pero
+               # deja a la proxima sesion sin puerta: se dice aqui.
+               ("arranque.json", ARRANQUE), ("recursos.json", RECURSOS),
+               ("grafo.json", GRAFO)]
 
     ancho = max(len(n) for n, *_ in filas)
     print("== lo que el Ojo tiene que servir ==")
@@ -419,6 +495,8 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--check", action="store_true",
                     help="dice si el Ojo puede servir y sale; no abre puerto")
+    ap.add_argument("--arranque", action="store_true",
+                    help="orientacion de arranque en JSON y sale; no abre puerto")
     ap.add_argument("--puerto", type=int, default=8790)
     a = ap.parse_args(argv)
 
@@ -426,6 +504,15 @@ def main(argv=None):
     # gate sin ocupar un puerto ni dejar un proceso suelto.
     if a.check:
         return comprobar()
+    # `--arranque` escupe la misma orientacion SIN abrir puerto. Una IA local
+    # con solo una terminal no deberia tener que levantar un servidor para
+    # saber donde esta.
+    if a.arranque:
+        d = Ojo._arranque()
+        d["rack_ahora"] = {"consumo_w": Ojo._consumo(),
+                           "ollama_vivo": Ojo._modelos_vivos()}
+        print(json.dumps(d, ensure_ascii=False, indent=1))
+        return 0
     # 127.0.0.1 clavado y sin bandera para cambiarlo. Una consola que enseña el
     # rack no debe poder atarse a 0.0.0.0 "sin querer".
     srv = ThreadingHTTPServer(("127.0.0.1", a.puerto), Ojo)
