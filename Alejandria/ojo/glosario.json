@@ -194,7 +194,7 @@
    "que_hace": "Entrenar LoRAs en este nodo SI es viable, y esta hecho: `torch 2.13.0+cpu` + `peft 0.20.0` en `~/.venvs/aurelius-forja`, CPU pura, `cuda.is_available()` False. Los adaptadores `v7-linea-a` y `v7-linea-b` salieron el 29 ago 2026 de `~/p0x/preceptor-lora/salida/`: rank 16, alpha 32, 2 epocas, 93 ejemplos de tren y 16 de validacion. MEDIDO: 553 s la linea A y 445 s la linea B — bajo diez minutos, no veinte ni treinta. Que no haya CUDA y que ROCm no soporte gfx1103 impide SERVIR un 27B por GPU; no impide AFINAR un 3B por CPU. Son dos hechos distintos y estuvieron confundidos en este glosario.",
    "donde_verlo": "tail -4 ~/p0x/preceptor-lora/entrenamiento-v7-linea-a.log && ~/.venvs/aurelius-forja/bin/python -c \"import torch;print(torch.__version__, torch.cuda.is_available())\"",
    "fuente": "preceptor-lora/salida/v7-linea-a/informe.json · entrenamiento-v7-linea-a.log:553s · salida/v7-linea-b.log:445s",
-   "nota": "Esta entrada decia lo contrario hasta el 2026-09-01 y era FALSA: heredaba «no hay CUDA» de la decision de servir y la aplicaba a entrenar. La correccion la firmo el Soberano y la confirmo la maquina. Lo que SI sigue en pie es la separacion de `hub.json`: `real.modelo` (con que se contesta) y `real.afinado` (el LoRA, null si no hay) son dos hechos, y un companero puede servir sobre modelo base. `preceptor-v7:latest` vuelve a estar en `ollama list` (2,0 GB). DEUDA: `mente/feedback/PENDIENTES.md:1290` repite la version falsa."
+   "nota": "Esta entrada decia lo contrario hasta el 2026-09-01 y era FALSA: heredaba «no hay CUDA» de la decision de servir y la aplicaba a entrenar. La correccion la firmo el Soberano y la confirmo la maquina. Lo que SI sigue en pie es la separacion de `hub.json`: `real.modelo` (con que se contesta) y `real.afinado` (el LoRA, null si no hay) son dos hechos, y un companero puede servir sobre modelo base. `preceptor-v7:latest` vuelve a estar en `ollama list` (2,0 GB). DEUDA: `mente/feedback/PENDIENTES.md:1290` repite la version falsa. Y una segunda correccion del mismo dia: «no hay CUDA en el rack» tambien es falso — lo es en SOBERANO, pero `la-torre` es una Jetson Orin Nano Super con CUDA 12.6 (hexelion/HARDWARE_MAP.md §1). Si alguna vez hace falta afinar algo que no quepa en la CPU, el hierro existe; es propose-only, no inexistente."
   },
   {
    "termino": "Nous A1T",
@@ -211,6 +211,18 @@
    "donde_verlo": "curl -s http://127.0.0.1:9000/api/rack | python3 -m json.tool | grep -A4 consumo_w",
    "fuente": "declaración del Soberano · el vatiaje sale de [Nous A1T]",
    "nota": "Para que el origen fuera MEDIDO haría falta un sensor en el lado de generación (inversor o medidor DC), no en el enchufe. Mientras no lo haya, la web dice «servido por IA 99% solar» como declaración de quien monta el rack, y así queda escrito."
+  },
+  {
+   "termino": "Doctrina Caza-Nido",
+   "que_hace": "Modelo donde la IA local esclaviza a la nube. El agente local declara NO_DATA y delega al usuario a cazar en IAs externas (Gemini/ChatGPT) y traer el dato al disco local para anidar un Second Brain soberano.",
+   "donde_verlo": "cat ~/p0x/preceptor-lora/data/sft_cazanido_v1.jsonl",
+   "fuente": "Doctrina firmada 2026-09-01"
+  },
+  {
+   "termino": "Mapeo Opcion C (Agentes)",
+   "que_hace": "Los IDs del tunel (8 en hub.json) se mantienen fijos por contrato con la-fragua, pero los prompts Caza-Nido (6) se mapean dinamicamente en hub.js sobre ellos. instalador->guia, privacidad->filtro, analista->analista, bibliotecario->archivero, escritor->cronista, coder->estratega.",
+   "donde_verlo": "grep -n 'agentes' ~/preceptoros-web/public/assets/hub.js",
+   "fuente": "Decision Soberano 2026-09-01"
   }
  ]
 }

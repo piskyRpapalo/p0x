@@ -497,6 +497,48 @@ function claseEstado(e) {
   return "pend";
 }
 
+/* QUE TIENE A MANO quien abre esta consola.
+
+   No es adorno ni documentacion: es la lista de cosas que una sesion puede
+   MEDIR en vez de suponer. Cada sesion empieza en frio, y sin esto un Claude
+   nuevo no sabe que hay un telefono enchufado al que se le puede abrir la web,
+   ni un enchufe que da vatios, ni cuatro gates que corren en un segundo. Un
+   recurso que no se sabe que existe es un recurso que no existe.
+
+   Cada uno lleva su estado con la misma vara que el resto del panel: MEDIDO si
+   se comprobo, DECLARADO si lo dice alguien, NO_DATA si no se ve desde aqui.
+   Un recurso supuesto seria justo la clase de dato que esta consola existe
+   para no publicar. */
+function pintarRecursos(d) {
+  var cuerpo = document.querySelector("#p-recursos .cuerpo");
+  if (!cuerpo) return;
+  vaciar(cuerpo);
+  if (!d || !d.recursos) {
+    cuerpo.appendChild(nodata((d && d.causa) || "no hay inventario de recursos"));
+    return;
+  }
+  var intro = el("p", "tenue", d.entrada || "");
+  cuerpo.appendChild(intro);
+  d.recursos.forEach(function (r) {
+    var det = el("details", "recurso");
+    var res = document.createElement("summary");
+    res.appendChild(el("span", null, r.recurso));
+    res.appendChild(sello(r.estado === "MEDIDO" ? "OK"
+                          : (r.estado === "NO_DATA" ? "NO_DATA" : "RED")));
+    det.appendChild(res);
+    det.appendChild(el("p", null, r.que_es || ""));
+    if (r.como_se_usa) {
+      var pre = el("pre", "como");
+      pre.textContent = r.como_se_usa;
+      det.appendChild(pre);
+    }
+    if (r.comprobado_con) {
+      det.appendChild(el("p", "tenue", "comprobado: " + r.comprobado_con));
+    }
+    cuerpo.appendChild(det);
+  });
+}
+
 function pintarFases(d) {
   var cuerpo = document.querySelector("#p-fases .cuerpo");
   vaciar(cuerpo);
@@ -584,6 +626,7 @@ function refrescar() {
   });
   traer("/api/acta").then(pintarActa);
   traer("/api/fases").then(pintarFases);
+  traer("/api/recursos").then(pintarRecursos);
   traer("/api/identidad").then(pintarIdentidad);
   traer("/api/companero").then(pintarCompanero);
 }

@@ -24,7 +24,7 @@ from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
 VEREDICTO = RAIZ / "FASE0_VEREDICTO.json"
-DATASET = RAIZ / "data" / "sft_cot_v7.jsonl"
+DATASET = RAIZ / "data" / "sft_cazanido_v1.jsonl"
 SALIDA = RAIZ / "salida"
 
 BASE_HF = "Qwen/Qwen3-4B-Instruct-2507"     # los pesos sin cuantizar, no el GGUF

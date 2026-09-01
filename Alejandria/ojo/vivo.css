@@ -258,3 +258,12 @@ footer p{margin:.25rem 0}
      color sigue diciendo lo mismo sin moverse. */
   .mueble.en-trabajo{animation:none}
 }
+
+/* --- El inventario de recursos ---------------------------------------
+   `<details>` nativo: la lista cabe de un vistazo cerrada y cada recurso se
+   abre solo si hace falta. Cero JS de plegado -- el navegador ya lo trae. */
+#p-recursos .recurso{border-top:1px solid var(--linea,#2a2a35);padding:.35rem 0}
+#p-recursos summary{cursor:pointer;display:flex;gap:.5rem;align-items:center;
+  justify-content:space-between}
+#p-recursos .como{white-space:pre-wrap;font-size:.72rem;overflow-x:auto;
+  background:rgba(0,0,0,.25);padding:.5rem;border-radius:6px;margin:.4rem 0}

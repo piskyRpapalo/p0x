@@ -79,6 +79,7 @@ ESTATICOS = {
 
 CAPA = AQUI.parent
 GLOSARIO = AQUI / "glosario.json"
+RECURSOS = AQUI / "recursos.json"
 FASES = CAPA / "fases.json"
 IDENTIDAD = CAPA / "identidad_publica.json"
 ACTA = CAPA / "mensajes" / "mensajes.jsonl"
@@ -270,6 +271,15 @@ class Ojo(BaseHTTPRequestHandler):
         if ruta == "/api/glosario":
             return self._fichero_json(GLOSARIO, "glosario.json",
                                       "no hay glosario en esta consola")
+
+        if ruta == "/api/recursos":
+            # QUE TIENE A MANO una sesion en este nodo. Vive aqui y no en la
+            # memoria de nadie porque cada sesion empieza en frio: sin esta
+            # lista, un Claude nuevo no sabe que puede abrir la web en un
+            # telefono real ni que hay un enchufe que mide vatios, y termina
+            # suponiendo lo que podria haber medido.
+            return self._fichero_json(RECURSOS, "recursos.json",
+                                      "no hay inventario de recursos en esta consola")
 
         if ruta == "/api/acta":
             # La cadena se verifica AL SERVIR, no al escribir solamente. Un
