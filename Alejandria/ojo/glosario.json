@@ -166,6 +166,34 @@
    "que_hace": "Verificando en el Doogee, la pagina seguia mostrando CSS y JS de antes del cambio: `sw.js` cachea los assets por origen. Subir `VERSION` en sw.js es lo correcto para produccion, pero para comprobar YA, lo barato es servir en OTRO PUERTO — otro origen, ningun worker registrado. Se perdieron tres capturas creyendo que un arreglo no funcionaba cuando si funcionaba.",
    "donde_verlo": "cd ~/preceptoros-web/public && python3 -m http.server 8830 --bind 127.0.0.1 && adb reverse tcp:8830 tcp:8830",
    "fuente": "preceptoros-web/public/sw.js:VERSION"
+  },
+  {
+   "termino": "que modelos viven en el Beelink",
+   "estado": "OK",
+   "que_hace": "DOS, y no ocho. Medido el 2026-09-01 por tres vias que coinciden (`ollama list`, /api/tags por loopback y por tailnet): `oficial-inventario:latest` (16 GB) y `qwen3-coder-30b:latest` (18 GB). `estado.json` todavia declara ocho porque es una lectura de hace dia y medio — NO te fies de esa lista sin volver a medir. Se perdieron seis modelos en ese intervalo.",
+   "donde_verlo": "ollama list",
+   "fuente": "medicion directa 2026-09-01"
+  },
+  {
+   "termino": "qwen3-coder-30b:latest",
+   "estado": "OK",
+   "que_hace": "SIRVE como Instalador de la web. Se le da el `papel` del i18n y se queda en el personaje: pregunta el sistema, pide el mensaje de error exacto, remite a la guia. ~4,7 tok/s (91 tokens en 19,5 s) con `think:false`. CUIDADO CON LA FRONTERA: INVENTA URLs — se saco `preceptoros.com/guia-instalacion-linux`, con el TLD equivocado y una ruta que no existe, que es justo lo que la regla 2 del papel prohibe. Si se sirve al publico, hay que endurecer el prompt o filtrar enlaces en la salida.",
+   "donde_verlo": "curl -s http://127.0.0.1:11434/api/generate -d '{\"model\":\"qwen3-coder-30b:latest\",\"prompt\":\"<papel>\",\"stream\":false,\"think\":false}'",
+   "fuente": "preceptoros-web/public/hub.json:agentes[instalador].real.modelo"
+  },
+  {
+   "termino": "oficial-inventario:latest",
+   "estado": "RED",
+   "que_hace": "NO sirve para dar un papel. IGNORA el system prompt: se le dio el papel del Instalador y contesto como asistente de inventario, escupiendo JSON (`\"comando\": \"iniciar_diagnostico_sistema\"`, `\"servicio_afectado\"`). Su propio afinado manda sobre lo que le pidas. Ademas es lento para chat: 120 tokens en 48 s (~2,5 tok/s). Uselo para lo suyo — inventario — y no como base de un companero.",
+   "donde_verlo": "mismo curl con model=oficial-inventario:latest y compara la respuesta",
+   "fuente": "medicion directa 2026-09-01"
+  },
+  {
+   "termino": "los LoRA no son un bloqueante",
+   "estado": "OK",
+   "que_hace": "Los adaptadores `preceptor-v7` y `preceptor-v7-linea-b` DESAPARECIERON del rack, y el catalogo de la web seguia declarandolos servidos. La leccion quedo en el diseno: SERVIR y ESTAR AFINADO son dos hechos distintos, y `hub.json` ya los separa en `real.modelo` (con que se contesta hoy) y `real.afinado` (el LoRA, null si no hay). Un companero puede servir sobre modelo base; el afinado mejora el papel y no es requisito. Entrenar LoRAs aqui NO es viable: ROCm no soporta gfx1103 y no hay CUDA — el entrenamiento sale del rack, y volver a entrenarlos es decision del Soberano, anotada en PENDIENTES.",
+   "donde_verlo": "cd ~/preceptoros-web && python3 -c \"import json; d=json.load(open('public/hub.json')); print([(a['id'], a['real']) for a in d['agentes'][:2]])\"",
+   "fuente": "preceptoros-web/public/hub.json · mente/feedback/PENDIENTES.md"
   }
  ]
 }

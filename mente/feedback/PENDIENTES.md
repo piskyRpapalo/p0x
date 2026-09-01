@@ -1269,3 +1269,42 @@ Y dos que no son físicos, salieron midiendo y no entraban en esta puerta:
   cara animada que se ve es todavía `seal-*.gif`. Cablear las hojas de sprite
   cambia cómo se anima la cara del producto y `seal-think` no tiene secuencia
   origen entre las 14 imágenes.
+
+---
+
+## Puerta 4 revisitada · 2026-09-01 (sesión de frontera)
+
+- **P4-6 · Los LoRA `preceptor-v7` y `preceptor-v7-linea-b` DESAPARECIERON del
+  rack.** (Coste L · decisión del Soberano.) Medido por tres vías que coinciden
+  (`ollama list`, `/api/tags` por loopback y por tailnet): la Ollama del
+  Beelink sirve **dos** modelos, `oficial-inventario:latest` y
+  `qwen3-coder-30b:latest`. Se perdieron seis modelos en día y medio, los dos
+  adaptadores del Preceptor incluidos. `estado.json` todavía declara los ocho
+  porque es una lectura vieja.
+
+  **No es un bloqueante hoy** y no se ha tocado: el Instalador de la web sirve
+  sobre el modelo base `qwen3-coder-30b:latest`, medido y funcionando. Lo que
+  queda por decidir es **si se re-entrenan y cuándo**, y eso lo firma el
+  Soberano.
+
+  Dos datos para esa decisión, ya medidos: **entrenar aquí no es viable** —
+  ROCm no soporta gfx1103 y no hay CUDA en el rack, así que el entrenamiento
+  sale fuera y solo vuelve el `.gguf` del adaptador para servirlo con Ollama.
+  Y **no hace falta para servir**: `hub.json` ya separa `real.modelo` (con qué
+  se contesta hoy) de `real.afinado` (el LoRA, `null` si no hay), así que un
+  compañero puede estar servido sin adaptador. Ese desacople es lo que impide
+  que la ausencia de un LoRA vuelva a apagar un compañero entero.
+
+- **P4-7 · `qwen3-coder-30b` inventa URLs, y hoy es la cara pública.** (Coste
+  S/M.) Sirviendo el papel del Instalador se sacó
+  `preceptoros.com/guia-instalacion-linux`: TLD equivocado y ruta inexistente,
+  justo lo que la regla 2 del papel prohíbe («no dictes rutas de memoria»).
+  Mientras sea el modelo del recepcionista hay que endurecer el prompt o
+  filtrar enlaces en la salida antes de que el turno llegue a producción — el
+  túnel todavía no está arriba, así que hay margen.
+
+- **P4-8 · Tag pelado `:latest` en el modelo que sirve al público.** (Coste S.)
+  El canon del nodo prohíbe los tags pelados porque apuntan a variantes
+  Thinking. `qwen3-coder-30b:latest` es el nombre real que da `ollama list`, y
+  con `think:false` respondió sin razonar, así que hoy no muerde. Pero fijarle
+  un tag explícito lo dejaría fuera de duda.
