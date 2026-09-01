@@ -258,3 +258,12 @@ footer p{margin:.25rem 0}
      color sigue diciendo lo mismo sin moverse. */
   .mueble.en-trabajo{animation:none}
 }
+
+/* --- V5 · el refugio -------------------------------------------------- */
+#p-grafo{padding:1rem}
+#p-grafo canvas{width:100%;max-width:1280px;height:auto;display:block;margin:0 auto;
+  cursor:pointer;image-rendering:pixelated;border-radius:6px}
+#grafo-ficha{max-width:1280px;margin:.6rem auto 0}
+#grafo-ficha h3{margin:.6rem 0 .1rem}
+#grafo-ficha ul{margin:.4rem 0 0;padding-left:1rem;font-size:.72rem}
+#grafo-ficha li{margin:.25rem 0}

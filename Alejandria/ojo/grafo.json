@@ -1,0 +1,374 @@
+{
+ "titulo": "El Second Brain · como se enlazan los productos",
+ "entrada": "El canon dice «Hexelion ≠ Aurelius ≠ P0X, jamas confundir», y esa frase vive en prosa: hay que acordarse de ella. Aqui esta dibujada. Una sesion que toca la app y luego la web puede seguir la linea sin cruzarla, porque las aristas de tipo `no_es` son tan visibles como las de `sirve`.",
+ "medido": "2026-09-01",
+ "tipos": {
+  "es_parte": {
+   "color": "#8f7bd6",
+   "que_dice": "A vive dentro de B"
+  },
+  "cara": {
+   "color": "#4fb286",
+   "que_dice": "A es la CARA visible de B"
+  },
+  "sirve": {
+   "color": "#e0a458",
+   "que_dice": "A le da un turno o un dato a B"
+  },
+  "empuja": {
+   "color": "#6b93d6",
+   "que_dice": "A versiona en B (remoto git)"
+  },
+  "corre_en": {
+   "color": "#9c9c9c",
+   "que_dice": "A se ejecuta en el metal B"
+  },
+  "no_es": {
+   "color": "#c65f5f",
+   "que_dice": "NO CONFUNDIR · frontera dura"
+  }
+ },
+ "nodos": [
+  {
+   "id": "p0x",
+   "nombre": "P0X",
+   "capa": "todo",
+   "z": 0,
+   "que_es": "La SUMA de todos los proyectos mas el Soberano. El organismo entero. NO tiene cara propia: si buscas «la pagina de P0X» no existe.",
+   "donde": "~/p0x",
+   "sala": "centro",
+   "tribu": "core"
+  },
+  {
+   "id": "hexelion",
+   "nombre": "Hexelion",
+   "capa": "producto",
+   "z": 1,
+   "que_es": "Lo FISICO: rack, sensores, impresora, atestacion. Cuando David dice «Hexelion» piensa hardware y dashboard, nunca aprendizaje.",
+   "donde": "~/p0x/hexelion · ~/hexelion-nexo",
+   "sala": "superficie",
+   "tribu": "hexelion"
+  },
+  {
+   "id": "nexo",
+   "nombre": "Nexo · Le Jardin",
+   "capa": "cara",
+   "z": 2,
+   "que_es": "El dashboard de Hexelion. Su cara visible.",
+   "donde": "hexelion-nexo/estatico",
+   "sala": "superficie",
+   "tribu": "hexelion"
+  },
+  {
+   "id": "faro",
+   "nombre": "El Faro",
+   "capa": "servicio",
+   "z": 2,
+   "que_es": "Servicio HEXELION de atestacion AIS, firma ed25519. FUERA DE ALCANCE de soberano: se documenta, no se toca, no se copia.",
+   "donde": "la-fragua",
+   "sala": "superficie",
+   "tribu": "hexelion"
+  },
+  {
+   "id": "aurelius",
+   "nombre": "Aurelius",
+   "capa": "producto",
+   "z": 1,
+   "que_es": "El proyecto de APRENDIZAJE para crear comunidad: ensena soberania tecnica con misiones jugables. Bilingue EN/ES. Repo propio.",
+   "donde": "~/aurelius · servido en /aurelius",
+   "sala": "ala-izq",
+   "tribu": "preceptor"
+  },
+  {
+   "id": "preceptoros",
+   "nombre": "PreceptorOS",
+   "capa": "producto",
+   "z": 1,
+   "que_es": "El producto que la gente instala en SU maquina. Se parte en dos superficies que NO se mezclan.",
+   "donde": "~/p0x/preceptor + ~/preceptoros-web",
+   "sala": "ala-izq",
+   "tribu": "preceptor"
+  },
+  {
+   "id": "web",
+   "nombre": "La web",
+   "capa": "cara",
+   "z": 2,
+   "que_es": "Instalacion + comunidad, y NADA MAS: la IA instaladora, el Tablon, el Benchmark publico y los perfiles. Techos duros: 7/7 paginas y 10.240 B por fichero, .json incluido.",
+   "donde": "~/preceptoros-web · preceptoros.org",
+   "sala": "ala-der",
+   "tribu": "preceptor"
+  },
+  {
+   "id": "app",
+   "nombre": "La app (MVP)",
+   "capa": "cara",
+   "z": 2,
+   "que_es": "Base de datos + laboratorio: el lore, las misiones, el Cold Start, la memoria y el cerebro local con harness. Solo biblioteca estandar.",
+   "donde": "~/p0x/preceptor",
+   "sala": "ala-izq",
+   "tribu": "preceptor"
+  },
+  {
+   "id": "agora",
+   "nombre": "El Agora",
+   "capa": "servicio",
+   "z": 2,
+   "que_es": "Quien CONTESTA en la web. api.preceptoros.org -> tunel -> uvicorn en nodo-agora:puerto. Hoy 404 en todas sus rutas: el tunel llega, la aplicacion no tiene puertas.",
+   "donde": "en la-fragua, tras el tunel de api.preceptoros.org",
+   "sala": "ala-der",
+   "tribu": "preceptor"
+  },
+  {
+   "id": "alejandria",
+   "nombre": "Alejandria",
+   "capa": "producto",
+   "z": 1,
+   "que_es": "La continuidad entre sesiones: memoria, actas, fases y EL OJO. No es producto de cara al publico, es el nexo de arranque de cualquier IA en este nodo.",
+   "donde": "~/p0x/Alejandria",
+   "sala": "centro",
+   "tribu": "core"
+  },
+  {
+   "id": "ojo",
+   "nombre": "El Ojo del Soberano",
+   "capa": "cara",
+   "z": 2,
+   "que_es": "LA PAGINA DE INFORMACION PARA UNA IA. Lenguaje de maquina: rutas, reglas, recursos y fronteras. Terso, sin graficos, legible por SSH o por curl. Es el nexo de arranque: `ojo.py --arranque`. Si buscas dibujos, no es aqui.",
+   "donde": "~/p0x/Alejandria/ojo/ojo.html · /api/* · 127.0.0.1:8790",
+   "sala": "centro",
+   "tribu": "core"
+  },
+  {
+   "id": "soberano",
+   "nombre": "soberano",
+   "capa": "metal",
+   "z": 3,
+   "que_es": "Beelink Ryzen 7 255 · 64 GB · Radeon 780M. El unico nodo que se toca directamente.",
+   "donde": "nodo `soberano` en la tailnet · el unico que se toca directamente",
+   "sala": "sotano",
+   "tribu": "core"
+  },
+  {
+   "id": "fragua",
+   "nombre": "la-fragua",
+   "capa": "metal",
+   "z": 3,
+   "que_es": "Orange Pi 5 Plus · RK3588 · 16 GB · NVMe 3,7 T en /mnt/[ALMACENAMIENTO]. PROPOSE-ONLY.",
+   "donde": "nodo `la-fragua` · Orange Pi 5 Plus, RK3588, NVMe en /mnt/[ALMACENAMIENTO] · PROPOSE-ONLY",
+   "sala": "sotano",
+   "tribu": "core"
+  },
+  {
+   "id": "torre",
+   "nombre": "la-torre",
+   "capa": "metal",
+   "z": 3,
+   "que_es": "Jetson Orin Nano Super 8 GB · CUDA 12.6 · host git soberano. La UNICA CUDA del rack. PROPOSE-ONLY.",
+   "donde": "nodo `la-torre` · Jetson Orin Nano Super, CUDA 12.6, host git · PROPOSE-ONLY",
+   "sala": "sotano",
+   "tribu": "core"
+  },
+  {
+   "id": "vigia",
+   "nombre": "el-vigia",
+   "capa": "metal",
+   "z": 3,
+   "que_es": "Raspberry Pi + camara + ESP32 + SDR. PROPOSE-ONLY.",
+   "donde": "nodo `el-vigia` · Raspberry Pi + camara + ESP32 · PROPOSE-ONLY",
+   "sala": "sotano",
+   "tribu": "hexelion"
+  },
+  {
+   "id": "doogee",
+   "nombre": "s110-1 (Doogee)",
+   "capa": "metal",
+   "z": 3,
+   "que_es": "Telefono de pruebas, por ADB. Donde se comprueba de verdad que la web funciona en un movil.",
+   "donde": "nodo `s110-1` · telefono de pruebas, por ADB",
+   "sala": "sotano",
+   "tribu": "core"
+  },
+  {
+   "id": "ojo-vivo",
+   "nombre": "El Ojo-Vivo",
+   "capa": "cara",
+   "z": 2,
+   "que_es": "EL JUEGO, para una PERSONA. El refugio con su topologia --superficie, alas, centro piramidal, sotano--, los agentes con mascara de estado, borde de tribu y mobiliario por ubicacion. Contrato visual firmado en plan_v5.md, fases V0-V4, tope 32 KB por fichero. Es lo que se ensena; vistas de marketing, family friendly.",
+   "donde": "~/p0x/Alejandria/ojo/vivo.* · /vivo · plan_v5.md",
+   "sala": "centro",
+   "tribu": "core"
+  }
+ ],
+ "aristas": [
+  {
+   "de": "hexelion",
+   "a": "p0x",
+   "tipo": "es_parte"
+  },
+  {
+   "de": "aurelius",
+   "a": "p0x",
+   "tipo": "es_parte"
+  },
+  {
+   "de": "preceptoros",
+   "a": "p0x",
+   "tipo": "es_parte"
+  },
+  {
+   "de": "alejandria",
+   "a": "p0x",
+   "tipo": "es_parte"
+  },
+  {
+   "de": "nexo",
+   "a": "hexelion",
+   "tipo": "cara"
+  },
+  {
+   "de": "web",
+   "a": "preceptoros",
+   "tipo": "cara"
+  },
+  {
+   "de": "app",
+   "a": "preceptoros",
+   "tipo": "cara"
+  },
+  {
+   "de": "ojo",
+   "a": "alejandria",
+   "tipo": "cara"
+  },
+  {
+   "de": "hexelion",
+   "a": "aurelius",
+   "tipo": "no_es",
+   "nota": "HARDWARE vs APRENDIZAJE. Es la confusion numero uno y esta en el canon del nodo."
+  },
+  {
+   "de": "web",
+   "a": "app",
+   "tipo": "no_es",
+   "nota": "La web NO lleva lore, misiones, memoria, engramas ni peldanos: eso es de la app. Yo mismo lo incumpli el 2026-08-29 y de ahi salio la regla."
+  },
+  {
+   "de": "p0x",
+   "a": "preceptoros",
+   "tipo": "no_es",
+   "nota": "P0X es el TODO y no tiene cara. PreceptorOS es UN producto dentro. Pedir «la web de P0X» es pedir algo que no existe."
+  },
+  {
+   "de": "agora",
+   "a": "web",
+   "tipo": "sirve",
+   "nota": "le pone el cerebro: el turno del chat"
+  },
+  {
+   "de": "app",
+   "a": "web",
+   "tipo": "sirve",
+   "nota": "EL CIRCUITO DE LA COMUNIDAD: la app mide el hardware y, si la persona quiere, envia la linea FIRMADA al Benchmark. Se corta con MODO_SANTUARIO."
+  },
+  {
+   "de": "ojo",
+   "a": "soberano",
+   "tipo": "sirve",
+   "nota": "pinta el rack; y orienta a la sesion que arranca"
+  },
+  {
+   "de": "faro",
+   "a": "hexelion",
+   "tipo": "sirve",
+   "nota": "atestacion firmada"
+  },
+  {
+   "de": "agora",
+   "a": "fragua",
+   "tipo": "corre_en"
+  },
+  {
+   "de": "faro",
+   "a": "fragua",
+   "tipo": "corre_en"
+  },
+  {
+   "de": "ojo",
+   "a": "soberano",
+   "tipo": "corre_en"
+  },
+  {
+   "de": "app",
+   "a": "soberano",
+   "tipo": "corre_en"
+  },
+  {
+   "de": "web",
+   "a": "doogee",
+   "tipo": "corre_en",
+   "nota": "donde se comprueba en un movil real"
+  },
+  {
+   "de": "p0x",
+   "a": "torre",
+   "tipo": "empuja",
+   "nota": "remoto `jetson:p0x.git`"
+  },
+  {
+   "de": "hexelion",
+   "a": "torre",
+   "tipo": "empuja",
+   "nota": "remoto `torre:hexelion.git`"
+  },
+  {
+   "de": "ojo-vivo",
+   "a": "alejandria",
+   "tipo": "cara"
+  },
+  {
+   "de": "ojo",
+   "a": "ojo-vivo",
+   "tipo": "no_es",
+   "nota": "INFORMACION PARA UNA IA vs JUEGO PARA UNA PERSONA. Comparten servidor y datos, y nada mas. El 2026-09-01 meti paneles de desarrollo --arranque, inventario, este mismo mapa-- dentro del Ojo-Vivo: ensuciaban el juego y se comian su presupuesto de 32 KB. Se sacaron. Lo que es para leer con los ojos va a /vivo; lo que es para leer con un parser, a /api."
+  },
+  {
+   "de": "ojo-vivo",
+   "a": "soberano",
+   "tipo": "corre_en"
+  }
+ ],
+ "salas": {
+  "superficie": {
+   "rotulo": "SUPERFICIE",
+   "que_es": "cupula y sensores HEXELION: lo que se ve desde fuera"
+  },
+  "ala-izq": {
+   "rotulo": "MVP",
+   "que_es": "el producto que la persona instala en su maquina"
+  },
+  "centro": {
+   "rotulo": "EL OJO",
+   "que_es": "la piramide: continuidad, memoria y el nexo de arranque"
+  },
+  "ala-der": {
+   "rotulo": "WEB",
+   "que_es": "instalacion y comunidad, servido en preceptoros.org"
+  },
+  "sotano": {
+   "rotulo": "LABORATORIO",
+   "que_es": "el metal medido"
+  }
+ },
+ "tribus": {
+  "preceptor": {
+   "color": "#8f7bd6"
+  },
+  "hexelion": {
+   "color": "#4fb286"
+  },
+  "core": {
+   "color": "#c89a5b"
+  }
+ }
+}

@@ -223,6 +223,14 @@
    "que_hace": "Los IDs del tunel (8 en hub.json) se mantienen fijos por contrato con la-fragua, pero los prompts Caza-Nido (6) se mapean dinamicamente en hub.js sobre ellos. instalador->guia, privacidad->filtro, analista->analista, bibliotecario->archivero, escritor->cronista, coder->estratega.",
    "donde_verlo": "grep -n 'agentes' ~/preceptoros-web/public/assets/hub.js",
    "fuente": "Decision Soberano 2026-09-01"
+  },
+  {
+   "termino": "preceptor-cazanido:latest",
+   "estado": "RED",
+   "que_hace": "El primer LoRA Caza-Nido, desplegado el 2026-09-01 sobre base `qwen3:4b`. LA DOCTRINA LA CUMPLE: con el papel del Analista delante y preguntandole una cifra de mercado de 2026 responde NO_DATA y se niega a inventar. Medido, no supuesto.\nLO QUE NO SE PUEDE SERVIR EN PUBLICO TODAVIA: el tag es PELADO sobre una base Thinking, y el razonamiento sale ENTERO dentro de `response`, sin etiquetas `<think>` que lo delimiten. En 700 tokens no llego a la respuesta: los gasto todos pensando, en INGLES, en una pagina en castellano. Y dentro de ese pensamiento cita doctrina interna («Cahier recuerda, Libro de Cabecera ensena») y la regla de negarse a revelar el system prompt. Eso es fuga de contexto a un visitante.\nSIN DELIMITADOR NO HAY NADA QUE RECORTAR: `rack.js` no puede filtrarlo, porque no hay marca donde cortar. `think:false` y el sufijo `/no_think` NO lo apagan; se probaron los dos.",
+   "donde_verlo": "curl -s http://127.0.0.1:11434/api/generate -d '{\"model\":\"preceptor-cazanido:latest\",\"prompt\":\"<el papel del Analista> Cuota de mercado del cafe de especialidad en Espana en 2026\",\"stream\":false,\"options\":{\"num_predict\":700}}'",
+   "fuente": "medicion directa 2026-09-01 · 25,6 tok/s en este nodo",
+   "nota": "Es exactamente el footgun que el canon ya tenia escrito: «los tags pelados apuntan a variantes Thinking con razonamiento no desactivable». Remedios, en orden de coste: darle tag explicito con una plantilla que suprima el pensamiento; o servirlo solo detras del Agora, que puede cortar antes de devolver. Mientras tanto, `hub.json` NO debe declararlo servido: seria otro falso verde."
   }
  ]
 }

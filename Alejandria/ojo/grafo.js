@@ -1,201 +1,222 @@
-/* El Second Brain · el mapa de productos, en 3D y sin una sola libreria.
+/* EL REFUGIO · el mapa de productos como un corte lateral del bunker.
+   Contrato visual: plan_v5.md, fase V5. Cero frameworks, loopback, 32 KB.
 
-   POR QUE EXISTE
-   --------------
-   El canon del nodo dice «Hexelion != Aurelius != P0X, jamas confundir». Esa
-   frase vive en prosa, y una frase en prosa hay que ACORDARSE de ella. Aqui la
-   confusion es geometria: las aristas `no_es` se pintan en rojo y a trazos,
-   igual de visibles que las que unen. Una sesion que salta de la app a la web
-   puede seguir la linea sin cruzarla.
+   POR QUE UN BUNKER Y NO UN GRAFO
+   -------------------------------
+   La primera version fue una nube de puntos girando en 3D. Era correcta y no
+   servia: un grafo de fuerzas coloca los nodos donde caben, no donde SON, y
+   aqui el sitio es el argumento. En el refugio, «superficie» es lo que se ve
+   desde fuera, «sotano» es el metal, y las alas son los dos productos que no
+   deben mezclarse. Mirarlo ya te dice la arquitectura; no hace falta leerla.
 
-   POR QUE 3D A MANO Y NO UNA LIBRERIA
-   -----------------------------------
-   Tres razones, en orden. La casa no mete frameworks. El Ojo es loopback y
-   tiene que abrir sin red. Y lo que hace falta de verdad --situar en el
-   espacio, girar y proyectar-- son treinta lineas: una matriz de rotacion, una
-   division por la profundidad y ordenar por z antes de pintar. Traerse tres
-   megas para eso seria pagar en dependencias lo que cuesta en aritmetica.
+   DE DONDE SALE CADA COSA
+   -----------------------
+   De `grafo.json` y de nada mas. La sala, la tribu y las fronteras son DATO.
+   Un render que decide donde va cada pieza es un render que puede mentir sobre
+   la arquitectura, y este dibujo existe justo para que nadie se confunda.
 
-   LA PROFUNDIDAD SIGNIFICA ALGO
-   -----------------------------
-   No es decoracion: cada capa es un nivel de abstraccion. z=0 el todo (P0X),
-   z=1 los productos, z=2 sus caras y servicios, z=3 el metal. Se lee de dentro
-   hacia fuera, que es como esta construido el organismo. */
+   PIXEL ART DE VERDAD
+   -------------------
+   Se pinta en un lienzo interno pequeno con coordenadas ENTERAS y se amplia
+   con `imageSmoothingEnabled=false`. Ampliar un dibujo suave no da pixel art,
+   da un dibujo borroso: el pixel tiene que nacer grande. Los rotulos van
+   despues, a resolucion nativa y en ui-monospace, que es lo que el anexo
+   tipografico manda para datos y HUD. */
 (function () {
   "use strict";
   var lienzo = document.getElementById("grafo");
   var ficha = document.getElementById("grafo-ficha");
   if (!lienzo || !lienzo.getContext) return;
 
+  var W = 320, H = 208, ESC = 1;           // el mundo, en pixeles de verdad
+  var buf = document.createElement("canvas");
+  buf.width = W; buf.height = H;
+  var b = buf.getContext("2d");
   var cx = lienzo.getContext("2d");
-  var G = null, N = [], sel = null;
-  // Giro inicial: ni de frente --las capas se taparian-- ni de perfil.
-  var giroY = -0.55, giroX = 0.32, arrastre = null;
-  var quieto = window.matchMedia
-    ? matchMedia("(prefers-reduced-motion: reduce)") : { matches: false };
+  var G = null, CAJAS = [], sel = null;
 
-  /* Cada capa es un anillo a su profundidad. El reparto por angulo es
-     determinista --indice entre total-- y no aleatorio: el mapa tiene que
-     salir IGUAL en cada recarga, o nadie construye memoria visual de el. */
-  function situar(g) {
-    var porCapa = {};
-    g.nodos.forEach(function (n) {
-      (porCapa[n.z] = porCapa[n.z] || []).push(n);
-    });
-    N = [];
-    Object.keys(porCapa).forEach(function (z) {
-      var fila = porCapa[z], radio = z === "0" ? 0 : 60 + Number(z) * 52;
-      fila.forEach(function (n, i) {
-        var a = (i / fila.length) * Math.PI * 2;
-        N.push({
-          d: n,
-          x: Math.cos(a) * radio,
-          y: (Number(z) - 1.5) * 62,
-          z0: Math.sin(a) * radio
-        });
-      });
-    });
+  var C = {
+    cielo: "#243b55", tierra: "#3a2b22", roca: "#241a15",
+    suelo: "#4a3830", pared: "#1b1520", panel: "#241d2e",
+    marmol: "#d8d2c4", tinta: "#0f0c14", sol: "#f0d9a0", rojo: "#c65f5f"
+  };
+
+  function tribu(n) {
+    return ((G.tribus || {})[n.tribu] || {}).color || C.marmol;
   }
 
-  function porId(id) {
-    for (var i = 0; i < N.length; i++) if (N[i].d.id === id) return N[i];
+  /* Un cuarto: pared, suelo y marco de su tribu. Sin degradados ni sombras --
+     el anexo pide bordes crudos-- y con todo en enteros para que ningun
+     pixel salga a medias. */
+  function cuarto(x, y, w, h, color, activo) {
+    b.fillStyle = C.pared; b.fillRect(x, y, w, h);
+    b.fillStyle = C.suelo; b.fillRect(x + 1, y + h - 3, w - 2, 2);
+    b.strokeStyle = activo ? C.sol : color;
+    b.lineWidth = 1;
+    b.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+    if (activo) b.strokeRect(x + 2.5, y + 2.5, w - 5, h - 5);
+  }
+
+  function piramide(x, y, w, h) {
+    b.fillStyle = C.panel;
+    b.beginPath();
+    b.moveTo(x + w / 2, y); b.lineTo(x + w, y + h); b.lineTo(x, y + h);
+    b.closePath(); b.fill();
+    b.strokeStyle = C.marmol; b.stroke();
+  }
+
+  /* El ojo del centro. Es el unico dibujo figurativo del mapa y esta a
+     proposito: la piramide es la casa de esta consola. */
+  function ojo(px, py) {
+    b.fillStyle = C.marmol;
+    b.fillRect(px - 7, py - 2, 14, 4);
+    b.fillRect(px - 5, py - 4, 10, 8);
+    b.fillStyle = C.tinta; b.fillRect(px - 2, py - 2, 4, 4);
+    b.fillStyle = C.sol;   b.fillRect(px - 1, py - 1, 2, 2);
+  }
+
+  function escena() {
+    CAJAS = [];
+    b.fillStyle = C.cielo; b.fillRect(0, 0, W, 62);
+    b.fillStyle = C.tierra; b.fillRect(0, 62, W, 4);
+    b.fillStyle = C.roca; b.fillRect(0, 66, W, H - 66);
+
+    piramide(94, 66, 132, 106);
+    ojo(160, 96);
+
+    var por = {};
+    G.nodos.forEach(function (n) { (por[n.sala] = por[n.sala] || []).push(n); });
+
+    // `col` apila --las salas de un ala van una encima de otra-- y `fil`
+    // reparte a lo ancho. El sotano es fila y no columna porque son CAJONES:
+    // asi salen en la referencia, y apilados se salian del lienzo.
+    function pon(lista, x, y, w, h, sep, horizontal) {
+      (lista || []).forEach(function (n, i) {
+        var xx = horizontal ? x + i * (w + sep) : x;
+        var yy = horizontal ? y : y + i * (h + sep);
+        cuarto(xx, yy, w, h, tribu(n), sel === n.id);
+        CAJAS.push({ id: n.id, x: xx, y: yy, w: w, h: h, n: n });
+      });
+    }
+    // La topologia del plan. Cada rotulo de sala tiene su franja libre encima:
+    // la primera version los pintaba sobre el primer cuarto y no se leia
+    // ninguno de los dos.
+    pon(por["superficie"], 8, 14, 62, 14, 3, false);
+    pon(por["ala-izq"], 8, 78, 80, 19, 4, false);
+    pon(por["ala-der"], 230, 78, 82, 19, 4, false);
+    pon(por["centro"], 118, 112, 84, 14, 2, false);
+    pon(por["sotano"], 6, 182, 58, 18, 4, true);
+
+    // Las fronteras: un muro rojo a trazos entre los dos cuartos que NO se
+    // confunden. Se pinta encima de todo porque es lo ultimo que hay que
+    // dejar de ver.
+    b.save(); b.setLineDash([3, 3]); b.strokeStyle = C.rojo; b.lineWidth = 2;
+    G.aristas.filter(function (e) { return e.tipo === "no_es"; }).forEach(function (e) {
+      var A = caja(e.de), B = caja(e.a);
+      if (!A || !B) return;
+      b.beginPath();
+      b.moveTo(A.x + A.w / 2, A.y + A.h / 2);
+      b.lineTo(B.x + B.w / 2, B.y + B.h / 2);
+      b.stroke();
+    });
+    b.restore();
+  }
+
+  function caja(id) {
+    for (var i = 0; i < CAJAS.length; i++) if (CAJAS[i].id === id) return CAJAS[i];
     return null;
   }
 
-  /* Rotar en Y, luego en X, y dividir por la profundidad. La `p` de la
-     perspectiva se guarda: sirve para el tamano del punto y para ordenar. */
-  function proyectar(n, w, h) {
-    var cy = Math.cos(giroY), sy = Math.sin(giroY);
-    var x1 = n.x * cy - n.z0 * sy, z1 = n.x * sy + n.z0 * cy;
-    var cxx = Math.cos(giroX), sxx = Math.sin(giroX);
-    var y1 = n.y * cxx - z1 * sxx, z2 = n.y * sxx + z1 * cxx;
-    var p = 420 / (420 + z2);
-    return { X: w / 2 + x1 * p, Y: h / 2 + y1 * p, p: p, z: z2 };
-  }
-
   function pintar() {
-    var w = lienzo.width, h = lienzo.height;
-    cx.clearRect(0, 0, w, h);
     if (!G) return;
-    var pos = {};
-    N.forEach(function (n) { pos[n.d.id] = proyectar(n, w, h); });
+    escena();
+    ESC = Math.max(1, Math.floor(lienzo.width / W));
+    cx.imageSmoothingEnabled = false;       // sin esto no es pixel art, es puré
+    cx.fillStyle = C.roca;
+    cx.fillRect(0, 0, lienzo.width, lienzo.height);
+    cx.drawImage(buf, 0, 0, W, H, 0, 0, W * ESC, H * ESC);
 
-    // Las aristas primero y de atras hacia delante, para que las de delante
-    // tapen y el volumen se lea.
-    G.aristas.slice().sort(function (a, b) {
-      return (pos[b.de].z + pos[b.a].z) - (pos[a.de].z + pos[a.a].z);
-    }).forEach(function (e) {
-      var A = pos[e.de], B = pos[e.a], t = G.tipos[e.tipo] || {};
-      if (!A || !B) return;
-      var vivo = !sel || sel === e.de || sel === e.a;
-      cx.save();
-      cx.globalAlpha = vivo ? 0.85 : 0.12;
-      cx.strokeStyle = t.color || "#888";
-      // `no_es` a trazos y mas gruesa: una frontera tiene que verse ANTES
-      // que un parentesco, porque es la que se cruza por error.
-      cx.lineWidth = e.tipo === "no_es" ? 2.2 : 1.1;
-      if (e.tipo === "no_es") cx.setLineDash([5, 4]);
-      cx.beginPath(); cx.moveTo(A.X, A.Y); cx.lineTo(B.X, B.Y); cx.stroke();
-      cx.restore();
+    // Rotulos a resolucion nativa: el anexo tipografico manda ui-monospace
+    // para datos y HUD, y un rotulo pixelado a mano no se lee en un telefono.
+    cx.font = "10px ui-monospace,monospace";
+    cx.textBaseline = "top";
+    Object.keys(G.salas || {}).forEach(function (k) { });
+    CAJAS.forEach(function (c) {
+      cx.fillStyle = sel === c.id ? C.sol : "#e8e8ef";
+      var t = c.n.nombre;
+      var max = Math.floor((c.w * ESC - 6) / 6);
+      if (t.length > max) t = t.slice(0, max - 1) + "…";
+      cx.fillText(t, c.x * ESC + 3, c.y * ESC + 3);
     });
-
-    N.slice().sort(function (a, b) { return pos[b.d.id].z - pos[a.d.id].z; })
-      .forEach(function (n) {
-        var P = pos[n.d.id], r = Math.max(3, 7 * P.p);
-        var vivo = !sel || sel === n.d.id || vecino(n.d.id);
-        cx.save();
-        cx.globalAlpha = vivo ? 1 : 0.2;
-        cx.beginPath(); cx.arc(P.X, P.Y, r, 0, Math.PI * 2);
-        cx.fillStyle = n.d.id === sel ? "#f0d9a0" : COLOR[n.d.capa] || "#bbb";
-        cx.fill();
-        cx.font = Math.round(11 * P.p + 3) + "px ui-monospace,monospace";
-        cx.fillStyle = "#e8e8ef";
-        cx.fillText(n.d.nombre, P.X + r + 4, P.Y + 4);
-        cx.restore();
-        n.P = P; n.r = r;
-      });
+    // Los rotulos de sala, en el sitio que ocupan en el plano.
+    cx.fillStyle = "#8a8398";
+    [["SUPERFICIE", 8, 3], ["MVP", 8, 68], ["WEB", 230, 68],
+     ["EL OJO", 118, 102], ["LABORATORIO", 6, 172]].forEach(function (r) {
+      cx.fillText(r[0], r[1] * ESC + 2, r[2] * ESC + 2);
+    });
   }
 
-  var COLOR = { todo: "#f0d9a0", producto: "#8f7bd6", cara: "#4fb286",
-                servicio: "#e0a458", metal: "#9c9c9c" };
-
-  function vecino(id) {
-    if (!sel) return false;
-    for (var i = 0; i < G.aristas.length; i++) {
-      var e = G.aristas[i];
-      if ((e.de === sel && e.a === id) || (e.a === sel && e.de === id)) return true;
-    }
-    return false;
-  }
-
-  /* La ficha no repite el dibujo: dice lo que el dibujo no puede decir --que
-     ES cada cosa y donde vive-- y, sobre todo, POR QUE cada frontera existe.
-     Una arista roja sin su motivo es un adorno. */
+  /* La ficha dice lo que el dibujo no puede: que ES cada cosa, donde vive y
+     POR QUE cada frontera existe. Una linea roja sin su motivo es un adorno. */
   function contar(id) {
-    sel = id;
-    var n = porId(id);
-    if (!ficha || !n) return;
+    sel = id; pintar();
+    var c = caja(id);
+    if (!ficha || !c) return;
+    var n = c.n;
     ficha.innerHTML = "";
-    var t = document.createElement("h3");
-    t.textContent = n.d.nombre;
-    ficha.appendChild(t);
-    var q = document.createElement("p");
-    q.textContent = n.d.que_es;
-    ficha.appendChild(q);
-    var d = document.createElement("p");
-    d.className = "tenue"; d.textContent = n.d.donde || "";
-    ficha.appendChild(d);
+    var h = document.createElement("h3"); h.textContent = n.nombre;
+    var s = document.createElement("p"); s.className = "tenue";
+    s.textContent = (G.salas[n.sala] || {}).rotulo + " · " + n.sala;
+    var q = document.createElement("p"); q.textContent = n.que_es;
+    var d = document.createElement("p"); d.className = "tenue";
+    d.textContent = n.donde || "";
+    ficha.appendChild(h); ficha.appendChild(s); ficha.appendChild(q); ficha.appendChild(d);
     var ul = document.createElement("ul");
     G.aristas.forEach(function (e) {
       if (e.de !== id && e.a !== id) return;
-      var otro = e.de === id ? e.a : e.de;
-      var on = porId(otro);
+      var otro = e.de === id ? e.a : e.de, on = caja(otro);
       var li = document.createElement("li");
-      var b = document.createElement("b");
-      b.style.color = (G.tipos[e.tipo] || {}).color || "#bbb";
-      b.textContent = (G.tipos[e.tipo] || {}).que_dice || e.tipo;
-      li.appendChild(b);
+      var bb = document.createElement("b");
+      bb.style.color = e.tipo === "no_es" ? C.rojo
+        : ((G.tipos[e.tipo] || {}).color || "#bbb");
+      bb.textContent = (G.tipos[e.tipo] || {}).que_dice || e.tipo;
+      li.appendChild(bb);
       li.appendChild(document.createTextNode(
-        " · " + (on ? on.d.nombre : otro) + (e.nota ? " — " + e.nota : "")));
+        " · " + (on ? on.n.nombre : otro) + (e.nota ? " — " + e.nota : "")));
       ul.appendChild(li);
     });
     ficha.appendChild(ul);
-    pintar();
   }
 
-  // --- girar con el raton, y tocar para seleccionar -----------------------
-  lienzo.addEventListener("pointerdown", function (ev) {
-    arrastre = { x: ev.clientX, y: ev.clientY, movido: false };
-    lienzo.setPointerCapture(ev.pointerId);
-  });
-  lienzo.addEventListener("pointermove", function (ev) {
-    if (!arrastre) return;
-    var dx = ev.clientX - arrastre.x, dy = ev.clientY - arrastre.y;
-    if (Math.abs(dx) + Math.abs(dy) > 3) arrastre.movido = true;
-    giroY += dx * 0.008;
-    giroX = Math.max(-1.2, Math.min(1.2, giroX + dy * 0.006));
-    arrastre.x = ev.clientX; arrastre.y = ev.clientY;
-    pintar();
-  });
-  lienzo.addEventListener("pointerup", function (ev) {
-    var era = arrastre; arrastre = null;
-    if (!era || era.movido) return;          // arrastrar no es seleccionar
+  lienzo.addEventListener("click", function (ev) {
     var r = lienzo.getBoundingClientRect();
-    var mx = (ev.clientX - r.left) * (lienzo.width / r.width);
-    var my = (ev.clientY - r.top) * (lienzo.height / r.height);
-    var cerca = null, dmin = 26;
-    N.forEach(function (n) {
-      if (!n.P) return;
-      var d = Math.hypot(n.P.X - mx, n.P.Y - my);
-      if (d < dmin) { dmin = d; cerca = n.d.id; }
-    });
-    if (cerca) contar(cerca); else { sel = null; pintar(); }
+    var mx = (ev.clientX - r.left) * (lienzo.width / r.width) / ESC;
+    var my = (ev.clientY - r.top) * (lienzo.height / r.height) / ESC;
+    for (var i = 0; i < CAJAS.length; i++) {
+      var c = CAJAS[i];
+      if (mx >= c.x && mx <= c.x + c.w && my >= c.y && my <= c.y + c.h) {
+        return contar(c.id);
+      }
+    }
+    sel = null; pintar();
   });
 
   function medir() {
-    var r = lienzo.getBoundingClientRect();
-    lienzo.width = Math.max(320, Math.round(r.width));
-    lienzo.height = Math.max(260, Math.round(r.width * 0.62));
+    // Se mide el PADRE, no el lienzo. Un canvas con `width:100%` toma su ancho
+    // del hueco, pero ese hueco lo define el propio canvas hasta que se le
+    // asigna uno: leerse a si mismo da siempre la escala 1 de arranque. Me
+    // paso, y el mapa salia del tamano de un sello.
+    // Y si el hueco sale degenerado se cae a la ventana. No es paranoia: el
+    // 2026-09-01 medi `html.clientWidth === 0` en esta misma pagina --el
+    // refugio se colapsa entero en algunos contextos-- y un mapa que depende
+    // de que su padre este bien maquetado desaparece sin decir por que.
+    var hueco = (lienzo.parentNode && lienzo.parentNode.clientWidth) || 0;
+    if (hueco < W) hueco = Math.max(W, window.innerWidth || W);
+    // Multiplo ENTERO del mundo: media escala parte los pixeles y el dibujo
+    // deja de ser nitido, que es todo lo que tiene.
+    var e = Math.max(1, Math.min(4, Math.floor(hueco / W)));
+    if (lienzo.width === W * e) { pintar(); return; }
+    lienzo.width = W * e; lienzo.height = H * e;
     pintar();
   }
   window.addEventListener("resize", medir);
@@ -205,14 +226,10 @@
       if (ficha) ficha.textContent = "NO_DATA · " + ((g && g.causa) || "sin grafo");
       return;
     }
-    G = g; situar(g); medir(); contar("p0x");
-    // Un giro lento solo si nadie ha pedido quietud, y se para al tocar: el
-    // movimiento aqui sirve para leer el volumen, no para adornar.
-    if (!quieto.matches) {
-      setInterval(function () {
-        if (!arrastre) { giroY += 0.0016; pintar(); }
-      }, 50);
-    }
+    G = g; medir(); contar("p0x");
+    // Y otra vez tras el primer pintado: en el arranque el hueco todavia no
+    // tiene su ancho definitivo y la escala saldria corta.
+    requestAnimationFrame(medir);
   }).catch(function (e) {
     if (ficha) ficha.textContent = "NO_DATA · el Ojo no sirvio /api/grafo: " + e.message;
   });

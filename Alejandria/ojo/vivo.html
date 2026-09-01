@@ -132,6 +132,15 @@
     <div class="fila-cuerpo" id="sotano-cuerpo">…</div>
   </section>
 
+  <!-- V5 del plan_v5: el refugio en corte lateral. Es JUEGO, no herramienta:
+       ensena la arquitectura mirandola. Los datos salen de /api/grafo. -->
+  <section class="fila" id="p-grafo">
+    <h2>El Refugio · el mapa</h2>
+    <canvas id="grafo" aria-label="Corte lateral del refugio con las salas del ecosistema"></canvas>
+    <p class="tenue">Toca una sala</p>
+    <div id="grafo-ficha" class="cuerpo">…</div>
+  </section>
+
 </main>
 
 <aside id="margen">
@@ -167,6 +176,7 @@
      medir el metal: <code>~/p0x/Alejandria/verificar_sesion.sh</code></p>
 </footer>
 
+<script src="/grafo.js" defer></script>
 <script src="/vivo.js"></script>
 </body>
 </html>
