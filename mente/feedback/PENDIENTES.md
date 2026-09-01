@@ -1287,9 +1287,7 @@ Y dos que no son físicos, salieron midiendo y no entraban en esta puerta:
   queda por decidir es **si se re-entrenan y cuándo**, y eso lo firma el
   Soberano.
 
-  Dos datos para esa decisión, ya medidos: **entrenar aquí no es viable** —
-  ROCm no soporta gfx1103 y no hay CUDA en el rack, así que el entrenamiento
-  sale fuera y solo vuelve el `.gguf` del adaptador para servirlo con Ollama.
+  Dos datos para esa decisión, ya medidos: **entrenar en GPU aquí no es viable, pero SÍ en CPU** — El Beelink entrena LoRAs en CPU pura (torch-CPU + PEFT) en ~9 min. QLoRA/GPU sigue sin ser viable en este hardware (Radeon 780M gfx1103), así que el entrenamiento pesado sale fuera y solo vuelve el `.gguf` del adaptador para servirlo con Ollama.
   Y **no hace falta para servir**: `hub.json` ya separa `real.modelo` (con qué
   se contesta hoy) de `real.afinado` (el LoRA, `null` si no hay), así que un
   compañero puede estar servido sin adaptador. Ese desacople es lo que impide
