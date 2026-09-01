@@ -1,7 +1,7 @@
 {
  "titulo": "Cómo funciona el enjambre",
  "entrada": "Lo que el panel dice en jerga, dicho en palabras. Cada entrada lleva dónde verlo con tus propios ojos: si no hay comando que lo enseñe, no es conocimiento, es una creencia.",
- "medido": "2026-08-30",
+ "medido": "2026-09-01",
  "entradas": [
   {
    "termino": "el enjambre",
@@ -117,6 +117,55 @@
    "donde_verlo": "cat ~/p0x/preceptor-internal/docs/bandeja_firmas.md",
    "fuente": "director.py:174-208 · ARQ_LOOPS.md:112-118",
    "nota": "Tiene 2 filas, y una es un artefacto de la suite de pruebas: `director.py` escribe en las rutas reales aunque se le pase otra base."
+  },
+  {
+   "termino": "la web habla con el rack",
+   "estado": "RED",
+   "que_hace": "Desde el 2026-09-01 la portada de preceptoros.org NO ofrece descargar un modelo ni buscar una Ollama: el modelo lo pone el rack. Quien elige es el companero activo — `agentes[].real.adaptador` de hub.json ES el nombre del modelo en Ollama. Hoy el camino NO llega y la pagina lo declara con NO_DATA y su causa, mas el JSON para llevarselo a otra IA. Esta en RED porque falta el otro extremo, no porque este roto lo de aqui.",
+   "donde_verlo": "curl -s -o /dev/null -w '%{http_code}\\n' https://api.preceptoros.org/api/tags   # hoy 404",
+   "fuente": "preceptoros-web/public/assets/rack.js · p0x/propuestas/la-fragua-agora-api-contrato-turno.md"
+  },
+  {
+   "termino": "api.preceptoros.org",
+   "estado": "RED",
+   "que_hace": "El tunel SI esta arriba y enruta a 127.0.0.1:9002 de la-fragua, donde corre `uvicorn agora_api:app` (FastAPI). El 404 no es de red ni de DNS: esa app no publica las rutas. Faltan DOS cosas, no una: (1) exponer POST /api/generate con el contrato NDJSON de Ollama, (2) CORSMiddleware con allow_origins=https://preceptoros.org — como contesta FastAPI y no Ollama, OLLAMA_ORIGINS ahi no pinta nada. la-fragua es propose-only desde soberano: NO se toca por SSH.",
+   "donde_verlo": "curl -s https://api.preceptoros.org/openapi.json   # {'detail':'Not Found'}",
+   "fuente": "p0x/propuestas/la-fragua-agora-api-contrato-turno.md"
+  },
+  {
+   "termino": "api-guia (:9001) es un falso verde",
+   "estado": "RED",
+   "que_hace": "El Ojo lo declara OK y `unidad: active`, y NO ESCUCHA NADIE. El script vive en ~/p0x/preceptor/api-guia pero no hay unidad systemd creada (`Unit api-guia.service could not be found`). Es un fallo de MEDICION del recolector, de la misma familia que los cuatro rojos que no existian, solo que al reves: aqui fabrica un verde. Mientras no se arregle, no te fies de esa fila.",
+   "donde_verlo": "ss -ltn | grep 9001   # sin resultado · systemctl --user status api-guia",
+   "fuente": "Alejandria/estado.json:componentes.api_guia"
+  },
+  {
+   "termino": "los dos techos de la web",
+   "estado": "OK",
+   "que_hace": "10 KB POR FICHERO (.html/.css/.js/.json/.webmanifest bajo public/) y 7 paginas de contenido, las dos cosas las hace cumplir test_web.py. Cuando un fichero se pasa, la doctrina es PARTIR, no recortar comentarios: asi salieron fallback.js, localai.js, engine.js y hub-cola.js de sus padres. El 2026-09-01 las portadas bajaron de ~200 B libres a ~3,2 KB al mudar 50 claves i18n con la funcion a la que servian.",
+   "donde_verlo": "cd ~/preceptoros-web && python3 -m pytest test_web.py -q",
+   "fuente": "preceptoros-web/test_web.py:TOPE_FICHERO"
+  },
+  {
+   "termino": "hidden no escondia nada",
+   "estado": "OK",
+   "que_hace": "`base.css` declaraba `button,.boton{...display:inline-block}` — regla de AUTOR, que pisa la del navegador que apaga los `[hidden]`. Consecuencia: ningun boton con atributo `hidden` se escondia EN TODA LA WEB. Arreglado el 2026-09-01 con `[hidden]{display:none}` en base.css, que es de donde venia el fallo. Si vuelves a ver un boton oculto que se ve, mira primero si alguien declaro `display` sobre el.",
+   "donde_verlo": "grep -n '\\[hidden\\]' ~/preceptoros-web/public/assets/base.css",
+   "fuente": "preceptoros-web/public/assets/base.css"
+  },
+  {
+   "termino": "counters.json tiene dos duenos",
+   "estado": "RED",
+   "que_hace": "`contadores.py` (en el repo web) y `p0x/bin/coherencia-publica.py` escriben AMBOS public/counters.json, y el primero no conoce las claves del segundo: al correr contadores.py desaparecen `pruebas_app` y `pruebas_web` y el gate se pone en rojo. Remedio inmediato: volver a correr `coherencia-publica.py --si` CON EL GATE YA EN VERDE (si el gate esta rojo escribe NO_DATA en la cifra de la web). Deuda anotada, no arreglada.",
+   "donde_verlo": "python3 ~/p0x/bin/coherencia-publica.py   # dry-run, no toca nada",
+   "fuente": "preceptoros-web/contadores.py · p0x/bin/coherencia-publica.py"
+  },
+  {
+   "termino": "el service worker te ensena codigo viejo",
+   "estado": "OK",
+   "que_hace": "Verificando en el Doogee, la pagina seguia mostrando CSS y JS de antes del cambio: `sw.js` cachea los assets por origen. Subir `VERSION` en sw.js es lo correcto para produccion, pero para comprobar YA, lo barato es servir en OTRO PUERTO — otro origen, ningun worker registrado. Se perdieron tres capturas creyendo que un arreglo no funcionaba cuando si funcionaba.",
+   "donde_verlo": "cd ~/preceptoros-web/public && python3 -m http.server 8830 --bind 127.0.0.1 && adb reverse tcp:8830 tcp:8830",
+   "fuente": "preceptoros-web/public/sw.js:VERSION"
   }
  ]
 }

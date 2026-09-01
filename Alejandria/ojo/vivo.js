@@ -154,10 +154,23 @@ function mascara(estado) {
    hora local, que es correcto porque esto es loopback: quien mira y quien
    midio son la misma maquina.
 
-   Y falta una tercera ancla A PROPOSITO. `trabajo` (busy) NO_OBSERVABLE: un
-   bucle `Type=oneshot` corre en segundos y la consola sondea cada varios; no
-   hay campo en /api/rack que diga «esta corriendo ahora». Pintarlo seria
-   inventar un movimiento que nadie midio. El sitio existe y se queda vacio. */
+   LA TERCERA ANCLA YA SE PUEDE PINTAR (2026-09-01). Hasta hoy `trabajo`
+   (busy) estaba declarada NO_OBSERVABLE aqui mismo, y con razon: no habia
+   campo en /api/rack que dijera «esta corriendo ahora», y pintarlo habria sido
+   inventar un movimiento que nadie midio.
+
+   Ahora lo hay. `/api/rack` trae `trabajando`, que el Ojo calcula AL VUELO
+   leyendo `loops.db`: un bucle esta ocupado si su ultimo latido es `entra` y
+   todavia no ha escrito `sale`. Tiene que ser al vuelo y no del recolector,
+   porque «esta corriendo AHORA» con media hora de retraso no es el mismo
+   hecho -- un `oneshot` dura segundos y la respuesta seria siempre «ninguno»,
+   que es una respuesta falsa disfrazada de dato.
+
+   `trabajo` MANDA sobre las otras dos: un bucle que esta corriendo no esta ni
+   esperando su cita ni congelado, por mucho que la hora diga otra cosa. Y si
+   el campo viene NO_DATA --sin fichero, o el libro tomado por otro proceso--
+   se vuelve exactamente al comportamiento de antes: se juzga por la cita. La
+   ausencia de dato no fabrica un estado. */
 /* El instante de la MEDIDA, no el del navegador. Se guarda al llegar cada
    lectura y lo usa quien pinte una ubicacion. Es una variable de modulo por la
    misma razon que SELECCIONADO: atarla por parametro obligaria a hilarla por
@@ -166,8 +179,14 @@ var MEDIDO_EN = null;
 
 var ANCLAS = {
   cama: { sim: "#i-cama", rotulo: "esperando su cita" },
-  hielo: { sim: "#i-hielo", rotulo: "se le paso la hora y no corrio" }
+  hielo: { sim: "#i-hielo", rotulo: "se le paso la hora y no corrio" },
+  trabajo: { sim: "#i-trabajo", rotulo: "trabajando ahora" }
 };
+
+/* Quien esta dentro de una pasada, por nombre de bucle -> segundos que lleva.
+   `null` mientras no se sepa: es distinto de «nadie trabaja», y el ancla lo
+   trata distinto. */
+var TRABAJANDO = null;
 
 function segundos(texto) {
   var m = /(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2}):(\d{2})/.exec(texto || "");
@@ -175,14 +194,18 @@ function segundos(texto) {
   return new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]).getTime() / 1000;
 }
 
-function ancla(a, medido) {
+function ancla(a, medido, nombre) {
+  // Lo que esta pasando AHORA manda sobre lo que decia el calendario.
+  if (TRABAJANDO && Object.prototype.hasOwnProperty.call(TRABAJANDO, nombre)) {
+    return "trabajo";
+  }
   var cita = segundos(a && a.proxima);
   if (cita === null || !medido) return null;   // sin cita no hay sitio: no se pinta
   return cita > medido ? "cama" : "hielo";
 }
 
-function mueble(a, medido) {
-  var cual = ancla(a, medido);
+function mueble(a, medido, nombre) {
+  var cual = ancla(a, medido, nombre);
   if (!cual) return null;
   var ns = "http://www.w3.org/2000/svg";
   var svg = document.createElementNS(ns, "svg");
@@ -194,7 +217,14 @@ function mueble(a, medido) {
   var caja = el("span", "sitio");
   caja.appendChild(svg);
   // El rotulo NO es decoracion: sin el, un icono de cama es un jeroglifico.
-  caja.appendChild(el("span", "sitio-rotulo", ANCLAS[cual].rotulo));
+  var rotulo = ANCLAS[cual].rotulo;
+  // Cuanto lleva dentro es parte del hecho: «trabajando ahora» durante tres
+  // horas no es salud, es un bucle colgado. Se dice el numero, no se juzga.
+  if (cual === "trabajo") {
+    var s = TRABAJANDO[nombre];
+    if (typeof s === "number") rotulo += " · " + s + " s";
+  }
+  caja.appendChild(el("span", "sitio-rotulo", rotulo));
   return caja;
 }
 
@@ -213,7 +243,7 @@ function agente(nombre, a) {
     a.resultado || a.estado || "NO_DATA"));
   v.appendChild(el("span", "entrega",
     (a.cadencia || "cadencia NO_DATA") + " · próxima " + (a.proxima || "NO_DATA")));
-  var sitio = mueble(a, MEDIDO_EN);
+  var sitio = mueble(a, MEDIDO_EN, nombre);
   if (sitio) v.appendChild(sitio);
   // El bocadillo: lo que el bucle dijo de si mismo en su ultimo latido.
   if (a.nota_latido) v.appendChild(el("span", "bocadillo", a.nota_latido));
@@ -504,6 +534,15 @@ function refrescar() {
     // Antes de pintar nada: cuando se midio esto. Sin esta linea, V3 juzgaria
     // las citas contra el reloj del navegador.
     MEDIDO_EN = typeof d.epoch === "number" ? d.epoch : null;
+    // `trabajando` se sirve al vuelo, asi que se relee en CADA refresco. Si
+    // viene NO_DATA se deja en null y las anclas vuelven a juzgar por la cita.
+    var tr = d.trabajando;
+    if (tr && tr.estado === "OK" && tr.ocupados) {
+      TRABAJANDO = {};
+      tr.ocupados.forEach(function (o) { TRABAJANDO[o.bucle] = o.desde_hace_s; });
+    } else {
+      TRABAJANDO = null;
+    }
     var c = d.componentes || {};
     pintarHud(d);
     pintarCielo(c);

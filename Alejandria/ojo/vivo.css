@@ -242,6 +242,11 @@ footer p{margin:.25rem 0}
   transition:transform .35s ease,opacity .35s ease}
 .mueble.en-cama{color:var(--violeta-txt)}
 .mueble.en-hielo{color:var(--stop,#e0554e);transform:translateY(-1px)}
+/* Trabajando: el UNICO estado de los tres que describe movimiento, y el unico
+   que gira. Verde porque es salud --el bucle esta haciendo su trabajo-- y
+   lento porque el giro tiene que leerse como «esta vivo», no como «corre». */
+.mueble.en-trabajo{color:var(--go,#5bbd7a);animation:gira 4s linear infinite}
+@keyframes gira{to{transform:rotate(360deg)}}
 .sitio-rotulo{font-size:.68rem;color:var(--tenue,#8b8b96);font-family:var(--mono)}
 
 /* Quien pide quietud no recibe movimiento. Mover sprites es movimiento por
@@ -249,4 +254,7 @@ footer p{margin:.25rem 0}
    acortarla: media animacion sigue siendo animacion. */
 @media (prefers-reduced-motion: reduce){
   .mueble{transition:none}
+  /* Quien pide menos movimiento no quiere un engranaje girando en bucle. El
+     color sigue diciendo lo mismo sin moverse. */
+  .mueble.en-trabajo{animation:none}
 }

@@ -34,6 +34,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sqlite3
 import sys
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -41,6 +42,9 @@ from pathlib import Path
 
 AQUI = Path(__file__).resolve().parent
 ESTADO = AQUI.parent / "estado.json"
+# El libro de latidos de los bucles. Vive fuera del repo, en el mismo sitio al
+# que se mudo la memoria del producto.
+LOOPS = Path.home() / ".preceptoros" / "loops.db"
 
 ESTATICOS = {
     "/": ("ojo.html", "text/html; charset=utf-8"),
@@ -95,6 +99,52 @@ class Ojo(BaseHTTPRequestHandler):
             return self._json(200, {"estado": "NO_DATA",
                                     "causa": f"{type(e).__name__}"})
 
+    @staticmethod
+    def _trabajando():
+        """Que bucles estan DENTRO de una pasada ahora mismo.
+
+        POR QUE ESTO NO ROMPE LA REGLA «NO MIDE, PINTA»
+        -----------------------------------------------
+        Esa regla existe para que la consola no se cuelgue justo cuando el rack
+        cae: prohibe SONDAR el rack --red, ssh, subprocesos-- al pintar. Leer un
+        fichero SQLite local es de la misma familia que leer `estado.json` o
+        calcular la frescura al vuelo: no sale de esta maquina y no espera a
+        nadie. Se abre en `mode=ro` y con `timeout=0`: si otro proceso tiene el
+        libro tomado, esto devuelve NO_DATA en vez de quedarse esperando.
+
+        Y tiene que ser al vuelo, no del recolector: «esta corriendo AHORA» con
+        media hora de retraso no es el mismo hecho. Un bucle `oneshot` dura
+        segundos; si se sirviera desde `estado.json` la respuesta seria siempre
+        «ninguno», que es una respuesta falsa disfrazada de dato.
+
+        Ocupado = su ultimo latido es `entra`. Cuando sale, escribe `sale`.
+        """
+        if not LOOPS.exists():
+            return {"estado": "NO_DATA", "causa": f"no existe {LOOPS.name}",
+                    "remedio": "los bucles todavia no han latido en este nodo"}
+        try:
+            cx = sqlite3.connect(f"file:{LOOPS}?mode=ro", uri=True, timeout=0)
+            try:
+                filas = cx.execute("""
+                    SELECT l.bucle, l.evento, l.momento FROM latidos l
+                    JOIN (SELECT bucle, MAX(momento) m FROM latidos GROUP BY bucle) u
+                      ON u.bucle = l.bucle AND u.m = l.momento
+                """).fetchall()
+            finally:
+                cx.close()
+        except sqlite3.Error as e:
+            # La causa entera, no «error de base de datos»: `no such column`
+            # y `database is locked` son dos averias distintas y se arreglan
+            # de forma distinta.
+            return {"estado": "NO_DATA", "causa": f"{type(e).__name__}: {e}",
+                    "remedio": f"comprobar el esquema de {LOOPS.name}"}
+        ahora = time.time()
+        ocupados = [{"bucle": b, "desde_hace_s": int(ahora - m)}
+                    for b, ev, m in filas if ev == "entra"]
+        return {"estado": "OK", "ocupados": ocupados,
+                "vistos": len(filas),
+                "nota": "ocupado = su ultimo latido es `entra` y aun no hay `sale`"}
+
     def _json(self, codigo, datos):
         self._responder(codigo, json.dumps(datos, ensure_ascii=False),
                         "application/json; charset=utf-8")
@@ -120,6 +170,9 @@ class Ojo(BaseHTTPRequestHandler):
             # La frescura es un CAMPO, no un adorno de la pantalla: asi el
             # script y el panel no pueden discrepar sobre si el dato esta viejo.
             d["frescura_segundos"] = int(time.time() - d.get("epoch", 0))
+            # AL VUELO y no del recolector: ver `_trabajando`. Es el unico
+            # campo de esta respuesta que describe el instante en que se pide.
+            d["trabajando"] = self._trabajando()
             return self._json(200, d)
 
         if ruta == "/api/glosario":
