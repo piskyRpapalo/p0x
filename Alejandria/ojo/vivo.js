@@ -371,9 +371,37 @@ function barra(pct) {
   return b;
 }
 
-function pintarSotano(c) {
+function pintarSotano(c, vatios) {
   var caja = document.getElementById("sotano-cuerpo");
   vaciar(caja);
+
+  /* --- Lo que el rack esta chupando AHORA ------------------------------
+     `vatios` llega por ARGUMENTO y no como `c.consumo_w` porque `c` es
+     `d.componentes`, que es el SNAPSHOT del recolector, y esta cifra se mide
+     al servir. Meterla ahi la haria parecer tan vieja como el resto -- que es
+     justo el fallo que `ollama_vivo` documenta en ojo.py: dos hechos
+     distintos, dos sitios. La forma es la del paquete de metricas del
+     producto, asi que este bloque no aprende un segundo formato. */
+  var luz = el("article", "cuarto tribu-hexelion");
+  var hl = el("h3");
+  hl.appendChild(icono("i-rayo"));
+  hl.appendChild(el("span", null, "Consumo del rack"));
+  hl.appendChild(sello(vatios && vatios.estado === "MEDIDO" ? "OK" : "NO_DATA"));
+  luz.appendChild(hl);
+  var cl = el("div", "cuerpo");
+  if (vatios && vatios.estado === "MEDIDO" && typeof vatios.valor === "number") {
+    cl.appendChild(fila("ahora", vatios.valor + " " + (vatios.unidad || "W"), "ok"));
+    cl.appendChild(fila("fuente", vatios.como || "NO_DATA"));
+  } else {
+    // El hueco se pinta con SU causa, no con una generica. «El enchufe no
+    // contesta» y «el Ojo no contesta» son dos averias, y quien mira el panel
+    // tiene que poder distinguirlas sin abrir una terminal.
+    cl.appendChild(fila("ahora", nodata(
+      (vatios && vatios.causa) || "el Ojo no devolvio `consumo_w`")));
+    if (vatios && vatios.detalle) cl.appendChild(fila("detalle", vatios.detalle));
+  }
+  luz.appendChild(cl);
+  caja.appendChild(luz);
 
   var disco = el("article", "cuarto tribu-hexelion");
   var hd = el("h3");
@@ -551,7 +579,7 @@ function refrescar() {
     vaciar(izq); vaciar(der);
     ALA_IZQ.forEach(function (p) { izq.appendChild(cuarto(p, c)); });
     ALA_DER.forEach(function (p) { der.appendChild(cuarto(p, c)); });
-    pintarSotano(c);
+    pintarSotano(c, d.consumo_w);
     seleccionable();          // los cuartos nuevos tambien se pueden mirar
   });
   traer("/api/acta").then(pintarActa);

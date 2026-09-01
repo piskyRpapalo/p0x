@@ -189,11 +189,28 @@
    "fuente": "medicion directa 2026-09-01"
   },
   {
-   "termino": "los LoRA no son un bloqueante",
+   "termino": "el Beelink SI entrena LoRAs",
    "estado": "OK",
-   "que_hace": "Los adaptadores `preceptor-v7` y `preceptor-v7-linea-b` DESAPARECIERON del rack, y el catalogo de la web seguia declarandolos servidos. La leccion quedo en el diseno: SERVIR y ESTAR AFINADO son dos hechos distintos, y `hub.json` ya los separa en `real.modelo` (con que se contesta hoy) y `real.afinado` (el LoRA, null si no hay). Un companero puede servir sobre modelo base; el afinado mejora el papel y no es requisito. Entrenar LoRAs aqui NO es viable: ROCm no soporta gfx1103 y no hay CUDA — el entrenamiento sale del rack, y volver a entrenarlos es decision del Soberano, anotada en PENDIENTES.",
-   "donde_verlo": "cd ~/preceptoros-web && python3 -c \"import json; d=json.load(open('public/hub.json')); print([(a['id'], a['real']) for a in d['agentes'][:2]])\"",
-   "fuente": "preceptoros-web/public/hub.json · mente/feedback/PENDIENTES.md"
+   "que_hace": "Entrenar LoRAs en este nodo SI es viable, y esta hecho: `torch 2.13.0+cpu` + `peft 0.20.0` en `~/.venvs/aurelius-forja`, CPU pura, `cuda.is_available()` False. Los adaptadores `v7-linea-a` y `v7-linea-b` salieron el 29 ago 2026 de `~/p0x/preceptor-lora/salida/`: rank 16, alpha 32, 2 epocas, 93 ejemplos de tren y 16 de validacion. MEDIDO: 553 s la linea A y 445 s la linea B — bajo diez minutos, no veinte ni treinta. Que no haya CUDA y que ROCm no soporte gfx1103 impide SERVIR un 27B por GPU; no impide AFINAR un 3B por CPU. Son dos hechos distintos y estuvieron confundidos en este glosario.",
+   "donde_verlo": "tail -4 ~/p0x/preceptor-lora/entrenamiento-v7-linea-a.log && ~/.venvs/aurelius-forja/bin/python -c \"import torch;print(torch.__version__, torch.cuda.is_available())\"",
+   "fuente": "preceptor-lora/salida/v7-linea-a/informe.json · entrenamiento-v7-linea-a.log:553s · salida/v7-linea-b.log:445s",
+   "nota": "Esta entrada decia lo contrario hasta el 2026-09-01 y era FALSA: heredaba «no hay CUDA» de la decision de servir y la aplicaba a entrenar. La correccion la firmo el Soberano y la confirmo la maquina. Lo que SI sigue en pie es la separacion de `hub.json`: `real.modelo` (con que se contesta) y `real.afinado` (el LoRA, null si no hay) son dos hechos, y un companero puede servir sobre modelo base. `preceptor-v7:latest` vuelve a estar en `ollama list` (2,0 GB). DEUDA: `mente/feedback/PENDIENTES.md:1290` repite la version falsa."
+  },
+  {
+   "termino": "Nous A1T",
+   "estado": "OK",
+   "que_hace": "El enchufe medidor del rack, con firmware Tasmota en 192[.]168[.]50[.]162. Se le pide `GET /cm?cmnd=Status+8` y devuelve `StatusSNS.ENERGY.Power` en vatios: el consumo instantáneo de todo lo que cuelga de él. Es la única cifra física del panel que no sale de /sys ni de /proc — cruza la LAN, y por eso lleva `timeout=2` y devuelve NO_DATA con causa si no contesta.",
+   "donde_verlo": "curl -s 'http://192[.]168[.]50[.]162/cm?cmnd=Status+8'",
+   "fuente": "preceptor/metricas.py:_consumo_w · Alejandria/ojo/ojo.py:_consumo · /api/rack → clave `consumo_w`",
+   "nota": "NO entra en `paquete()` de METRICAS_NORMA a propósito: los once campos comparan PAQUETES DE MODELO entre máquinas, y el vatiaje describe el rack. Meterlo dentro rompería la comparación con cualquier máquina sin enchufe."
+  },
+  {
+   "termino": "99% solar",
+   "estado": "OK",
+   "que_hace": "El rack se alimenta de la instalación fotovoltaica del Soberano. Es una condición DECLARADA, no medida por este nodo: el Nous A1T mide cuántos vatios se gastan, no de dónde vienen. Las dos cifras se leen juntas y son distintas — `consumo_w` es medida, el origen solar es declaración.",
+   "donde_verlo": "curl -s http://127.0.0.1:9000/api/rack | python3 -m json.tool | grep -A4 consumo_w",
+   "fuente": "declaración del Soberano · el vatiaje sale de [Nous A1T]",
+   "nota": "Para que el origen fuera MEDIDO haría falta un sensor en el lado de generación (inversor o medidor DC), no en el enchufe. Mientras no lo haya, la web dice «servido por IA 99% solar» como declaración de quien monta el rack, y así queda escrito."
   }
  ]
 }

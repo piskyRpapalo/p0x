@@ -54,6 +54,13 @@ OLLAMA = "http://127.0.0.1:11434"
 # Por encima de esto, un snapshot deja de poder leerse como «lo que hay».
 RANCIO_S = 3600
 
+# El modulo de metricas del producto, cargado POR RUTA y no por sys.path. Meter
+# `~/p0x/preceptor` entero en el path importaria de paso sesenta modulos que
+# esta consola no usa, y algunos se llaman como los de aqui (`estado`,
+# `mensajes`): la primera colision seria un import silencioso del fichero
+# equivocado. Solo stdlib al otro lado, asi que cargarlo es barato.
+METRICAS_PY = Path.home() / "p0x" / "preceptor" / "metricas.py"
+
 ESTATICOS = {
     "/": ("ojo.html", "text/html; charset=utf-8"),
     # El Ojo-Vivo convive con la consola de texto en vez de sustituirla: la
@@ -185,6 +192,37 @@ class Ojo(BaseHTTPRequestHandler):
                 "vistos": len(filas),
                 "nota": "ocupado = su ultimo latido es `entra` y aun no hay `sale`"}
 
+    @staticmethod
+    def _consumo():
+        """Los vatios del rack, del enchufe, ahora.
+
+        DECLARADO: esto SI es una sonda de red, y la regla 2 de la cabecera
+        dice «no mide, pinta». La excepcion se abre a proposito y se acota
+        igual que `_modelos_vivos`: `timeout=2` dentro del propio modulo,
+        NO_DATA con causa si no contesta, y jamas una espera larga. El motivo
+        es que el consumo no lo escribe nadie en `estado.json`: o se pide aqui
+        o no existe. Si algun dia el recolector lo escribe, esta funcion sobra
+        y se retira -- ese es el sitio correcto y este es el atajo honesto.
+
+        Se importa por ruta y en el momento de servir, no al arrancar: que
+        falte el modulo del producto no puede tumbar la consola del rack.
+        """
+        if not METRICAS_PY.exists():
+            return {"clave": "consumo_w", "estado": "NO_DATA", "valor": None,
+                    "unidad": "W",
+                    "causa": f"no existe {METRICAS_PY}",
+                    "remedio": "el modulo de metricas vive en el repo del producto"}
+        try:
+            import importlib.util
+            spec = importlib.util.spec_from_file_location("p0x_metricas", METRICAS_PY)
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            return mod._consumo_w()
+        except Exception as e:                     # noqa: BLE001
+            return {"clave": "consumo_w", "estado": "NO_DATA", "valor": None,
+                    "unidad": "W",
+                    "causa": f"metricas.py no se pudo cargar: {type(e).__name__}: {e}"}
+
     def _json(self, codigo, datos):
         self._responder(codigo, json.dumps(datos, ensure_ascii=False),
                         "application/json; charset=utf-8")
@@ -217,6 +255,11 @@ class Ojo(BaseHTTPRequestHandler):
             # esta clave no lo es, y por eso va aparte en vez de pisar
             # `componentes.ollama.nombres`: dos hechos distintos, dos sitios.
             d["ollama_vivo"] = self._modelos_vivos()
+            # El vatiaje, tambien EN VIVO y por el mismo motivo que los modelos:
+            # el snapshot no lo trae. Va en su propia clave, con la forma de
+            # metrica del producto (estado/valor/unidad/como o causa), para que
+            # el panel no tenga que aprender un segundo formato.
+            d["consumo_w"] = self._consumo()
             # Un snapshot rancio deja de poder leerse como «lo que hay». Se
             # dice con una palabra, al lado de los segundos, porque nadie mira
             # un entero de seis cifras y calcula horas de cabeza. Me paso a mi.
