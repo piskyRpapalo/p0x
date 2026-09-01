@@ -458,6 +458,65 @@ class OjoVivoV2(unittest.TestCase):
         self.assertNotIn("is-active", codigo)
 
 
+class OjoVivoV3(unittest.TestCase):
+    """V3 · el MOBILIARIO es la ubicacion: cada bucle se pinta donde esta.
+
+    V1 puso el borde (tribu), V2 la mascara (estado). V3 mueve: un bucle que
+    espera su cita se dibuja en la cama; uno que se paso la hora, congelado.
+    """
+
+    def setUp(self):
+        self.css = (CONSOLA / "vivo.css").read_text(encoding="utf-8")
+        self.js = (CONSOLA / "vivo.js").read_text(encoding="utf-8")
+        self.html = (CONSOLA / "vivo.html").read_text(encoding="utf-8")
+        self.codigo = re.sub(r"/\*.*?\*/", "", self.js, flags=re.S)
+        self.codigo = re.sub(r"(?m)//.*$", "", self.codigo)
+
+    def test_la_cita_se_juzga_contra_la_MEDIDA_y_no_contra_el_reloj(self):
+        """El error de los cuatro rojos que no existian, otra vez a la puerta.
+
+        `estado.json` puede tener horas de antiguedad --ahora mismo 35-- y sus
+        `proxima` quedan atras solo porque nadie ha vuelto a medir. Comparar
+        contra `Date.now()` marcaria TODOS los bucles como congelados y la
+        averia seria de la medicion, no del rack. Se compara contra `epoch`,
+        que es el instante en que se midio.
+        """
+        self.assertIn("epoch", self.codigo,
+                      "V3 no usa el instante de la medida")
+        self.assertNotIn("Date.now()", self.codigo,
+                         "V3 juzga contra el reloj de pared: fabricara "
+                         "congelados que son antiguedad del snapshot")
+
+    def test_las_dos_anclas_observables_existen_y_se_usan(self):
+        for sym in ("i-cama", "i-hielo"):
+            with self.subTest(symbol=sym):
+                self.assertIn(sym, self.html, "el sprite no trae " + sym)
+                self.assertIn(sym, self.codigo, sym + " esta dibujado y no se usa")
+
+    def test_trabajando_no_se_finge(self):
+        """`busy` no es observable con lo que la API da hoy.
+
+        Un bucle `Type=oneshot` corre en segundos y la consola sondea cada
+        pocos: no hay campo que diga «esta corriendo ahora». Inventar esa
+        ubicacion seria pintar un movimiento que nadie midio. El ancla se
+        declara y se deja vacia, con su causa.
+        """
+        self.assertIn("NO_OBSERVABLE", self.js,
+                      "el ancla de trabajo no se declara como no observable")
+
+    def test_el_movimiento_respeta_a_quien_pide_quietud(self):
+        """Mover sprites es movimiento, y hay quien no puede con el."""
+        self.assertIn("prefers-reduced-motion", self.css)
+
+    def test_ninguna_ubicacion_esta_escrita_a_mano(self):
+        """Cero hardcodeo: la ubicacion sale del dato o no sale."""
+        for nombre in ("guardian", "curador", "afinador"):
+            with self.subTest(bucle=nombre):
+                self.assertNotIn('"' + nombre + '"', self.codigo,
+                                 "hay un bucle nombrado en el codigo: la "
+                                 "ubicacion tiene que salir del JSON")
+
+
 class ElOjoSeComprueba(unittest.TestCase):
     """`ojo.py --check`: decir si el Ojo puede servir, SIN levantarlo.
 

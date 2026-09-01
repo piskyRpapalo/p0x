@@ -228,3 +228,25 @@ footer p{margin:.25rem 0}
    y movería el refugio entero al elegir un cuarto -- y ademas el borde ya
    esta ocupado diciendo la tribu. */
 .cuarto:focus-visible,.cuarto.sel{outline:2px solid var(--sol);outline-offset:2px}
+
+/* === V3 · el mobiliario ==================================================
+   La ubicacion se pinta como un sitio: el mueble y su rotulo. El rotulo NO es
+   redundante -- un icono de cama sin palabra es un jeroglifico, y esta consola
+   la lee alguien a las tres de la manana buscando por que algo no corrio. */
+.sitio{display:flex;align-items:center;gap:.35rem;margin:.25rem 0 0 1.3rem}
+.mueble{width:16px;height:16px;flex:none;
+  image-rendering:pixelated;shape-rendering:crispEdges;
+  /* El movimiento entre anclas se anima: lo que se ve moverse se recuerda.
+     `transform` y `opacity` y nada mas -- son las dos que el compositor puede
+     mover sin volver a maquetar la pagina entera. */
+  transition:transform .35s ease,opacity .35s ease}
+.mueble.en-cama{color:var(--violeta-txt)}
+.mueble.en-hielo{color:var(--stop,#e0554e);transform:translateY(-1px)}
+.sitio-rotulo{font-size:.68rem;color:var(--tenue,#8b8b96);font-family:var(--mono)}
+
+/* Quien pide quietud no recibe movimiento. Mover sprites es movimiento por
+   mucho que sean 16 px, y aqui se apaga la transicion entera en vez de
+   acortarla: media animacion sigue siendo animacion. */
+@media (prefers-reduced-motion: reduce){
+  .mueble{transition:none}
+}
