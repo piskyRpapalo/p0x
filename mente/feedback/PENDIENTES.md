@@ -1306,3 +1306,46 @@ Y dos que no son físicos, salieron midiendo y no entraban en esta puerta:
   Thinking. `qwen3-coder-30b:latest` es el nombre real que da `ollama list`, y
   con `think:false` respondió sin razonar, así que hoy no muerde. Pero fijarle
   un tag explícito lo dejaría fuera de duda.
+
+## Misión Ágora · Comunidad, Perfil y la cara de la marca (2026-09-02)
+
+- **P5-1 · `counters.json` sigue teniendo dos dueños, y hoy se salvó por poco.**
+  (Coste S.) La avería declarada RED en el glosario no se ha arreglado: sigue
+  dependiendo de correr `coherencia-publica.py --si` DESPUÉS de `contadores.py`
+  y con los gates en verde. Hoy funcionó porque se corrió en ese orden a
+  propósito. Lo que lo cerraría de verdad es un test que falle si `contadores.py`
+  y `coherencia-publica.py` declaran alguna clave en común — hoy la separación
+  vive en un comentario, no en una comprobación.
+
+- **P5-2 · El perfil no puede ir a ningún sitio, y esa es su única deuda real.**
+  (Coste M.) `profile.html` está completo salvo en lo único que necesita otro
+  extremo: biografía, avatar y firma se quedan en IndexedDB porque el Ágora no
+  publica endpoint de perfiles. Es el mismo hueco que tumba `/api/v1/threads`
+  (404 medido el 2026-08-30) y el mismo que declaran los dos anuncios. Un solo
+  endpoint en `agora_api` de la-fragua desbloquea las tres cosas a la vez.
+
+- **P5-3 · Los avatares no llegan al Ojo-Vivo ni al busto de la app.** (Coste M.)
+  Los 8 bustos ya están sincronizados en los dos productos, pero quien elige
+  «Halo» en la web sigue viendo el mismo mármol de siempre en el tablero de la
+  app: `dashboard.css` tiene la tira `aurelius-up.png` horneada y el Ojo-Vivo
+  pinta un `<symbol>` SVG. Elegir avatar solo pinta en la web.
+
+- **P5-4 · El corazón como guiño de la intro está pendiente, y cuesta más de lo
+  que parece.** (Coste M.) `busto-corazon` es el fotograma que cierra el
+  despertar y el sitio natural es el telón de la app. Pero el telón anima
+  `aurelius-up.png` con `steps(4)` sobre el 400 % del ancho, y esa MISMA tira
+  la usa el busto del tablero parándose en el tercer fotograma: meter un quinto
+  rompe la aritmética de los dos. Hay que rehacer la tira y las dos reglas CSS
+  a la vez, o darle al telón una tira propia y aceptar que dejan de ser una
+  sola verdad.
+
+- **P5-5 · Los iconos de la app y los de la web eran distintos y nadie lo sabía.**
+  (Coste S, ya hecho — queda cronificarlo.) Diferían en bytes (103599 contra
+  104238) sin que ninguna comprobación lo mirara. Ahora `iconos.py --comprobar`
+  los ata a los siete, pero NO lo corre ningún gate: hoy hay que acordarse. El
+  sitio natural es el afinador, y crear esa unidad exige firma.
+
+- **P5-6 · `hitos.html` es la única página sin traducir de las ocho.** (Coste S.)
+  Vive en la raíz y solo existe en español, aunque el pie de `/en/` y `/fr/`
+  la enlaza como «Milestones» y «Jalons». Está en el sitemap sin alternativas
+  de idioma porque es la verdad: no las tiene.
