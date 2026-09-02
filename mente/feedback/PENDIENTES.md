@@ -1349,3 +1349,74 @@ Y dos que no son físicos, salieron midiendo y no entraban en esta puerta:
   Vive en la raíz y solo existe en español, aunque el pie de `/en/` y `/fr/`
   la enlaza como «Milestones» y «Jalons». Está en el sitemap sin alternativas
   de idioma porque es la verdad: no las tiene.
+
+---
+
+## Misión 3 · Refactor App MVP (2026-09-02)
+
+Cierra dos de las de arriba y abre seis. Commits `73cf415..90b1729` en
+`~/p0x/preceptor`. Gates al cerrar: `bin/pruebas` 588/588 · 40 suites ·
+`pytest` 482 passed, 188 subtests.
+
+**P5-4 queda CERRADA.** Era exactamente el problema descrito: «el telón anima
+`aurelius-up.png` con `steps(4)` y esa misma tira la usa el busto parándose en
+el tercero; meter un quinto rompe la aritmética de los dos». Se rehizo la tira
+entera (`preceptor-up-v2.webp`, ocho fotogramas) y las dos reglas a la vez,
+manteniendo una sola verdad. `busto-corazon` es ahora el fotograma 6.
+
+**P5-3 queda a medias, y la mitad que falta es la que importa.** La app ya
+tiene selector de avatar (Perfil → Tu cara, ocho bustos, persistido en SQLite),
+pero el busto del tablero sigue animando la tira y no la cara elegida. Ver
+P6-1.
+
+- **P6-1 · El avatar elegido no manda sobre el busto del tablero.** (Coste M.)
+  La persona elige «Halo» en Perfil y el busto sigue recorriendo la tira. Para
+  que mande hace falta que `.busto` acepte una cara fija como estado, y ahí
+  choca con el despertar y con el bucle de la boca: las tres quieren escribir
+  `background-image` sobre el mismo elemento. La salida limpia probablemente
+  sea separar «la cara» de «la animación» en dos capas apiladas, no encadenar
+  más `!important`.
+
+- **P6-2 · `cara.py` sigue con la tira de cuatro, y no por descuido.** (Coste
+  M.) Sus dos hojas comparten un `background-size: 400% 100%` y un `.marco` con
+  `aspect-ratio: 3/4`; los fotogramas nuevos son cuadrados. Meter la tira de
+  ocho ahí estiraría los bustos un 33 % en vertical. Hace falta una hoja
+  `talks` cuadrada que haga juego — y entre los ocho bustos nuevos **no hay
+  ninguna posición de boca**, así que ese material aún no existe. Es una tarea
+  de arte antes que de código.
+
+- **P6-3 · Nada corre el gate al hacer commit; el hook depende de la sesión.**
+  (Coste S.) `deploy/soberano/hooks/gate.sh` es un hook de Claude Code: protege
+  cuando hay una sesión de IA escribiendo, y no protege cuando el Soberano edita
+  a mano. Un `pre-commit` en `~/p0x/preceptor/.git/hooks` que llame al mismo
+  script cerraría el flanco. No lo he puesto: crear algo que se ejecuta solo
+  exige firma.
+
+- **P6-4 · La regla de mayúsculas de `interface/` no avisa, castiga.** (Coste
+  S.) `test_guardrails` prohíbe toda palabra de cinco o más mayúsculas
+  seguidas en `.html/.css/.js`, y la prosa de los comentarios la dispara: me
+  costó **cinco** rojos en esta misión. Peor: ya había causado un fallo real —
+  alguien escribió la marca de ausencia con otras mayúsculas para esquivarla y
+  la comparación dejó de acertar (arreglado en `a630bd2`). El mensaje del test
+  debería decir «en `interface/` no se escriben palabras en mayúsculas; usa la
+  frase para enfatizar», no solo «no es una política».
+
+- **P6-5 · El armazón cacheado no incluye ninguna imagen.** (Coste S.) `sw.js`
+  precachea el `.html`, el `.css`, el `.js` y el `compass.svg`, pero ni el
+  sprite del busto ni los ocho avatares. Sin conexión, la cara del producto no
+  se dibuja. Añadir `preceptor-up-v2.webp` son 464 KB de instalación: es una
+  decisión de presupuesto, no un descuido, y por eso se anota en vez de
+  hacerse.
+
+- **P6-6 · `dashboard.css:249` tiene una llave huérfana desde antes de esta
+  misión.** (Coste S.) Un comentario describe una animación de parpadeo del ojo
+  («una vez por minuto, `steps(2)`, del blueprint del rack») y debajo hay un
+  `}` suelto sin regla. La animación no existe: o se escribe, o se borra el
+  comentario que promete algo que no está.
+
+- **P6-7 · La casa no se puede redirigir por entorno, y eso encarece cada
+  prueba.** (Coste M.) `casa.raiz()` cuelga de `Path.home()` sin variable de
+  escape, así que probar cualquier cosa que toque el registro del cerebro o la
+  huella obliga a lanzar el proceso entero con `HOME` cambiado. Una variable
+  del tipo `PRECEPTOROS_CASA`, leída solo por `casa.py`, haría de esto un
+  parámetro en vez de una maniobra.
