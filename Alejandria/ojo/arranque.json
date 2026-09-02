@@ -1,8 +1,36 @@
 {
  "titulo": "Arranque de sesion · lee esto ANTES de tocar nada",
  "para_quien": "Cualquier IA que abra sesion en soberano: Claude Code, cc-local o una voz del Sinodo. Es el nexo de arranque, no un resumen de cortesia.",
- "medido": "2026-09-01",
+ "medido": "2026-09-02",
  "primer_comando": "curl -s http://127.0.0.1:8790/api/arranque | python3 -m json.tool   # o: python3 ~/p0x/Alejandria/ojo/ojo.py --arranque",
+ "cargar_partida": {
+  "que_es": "El save game. Cuatro pilares que NO se deducen del codigo y que una sesion fria da por supuestos si nadie se los dice, mas la mision siguiente y las trampas que ya han mordido a otro. El texto no vive aqui: vive en el glosario, y esto solo dice CUALES. Si un termino de estas listas desaparece del glosario, la respuesta trae NO_DATA con su nombre en vez de callarse.",
+  "los_cuatro_pilares": [
+   "Doctrina Caza-Nido",
+   "Arquitectura de 3 Capas",
+   "La Verdad del Silicio",
+   "Bug LoRA Thinking (qwen3:4b) · BLOQUEANTE"
+  ],
+  "de_donde_vienes": "SAVE GAME · lo que hizo la sesion del 2026-09-02",
+  "a_donde_vas": "SIGUIENTE MISION · refactor de la App MVP",
+  "lo_que_te_va_a_morder": [
+   "La Necropolis · lo que ya se mato, y por que",
+   "Donde el inventario de Gemini NO cuadra con el rack",
+   "los repos, y no son tres",
+   "Los repos en GitHub, y cuales son PUBLICOS",
+   "el gate corre solo, en un hook",
+   "los dos techos de la web",
+   "el service worker te ensena codigo viejo",
+   "el cache del navegador, hermano del service worker",
+   "no hay cwebp en este nodo (ni ImageMagick)",
+   "gate",
+   "NO_DATA"
+  ],
+  "y_para_eso_lee": [
+   "El Camino (The Path) y La Brujula (The Compass)",
+   "El rack fisico completo (Le Jardin, Lisboa)"
+  ]
+ },
  "donde_estas": {
   "nodo": "soberano · Beelink Ryzen 7 255 · 64 GB · Radeon 780M · sin CUDA",
   "eres": "el ejecutor. La doctrina la valida el Preceptor fuera del rack: despliegas, no reescribes por iniciativa.",

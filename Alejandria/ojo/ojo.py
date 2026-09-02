@@ -75,6 +75,7 @@ ESTATICOS = {
     "/glosario.js": ("glosario.js", "application/javascript; charset=utf-8"),
     "/grafo.js": ("grafo.js", "application/javascript; charset=utf-8"),
     "/arranque.js": ("arranque.js", "application/javascript; charset=utf-8"),
+    "/partida.js": ("partida.js", "application/javascript; charset=utf-8"),
     "/acta.js": ("acta.js", "application/javascript; charset=utf-8"),
     "/digesto.js": ("digesto.js", "application/javascript; charset=utf-8"),
 }
@@ -229,6 +230,42 @@ class Ojo(BaseHTTPRequestHandler):
                     "causa": f"metricas.py no se pudo cargar: {type(e).__name__}: {e}"}
 
     @staticmethod
+    def _partida(arranque, glosario):
+        """El save game: los terminos que nombra `arranque.json`, con su texto.
+
+        UN TERMINO QUE NO ESTA NO SE CALLA. Si alguien renombra una entrada del
+        glosario, aqui sale `{"falta": "<el nombre>"}` en el sitio donde iba, y
+        la sesion que arranca ve el hueco. La alternativa --filtrar y seguir--
+        deja una partida con tres pilares que parece completa, que es el modo
+        de fallo que este panel entero existe para no tener.
+        """
+        plan = (arranque or {}).get("cargar_partida")
+        if not isinstance(plan, dict):
+            return {"estado": "NO_DATA",
+                    "causa": "arranque.json no declara `cargar_partida`",
+                    "remedio": "anadirlo con los terminos del glosario que "
+                               "una sesion fria no puede deducir del codigo"}
+
+        por_termino = {e.get("termino"): e
+                       for e in (glosario or {}).get("entradas", [])}
+
+        def traer(nombre):
+            return por_termino.get(nombre) or {
+                "falta": nombre,
+                "causa": "ese termino ya no esta en glosario.json",
+                "remedio": "renombrarlo en arranque.json o devolverlo al glosario"}
+
+        def lista(clave):
+            return [traer(n) for n in plan.get(clave, [])]
+
+        return {"que_es": plan.get("que_es"),
+                "los_cuatro_pilares": lista("los_cuatro_pilares"),
+                "de_donde_vienes": traer(plan.get("de_donde_vienes")),
+                "a_donde_vas": traer(plan.get("a_donde_vas")),
+                "y_para_eso_lee": lista("y_para_eso_lee"),
+                "lo_que_te_va_a_morder": lista("lo_que_te_va_a_morder")}
+
+    @staticmethod
     def _arranque():
         """LA PUERTA DE ENTRADA. Una sola peticion y una sesion fria sabe donde
         esta, que reglas la atan, que tiene a mano y como esta el rack AHORA.
@@ -253,8 +290,22 @@ class Ojo(BaseHTTPRequestHandler):
             except (OSError, ValueError) as e:
                 return {"estado": "NO_DATA", "causa": f"{nombre}: {type(e).__name__}"}
 
+        arranque = leer(ARRANQUE, "arranque.json")
+
+        # LA PARTIDA VA PRIMERA, Y RESUELTA. `arranque.json` solo NOMBRA los
+        # terminos; el texto vive en el glosario y se trae aqui ya montado.
+        #
+        # Por que resuelto y no un indice: una sesion a la que se le entrega
+        # una lista de nombres tiene que hacer una segunda peticion, y la
+        # segunda peticion no se hace -- se supone. Es la misma razon por la
+        # que esta ruta existe en vez de cuatro.
+        #
+        # Por que del glosario y no copiado aqui: el glosario ya llego a tener
+        # la Doctrina Caza-Nido escrita TRES VECES con tres redacciones. Una
+        # copia mas en este fichero seria la cuarta, y la que nadie mira.
         d = {"esquema": 1,
-             "lee_esto_primero": leer(ARRANQUE, "arranque.json"),
+             "cargar_partida": Ojo._partida(arranque, leer(GLOSARIO, "glosario.json")),
+             "lee_esto_primero": arranque,
              "lo_que_tienes_a_mano": leer(RECURSOS, "recursos.json")}
 
         # LAS FRONTERAS, DERIVADAS DEL MAPA Y NO COPIADAS A MANO. Son las

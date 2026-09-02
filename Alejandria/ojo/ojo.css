@@ -101,3 +101,26 @@ details.vista[open]>summary::before{content:"▾ "}
 .glos-cmd{background:var(--nx-void-hondo);border:1px solid var(--bronce);
   border-radius:6px;padding:.5rem;font-size:.74rem;overflow-x:auto;
   white-space:pre-wrap;word-break:break-all}
+
+/* --- CARGAR PARTIDA · el save game -------------------------------------- */
+/* Marco violeta y no bronce: en esta consola el bronce es «seccion» y el
+   violeta es «esto es lo tuyo». Se distingue del resto por el color del canto
+   y por ir primero, no por ser mas grande — el tamano lo decide el texto. */
+.partida{margin-top:1.2rem;border:1px solid var(--violeta);border-radius:10px;
+  padding:1rem 1.1rem;background:rgba(109,90,224,.06)}
+.partida>h2{margin-top:0;color:var(--violeta-claro)}
+.partida-rotulo{color:var(--bronce-claro);font-size:.78rem;letter-spacing:.12em;
+  text-transform:uppercase;margin:1.4rem 0 .6rem;
+  border-bottom:1px solid rgba(120,98,76,.35);padding-bottom:.3rem}
+.pilar{margin:0 0 1.1rem}
+.pilar:last-child{margin-bottom:0}
+.pilar h3,.pilar h4{margin:0 0 .35rem;font-size:.95rem;color:var(--violeta-claro)}
+.pilar p{margin:.3rem 0;font-size:.9rem;line-height:1.5}
+.pilar pre{margin:.5rem 0 .3rem;font-size:.8rem;white-space:pre-wrap;
+  word-break:break-word}
+.pilar-fuente{font-size:.78rem}
+/* El estado va como etiqueta y NO solo como color: quien no distingue el rojo
+   del verde tiene que poder leer RED igual que lo lee todo el mundo. */
+.pilar-estado{font-size:.68rem;letter-spacing:.1em;border:1px solid currentColor;
+  border-radius:3px;padding:.05rem .3rem;vertical-align:middle}
+.pilar-falta{border-left:3px solid var(--red);padding-left:.7rem}

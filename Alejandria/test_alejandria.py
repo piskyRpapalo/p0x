@@ -629,6 +629,130 @@ class ElGlosario(unittest.TestCase):
                         "hay piezas medidas como no construidas")
 
 
+class CargarPartida(unittest.TestCase):
+    """El save game: los cuatro pilares que una sesion fria da por supuestos.
+
+    Existe por una averia concreta y medida: la Doctrina Caza-Nido llego a
+    estar escrita TRES VECES en glosario.json con tres redacciones distintas, y
+    nadie lo vio porque el glosario vive plegado al final de la consola. Tres
+    verdades sobre el mismo hecho es lo que esta capa entera existe para
+    impedir, y se colo en la capa misma.
+    """
+
+    def setUp(self):
+        self.arranque = json.loads((CONSOLA / "arranque.json").read_text(encoding="utf-8"))
+        self.glosario = json.loads((CONSOLA / "glosario.json").read_text(encoding="utf-8"))
+        self.plan = self.arranque.get("cargar_partida")
+
+    def _nombres(self):
+        p = self.plan
+        return (list(p.get("los_cuatro_pilares", []))
+                + list(p.get("lo_que_te_va_a_morder", []))
+                + list(p.get("y_para_eso_lee", []))
+                + [p.get("de_donde_vienes"), p.get("a_donde_vas")])
+
+    def test_el_arranque_declara_la_partida(self):
+        self.assertIsInstance(self.plan, dict,
+                              "arranque.json no declara `cargar_partida`")
+        self.assertEqual(4, len(self.plan.get("los_cuatro_pilares", [])),
+                         "los pilares no son cuatro")
+
+    def test_cada_termino_de_la_partida_existe_en_el_glosario(self):
+        """Un nombre que no resuelve deja un hueco en la puerta de entrada.
+
+        Y el hueco es silencioso si nadie lo comprueba: la API devuelve
+        `{falta: ...}` en su sitio, que se ve -- pero solo si alguien abre la
+        pagina. Esto lo cae en el commit que renombra la entrada.
+        """
+        tiene = {e.get("termino") for e in self.glosario["entradas"]}
+        for nombre in self._nombres():
+            with self.subTest(termino=nombre):
+                self.assertIn(nombre, tiene,
+                              f"`{nombre}` esta en arranque.json y no en el glosario")
+
+    def test_el_glosario_no_repite_ningun_termino(self):
+        """La averia que origina esta clase, convertida en gate."""
+        import collections
+        c = collections.Counter(e.get("termino") for e in self.glosario["entradas"])
+        repetidos = sorted(k for k, v in c.items() if v > 1)
+        self.assertEqual([], repetidos,
+                         f"terminos repetidos en el glosario: {repetidos}. "
+                         "Dos redacciones del mismo hecho divergen; fundelas.")
+
+    def test_cada_entrada_de_la_partida_ensena_como_verse(self):
+        """La regla de esta consola, aplicada a lo que mas se lee.
+
+        «Si no hay comando que lo enseñe, no es conocimiento, es una creencia»
+        -- lo dice la entrada del propio glosario. Los pilares son justo lo que
+        una sesion va a creerse sin comprobar, asi que aqui no es opcional.
+        """
+        por_termino = {e.get("termino"): e for e in self.glosario["entradas"]}
+        for nombre in self._nombres():
+            e = por_termino.get(nombre)
+            if e is None:
+                continue          # ya lo cae el test de arriba
+            with self.subTest(termino=nombre):
+                self.assertTrue((e.get("donde_verlo") or "").strip(),
+                                f"`{nombre}` no dice donde verlo")
+                self.assertTrue((e.get("fuente") or "").strip(),
+                                f"`{nombre}` no declara su fuente")
+
+    def test_la_partida_va_la_primera_en_el_arranque(self):
+        """Lo que va detras de tres bloques se lee cuando ya se ha decidido."""
+        sys.path.insert(0, str(CONSOLA))
+        import importlib
+        ojo = importlib.import_module("ojo")
+        d = ojo.Ojo._arranque()
+        claves = [k for k in d if k != "esquema"]
+        self.assertEqual("cargar_partida", claves[0],
+                         f"la partida no es lo primero: {claves}")
+
+    def test_un_pilar_que_falta_sale_como_hueco_y_no_se_filtra(self):
+        """El sabotaje: si se filtrara, quedarian tres pilares con cara de cuatro."""
+        sys.path.insert(0, str(CONSOLA))
+        import importlib
+        ojo = importlib.import_module("ojo")
+        roto = {"cargar_partida": {"los_cuatro_pilares": ["no existe esta entrada"],
+                                   "de_donde_vienes": None, "a_donde_vas": None,
+                                   "lo_que_te_va_a_morder": []}}
+        p = ojo.Ojo._partida(roto, self.glosario)
+        self.assertEqual(1, len(p["los_cuatro_pilares"]),
+                         "el pilar que falta desaparecio de la lista")
+        hueco = p["los_cuatro_pilares"][0]
+        self.assertEqual("no existe esta entrada", hueco.get("falta"))
+        self.assertTrue(hueco.get("causa"), "el hueco no dice por que")
+        self.assertTrue(hueco.get("remedio"), "el hueco no dice como arreglarlo")
+
+    def test_la_partida_no_escribe_doctrina_a_mano(self):
+        """Ni el render ni el HTML pueden repetir el texto del glosario.
+
+        Si lo repitieran serian la cuarta copia de la Doctrina Caza-Nido, y la
+        que nadie mira cuando cambia. Se comprueba buscando trozos LARGOS y
+        caracteristicos de los pilares dentro de los ficheros que los pintan.
+        """
+        por_termino = {e.get("termino"): e for e in self.glosario["entradas"]}
+        fuentes = {n: (CONSOLA / n).read_text(encoding="utf-8")
+                   for n in ("partida.js", "ojo.html")}
+        for nombre in self.plan.get("los_cuatro_pilares", []):
+            e = por_termino.get(nombre) or {}
+            trozo = (e.get("que_hace") or "")[:60].strip()
+            if not trozo:
+                continue
+            for fichero, texto in fuentes.items():
+                with self.subTest(termino=nombre, fichero=fichero):
+                    self.assertNotIn(trozo, texto,
+                                     f"{fichero} copia el texto de `{nombre}`")
+
+    def test_la_pagina_carga_el_render_de_la_partida(self):
+        """Un <section> sin su script es un hueco que dice «…» para siempre."""
+        html = (CONSOLA / "ojo.html").read_text(encoding="utf-8")
+        self.assertIn('id="partida-cuerpo"', html, "falta el hueco de la partida")
+        self.assertIn('src="/partida.js"', html, "la pagina no carga partida.js")
+        self.assertTrue((CONSOLA / "partida.js").is_file(), "falta partida.js")
+        ojo_py = (CONSOLA / "ojo.py").read_text(encoding="utf-8")
+        self.assertIn('"/partida.js"', ojo_py, "el servidor no sirve partida.js")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=1)
 

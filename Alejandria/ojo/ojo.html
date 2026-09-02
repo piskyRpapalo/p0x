@@ -20,6 +20,22 @@
 <div id="frescura" class="frescura" role="status" aria-live="polite">cargando…</div>
 
 <main>
+
+  <!-- CARGAR PARTIDA. Lo PRIMERO de la pagina y sin plegar, por delante
+       incluso del arranque: el arranque dice que reglas te atan, y esto dice
+       en que proyecto estas. Una sesion que lee las reglas sin saber que es la
+       Doctrina Caza-Nido las cumple sobre el proyecto equivocado.
+
+       Se pinta desde /api/arranque -> cargar_partida, que resuelve contra el
+       glosario los terminos que nombra arranque.json. Ni una palabra a mano. -->
+  <section class="partida" id="partida">
+    <h2>▶ Cargar partida</h2>
+    <p class="tenue">Si acabas de abrir sesion en este nodo, esto es lo que la
+       sesion anterior sabia y tu no. Leelo entero antes de tocar un fichero:
+       son cuatro cosas que no se deducen del codigo.</p>
+    <div id="partida-cuerpo">…</div>
+  </section>
+
   <!-- ARRANQUE DE SESION. Va antes que el log a proposito: el log dice que
        PASO; esto dice donde estas, que puedes tocar y que no debes confundir.
        Leer el log sin esto es leer sintomas sin conocer el cuerpo. Se rellena
@@ -68,6 +84,7 @@
      rack entero — atarla a <code>0.0.0.0</code> sería repartirlo.</p>
 </footer>
 
+<script src="/partida.js" defer></script>
 <script src="/arranque.js" defer></script>
 <script src="/ojo.js"></script>
 <script src="/digesto.js"></script>
