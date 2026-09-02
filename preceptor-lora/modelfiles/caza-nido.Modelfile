@@ -1,17 +1,21 @@
-# PreceptorOS · LoRA v7 · LINEA B
+# PreceptorOS · LoRA Caza-Nido v3 · sobre Llama-3.2-3B
 #
 # Base: Llama-3.2-3B-Instruct, el peso Q4_K_M que ya vive en Ollama.
 # Se nombra el modelo, no su blob: un sha256 en un fichero versionado
 # envejece mal y ademas es una ruta de infraestructura.
 #
-# Adapter: entrenado sobre unsloth/Llama-3.2-3B-Instruct (bf16), espejo sin
-# verja del repo con verja meta-llama/Llama-3.2-3B-Instruct. Arquitectura
-# verificada campo a campo el 2026-08-29.
+# POR QUE v3 Y NO v1: los adapters caza-nido-v1 y -v2 declaran
+# `base_model_name_or_path: Qwen/Qwen3-4B-Instruct-2507` en su
+# adapter_config.json -- se entrenaron sobre qwen3:4b, el modelo THINKING
+# cuyo razonamiento sale sin delimitador y no se puede recortar. Colgarlos
+# de un FROM llama3.2:3b es una quimera: base y adapter de arquitecturas
+# distintas. caza-nido-v3 se entreno el 2026-09-02 sobre
+# unsloth/Llama-3.2-3B-Instruct (bf16), que NO es thinking.
 #
-# Crear desde ESTA carpeta:
-#   ollama create preceptor-v7-linea-b -f modelfiles/preceptor-v7-linea-b.Modelfile
-FROM qwen3:4b
-ADAPTER ../salida/caza-nido-v1/adapter.gguf
+# Crear desde ESTA carpeta, con tag explicito (nunca :latest):
+#   ollama create preceptor-cazanido-v3:llama3.2 -f modelfiles/caza-nido.Modelfile
+FROM llama3.2:3b
+ADAPTER ../salida/caza-nido-v3/adapter.gguf
 
 # El dataset es texto crudo "[Usuario] ... <think> ... [Preceptor] ...", no
 # turnos de chat: la plantilla pasa el prompt tal cual, como en la linea A.

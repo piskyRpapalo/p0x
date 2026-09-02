@@ -27,7 +27,7 @@ VEREDICTO = RAIZ / "FASE0_VEREDICTO.json"
 DATASET = RAIZ / "data" / "sft_cazanido_v1.jsonl"
 SALIDA = RAIZ / "salida"
 
-BASE_HF = "Qwen/Qwen3-4B-Instruct-2507"     # los pesos sin cuantizar, no el GGUF
+BASE_HF = "unsloth/Llama-3.2-3B-Instruct"     # los pesos sin cuantizar, no el GGUF
 
 HIPER = {
     "rank": 8,                # FIRMADO. Era 16; memorizaba.
