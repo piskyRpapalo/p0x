@@ -1451,3 +1451,49 @@ P6-1.
   ni cron. Queda sin atribuir, y eso importa: la regla «cero push sin firma»
   no la puede cumplir el Soberano si algo empuja por su cuenta. Merece un
   `git config --global push.default nothing` o, mejor, averiguar qué fue.
+
+## Misión Liberación Pública · 2026-09-02 (bloqueantes 1-3)
+
+- **P7-1 · El LoRA se contradice a sí mismo, y el dataset es la causa medida.**
+  (Coste M.) `preceptor-cazanido-v3:llama3.2` ya no razona en inglés, pero ante
+  «¿cuál es la mejor web para aprender Python? dame el enlace» contesta
+  `NO_DATA.` **y a continuación lista cuatro URLs**. `sft_cazanido_v1.jsonl`
+  tiene **12 líneas**: 10 de tren, 10 pasos, una época, y la pérdida sólo baja
+  3,81 → 3,35. No alcanza a tapar el reflejo servicial de la base. Hacen falta
+  ~60-80 pares, con la familia «dame el enlace» explícita. Mientras tanto, el
+  filtro de URLs tiene que estar en `guardrails.py`, no en los pesos.
+
+- **P7-2 · El dataset del Caza-Nido es monolingüe y el producto no.** (Coste S.)
+  El trainer imprimió `validación 2 (en=0 es=2)`: las 12 muestras son
+  castellano. La web y la app son EN/ES. La mitad inglesa del LoRA hoy es
+  `NO_DATA`, no «peor»: no existe.
+
+- **P7-3 · Dos modelos rotos siguen en `ollama list` ocupando 4,5 GB.** (Coste
+  S.) `preceptor-cazanido-v2:latest` **arranca y muere** (`exit status 1`): es
+  un adapter de Qwen colgado de una base Llama. `preceptor-cazanido:latest` es
+  el que tiene el bug Thinking. Los dos con tag pelado `:latest`, que el propio
+  Ojo ya marca. Retirarlos evita que la próxima sesión los sirva por error.
+
+- **P7-4 · El repo no sabía lo que corría en la-fragua, y nadie lo habría
+  notado.** (Coste M, y es el hallazgo más caro de esta tanda.) `md5sum` del
+  mismo fichero difería entre el nodo y `deploy/fragua/`: el nodo llevaba dos
+  días con 31 líneas añadidas a mano —CORS y el proxy `/api/generate`— que aquí
+  no estaban. **Un diff calculado sobre la copia del repo habría borrado el chat
+  de la portada al aplicarse.** Propose-only protege al nodo de este repo, pero
+  no protege a este repo de que el nodo cambie por debajo. Hace falta un
+  comprobador de deriva: un `md5sum` de los artefactos desplegados, leído por
+  SSH y comparado, que el Ojo pueda enseñar.
+
+- **P7-5 · `Linger=no` convierte toda unidad de usuario en una promesa falsa.**
+  (Coste S.) `agora-tunnel.service` está `enabled` y `active`, y aun así el
+  túnel se cae al reiniciar: son unidades de USUARIO y sin `linger` no arrancan
+  hasta que alguien hace login. La regla vale para las cuatro unidades de
+  usuario del rack, no sólo para ésta. Merece una línea en el canon al lado de
+  «ningún servicio sin firma explícita»: **una unidad de usuario sin linger no
+  es un servicio, es un atajo con nombre de servicio.**
+
+- **P7-6 · El tablón vacío es correcto y va a parecer una avería.** (Coste S.)
+  En cuanto `GET /api/v1/threads` responda 200 con cero hilos, `community.html`
+  dejará de caer a `threads.json` y se verá vacío. Es lo honesto —`hilos_reales:
+  0`— pero conviene que la web lo diga con todas las letras antes de que alguien
+  lo lea como «el Ágora se rompió».
