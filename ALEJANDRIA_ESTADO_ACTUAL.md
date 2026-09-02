@@ -30,8 +30,8 @@ Sun 2026-08-30 05:01:09 WEST       1h 17min Tue 2026-08-25 01:31:16 WEST        
 Mon 2026-08-31 03:09:42 WEST            23h Sun 2026-08-30 03:05:07 WEST   38min ago afinador.timer                 afinador.service
 
 ## 2. PUERTOS ACTIVOS
-- 100.81.82.34:11434 → 
-- 100.81.82.34:9001 → users:(("python3",pid=403615,fd=6))
+- 100[.]81[.]82[.]34:11434 → 
+- 100[.]81[.]82[.]34:9001 → users:(("python3",pid=403615,fd=6))
 - 0.0.0.0:8080 → users:(("python3",pid=419514,fd=3))
 - 127.0.0.1:8740 → users:(("python3",pid=475769,fd=3))
 
