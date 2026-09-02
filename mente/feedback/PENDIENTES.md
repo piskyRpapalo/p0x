@@ -1420,3 +1420,34 @@ P6-1.
   huella obliga a lanzar el proceso entero con `HOME` cambiado. Una variable
   del tipo `PRECEPTOROS_CASA`, leída solo por `casa.py`, haría de esto un
   parámetro en vez de una maniobra.
+
+- **P6-8 · El test del sprite de la web vigila los ficheros que NO se usan.**
+  (Coste M, y es el más serio de esta tanda.) Medido el 2026-09-02:
+
+  | | ficheros | peso |
+  |---|---|---|
+  | lo que `base.css` pinta de verdad | `seal-wake.gif`, `seal-think.gif`, `seal-talk.gif` | **96 344 B** |
+  | lo que el test mide | `despierta.webp`, `habla.webp` | 24 554 B |
+
+  `test_el_sprite_pesa_menos_de_50_kb` suma los dos WebP —que **no los pinta
+  nadie y ni siquiera están precacheados**— y da verde con holgura, mientras la
+  cara real cuesta **1,9 veces el tope que ese test cree estar defendiendo**.
+  No es un test que falle: es un test que mide otra cosa y por eso nunca avisa.
+
+  No lo arreglo porque la salida no es obvia y es una decisión de diseño: hay
+  `despierta.webp` (4 fotogramas) y `habla.webp` (4), pero **no hay un WebP de
+  «pensando»**, y `seal-think.gif` tiene 8. Migrar hoy pierde un estado de la
+  cara. Las tres salidas son: (a) generar el tercer WebP y migrar —ahorra ~72
+  KB—, (b) borrar los dos WebP muertos y apuntar el test a los GIF, aceptando
+  que la cara cuesta 96 KB, o (c) subir el tope y declarar por qué. Cualquiera
+  vale; seguir como está, no.
+
+- **P6-9 · Nadie sabe quién empuja a GitHub, y empuja.** (Coste S.) Los seis
+  commits de la Misión 3 aparecieron en `origin/main` a las **06:45:19**, dos
+  horas después del último commit (04:43) y sin que yo ejecutara un solo
+  `git push` — el reflog lo registra como `update by push`, así que fue un push
+  real desde esta máquina. `guardian.service` no puede ser: tiene
+  `ProtectSystem=strict` y sólo escribe en `~/.aurelius`. No hay `post-commit`
+  ni cron. Queda sin atribuir, y eso importa: la regla «cero push sin firma»
+  no la puede cumplir el Soberano si algo empuja por su cuenta. Merece un
+  `git config --global push.default nothing` o, mejor, averiguar qué fue.
