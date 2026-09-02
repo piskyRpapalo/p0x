@@ -93,5 +93,82 @@ c, r = pide("/agents")
 caso("catalogo 1 de 8", r.get("disponibles") == 1 and r.get("total") == 8,
      f"{r.get('disponibles')}/{r.get('total')}")
 
-print(f"\n{'VERDE' if not fallos else 'ROJO'} · {7 - len(fallos)}/7")
+
+# --- El Agora que la web ya llama · perfiles con ficha y tablon -------------
+#
+# Estos casos son TDD: se escribieron antes que los endpoints. `profile.html` y
+# `community.html` estan desplegadas y hoy caen a NO_DATA porque estas tres
+# rutas no existen. Lo que se comprueba aqui es el contrato que esas dos
+# paginas ya hablan, no uno nuevo inventado para la ocasion.
+
+# 8 · el tablon existe y dice CUANTOS hilos reales hay
+c, r = pide("/threads")
+caso("GET /threads responde con lista", c == 200 and isinstance(r.get("hilos"), list),
+     f"HTTP {c}")
+
+# 9 · y no finge actividad: si no hay comunidad, el contador es 0 y se declara
+caso("el tablon declara sus hilos reales",
+     r.get("hilos_reales") == len(r.get("hilos", [])),
+     f"hilos_reales={r.get('hilos_reales')} len={len(r.get('hilos', []))}")
+
+# 10 · la ficha del perfil creado arriba, por pseudonimo
+c, r = pide(f"/profiles/{yo}")
+caso("GET /profiles/<pseudonimo>", c == 200 and r.get("pseudonimo") == yo, f"HTTP {c}")
+
+# 11 · «huella» es tambien la clave publica entera: es como la llama auth.js
+#      («la huella completa») y es lo que ensena profile.html en su <details>.
+c, r = pide(f"/profiles/{pub}")
+caso("GET /profiles/<clave_publica>", c == 200 and r.get("pseudonimo") == yo, f"HTTP {c}")
+
+# 12 · quien no existe es 404, no una ficha vacia
+c, r = pide("/profiles/Tester-NADIE")
+caso("perfil desconocido es 404", c == 404, f"HTTP {c}")
+
+# 13 · guardar bio y avatar. La firma cubre el CONTENIDO, no solo la identidad
+_, r = pide("/reto"); reto = r["reto"]
+BIO = "## Quien soy\n- Mido cosas\n- No invento numeros"
+AV = "ojo"
+msg = f"{yo}|{pub}|{reto}|{AV}|{BIO}"
+c, r = pide("/profiles", {"pseudonimo": yo, "clave_publica": pub, "reto": reto,
+                          "bio": BIO, "avatar": AV,
+                          "firma": sk.sign(msg.encode()).signature.hex()})
+caso("guardar bio y avatar firmados", c == 200 and r.get("nuevo") is False,
+     f"HTTP {c}")
+
+# 14 · y la ficha los devuelve
+c, r = pide(f"/profiles/{yo}")
+caso("la ficha devuelve bio y avatar",
+     r.get("bio") == BIO and r.get("avatar") == AV,
+     f"avatar={r.get('avatar')}")
+
+# 15 · LA TRAMPA. Una firma de los TRES campos de siempre no puede colar una
+#      bio: si valiera, cualquiera con un reto firmado podria escribir en la
+#      ficha de otro sin firmar lo que escribe.
+_, r = pide("/reto"); reto = r["reto"]
+c, r = pide("/profiles", {"pseudonimo": yo, "clave_publica": pub, "reto": reto,
+                          "bio": "bio inyectada", "avatar": AV,
+                          "firma": firma_de(sk, yo, pub, reto)})
+caso("firma sin contenido no puede escribir bio", c == 403, f"HTTP {c}")
+
+# 16 · y no la escribio
+c, r = pide(f"/profiles/{yo}")
+caso("la bio anterior sigue intacta", r.get("bio") == BIO, f"bio={str(r.get('bio'))[:20]}")
+
+# 17 · las medidas NO se inventan: el Agora no tiene ledger, y lo dice
+c, r = pide(f"/profiles/{yo}")
+caso("scores es NO_DATA con causa",
+     r.get("scores") is None and bool(r.get("scores_causa")),
+     str(r.get("scores_causa"))[:40])
+
+# 18 · un avatar que no es un identificador se rechaza en la puerta
+_, r = pide("/reto"); reto = r["reto"]
+malo = "../../etc/passwd"
+msg = f"{yo}|{pub}|{reto}|{malo}|"
+c, r = pide("/profiles", {"pseudonimo": yo, "clave_publica": pub, "reto": reto,
+                          "bio": "", "avatar": malo,
+                          "firma": sk.sign(msg.encode()).signature.hex()})
+caso("avatar con forma invalida se rechaza", c == 422, f"HTTP {c}")
+
+
+print(f"\n{'VERDE' if not fallos else 'ROJO'} · {18 - len(fallos)}/18")
 sys.exit(1 if fallos else 0)

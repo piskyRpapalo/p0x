@@ -1,7 +1,12 @@
 [Unit]
 Description=Tunel del Agora · expone 127.0.0.1:9002 como api.preceptoros.org
 Documentation=file://%h/agora/README.md
-After=network-online.target
+After=network-online.target agora-api.service
+# El tunel SIN la API es una puerta a un pasillo vacio: cloudflared arranca,
+# publica api.preceptoros.org y todo lo que llega recibe un 502. `Wants` y no
+# `Requires` a proposito -- si la API cae, el tunel no tiene por que caerse
+# con ella; se levanta sola por Restart y el tunel ya esta esperando.
+Wants=agora-api.service
 
 [Service]
 Type=simple

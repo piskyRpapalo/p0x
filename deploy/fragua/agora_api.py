@@ -40,7 +40,7 @@ import sqlite3
 import time
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from pydantic import BaseModel, Field
 
 from nacl.exceptions import BadSignatureError
@@ -82,6 +82,17 @@ def init():
           -- Se declara en la propia fila que esto NO esta verificado. Una
           -- columna que lo dice es mas dificil de olvidar que un comentario.
           firma_verificada INTEGER NOT NULL DEFAULT 0);
+        -- El tablon. Vacio a proposito: no se siembran hilos de ejemplo en la
+        -- base. La web YA lleva `threads.json` con hilos declarados EJEMPLO
+        -- para cuando el Agora no contesta; sembrarlos aqui los convertiria en
+        -- reales sin que nadie los haya escrito, que es justo lo que
+        -- `community.html` dice no hacer.
+        CREATE TABLE IF NOT EXISTS hilos (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          tipo TEXT NOT NULL, titulo TEXT NOT NULL,
+          autor TEXT NOT NULL, cuando REAL NOT NULL,
+          respuestas INTEGER NOT NULL DEFAULT 0);
+        CREATE INDEX IF NOT EXISTS idx_hilos ON hilos(cuando DESC);
         CREATE TABLE IF NOT EXISTS selecciones (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           pseudonimo TEXT NOT NULL,
@@ -92,6 +103,11 @@ def init():
         -- cambio de companero, y cuando, es informacion; sobrescribir la
         -- borra.
         CREATE INDEX IF NOT EXISTS idx_sel ON selecciones(pseudonimo, cuando);
+        -- La ficha publica. `bio` y `avatar` se anaden a una tabla que ya
+        -- tiene filas en produccion, asi que van por ALTER y no en el CREATE:
+        -- un CREATE TABLE IF NOT EXISTS con columnas nuevas no las anade a la
+        -- tabla que ya existe -- no falla, simplemente no hace nada, y el
+        -- endpoint saldria con «no such column» en el primer SELECT.
         -- Los retos: uno por peticion, y se queman al usarse. Guardarlos en la
         -- base y no en memoria es lo que hace que un reinicio no invalide los
         -- que hay en vuelo -- y que dos procesos no se contradigan.
@@ -99,6 +115,13 @@ def init():
           reto TEXT PRIMARY KEY, creado REAL NOT NULL,
           usado INTEGER NOT NULL DEFAULT 0);
         """)
+        # ALTER idempotente: SQLite no tiene `ADD COLUMN IF NOT EXISTS`, asi
+        # que se pregunta a la propia tabla que columnas tiene. Repetir el
+        # ALTER seria un error, no un no-op.
+        tiene = {f["name"] for f in c.execute("PRAGMA table_info(perfiles)")}
+        for col, tipo in (("bio", "TEXT"), ("avatar", "TEXT")):
+            if col not in tiene:
+                c.execute(f"ALTER TABLE perfiles ADD COLUMN {col} {tipo}")
         c.commit()
 
 
@@ -116,6 +139,11 @@ class NuevoPerfil(BaseModel):
     clave_publica: str = Field(min_length=64, max_length=64)
     reto: str
     firma: str
+    # La ficha es OPCIONAL, y por eso son `None` y no cadena vacia: hay que
+    # poder distinguir «no toco la bio» de «borra la bio». Con "" las dos
+    # peticiones serian la misma y crear una identidad borraria la ficha.
+    bio: str | None = Field(default=None, max_length=2000)
+    avatar: str | None = Field(default=None, max_length=32)
 
 
 class Seleccion(BaseModel):
@@ -143,14 +171,31 @@ def quemar_reto(c, reto):
     return None
 
 
-def verificar(pseudonimo, clave_publica, reto, firma):
+def verificar(pseudonimo, clave_publica, reto, firma, ficha=None):
     """Ed25519 sobre `pseudonimo|clave_publica|reto`. Falla CERRADO.
 
     Los tres campos van en el mensaje a proposito: firmar solo el reto dejaria
     reusar esa firma para otro pseudonimo, y firmar solo el pseudonimo la
     dejaria valer para siempre.
+
+    CUANDO VIENE FICHA, LA FICHA SE FIRMA. El mensaje pasa a ser
+    `pseudonimo|clave_publica|reto|avatar|bio`. Sin esto la firma probaria
+    quien eres y no QUE ESCRIBES: cualquiera que interceptase una peticion
+    valida podria cambiarle la biografia por el camino y la firma seguiria
+    cuadrando. Una firma que no cubre el contenido no lo protege.
+
+    El formato es condicional a proposito, y no abre un hueco: una firma de
+    tres campos NO vale para una peticion con ficha --el servidor verifica el
+    mensaje de cinco y no cuadra-- y una de cinco tampoco vale si se le quita
+    la ficha por el camino. No hay degradacion posible en ninguna direccion.
+    Y el cliente que ya esta desplegado (`auth.js`, que firma tres campos para
+    crear identidad) sigue funcionando sin tocarlo.
     """
-    mensaje = f"{pseudonimo}|{clave_publica.lower()}|{reto}".encode("utf-8")
+    base = f"{pseudonimo}|{clave_publica.lower()}|{reto}"
+    if ficha is not None:
+        avatar, bio = ficha
+        base = f"{base}|{avatar}|{bio}"
+    mensaje = base.encode("utf-8")
     try:
         VerifyKey(bytes.fromhex(clave_publica)).verify(mensaje, bytes.fromhex(firma))
         return True
@@ -181,34 +226,117 @@ def reto():
             "firma_sobre": "pseudonimo|clave_publica|reto"}
 
 
+AVATAR = re.compile(r"^[a-z0-9][a-z0-9-]{0,31}$")
+
+
 @app.post(f"/api/{VERSION}/profiles", status_code=201)
-def crear_perfil(p: NuevoPerfil):
+def crear_perfil(p: NuevoPerfil, respuesta: Response):
     if not HEX64.match(p.clave_publica):
         raise HTTPException(422, "clave_publica: 64 caracteres hexadecimales")
+    # HAY FICHA si viene cualquiera de los dos campos. Se normaliza a cadena
+    # para firmar, porque `None` y "" tienen que dar mensajes distintos y solo
+    # uno de los dos puede viajar dentro de un texto firmado.
+    hay_ficha = p.bio is not None or p.avatar is not None
+    avatar = p.avatar or ""
+    bio = p.bio or ""
+    if avatar and not AVATAR.match(avatar):
+        # El catalogo de bustos NO se valida aqui: lo publica la web
+        # (`bustos.json`) y copiarlo al Agora crearia dos listas que se
+        # separan el dia que se anada un busto. Lo que si es del Agora es la
+        # FORMA: un identificador, no una ruta ni un texto libre.
+        raise HTTPException(422, "avatar: identificador [a-z0-9-], hasta 32")
     with abrir() as c:
         motivo = quemar_reto(c, p.reto)
         if motivo:
             c.commit()
             raise HTTPException(403, {"estado": "RECHAZADO", "causa": motivo})
-        if not verificar(p.pseudonimo, p.clave_publica, p.reto, p.firma):
+        ficha = (avatar, bio) if hay_ficha else None
+        if not verificar(p.pseudonimo, p.clave_publica, p.reto, p.firma, ficha):
             c.commit()      # el reto se quema igual: un intento fallido lo gasta
             raise HTTPException(403, {"estado": "RECHAZADO",
-                                      "causa": "la firma no corresponde a esa clave publica"})
-        try:
-            c.execute("insert into perfiles (pseudonimo, clave_publica, creado_en, "
-                      "firma_verificada) values (?,?,?,1)",
-                      (p.pseudonimo, p.clave_publica.lower(), time.time()))
-            c.commit()
-        except sqlite3.IntegrityError:
+                                      "causa": "la firma no cubre lo que se manda"
+                                      if hay_ficha else
+                                      "la firma no corresponde a esa clave publica"})
+        fila = c.execute("select clave_publica from perfiles where pseudonimo=?",
+                         (p.pseudonimo,)).fetchone()
+        if fila:
             # Idempotente si es el MISMO par; conflicto si el pseudonimo ya es
             # de otra clave. Reintentar no puede robarle el nombre a nadie.
-            fila = c.execute("select clave_publica from perfiles where pseudonimo=?",
-                             (p.pseudonimo,)).fetchone()
-            if fila and fila["clave_publica"] == p.clave_publica.lower():
-                return {"estado": "OK", "pseudonimo": p.pseudonimo, "nuevo": False}
-            raise HTTPException(409, "ese pseudonimo ya es de otra clave")
+            if fila["clave_publica"] != p.clave_publica.lower():
+                raise HTTPException(409, "ese pseudonimo ya es de otra clave")
+            if hay_ficha:
+                # Solo se pisa lo que venia. Mandar avatar sin bio no borra la
+                # bio: son dos campos de la misma ficha, no una ficha entera.
+                if p.avatar is not None:
+                    c.execute("update perfiles set avatar=? where pseudonimo=?",
+                              (avatar, p.pseudonimo))
+                if p.bio is not None:
+                    c.execute("update perfiles set bio=? where pseudonimo=?",
+                              (bio, p.pseudonimo))
+                c.commit()
+            # 200 y no 201: no se ha creado nada. El 201 es del decorador,
+            # que solo sabe del camino feliz; aqui se corrige en el camino que
+            # ACTUALIZA. Un 201 en cada guardado de biografia diria «he creado
+            # un perfil» una vez por pulsacion del boton.
+            respuesta.status_code = 200
+            return {"estado": "OK", "pseudonimo": p.pseudonimo, "nuevo": False,
+                    "ficha_guardada": hay_ficha}
+        try:
+            c.execute("insert into perfiles (pseudonimo, clave_publica, creado_en, "
+                      "firma_verificada, bio, avatar) values (?,?,?,1,?,?)",
+                      (p.pseudonimo, p.clave_publica.lower(), time.time(),
+                       p.bio, p.avatar))
+            c.commit()
+        except sqlite3.IntegrityError:
+            # La clave publica es UNIQUE: el choque que queda es esa misma
+            # clave pedida con otro pseudonimo.
+            raise HTTPException(409, "esa clave publica ya tiene otro pseudonimo")
     return {"estado": "OK", "pseudonimo": p.pseudonimo, "nuevo": True,
-            "firma_verificada": True}
+            "firma_verificada": True, "ficha_guardada": hay_ficha}
+
+
+@app.get(f"/api/{VERSION}/profiles/{{huella}}")
+def ficha(huella: str):
+    """La ficha publica. `huella` es el pseudonimo O la clave publica entera.
+
+    Las dos porque las dos son la huella para quien mira desde la web:
+    `auth.js` llama «la huella completa» a la clave publica en hexadecimal y es
+    lo que `profile.html` ensena en su <details>, mientras que el pseudonimo es
+    lo que se ve en la cabecera y lo que se comparte. Obligar a elegir una
+    obligaria a la web a saber cual, y la web tiene las dos a mano.
+
+    NO PIDE FIRMA: es una ficha PUBLICA, y todo lo que devuelve ya es publico
+    por definicion --el pseudonimo se deriva de la clave, la clave es publica y
+    la biografia se escribe para que se lea. Exigir firma para leer convertiria
+    un perfil publico en uno privado sin decirlo.
+    """
+    with abrir() as c:
+        campo = "clave_publica" if HEX64.match(huella) else "pseudonimo"
+        valor = huella.lower() if campo == "clave_publica" else huella
+        f = c.execute(f"select pseudonimo, clave_publica, creado_en, bio, avatar "
+                      f"from perfiles where {campo}=?", (valor,)).fetchone()
+        if not f:
+            raise HTTPException(404, {"estado": "NO_DATA",
+                                      "causa": f"no hay perfil con esa {campo}"})
+        sel = c.execute("select agente, cuando from selecciones where pseudonimo=? "
+                        "order by cuando desc limit 1", (f["pseudonimo"],)).fetchone()
+    return {
+        "estado": "OK",
+        "pseudonimo": f["pseudonimo"],
+        "clave_publica": f["clave_publica"],
+        "creado_en": f["creado_en"],
+        "bio": f["bio"],
+        "avatar": f["avatar"],
+        "companero": sel["agente"] if sel else None,
+        # LAS MEDIDAS NO SE INVENTAN. Un `scores: 0` aqui se leeria como
+        # «midio cero veces» cuando lo cierto es que este nodo no tiene el
+        # ledger: son dos cosas distintas y la diferencia es el proyecto
+        # entero. Va `null` con la causa al lado, como ya hace la web.
+        "scores": None,
+        "scores_causa": "el Agora no guarda el ledger firmado: las medidas "
+                        "viven en ledger.jsonl y todavia no llega ninguna "
+                        "linea firmada de nadie",
+    }
 
 
 @app.get(f"/api/{VERSION}/agents")
@@ -255,4 +383,88 @@ def elegir(s: Seleccion):
             "adaptador": a["adaptador"], "nombre": a["nombre"]}
 
 
+@app.get(f"/api/{VERSION}/threads")
+def hilos():
+    """El tablon. Devuelve lo que HAY, y dice cuanto es.
+
+    `community.html` lee esto por `board-fuentes.js`, que comprueba
+    `Array.isArray(d.hilos)` y nada mas. Por eso viaja tambien
+    `hilos_reales`: una lista vacia y una lista que no llego se ven igual en
+    la pantalla, y la web necesita el dato para escribir la frase --no puede
+    salir de aqui ya escrita, porque aqui no hay idioma.
+
+    OJO AL EFECTO, QUE ES REAL: hasta hoy esta ruta daba 404 y la web caia a
+    `threads.json`, sus hilos de EJEMPLO. En cuanto responda 200 con cero
+    hilos, el tablon se ensenara VACIO, porque vacio es lo que hay. Es la
+    misma regla que el propio `threads.json` declara en su cabecera: fingir
+    actividad en un foro sin comunidad es la mentira mas vieja de internet.
+
+    NO HAY POST. Escribir en el tablon exige moderacion, limites de ritmo y
+    una decision sobre que se hace con lo que se publica; nada de eso esta
+    firmado, y abrir la escritura antes que esa decision seria abrir un buzon
+    publico sin saber quien lo vacia.
+    """
+    with abrir() as c:
+        filas = c.execute("select tipo, titulo, autor, cuando, respuestas "
+                          "from hilos order by cuando desc limit 200").fetchall()
+    return {"estado": "OK", "hilos_reales": len(filas),
+            "escritura": "cerrada: el Agora todavia no modera",
+            "hilos": [dict(f) for f in filas]}
+
+
 init()
+
+
+# --- PROXY A OLLAMA Y CORS -------------------------------------------------
+#
+# ESTE BLOQUE VOLVIO DEL NODO, no se escribio aqui. Lo anadio el Soberano a
+# mano sobre `la-fragua` el 2026-09-01 para que la portada pudiera hablar con
+# el modelo del rack, y el repo no se entero: durante dos dias el artefacto
+# versionado NO era lo que corria. Se recupera integro salvo una cosa.
+#
+# LA UNICA COSA: la direccion de la Ollama viaja por entorno y no escrita
+# aqui. En el nodo era una IP de tailnet literal, y la guardia de higiene la
+# marca [IP-TAILNET] -- una regla que ni `guardia:permitir` puede eximir
+# (D8_JAMAS). Este repo tiene remoto publico. Sin `OLLAMA_HOST` puesto, el
+# proxy NO adivina un destino: contesta 503 diciendo que falta, que es
+# preferible a arrancar apuntando a una maquina que igual no es la que se
+# queria.
+import os as _os
+
+import httpx
+from fastapi import Request
+from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    # Un origen exacto por entrada. `http://localhost:*` NO es un comodin
+    # valido para CORS y el navegador nunca lo casa: estaba en el nodo y aqui
+    # se deja fuera en vez de arrastrar una entrada que no hace nada. Para
+    # probar en local se anade el puerto concreto.
+    allow_origins=["https://preceptoros.org"],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type"],
+)
+
+OLLAMA_HOST = _os.environ.get("OLLAMA_HOST", "").rstrip("/")
+
+
+@app.post("/api/generate")
+async def proxy_ollama_generate(request: Request):
+    """Contrato de Ollama, tal cual. La web ya lo habla; no se inventa otro."""
+    if not OLLAMA_HOST:
+        raise HTTPException(503, {"estado": "NO_DATA",
+                                  "causa": "OLLAMA_HOST no esta puesto en el entorno",
+                                  "remedio": "exportarlo antes de arrancar uvicorn"})
+    cuerpo = await request.json()
+
+    async def trozos():
+        async with httpx.AsyncClient(timeout=120.0) as cliente:
+            async with cliente.stream("POST", f"{OLLAMA_HOST}/api/generate",
+                                      json=cuerpo) as r:
+                async for t in r.aiter_bytes():
+                    yield t
+
+    return StreamingResponse(trozos(), media_type="application/x-ndjson")

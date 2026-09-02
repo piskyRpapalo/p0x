@@ -5,12 +5,26 @@ firmada por el Soberano; nada más de este nodo se toca sin palabra nueva.
 
 ## Qué es
 
-Tres endpoints y su salud:
+Los endpoints y su salud:
 
     GET  /api/v1/salud
-    POST /api/v1/profiles        {pseudonimo, clave_publica}
+    GET  /api/v1/reto
+    POST /api/v1/profiles          {pseudonimo, clave_publica[, bio, avatar]}
+    GET  /api/v1/profiles/{huella} ficha publica: bio, avatar, companero
     GET  /api/v1/agents
-    POST /api/v1/agents/select   {pseudonimo, agente}
+    POST /api/v1/agents/select     {pseudonimo, agente}
+    GET  /api/v1/threads           el tablon
+    POST /api/generate             proxy al contrato de Ollama (necesita OLLAMA_HOST)
+
+`huella` es el pseudonimo **o** la clave publica entera: `auth.js` llama «la
+huella completa» a la segunda y `profile.html` ensena las dos.
+
+`scores` sale `null` con `scores_causa`, nunca `0`. Un cero se lee como «midio
+cero veces»; lo cierto es que este nodo no tiene el ledger. Ante la duda,
+NO_DATA.
+
+`GET /threads` devuelve lo que HAY y cuanto es (`hilos_reales`). **No hay POST**:
+escribir exige moderacion y limite de ritmo, y nada de eso esta firmado.
 
 Base SQLite en modo WAL sobre el NVMe de la-fragua (`AGORA_DATOS`, por
 defecto `/mnt/nvme/agora_db`). <!-- guardia:permitir ruta del nodo de destino,
@@ -30,6 +44,16 @@ Los tres campos van dentro del mensaje firmado a propósito: firmar solo el reto
 dejaría reusar esa firma para otro pseudónimo, y firmar solo el pseudónimo la
 dejaría valer para siempre.
 
+**Y cuando viaja ficha, la ficha se firma:**
+
+    firma = Ed25519( "pseudonimo|clave_publica|reto|avatar|bio" )
+
+Sin esto la firma probaría quién eres pero no QUÉ escribes: quien interceptase
+una petición válida podría cambiarle la biografía por el camino. El formato
+condicional no abre hueco en ninguna dirección —una firma de tres campos no vale
+para una petición con ficha, y una de cinco no vale si le quitan la ficha— y
+`auth.js`, que firma tres campos para crear identidad, sigue igual.
+
 El nonce **caduca a los 300 s y se quema al usarse**, incluso si el intento
 falla. Sin esas dos cosas, una firma capturada una vez vale para siempre y el
 reto no es un reto: es una contraseña larga viajando en claro.
@@ -46,9 +70,11 @@ Soberano. Escribir Ed25519 a mano sería mucho peor que declararla.
 
     ~/venvs/agora/bin/python test_agora.py
 
-Siete casos contra la API viva, y firman de verdad: una prueba que simulara la
+Dieciocho casos contra la API viva, y firman de verdad: una prueba que simulara la
 firma estaría comprobando el simulador. Cubren el camino honrado, el reto
-reusado, la firma corrupta, la clave de otro y elegir en nombre ajeno.
+reusado, la firma corrupta, la clave de otro, elegir en nombre ajeno, las dos
+formas de la huella, la ficha guardada y --el que mas importa-- que una firma de
+tres campos NO puede colar una biografia.
 
 ## Arrancar y parar
 
@@ -56,8 +82,23 @@ reusado, la firma corrupta, la clave de otro y elegir en nombre ajeno.
 ~/venvs/agora/bin/uvicorn agora_api:app --host 127.0.0.1 --port 9002
 ```
 
-No hay unidad systemd: crear una exige firma por unidad (canon DUNI) y se pide
-aparte.
+`agora-api.service` es el artefacto de la unidad, y **se pide firma aparte**:
+crear una unidad exige firma por unidad (canon del nodo, 2026-08-24).
+
+**`Linger` es la parte que se olvida.** Estas son unidades de USUARIO: con
+`Linger=no` solo viven mientras haya sesion abierta de `ubuntu`, asi que tras un
+reinicio sin login no arranca ninguna. Es la causa medida de «el tunel se cae al
+reiniciar», no el lanzarlo a mano:
+
+```bash
+sudo loginctl enable-linger ubuntu
+```
+
+Ni la IP de la Ollama ni la ruta del NVMe van en la unidad: la guardia de
+higiene marca `[IP-TAILNET]` --que ni `guardia:permitir` exime-- y `[RUTA-HOME]`.
+Viven en `~/.config/agora.env` del propio nodo, que la unidad lee con
+`EnvironmentFile=-`. Sin `OLLAMA_HOST`, el proxy contesta 503 con su causa y el
+resto del Agora sigue sirviendo.
 
 ## El catálogo
 
