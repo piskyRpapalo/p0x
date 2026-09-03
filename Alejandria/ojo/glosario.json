@@ -1,7 +1,7 @@
 {
  "titulo": "Cómo funciona el enjambre",
  "entrada": "Lo que el panel dice en jerga, dicho en palabras. Cada entrada lleva dónde verlo con tus propios ojos: si no hay comando que lo enseñe, no es conocimiento, es una creencia.",
- "medido": "2026-09-02",
+ "medido": "2026-09-03",
  "entradas": [
   {
    "termino": "el enjambre",
@@ -120,17 +120,19 @@
   },
   {
    "termino": "la web habla con el rack",
-   "estado": "RED",
-   "que_hace": "Desde el 2026-09-01 la portada de preceptoros.org NO ofrece descargar un modelo ni buscar una Ollama: el modelo lo pone el rack. Quien elige es el companero activo — `agentes[].real.adaptador` de hub.json ES el nombre del modelo en Ollama. Hoy el camino NO llega y la pagina lo declara con NO_DATA y su causa, mas el JSON para llevarselo a otra IA. Esta en RED porque falta el otro extremo, no porque este roto lo de aqui.",
-   "donde_verlo": "curl -s -o /dev/null -w '%{http_code}\\n' https://api.preceptoros.org/api/tags   # hoy 404",
-   "fuente": "preceptoros-web/public/assets/rack.js · p0x/propuestas/la-fragua-agora-api-contrato-turno.md"
+   "estado": "OK",
+   "que_hace": "El camino llega entero, medido de extremo a extremo el 2026-09-03. Un POST a `https://api.preceptoros.org/api/generate` desde el origen de la web devuelve NDJSON en streaming con tokens de verdad del modelo del rack, y trae la cabecera CORS. Ya no hay que declarar NO_DATA con su causa: la causa se arreglo.",
+   "donde_verlo": "curl -N -X POST https://api.preceptoros.org/api/generate -H 'Content-Type: application/json' -d '{\"model\":\"preceptor-v7:latest\",\"prompt\":\"di listo\",\"stream\":true}'",
+   "fuente": "preceptoros-web/public/assets/rack.js · p0x/propuestas/la-fragua-agora-api-contrato-turno.md",
+   "nota": "El modelo que contesta sigue siendo `preceptor-v7:latest`, que es lo que declara `agentes.json`. El LoRA nuevo --`preceptor-cazanido-v3:llama3.2`-- existe y funciona, pero el catalogo todavia no lo nombra. Ese es el siguiente eslabon, y es una linea de json."
   },
   {
    "termino": "api.preceptoros.org",
-   "estado": "RED",
-   "que_hace": "El tunel SI esta arriba y enruta a 127.0.0.1:9002 de la-fragua, donde corre `uvicorn agora_api:app` (FastAPI). El 404 no es de red ni de DNS: esa app no publica las rutas. Faltan DOS cosas, no una: (1) exponer POST /api/generate con el contrato NDJSON de Ollama, (2) CORSMiddleware con allow_origins=https://preceptoros.org — como contesta FastAPI y no Ollama, OLLAMA_ORIGINS ahi no pinta nada. la-fragua es propose-only desde soberano: NO se toca por SSH.",
-   "donde_verlo": "curl -s https://api.preceptoros.org/openapi.json   # {'detail':'Not Found'}",
-   "fuente": "p0x/propuestas/la-fragua-agora-api-contrato-turno.md"
+   "estado": "OK",
+   "que_hace": "El tunel esta arriba y la API publica TODO lo que le faltaba. Las dos cosas que estaban en rojo se cerraron: `POST /api/generate` con el contrato NDJSON de Ollama, y el CORSMiddleware con `allow_origins=https://preceptoros.org`. Medido el 2026-09-03 por el tunel publico: `/api/v1/salud` 200 en 0,228 s, `/api/v1/agents` 200 en 0,107 s, `/api/v1/profiles/{huella}` y `/api/v1/threads` sirviendo, y `access-control-allow-origin` en la respuesta. La API escucha SOLO en loopback: pedirla por la tailnet no responde, y eso es lo correcto.",
+   "donde_verlo": "curl -s https://api.preceptoros.org/api/v1/salud",
+   "fuente": "p0x/propuestas/la-fragua-agora-api-contrato-turno.md",
+   "nota": "Lo que queda no es de red: `/api/v1/threads` devuelve la lista vacia con `hilos_reales: 0`, que es la verdad -- todavia no hay comunidad."
   },
   {
    "termino": "api-guia (:9001) es un falso verde",
@@ -238,12 +240,12 @@
    "nota": "El techo de VRAM del Jetson es lo unico DECLARADO de los cuatro, y medirlo NO se hace desde aqui: `soberano` es propose-only hacia la-torre. La medida (`tegrastats` y `free -m`, corridos EN la Torre) sale como propuesta en p0x/propuestas/ y la ejecuta quien tenga esa consola delante. Mientras nadie la traiga y la escriba en esta entrada, el techo se trata como creencia util, no como dato: la regla de esta consola no cambia por ser el Soberano quien lo dice."
   },
   {
-   "termino": "Bug LoRA Thinking (qwen3:4b) · BLOQUEANTE",
-   "estado": "RED",
-   "que_hace": "El modelo base Qwen3-4B-Instruct es un modelo THINKING: su razonamiento sale ENTERO dentro de `response`, sin etiquetas `<think>` que lo delimiten. Gasta ~700 tokens pensando en INGLES en una pagina en castellano, y dentro de ese pensamiento cita doctrina interna — eso es fuga de contexto a un visitante. `think:false` y el sufijo `/no_think` NO lo apagan: se probaron los dos. SIN DELIMITADOR NO HAY NADA QUE RECORTAR, asi que `rack.js` tampoco puede filtrarlo. SOLUCION FIRMADA: reentrenar el LoRA sobre una base NO-thinking — Llama-3.2-3B o Qwen2.5-3B. Hasta entonces `hub.json` NO debe declararlo servido: seria otro falso verde.",
-   "donde_verlo": "ollama run preceptor-cazanido:latest 'cuota de mercado del cafe de especialidad en Espana en 2026'",
+   "termino": "Bug LoRA Thinking · CERRADO el 2026-09-02",
+   "estado": "OK",
+   "que_hace": "MUERTO. La base era el problema, no el afinado: Qwen3-4B-Instruct saca su razonamiento entero dentro de `response` y sin etiquetas que recortar. Se reentreno el LoRA sobre `unsloth/Llama-3.2-3B-Instruct` (CPU, 10 pasos, validacion 3,9245 -> 3,3502) y se creo `preceptor-cazanido-v3:llama3.2`, con tag explicito. Medido con el mismo prompt que lo destapo: responde `NO_DATA.` en castellano, 4 tokens, sin una linea de pensamiento. El viejo soltaba 250 tokens de razonamiento en ingles y terminaba saltandose el NO_DATA.",
+   "donde_verlo": "ollama run preceptor-cazanido-v3:llama3.2 'cuota de mercado del cafe de especialidad en Espana en 2026'",
    "fuente": "Hallazgo medido 2026-09-01 · reunificado 2026-09-02",
-   "nota": "El LoRA CUMPLE la doctrina — dice NO_DATA y se niega a inventar, medido, no supuesto. Lo que lo bloquea no es su afinado: es la base. Estaba escrito dos veces en este glosario; se fundio en una."
+   "nota": "Lo que NO cierra: con 12 muestras el LoRA todavia se contradice ante «dame el enlace» --dice NO_DATA y lista cuatro URLs--. Es hambre de datos, no configuracion, y esta anotado como P7-1 en PENDIENTES.md. Y `preceptor-cazanido-v2:latest` sigue en Ollama ROTO: es un adapter de Qwen colgado de una base Llama y muere al arrancar."
   },
   {
    "termino": "preceptor-cazanido:latest",
@@ -355,6 +357,14 @@
    "donde_verlo": "gh repo list piskyRpapalo --limit 20  # o abrir github.com/piskyRpapalo?tab=repositories",
    "fuente": "captura del Soberano, 2026-09-02 · no medido desde este nodo",
    "nota": "ESTA EN RED POR UN HALLAZGO, no por el inventario: la descripcion publica de `PreceptorOS` sigue diciendo «The customs house between your data and external AIs». El 2026-09-02 el Soberano retiro esa metafora de la web entera --tarjeta social, og:description de las cuatro portadas y el onboarding en tres idiomas-- porque describe el producto como un puesto de control y es lo contrario: una GUIA que se instala y acompana. La descripcion del repo publico se quedo fuera de aquel barrido porque vive en GitHub, no en el repo. Se cambia desde la web de GitHub o con `gh repo edit piskyRpapalo/PreceptorOS --description '...'`, y exige firma del Soberano: es texto publico de cara al mundo."
+  },
+  {
+   "termino": "dead_path.jsonl · DORMIDO, no ausente",
+   "estado": "OK",
+   "que_hace": "No existe en disco Y ESO ESTA BIEN. El Soberano firmo retirarlo el 2026-08-31 y se marco `@sleeping` con condicion de despertar, siguiendo la regla (b) de ARQ_LOOPS.md: «una capacidad que deja de aplicar se marca dormida con motivo, no se borra». El umbral escrito para volver a abrirlo son cien lineas reales. Entra en este glosario porque un `find` que no lo encuentra parece una tarea pendiente, y construirlo seria deshacer una decision firmada sin saberlo. Casi me pasa el 2026-09-03.",
+   "donde_verlo": "grep -n '@sleeping' ~/p0x/preceptor/mente/misiones/MISION_TENEDOR.md",
+   "fuente": "MISION_TENEDOR.md lineas 75 y 128 · commit 47abacb del 2026-08-31",
+   "nota": "La forma general, que vale para todo el rack: antes de construir algo que «falta», se busca si alguien lo mato a proposito. La ausencia sin motivo y la ausencia firmada se ven exactamente igual desde fuera."
   }
  ]
 }
