@@ -150,11 +150,51 @@ def tarjeta(ancho=1200, alto=630):
     return fondo
 
 
+def puerta(lado, alto_cabeza, apaga_halo=None, radio=0.455):
+    """El icono de la PUERTA: la misma cara, con un anillo de bronce.
+
+    POR QUE EXISTE, medido el 2026-09-04. La web y la app son dos productos
+    instalables, y hasta hoy compartian icono BYTE A BYTE --mismo sha256-- y
+    ademas el mismo `short_name`. O sea: quien seguia el camino entero acababa
+    con dos iconos identicos y la misma etiqueta debajo, uno al lado del otro
+    en su pantalla de inicio, y ninguna forma de saber cual era cual. Justo en
+    el momento en que ya habia hecho el trabajo de instalar las dos cosas.
+
+    POR QUE UN ANILLO Y NO OTRA CARA. Los otros masters de esta carpeta
+    --green, blue, Orange, marble, los wake-- son placas de croma: su esquina
+    mide (7,247,0). Componerlos sobre un fondo es exactamente el trabajo que la
+    cabecera de este fichero documenta como fallido: pelo cortado y cascotes
+    que se leen como picos blancos. El unico master compuesto es
+    `cara-oficial.jpg`, asi que la puerta se separa por marca, no por retrato:
+    misma familia, distinta insignia. A tamano de icono un anillo se distingue
+    antes que un cambio de tono de fondo.
+
+    EL RADIO NO ES EL MISMO EN LAS DOS VARIANTES, y esa es la trampa. Android
+    recorta los maskable a un circulo del 80 % del lado, y este fichero ya
+    apaga el halo a 0.395 para que quepa. Un anillo pintado a 0.455 caeria
+    fuera del recorte Y dentro de la zona que el desvanecido borra: no se
+    veria, o se veria a medias segun el telefono. En el maskable va a 0.32, que
+    esta dentro de la parte que el desvanecido deja intacta (0.395 x 0.86).
+    """
+    base = icono(lado, alto_cabeza, apaga_halo)
+    d = ImageDraw.Draw(base)
+    r = radio * lado
+    grosor = max(2, round(lado / 34))
+    d.ellipse([lado / 2 - r, lado / 2 - r, lado / 2 + r, lado / 2 + r],
+              outline=BRONCE, width=grosor)
+    return base
+
+
+# La puerta (web) estrena insignia; el taller (app) NO se toca, y el orden de
+# esa decision importa: su icono ya esta instalado en aparatos, y cambiarlo
+# moveria el dibujo bajo el dedo de quien ya lo tiene. Estrena el que todavia
+# no ha llegado a ninguna pantalla de inicio.
 PLAN = [
     (os.path.join(WEB, "preceptor-og.png"), tarjeta),
-    (os.path.join(WEB, "icon-192.png"), lambda: icono(192, 0.90)),
-    (os.path.join(WEB, "icon-512.png"), lambda: icono(512, 0.90)),
-    (os.path.join(WEB, "icon-512-maskable.png"), lambda: icono(512, 0.55, apaga_halo=0.395)),
+    (os.path.join(WEB, "icon-192.png"), lambda: puerta(192, 0.90)),
+    (os.path.join(WEB, "icon-512.png"), lambda: puerta(512, 0.90)),
+    (os.path.join(WEB, "icon-512-maskable.png"),
+     lambda: puerta(512, 0.55, apaga_halo=0.395, radio=0.32)),
     (os.path.join(APP, "icono-192.png"), lambda: icono(192, 0.90)),
     (os.path.join(APP, "icono-512.png"), lambda: icono(512, 0.90)),
     (os.path.join(APP, "icono-512-maskable.png"), lambda: icono(512, 0.55, apaga_halo=0.395)),
