@@ -14,8 +14,45 @@ del Soberano»* + *«`systemctl --user list-units` al cerrar cada sesión»*. Fi
 
 | `curador.timer` | Higiene de la memoria: duplicados y enlaces rotos. **Propone, no toca** | domingos 05:00 (±30 min), `Persistent=true` | Abre `memory.db` en **solo lectura** (`mode=ro` en el código **y** `ReadOnlyPaths` en la unidad: dos cerrojos independientes). Escribe latidos y hallazgos | 2026-08-25 · **ACTIVA**, probada a mano y bajo systemd | `systemctl --user disable --now curador.timer` |
 | `afinador.timer` | Corre `bin/pruebas` entera y vigila **que la tanda siga midiendo**: recuento a la baja, suites que caen del corredor, cobertura que se ensancha, sabotajes ciegos | diario 03:00 (±15 min), `Persistent=true` | **Solo lee** `~/p0x/aurelius`. Escribe latidos y hallazgos en `~/.aurelius/loops.db`. `Nice=10` + `IOSchedulingClass=idle` para no competir con la persona | 2026-08-25 · **ACTIVA**, probada a mano y bajo systemd (87 s, dejó latido) antes de cronificar | `systemctl --user disable --now afinador.timer` |
-| `aurelius.service` | La cara (PWA) en `127.0.0.1:8740`, vía `bin/aurelius-servicio` | `Type=simple` + `Restart=always`, permanente | Sirve desde **`~/p0x/aurelius`** (el árbol bueno). Escribe `~/.aurelius/pwa.log` | 2026-08-25 · **FIRMADA**, `enabled`, verificada estable 25 s sin reiniciar | `systemctl --user disable --now aurelius.service` |
-| `aurelius.service.d/10-motor-vulkan.conf` | **Drop-in.** Apunta el motor del turno al envoltorio Vulkan en vez del binario CPU del PATH | con la unidad; no añade disparo propio | Solo pone `PRECEPTOROS_MOTOR`. Mismo modelo (el 4B), misma memoria, mismo puerto | 2026-08-25 · **ACTIVO**, firmado por el Soberano. Verificado: `NRestarts=0`, cara HTTP 200 y **un turno real en 4 s** por `/api/charla` | `rm ~/.config/systemd/user/aurelius.service.d/10-motor-vulkan.conf && systemctl --user daemon-reload && systemctl --user restart aurelius.service` |
+| `preceptoros-pwa.service` | La cara (PWA) en `127.0.0.1:8740`, vía `bin/preceptoros-servicio` | `Type=simple` + `Restart=always`, permanente | Escribe `~/.preceptoros/pwa.log` | 2026-08-25 · **FIRMADA** como `aurelius.service`; **renombrada por el Soberano el 2026-09-04**. Verificada tras el renombrado: `active running`, `NRestarts=0`, cara HTTP 200 | `systemctl --user disable --now preceptoros-pwa.service` |
+| `10-motor-vulkan.conf` | **Drop-in.** Apunta el motor del turno al envoltorio Vulkan en vez del binario CPU del PATH | con la unidad; no añade disparo propio | Solo pone `PRECEPTOROS_MOTOR`. Mismo modelo (el 4B), misma memoria, mismo puerto | 2026-08-25 · firmado y **ACTIVO** (un turno real en 4 s por `/api/charla`). 🔴 **HUÉRFANO desde el renombrado del 2026-09-04** — ver abajo | `rm ~/.config/systemd/user/preceptoros-pwa.service.d/10-motor-vulkan.conf && systemctl --user daemon-reload && systemctl --user restart preceptoros-pwa.service` |
+
+### 🔴 El renombrado del 2026-09-04 desconectó el motor Vulkan
+
+El Soberano renombró `aurelius.service` → `preceptoros-pwa.service`. La unidad quedó
+perfecta: `active running`, `NRestarts=0`, cara en HTTP 200. **Y el drop-in se quedó
+atrás**, en `~/.config/systemd/user/aurelius.service.d/` — un directorio que systemd ya no
+mira, porque la unidad a la que pertenecía no existe.
+
+Medido el mismo día:
+
+    systemctl --user show preceptoros-pwa.service -p DropInPaths --value   # vacío
+    tr '\0' '\n' < /proc/<MainPID>/environ | grep MOTOR                    # nada
+
+Sin `PRECEPTOROS_MOTOR`, el turno cae al binario CPU del PATH. Lo que cuesta está medido en
+la cabecera del propio drop-in: **19,23 tok/s y 6,2 s de pared por turno, frente a 27,25 y
+3,9 s**. Un ×1,42 y un 37 % más de espera en cada turno de la app.
+
+Y es invisible por donde se mira: el servicio está verde, el puerto responde 200 y nada
+falla. Es la misma familia que el bucle de 7970 reinicios de esa misma mañana — **se vigila
+el puerto, no la configuración**. Un drop-in huérfano no da error: deja de aplicarse.
+
+**REMEDIO — exige firma, es una unidad. No aplicado:**
+
+    mkdir -p ~/.config/systemd/user/preceptoros-pwa.service.d
+    mv ~/.config/systemd/user/aurelius.service.d/10-motor-vulkan.conf \
+       ~/.config/systemd/user/preceptoros-pwa.service.d/
+    rmdir ~/.config/systemd/user/aurelius.service.d
+    systemctl --user daemon-reload
+    systemctl --user restart preceptoros-pwa.service
+
+Y se comprueba que volvió, que es la mitad que suele saltarse:
+
+    systemctl --user show preceptoros-pwa.service -p DropInPaths --value   # ya no vacío
+    curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:8740/api/estado
+
+Queda además `aurelius-interfaz.service` (`inactive`, `disabled`), último resto del nombre
+viejo. No hace nada; retirarlo es otra firma, y de las baratas.
 
 ### Sobre `aurelius.service` — encontrada sin firma, firmada al día siguiente
 
