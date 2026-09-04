@@ -1563,3 +1563,22 @@ P6-1.
 - **P7-5 queda RESUELTA.** Medido hoy en la-fragua: `loginctl show-user -p
   Linger` da `yes`, y `agora-tunnel` de usuario lleva `active running` desde el
   2026-09-01 con NRestarts 0. El túnel ya sobrevive al reinicio.
+
+- **P8-7 · El teclado se ha probado con el chat VACÍO.** (Coste S.) Medido hoy
+  en el Doogee con `deploy/soberano/probar-teclado-doogee.sh`: con el teclado
+  abierto la app se comprime a lo visible y el campo de escribir queda entero
+  encima, y al cerrarlo la maqueta vuelve idéntica. Eso cubre la mitad de la
+  promesa. La otra mitad —que **el chat haga scroll al último mensaje** cuando
+  el teclado sube— no se ha visto, porque hacía falta un historial y `#dice`
+  estaba vacío. `alFondo()` existe y se llama, pero llamarse no es verse. Basta
+  con sembrar unos turnos en `memory.db` y repetir el guion.
+
+- **P8-8 · Delegar al cerebro local se decide por TURNOS, no por líneas.**
+  (Coste S, y es doctrina que ya está en el canon pero conviene en la lista.)
+  `cc-local` funciona desde hoy, y cuesta **~8 min de pared por turno**: el
+  cliente espera 454 s el primer token mientras el mismo servidor contesta un
+  prompt corto al instante, porque lo que tarda es leer el preámbulo. Una tarea
+  de dos turnos y mucho texto por turno sale a cuenta; un refactor de ida y
+  vuelta sobre varios ficheros son horas. La partición de `chat-router.js` y
+  `sw.js` es justo del segundo tipo, y esa es la lección que deja: la Regla de
+  oro dice *quién* ejecuta, y esta medida dice *cuándo compensa*.
