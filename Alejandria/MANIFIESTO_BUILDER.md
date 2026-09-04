@@ -28,6 +28,18 @@ Se comprueba en: `preceptor/memory.py` (la base con búsqueda de texto completo)
 `preceptor/captura.py` (cómo entran los turnos), y el fichero real en
 `~/.preceptoros/memory.db`.
 
+**Y una condición que hay que decir antes de que alguien la descubra sola.** El Ojo
+local está diseñado para usuarios con hardware siempre encendido: un servidor, un NAS,
+un ordenador dedicado. Es la unión de dos cosas —la base de datos local, donde viven tu
+hardware, tu perfil y tus proyectos, y la IA local que te responde usándola— y las dos
+tienen que estar despiertas para que la segunda pueda leer a la primera.
+
+Eso significa que hay procesos que trabajan solos y que solo trabajan mientras la máquina
+está encendida. En un teléfono apagado en el bolsillo no pasa nada, y no debería
+prometerse lo contrario: la app sigue guardando lo que le cuentes, pero el Ojo —que
+observa, mide y ordena— duerme con el aparato. Un producto que dijera «funciona en
+cualquier sitio» estaría cobrando por adelantado una capacidad que depende de un enchufe.
+
 Ahora tienes una herramienta, adáptala a tu ser. Las habilidades que aprendas por el
 camino, compártelas. Mientras te inspiras, comparte con los demás tus encuentros,
 herramientas y conocimiento.
