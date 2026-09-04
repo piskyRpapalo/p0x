@@ -1,7 +1,7 @@
 {
  "titulo": "Arranque de sesion · lee esto ANTES de tocar nada",
  "para_quien": "Cualquier IA que abra sesion en soberano: Claude Code, cc-local o una voz del Sinodo. Es el nexo de arranque, no un resumen de cortesia.",
- "medido": "2026-09-02",
+ "medido": "2026-09-04",
  "primer_comando": "curl -s http://127.0.0.1:8790/api/arranque | python3 -m json.tool   # o: python3 ~/p0x/Alejandria/ojo/ojo.py --arranque",
  "cargar_partida": {
   "que_es": "El save game. Cuatro pilares que NO se deducen del codigo y que una sesion fria da por supuestos si nadie se los dice, mas la mision siguiente y las trampas que ya han mordido a otro. El texto no vive aqui: vive en el glosario, y esto solo dice CUALES. Si un termino de estas listas desaparece del glosario, la respuesta trae NO_DATA con su nombre en vez de callarse.",
@@ -14,6 +14,8 @@
   "de_donde_vienes": "SAVE GAME · lo que hizo la sesion del 2026-09-02",
   "a_donde_vas": "SIGUIENTE MISION · refactor de la App MVP",
   "lo_que_te_va_a_morder": [
+   "preceptoros-pwa.service (antes aurelius.service)",
+   "el bucle verde · Restart=always y salir 0",
    "La Necropolis · lo que ya se mato, y por que",
    "Donde el inventario de Gemini NO cuadra con el rack",
    "los repos, y no son tres",
@@ -28,7 +30,9 @@
   ],
   "y_para_eso_lee": [
    "El Camino (The Path) y La Brujula (The Compass)",
-   "El rack fisico completo (Le Jardin, Lisboa)"
+   "El rack fisico completo (Le Jardin, Lisboa)",
+   "cc-local · las tres condiciones",
+   "lo que este rack te da"
   ]
  },
  "donde_estas": {

@@ -1,7 +1,7 @@
 {
  "titulo": "Cómo funciona el enjambre",
  "entrada": "Lo que el panel dice en jerga, dicho en palabras. Cada entrada lleva dónde verlo con tus propios ojos: si no hay comando que lo enseñe, no es conocimiento, es una creencia.",
- "medido": "2026-09-03",
+ "medido": "2026-09-04",
  "entradas": [
   {
    "termino": "el enjambre",
@@ -365,6 +365,34 @@
    "donde_verlo": "grep -n '@sleeping' ~/p0x/preceptor/mente/misiones/MISION_TENEDOR.md",
    "fuente": "MISION_TENEDOR.md lineas 75 y 128 · commit 47abacb del 2026-08-31",
    "nota": "La forma general, que vale para todo el rack: antes de construir algo que «falta», se busca si alguien lo mato a proposito. La ausencia sin motivo y la ausencia firmada se ven exactamente igual desde fuera."
+  },
+  {
+   "termino": "preceptoros-pwa.service (antes aurelius.service)",
+   "estado": "RED",
+   "que_hace": "La unidad que sirve la cara del MVP en :8740. Se llamaba `aurelius.service` y el Soberano la renombro el 2026-09-04; la vieja YA NO EXISTE y preguntar por ella devuelve un NO_DATA que no significa que el servicio este caido. El binario correcto es `bin/preceptoros-servicio`, NUNCA `python3 aurelius.py`: ese es el producto interactivo y bajo `Type=simple` seria un bucle de arranques. ESTA EN RED POR UN DANO COLATERAL DEL RENOMBRADO, medido el mismo dia: el drop-in `10-motor-vulkan.conf` --que estaba instalado y ACTIVO sobre la unidad vieja-- quedo huerfano en `~/.config/systemd/user/aurelius.service.d/`, un directorio de una unidad que ya no existe. `systemctl --user show preceptoros-pwa.service -p DropInPaths` sale VACIO y el proceso vivo no tiene `PRECEPTOROS_MOTOR` en su entorno: el motor de inferencia se ha caido a CPU sin que nada lo diga. Cuesta lo que el propio drop-in midio: 19,23 tok/s y 6,2 s de pared por turno, frente a 27,25 tok/s y 3,9 s con Vulkan. Un x1,42 y un 37 % mas de espera, en verde y en silencio. REMEDIO (exige firma, es una unidad): mover el drop-in a `preceptoros-pwa.service.d/`, `daemon-reload` y reiniciar. Y de paso queda `aurelius-interfaz.service`, inactive y disabled, que es el ultimo resto del nombre viejo.",
+   "donde_verlo": "systemctl --user show preceptoros-pwa.service -p DropInPaths,Environment --value  ·  tr '\\0' '\\n' < /proc/$(systemctl --user show preceptoros-pwa.service -p MainPID --value)/environ | grep MOTOR",
+   "fuente": "renombrado del Soberano 2026-09-04 · drop-in medido 2026-08-25 · regresion medida 2026-09-04"
+  },
+  {
+   "termino": "cc-local · las tres condiciones",
+   "estado": "OK",
+   "que_hace": "El cerebro local SI sirve para el arnes de Claude Code, y la telemetria del 2026-08-26 decia que no. Lo que faltaba eran tres cosas a la vez, y ninguna es opcional. (1) `num_ctx=65536`, firmado por el Soberano el 2026-09-04; el lanzador ya lo trae por defecto. (2) `CLAUDE_CODE_MAX_CONTEXT_TOKENS=65536`, porque el modelo es «unrecognized» y el arnes empaqueta contra una ventana supuesta de 200k. (3) `--strict-mcp-config` con una config vacia, que es la que mas pesa: los esquemas de los ~20 servidores MCP del perfil global son la mayor parte del preambulo. Sin la tercera hay 400 aunque sobre ventana, porque la carga CRECE con ella: 26.327 / 43.349 / 68.619 tokens para 16k / 32k / 64k. Y LO QUE CUESTA, que es lo que decide si se delega: ~8 min de pared POR TURNO --454 s medidos esperando el primer token, con el cliente al 1,1 % de CPU mientras el mismo servidor contesta un prompt corto al instante: no esta colgado, esta leyendo su preambulo--. Sale a cuenta en tareas de POCOS TURNOS y mucho texto por turno; un refactor de ida y vuelta sobre varios ficheros son horas. Antes de delegar, cuenta TURNOS, no lineas.",
+   "donde_verlo": "echo '{\"mcpServers\":{}}' > /tmp/mcp-vacio.json  ·  CLAUDE_CODE_MAX_CONTEXT_TOKENS=65536 ~/p0x/bin/cc-local --strict-mcp-config --mcp-config /tmp/mcp-vacio.json",
+   "fuente": "medido 2026-09-04 · canon del nodo, seccion «El cerebro local de cc-local»"
+  },
+  {
+   "termino": "el bucle verde · Restart=always y salir 0",
+   "estado": "OK",
+   "que_hace": "La trampa mas cara de este rack, encontrada DOS VECES el mismo dia en dos nodos distintos. Una unidad `Type=simple` con `Restart=always` cuyo ExecStart termina en 0 SIN dejar proceso en primer plano no se para: systemd cree que acabo bien y la relanza cada `RestartSec`, para siempre y en VERDE. En soberano, `aurelius.service` llevaba 7970 reinicios contra un `preceptoros-pwa` arrancado a mano por una sesion anterior --cgroup de la aplicacion, no de la unidad-- que ademas servia codigo viejo. En la-fragua, la `agora-tunnel` de `/etc/systemd/system/` lleva 5418 sin haber arrancado nunca (`203/EXEC`). Trece mil reinicios y ninguna alarma, por el mismo motivo en los dos sitios: LO QUE SE VIGILA ES EL PUERTO, Y EL PUERTO RESPONDE. Un servicio que reinicia en verde es indistinguible de uno sano desde fuera. Lo que informa no es `is-active` ni un `curl`: es `NRestarts`.",
+   "donde_verlo": "systemctl --user show <unidad> -p NRestarts --value   # y el manager de SISTEMA tambien  ·  p0x/propuestas/2026-09-04_fragua-tunel-duplicado.md",
+   "fuente": "medido 2026-09-04 en soberano (7970) y en la-fragua (5418)"
+  },
+  {
+   "termino": "lo que este rack te da",
+   "estado": "OK",
+   "que_hace": "Medido el 2026-09-04, no copiado de una ficha. SOBERANO (aqui): Ryzen 7 255, **57 GB de RAM utiles** (no 64: esa es la cifra de la caja), Radeon 780M con Vulkan pero SIN CUDA, disco de 915 GB con 425 libres. OLLAMA: **8 modelos**, y CUATRO con tag pelado `:latest` (`preceptor-cazanido`, `-v2`, `preceptor-v7`, `oficial-inventario`) que el canon prohibe usar asi. CEREBRO LOCAL aparte de Ollama: Qwen3-Coder-30B-A3B por `llama-server` con Vulkan, ventana 65536, que habla `/v1/messages` nativo. TAILNET: ocho maquinas dadas de alta y **solo cuatro vivas** -- soberano, el-vigia, la-torre y `orange-pi`; fedora, krista y los dos musculo-hp estan offline. OJO: el nombre de la Orange Pi EN LA MALLA es `orange-pi`, mientras que en `~/.ssh/config` y en toda la doctrina se la llama `la-fragua`. Son la misma maquina --misma IP, se ve en `tailscale status`-- y buscarla por el nombre equivocado da un NO_DATA falso. Y HAY UN TELEFONO: el Doogee S110 por USB, que es el unico sitio donde se comprueba de verdad un PWA o un teclado.",
+   "donde_verlo": "free -g  ·  df -h /  ·  tailscale status  ·  curl -s \"http://$(tailscale ip -4 | head -1):11434/api/tags\" | python3 -m json.tool  ·  adb devices -l",
+   "fuente": "medido 2026-09-04 desde este nodo"
   }
  ]
 }
