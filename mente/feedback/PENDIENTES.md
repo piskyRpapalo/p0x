@@ -1497,3 +1497,61 @@ P6-1.
   dejará de caer a `threads.json` y se verá vacío. Es lo honesto —`hilos_reales:
   0`— pero conviene que la web lo diga con todas las letras antes de que alguien
   lo lea como «el Ágora se rompió».
+
+## Misión Ojo · autonomía no-stop · 2026-09-04
+
+- **P8-1 · Nadie mira `NRestarts`, y hoy había 13.388 reinicios en dos nodos.**
+  (Coste S, y es el hallazgo con más recorrido.) `aurelius.service` en soberano
+  llevaba **7970** reinicios contra un proceso que no era suyo; `agora-tunnel`
+  de sistema en la-fragua lleva **5418** sin haber arrancado nunca. Ninguno de
+  los dos disparó ninguna alarma, y el motivo es el mismo en los dos sitios:
+  **lo que se vigila es el puerto, y el puerto respondía**. Un servicio que
+  reinicia en verde cada diez segundos es indistinguible de uno sano desde
+  fuera. `recolector.py` ya lee unidades para el enjambre: añadirle
+  `systemctl show -p NRestarts` de cada unidad firmada, y que el Ojo lo pinte
+  en ROJO por encima de un umbral, cierra la clase entera de avería.
+
+- **P8-2 · El Director vigila bucles muertos, y es el bucle muerto.** (Coste S
+  la parte de medir, M la de decidir.) `director.py` existe, está registrado en
+  `loops.db` y `--informe` corre limpio, pero **no tiene timer ni unidad**: su
+  último latido es de hace **11,8 días**. Y como la histéresis que marca a los
+  muertos sólo se evalúa cuando el Director corre, se etiqueta a sí mismo
+  `vivo`. Es circular: el vigilante caído no puede declarar su propia caída, y
+  nada más lo mira. El propio docstring lo predijo —«el sistema de vigilancia
+  ha dejado de vigilar sin que nadie lo haya apagado»— sin ver que le hablaba a
+  él. Cronificarlo exige firma; probarlo a mano ya está hecho y sale bien.
+
+- **P8-3 · El inventario que la doctrina manda actualizar no se versiona.**
+  (Coste S.) El canon dice que toda sesión actualiza `recursos.json` antes de
+  cerrar, y `.gitignore:96` lo excluye del repo. El trabajo de inventario de
+  todas las sesiones vive en un solo disco, sin copia y sin historia: no se
+  puede saber quién midió qué ni cuándo dejó de ser verdad. Si la exclusión es
+  por privacidad, el fichero ya viaja con los datos sensibles ofuscados
+  (`[RUTA-OFUSCADA]`, `[CLAVE-SOBERANO]`), así que la razón puede haber
+  caducado. Decidir: versionarlo, o declarar en el canon que es efímero.
+
+- **P8-4 · El Ojo sirvió 4,3 días de datos rancios, y no fue culpa suya.**
+  (Coste S.) `/api/rack` decía `536/536 pruebas · 37 suites` cuando el gate real
+  daba `590/590 · 40`. El panel se portó bien —marcaba `frescura: RANCIO` con
+  sus 372.400 segundos— pero **nadie reejecuta `recolector.py`**: no hay timer,
+  y depende de que una sesión se acuerde. Un dato viejo bien etiquetado sigue
+  siendo un dato viejo, y la etiqueta sólo la ve quien lee el JSON entero.
+  Opciones: timer firmado, o engancharlo al cierre de sesión que el canon ya
+  exige. Refrescado a mano hoy; volverá a envejecer solo.
+
+- **P8-5 · `ls` puede enseñar vacío un directorio con 322 ficheros.** (Coste S.)
+  `ls` es alias de `eza`, y en `~/p0x/preceptor-internal` imprime CERO líneas
+  con `rc=0`: sin error, sin stderr, sin pista. Una sesión que se lo crea da por
+  vacío un repo entero y lo reporta como NO_DATA. Ya está anotado en
+  `recursos.json`; merece subir al canon junto a los otros footguns, porque es
+  peor que los demás: no falla, **miente sobre si hay dato**.
+
+- **P8-6 · Dos ficheros de la web a 13 y 17 bytes del techo.** (Coste M.)
+  `chat-router.js` queda hoy en 10.226 B y `sw.js` en 10.223, con 13 y 17 bytes
+  libres de 10.240. El siguiente porqué que alguien escriba en cualquiera de los
+  dos los revienta, y la doctrina dice PARTIR, no recortar el comentario. Mejor
+  partirlos en frío ahora que con el gate en rojo y con prisa.
+
+- **P7-5 queda RESUELTA.** Medido hoy en la-fragua: `loginctl show-user -p
+  Linger` da `yes`, y `agora-tunnel` de usuario lleva `active running` desde el
+  2026-09-01 con NRestarts 0. El túnel ya sobrevive al reinicio.
