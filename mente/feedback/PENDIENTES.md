@@ -1582,3 +1582,12 @@ P6-1.
   vuelta sobre varios ficheros son horas. La partición de `chat-router.js` y
   `sw.js` es justo del segundo tipo, y esa es la lección que deja: la Regla de
   oro dice *quién* ejecuta, y esta medida dice *cuándo compensa*.
+
+- **P8-9 · Una imagen con las transparencias mal, y puede que sirva.** (Coste S
+  mirarlo.) Anotado por el Soberano el 2026-09-04 sin resolver: hay una lámina
+  con un problema de transparencia que quizá se pueda aprovechar en vez de
+  descartarla. Falta identificar cuál —el barrido de hoy dejó 15 png de croma
+  verde sin versionar en `preceptor/assets/` y 28 en `assets/caras-calibradas/`,
+  así que el candidato está en uno de esos dos sitios— y decidir si el fallo es
+  un defecto o un efecto. Se mide con Pillow: canal alfa por fotograma y dónde
+  el croma no llegó a recortarse.
