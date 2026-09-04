@@ -272,20 +272,20 @@
    "nota": "/vivo es el JUEGO, para una persona. /  (ojo.html) es la CONSOLA, para una IA. No son dos vistas del mismo panel: son dos publicos."
   },
   {
-   "termino": "SAVE GAME · lo que hizo la sesion del 2026-09-02",
+   "termino": "SAVE GAME · lo que hizo la sesion del 2026-09-04",
    "estado": "OK",
-   "que_hace": "HECHO Y EN REMOTO: los 16 sprites sincronizados a web y app (8 bustos 256px, 8 ojos 128px) con `Alejandria/marca/sincronizar.py`. `board.html` renombrada a `community.html` en 3 idiomas, con los DOS anuncios oficiales del Soberano en `public/anuncios.json`, aparte de los hilos de EJEMPLO. `profile.html` NUEVA en 3 idiomas: pseudonimo Ed25519, los 8 bustos elegibles, biografia firmada, medidas del libro publico, contribuciones en NO_DATA con causa, compartir. Amnistia del techo de paginas 7->8, firmada en test_web.py. SEO propio por pagina + sitemap.xml derivado del disco por `sitemap.py` + robots.txt. La cara de la marca unificada en los 7 sitios que la ensenan desde `Alejandria/marca/cara-oficial.jpg` con `iconos.py --comprobar`. Dos fallos arreglados: el avatar iba un clic por detras (parametro que sombreaba la variable del modulo) y `ambient.js` no recogia el rechazo de `startViewTransition().ready`, que ensuciaba la consola con siete «Uncaught (in promise)» por carga.",
-   "donde_verlo": "git -C ~/preceptoros-web log --oneline -4  ·  git -C ~/p0x log --oneline -3",
-   "fuente": "Mision Agora 2026-09-02 · gates en verde: web 73/73, app 540/540",
-   "nota": "Lo que NO se hizo: la Mision 3, el refactor de la App MVP. Es la siguiente, y tiene entrada propia en este glosario."
+   "que_hace": "HECHO Y COMMITEADO (falta empujar `preceptor`). CARA UNIFICADA en app y web, con los mismos numeros en las dos: la apertura --la piedra y el laser-- sale del cabezal del chat y se queda solo en el telon; la cara nace despierta; fuera el fundido que la dejaba medio transparente varias veces por minuto; acercada 1,225x en el cabezal (490 %) y 1,1x en el telon (770 %), que son los puntos medios tras probar 1,45x y 1,2x y sonar demasiado cerca. MARCA EN TEXTO: fuera `titulo-preceptoros.png` (184 kB de gotico ilegible), ahora `Preceptor` en tinta y `OS` en violeta y mas grande, en las dos caras -- la web lo tenia AL REVES. PERFIL sin el selector de 16 avatares (la api conserva su vocabulario cerrado, con sus pruebas). VOZ: el mando baja junto a Enviar y se dibuja apagado, con el microfono tachado, porque dictado no hay -- el del navegador manda el audio a Google. PROYECTOS: de cuaderno de rutas a gestor con descripcion, estado (vocabulario cerrado), ultima actualizacion y notas, con migracion aditiva probada contra una base vieja. TECLADO verificado en el Doogee con guion propio.",
+   "donde_verlo": "git -C ~/p0x/preceptor log --oneline -8  ·  git -C ~/preceptoros-web log --oneline -2",
+   "fuente": "sesion 2026-09-04 · gates: app 590/590, web 74/74, enjambre 88, Alejandria 53",
+   "nota": "TRES AVERIAS DE FONDO que se arreglaron y conviene no reintroducir. (1) `steps(3, jump-none)` sobre una tira de CUATRO cuadros dejaba una parada en la juntura: medio cuadro de cada lado, un circulo casi vacio. Llevaba meses invisible. (2) El busto venia DIBUJADO 13,6 % a la izquierda y el css no podia corregirlo; se genero `cara-secuencia-apertura-256-centrada.webp` corriendo cada cuadro 35 px, y el original sigue intacto al lado. (3) El html no llevaba `Cache-Control`, asi que el `?v=N` de css y js --que vive DENTRO del html-- nunca se leia: cuatro veces se dio por no aplicado un cambio que si estaba en disco."
   },
   {
-   "termino": "SIGUIENTE MISION · refactor de la App MVP",
-   "estado": "NO_DATA",
-   "que_hace": "LA MINA. El MVP (~/p0x/preceptor) ya tiene base solida: `memory.py` (SQLite + FTS5), `guardrails.py` (el filtro que sanea antes de salir), `captura.py` (turnos). LO QUE FALTA, firmado por el Soberano: 1) «The Path» (El Camino) y «The Compass» (La Brujula) como guias visuales ligeras en `interface/app.html` y `interface/dashboard.html`. 2) Pestana «Perfil Local»: clave publica del usuario y eleccion de avatar entre los 8 bustos — YA ESTAN en `preceptor/assets/busto-*.webp`, se sincronizaron el 2026-09-02. 3) Herramientas de vision: elegir un LoRA de la lista y ver sus metricas con `metricas.py`. 4) PROHIBIDO rutear a la web desde la app. Son dos mundos separados hoy.",
-   "donde_verlo": "ls ~/p0x/preceptor/interface/  ·  ls ~/p0x/preceptor/assets/busto-*.webp",
-   "fuente": "Vision Soberano 2026-09-01, reafirmada 2026-09-02",
-   "nota": "NO se toca `preceptor-lora/forja/entrenar_lora.py`: ya esta ajustado. Y el gate del MVP es `bin/pruebas`, no pytest — pytest solo ve parte de la suite."
+   "termino": "SIGUIENTE MISION · lo que quedo abierto el 2026-09-04",
+   "estado": "OK",
+   "que_hace": "El refactor de la app YA NO es la siguiente mision: se hizo. Lo que queda, por orden de lo mas barato a lo mas caro. 1) EMPUJAR `preceptor`, que es lo unico sin empujar. 2) LOS 43 PNG SUELTOS: 15 de croma verde sin versionar en `preceptor/assets/` (15,6 MB) mas 28 en `assets/caras-calibradas/`, y 3 laminas borradas sin commitear (6,8 MB). Uno se llama `wake1,5.png`, con coma. Decidir que entra y que se va, y de paso mirar P8-9 -- hay una lamina con la transparencia mal que quiza sirva como efecto en vez de como defecto. 3) LOS OCHO BUSTOS VIEJOS: el Soberano los borro «para que no existan confusiones» y esta sesion los restauro sin saberlo; siguen en disco. Antes de borrarlos hay que quitarlos del vocabulario de avatares (test_pwa fija `busto-despierto.webp` a mano) y saber que `herramientas/unir_bustos.py` los usa como fuente para generar las tiras. 4) LAS TIRAS DE REPOSO Y HABLA no estan centradas del todo tampoco; se arreglan igual que la de apertura si molesta. 5) `chat-router.js` y `sw.js` de la web siguen a 17 y 16 bytes del techo de 10 KB.",
+   "donde_verlo": "git -C ~/p0x/preceptor status --short  ·  grep -n 'P8-9' ~/p0x/mente/feedback/PENDIENTES.md",
+   "fuente": "cierre de la sesion 2026-09-04",
+   "nota": "Y una cosa que NO se puede arreglar desde el css, por si vuelve a pedirse: mover una cara dentro de su circulo tiene techo. La ventana de un cuadro no puede salirse de su cuadro o se cuela el vecino, y eso fija c entre 0,5/zoom y 1-0,5/zoom. Si hace falta mas, se corrige la tira."
   },
   {
    "termino": "los repos, y no son tres",
