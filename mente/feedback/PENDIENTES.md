@@ -1529,6 +1529,14 @@ P6-1.
   por privacidad, el fichero ya viaja con los datos sensibles ofuscados
   (`[RUTA-OFUSCADA]`, `[CLAVE-SOBERANO]`), así que la razón puede haber
   caducado. Decidir: versionarlo, o declarar en el canon que es efímero.
+  **Y no es uno, son dos.** `mente/telemetria/cerebro_local.jsonl` está también
+  en `.gitignore`, y el canon dice de él algo aún más fuerte: *«sin ese fichero
+  no hay forma legítima de re-editar este reparto más adelante: se decidiría de
+  memoria, que es exactamente lo que esta sección existe para impedir»*. Un
+  registro que existe para poder revisar una decisión dentro de meses, y que
+  vive sin copia en un solo disco, no cumple lo que promete. Hoy ya sostiene
+  algo que importa: la entrada del 2026-08-26 dejó una pregunta abierta y la del
+  2026-09-04 la responde. Esa cadena es justo lo que se pierde.
 
 - **P8-4 · El Ojo sirvió 4,3 días de datos rancios, y no fue culpa suya.**
   (Coste S.) `/api/rack` decía `536/536 pruebas · 37 suites` cuando el gate real
