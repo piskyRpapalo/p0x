@@ -223,6 +223,60 @@ pero hay que acordarse, y por eso queda escrito.
 99` de verdad y `-c 32768` medido. Para si no encuentra binario o modelo, en vez de caer a CPU
 en silencio — que es exactamente lo que hacía antes sin decirlo.
 
+## El cerebro local de `cc-local` · techo **65536**, firmado 2026-09-04
+
+**No confundir con el modelo de la sección anterior.** Son dos modelos, dos servidores y dos
+techos, y mezclarlos es exactamente el error que este canon existe para impedir:
+
+| | modelo del nodo (chat) | **cerebro local (`cc-local`)** |
+|---|---|---|
+| modelo | Qwen3.8-27B-Uncensored-OrcaRouter | **Qwen3-Coder-30B-A3B-Instruct-Q4_K_M** |
+| binario | build Vulkan de `soberano-bench` | **`llama-server` de Ollama + `GGML_BACKEND_PATH`** |
+| lanzador | `qwen-chat.sh` | **`deploy/soberano/cerebro-local-arranca.sh`** |
+| techo | 32768 (medido 2026-08-25) | **65536 (medido y firmado 2026-09-04)** |
+
+El Bloque SOBERANO-1 fijaba 16384. **Sube a 65536**, medido: con el modelo cargado quedan
+~20 GB de RAM libres y `/health` responde. Backend Vulkan comprobado por los **dos descriptores
+a `/dev/dri`** del proceso, no por el log — que a la verbosidad de arranque no menciona Vulkan
+ni una vez.
+
+### `cc-local` no arranca solo, y hacen falta TRES cosas a la vez
+
+El arnés de Claude Code manda un preámbulo enorme, y **crece con la ventana** — subir `num_ctx`
+a secas no lo arregla nunca:
+
+| `num_ctx` | pide el arnés | |
+|---|---|---|
+| 16384 | 26.327 | 400 |
+| 32768 | 43.349 | 400 |
+| 65536 | 68.619 | 400 |
+| 65536 **+ `--strict-mcp-config`** | cabe | **turno completo** |
+
+    echo '{"mcpServers":{}}' > /tmp/mcp-vacio.json
+    P0X_NUM_CTX=65536 deploy/soberano/cerebro-local-arranca.sh
+    CLAUDE_CODE_MAX_CONTEXT_TOKENS=65536 ~/p0x/bin/cc-local \
+      --strict-mcp-config --mcp-config /tmp/mcp-vacio.json
+
+Las tres, y ninguna es opcional. `CLAUDE_CODE_MAX_CONTEXT_TOKENS` porque el modelo es
+«unrecognized» y el arnés empaqueta contra una ventana supuesta de 200k. `--strict-mcp-config`
+porque **los esquemas de los ~20 servidores MCP del perfil global son la mayor parte del
+preámbulo** — es la que más pesa de las tres.
+
+Esto **revierte el veredicto del 2026-08-26**, que daba el cerebro local por no viable para el
+arnés y cerraba pidiendo justo esta medición: *«antes de darlo por muerto, medir el preámbulo
+con los MCP apagados»*. Sí sirve.
+
+### Lo que cuesta, que es lo que decide si se usa
+
+**~8 minutos de pared por turno.** El cliente pasa 454 s al 1,1 % de CPU esperando el primer
+token mientras el mismo servidor contesta un prompt corto al instante: no está colgado, está
+leyendo su preámbulo. La aritmética es la de la tabla de arriba — decenas de miles de tokens a
+67 tok/s de prompt.
+
+Consecuencia práctica, y es la que manda al delegar: **el cerebro local sale a cuenta en tareas
+de pocos turnos y muchos tokens por turno**, no en refactors largos de ida y vuelta. Antes de
+delegar, cuenta turnos, no líneas.
+
 ## Footguns conocidos (con cicatriz)
 
 - **Tags Ollama pelados** apuntan a variantes Thinking con razonamiento no desactivable — siempre

@@ -50,7 +50,13 @@ GGUF="${P0X_GGUF:-$HOME/soberano-bench/models/Qwen3-Coder-30B-A3B-Instruct-Q4_K_
 PUERTO="${P0X_PUERTO:-8081}"
 BIND="${P0X_BIND:-$(tailscale ip -4 2>/dev/null | head -1)}"
 [ -n "$BIND" ] || BIND=127.0.0.1   # sin tailnet, al menos que arranque en local
-NUM_CTX="${P0X_NUM_CTX:-16384}"     # autorizado por el Soberano (Bloque SOBERANO-1)
+# 65536 y no 16384 desde el 2026-09-04, firmado por el Soberano. El techo viejo
+# era del Bloque SOBERANO-1 y NO daba para el arnes de Claude Code: su preambulo
+# pide 26.327 tokens con la ventana a 16k, y la carga crece con la ventana
+# (43.349 a 32k, 68.619 a 64k), asi que `cc-local` moria en 400 antes del primer
+# turno. Medido con el modelo dentro: quedan ~20 GB de RAM libres. Y no basta con
+# esto: hace falta ademas arrancar el arnes con --strict-mcp-config. Ver el canon.
+NUM_CTX="${P0X_NUM_CTX:-65536}"
 NGL="${P0X_NGL:-999}"               # todas las capas a la GPU
 LOG="${P0X_LOG:-$HOME/.cache/p0x/cerebro_local_arranque.log}"
 
