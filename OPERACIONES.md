@@ -101,3 +101,46 @@ Eso lo ata a `mente/doctrina/LORATELIER_P0X.md` por el extremo contrario al
 botón «corregir esta respuesta»: uno recoge correcciones, el otro define
 disparos. Con D1-D4 abiertas, **el panel puede existir vacío; los disparadores
 no se activan sin firma**.
+
+## El tope por fichero de la web · 16 KiB, medido (2026-09-05)
+
+El tope llevaba en 10 KB desde que el Soberano lo puso a mano. Sube a **16 KiB
+(16.384 B)**, y esta vez sale de una cuenta que se deja aquí para que la
+próxima revisión discuta con datos y no con gusto.
+
+**Lo que se descubrió al medir: el tope de 10 KB nunca fue un límite de red.**
+Los 77 ficheros que la regla vigila comprimen **2,43x** de media —458.360 B en
+disco contra 188.656 B con `gzip -9`—, así que uno de 10.240 B viajaba como
+~4.214. La ventana inicial de congestión son ~14 KB (diez paquetes de ~1.460),
+o sea que el tope viejo gastaba **menos de un tercio** del primer viaje de ida
+y vuelta. Sobraba red por todas partes.
+
+**Lo que sí acotaba era el razonamiento.** El **43 %** de un fichero de este
+árbol es prosa, porque aquí los comentarios son la documentación. A 10.240 B
+eso deja ~5.850 B de código útil; en cuanto una pieza pedía 6,5 KB, lo que se
+recortaba era el porqué. Pasó de verdad en la sesión del 2026-09-05: se limaron
+comentarios propios **seis veces seguidas** para volver bajo el tope, que es
+exactamente lo que «se parte, no se recorta» viene a impedir.
+
+**La aritmética del número nuevo.** Se reparte la ventana inicial y se le da a
+un fichero la mitad —varios se piden en paralelo y comparten ese vuelo—: 7 KB
+en el cable. A 2,43x son 17,4 KB en disco, redondeado a la baja al binario
+limpio: **16 KiB**. Comprobado al revés: 16.384 B viajan como ~6.743, el 48 %
+de un viaje.
+
+**No se queda en una suposición.** El tope de disco es un proxy, así que entró
+con `test_ningun_fichero_gasta_medio_viaje_de_red`, que comprime cada fichero y
+lo mide contra ese medio viaje. Un ratio medio deja de valer en cuanto entra
+algo que comprime mal —base64, rutas SVG largas—, y una regla que se cumple por
+casualidad se rompe el día que alguien cambia lo casual.
+
+**Lo que desbloquea, y por qué importa para refactorizar.** `sw.js` gana 6,1 KB,
+que a ~22 B por línea de precache son sitio para ~270 ficheros más. La razón por
+la que un `capas.css` se escribió y se deshizo el mismo día —su etiqueta dejaba
+`sw.js` en 10.244 B— deja de existir. A partir de aquí **partir por asunto ya no
+cuesta una ranura**: se puede separar sin negociar con el tope.
+
+La cifra es pública: se anuncia en las tres portadas y en el README, así que se
+cambia en los cinco sitios a la vez. Enmienda propuesta para `METRICAS_NORMA.md`
+en `propuestas/2026-09-05_tope-fichero-web.md` — ese documento es
+`editor_autorizado: carbono` y solo el Soberano lo canoniza.
