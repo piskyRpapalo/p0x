@@ -1,114 +1,80 @@
-# Traspaso · sesión del 2026-09-05
+# Traspaso · sesión del 2026-09-05 (noche)
 
-**Gates al cerrar:** `preceptor/bin/pruebas` → **VERDE 617/617** ·
-`preceptoros-web/test_web.py` → **76/76**. Los tres repos empujados, cero
-pendientes.
+**Gates al cerrar:** web `test_web.py` **76/76** · `arnes_sw.mjs` **21/21** ·
+app `bin/pruebas` **617/617**. Los tres repos empujados, cero pendientes sin
+commitear.
 
-**Servidor de pruebas de la web.** Se levanta desde `~/preceptoros-web` con
-`nohup python3 -m http.server 8118 --bind 0.0.0.0 --directory public &`, y se
-abre desde el móvil con la dirección del nodo en la tailnet —`tailscale ip -4`—
-o la del wifi —`hostname -I`—, seguida de `:8118/es/`. Las direcciones no se
-escriben aquí: la guardia de higiene las bloquea, y con razón.
-
-**No es el sitio desplegado.** `preceptoros.org` va por detrás y ahí no se ve
-nada de lo de hoy. Esa confusión ya costó tres capturas.
+**Lee primero:** [`INVENTARIO.md`](INVENTARIO.md) — cada parte de la web y de
+la app, con sus secciones, sus visuales y dónde vive cada cosa. Y
+`~/preceptoros-web/docs/ESTADO.md` para el trabajo de GitHub.
 
 ---
 
-## Lo hecho, en una línea cada cosa
+## Lo hecho esta noche, en una línea cada cosa
 
-**App** · el harness lee la base (`herramientas.py`, recuperación inyectada) y
-los dos gestos de escritura —botón sobre el turno y formulario del cajón—
-escriben por `/api/anidar` con `origen: persona`. Comprobado en metal: turno →
-guardar → el turno siguiente contesta «Vera.», y la app no guarda historial, así
-que la única vía es la recuperación.
+**Un solo marco** de bronce engloba el lugar de trabajo entero. Eran tres
+cajas con mármol entre medias.
 
-**Techo por fichero** · sube de 10 KB a **16 KiB**, medido y canonizado en
-`METRICAS_NORMA.md` v1.1.0. Con `test_ningun_fichero_gasta_medio_viaje_de_red`
-vigilando el cable de verdad.
+**El botón de Herramientas ya no existe.** Sus ocho nubes bajaron al cuadro de
+especificaciones, donde se ven sin pulsar nada. Retirar el mando no bastaba: el
+router seguía plegándolas al arrancar y quedaron invisibles con contenido
+dentro.
 
-**Web** · cinco capas, cabezal nuevo, dos paneles, cara de la app, atajos
-fusionados en una fila, telón, capas 2 y 5.
+**El cabecero, por esquinas.** Escritorio: marca izquierda, rueda e identidad
+gemelas —doradas y transparentes— en la esquina derecha. Teléfono: dos
+renglones, marca con sus iconos y debajo la cuenta con la rueda.
 
----
+**La esfera dejó de apagarse.** La traslucidez era una línea literal
+(`opacity:.55` al escribir). Ahora se enciende en neón al pensar y saca la nube
+«Activando modelo».
 
-## LO QUE FALTA · empezar por aquí
+**La declaración solar es una pila que se carga**, dibujada en un
+pseudo-elemento, sin una sola etiqueta nueva.
 
-### 1 · Desplegar
-Nada de lo de hoy está en `preceptoros.org`. Es lo primero: el Soberano está
-mirando el sitio desplegado y ve la versión de antes.
+**Teclado abierto:** `visualViewport` publica el alto real y la página se
+reparte en columna. `dvh` no servía — en Android el teclado se dibuja encima
+sin encoger la ventana.
 
-### 2 · Las transparencias, comprobadas en el móvil de verdad
-Están escritas (`color-mix` sobre `--glass-solid` al 62 %, y los desplegables al
-78 %) y verificadas en el navegador del arnés. **Falta verlas en el Doogee**: el
-`backdrop-filter` se comporta distinto ahí y el respaldo opaco tiene que
-aguantar. Si no se ve el fondo a través, mirar primero si `@supports` está
-cayendo al respaldo.
+**Un despertar por sesión**, y la app instalada deja de preguntar el idioma
+cada vez.
 
-### 3 · La secuencia de despertar, la que pidió el Soberano
-El telón ya está cableado con `cara-secuencia-apertura-256-telon.webp` al 770 %,
-`steps(7, jump-none)` en 1,2 s y la cortina cayendo a 1,8 s — las cifras de la
-app. **Lo que falta es comprobar que se ve al abrir la web**, y que la
-transición del telón a la cara de reposo no da un salto.
+**Los dos README**, en inglés, con la voz del Soberano: para quién se escribe
+GitHub, la soberanía de la corriente, el rack como laboratorio, las dos formas
+de participar, y la base de datos local explicada para quien empieza.
 
-Los masters están en `Alejandria/marca/` con su catálogo (`catalogo.json`, 20
-piezas: `busto-dormido`, `busto-grieta`, `busto-rompe`, `busto-ojo`,
-`busto-despierto`, `busto-corazon` para el despertar; `habla-1..4` para la boca).
-Las tiras ya derivadas viven en `preceptor/assets/` y se copiaron a
-`preceptoros-web/public/assets/caras/`.
-
-### 4 · Los tres estados, ya funcionando — no volver a tocarlos
-reposo 122,5 % · piensa 612,5 % · habla 490 %, con el desplazamiento 27,78 %.
-**Ese 27,78 no es un centro mal puesto**: el busto viene dibujado a la izquierda
-de su cuadro y al 50 % los ojos quedan descentrados respecto del aro. Firmado en
-la app el 2026-09-04.
-
-### 5 · Los idiomas
-**Portugués: HECHO** (2026-09-05). Cuarta lengua, entera y en verde. Se armó
-fuera de `public/` y se movió de una vez, así que el gate no estuvo rojo por una
-lengua a medias ni un momento — que es la lección que `LEEME-pt.md` dejó escrita.
-
-El bloqueo que aquel documento anunciaba como «el hallazgo que vale para las
-cuatro lenguas siguientes» **ya no existe**: los «dos bloques de traducción» eran
-el fragmento huérfano de i18n que se borró esa misma mañana. Traducir es traducir
-un bloque.
-
-**Faltan cuatro: italiano, alemán, ruso y griego.** Medido lo que cuesta cada
-una: ~12.000 caracteres de texto visible repartidos en siete páginas, de los
-cuales 6.290 son `instalar.html` sola —que no tiene bloque i18n y lleva la mitad
-de sus cadenas en comandos que NO se traducen—. La receta que funcionó:
-
-1. Armar la lengua completa en `traducciones/<idioma>/`, nunca en `public/`.
-2. Copiar de `es/`, cambiar `lang`, `prompts-<idioma>.js` y las URL canónicas.
-3. Traducir el bloque `id="i18n"` entero y las cadenas visibles.
-4. Cablear: `prompts-<idioma>.js`, los dos anuncios, los ocho bustos, el
-   selector de la raíz, el `hreflang` en TODAS las portadas, la página sin red
-   de `sw.js`, y la cuenta de rutas de `arnes_sw.mjs` (sube de siete en siete).
-5. Mover a `public/`, regenerar el sitemap y `coherencia-publica.py --si`.
-
-El selector de la rueda ya NO hay que tocarlo: descubre las lenguas de las
-etiquetas `hreflang` de la propia página.
-
-**Y una advertencia sobre ruso y griego:** son las dos que no puedo revisar. La
-copia de producto mal traducida en un sitio público es peor que no tenerla.
-
-### 6 · El catálogo de compañeros está solo en castellano
-`hub.json` lleva UN `name` y UNA `function` por agente, sin variantes por idioma:
-«El Instalador» sale igual en la portada inglesa, la francesa y la portuguesa.
-**No lo trajo el portugués — ya pasaba.** Arreglarlo son 8 agentes × N idiomas en
-un fichero que tiene sus propias pruebas, y es decisión de contenido: puede que
-los nombres sean nombres propios y no deban traducirse.
+**Arreglado:** tres guiones que no cargaba nadie, el onboarding que prometía un
+404, y el nombre del compañero que viajaba sin traducir.
 
 ---
 
-## Tres trampas que mordieron hoy
+## Las siete trampas de esta sesión
 
-1. **El caché del navegador enseña código viejo.** Pasó cinco veces. Lo que se ve
-   no es lo que hay en disco hasta que se sirve desde un puerto nuevo.
-2. **Los guardianes leen los comentarios como si fueran código.** Nombrar
-   `text-shadow` en una frase que explica por qué NO se usa pone el gate rojo.
-   Igual con palabras de cuatro mayúsculas en `interface/` y con `NO_DATA`, que
-   no es una política declarada.
-3. **Un oyente que revienta firma el crimen con el nombre de quien lo disparó.**
-   Un `insertBefore` mal apuntado en un oyente de `hub:listo` salía atribuido a
-   la línea del `dispatchEvent`, en otro fichero y doscientas líneas más allá.
+Ninguna se dedujo: todas se midieron o se vieron en pantalla.
+
+1. **El guardián lee los comentarios como código.** Seis rojos por nombrar un
+   radio o un `backdrop-filter` en la frase que explica por qué NO se usan.
+2. **El caché del navegador enseña código viejo.** Media hora leyendo una regla
+   que estaba en disco y no en el navegador. Puerto nuevo por tanda.
+3. **El telón bloquea las capturas headless.** Se fotografía sirviendo una
+   copia de `public/` sin ese bloque.
+4. **Retirar un mando es retirar también lo que le obedecía.**
+5. **`display:contents` anula el `order` del envoltorio.**
+6. **Un `top` no gana a un margen: se suman.** Los dos mandos declaraban la
+   misma altura y uno caía 11,2 px más abajo — el `margin-top` de `.fila`.
+7. **Con `margin-left:auto` en dos cajas el hueco se reparte**, no se cierra.
+
+Y una que vale por todas: **un guardián puede estar en verde protegiendo el
+fallo.** El del onboarding exigía literalmente las dos URL que daban 404.
+
+---
+
+## Lo que queda
+
+1. **Reordenar GitHub** — hay un prompt escrito para eso en
+   `prompts/SESION_GITHUB.md`.
+2. **Seguir con web y app** — prompt en `prompts/SESION_PRODUCTO.md`.
+3. **Revisión nativa de ruso y griego.** Son las dos lenguas que no puedo
+   revisar.
+4. **Una captura con el teclado abierto en un teléfono real.** Lo de aquí está
+   medido forzando `--alto-visible` en el navegador, no en metal.
+5. **Los cinco arreglos propuestos** están en `INVENTARIO.md`, parte 3.
