@@ -88,25 +88,50 @@
  },
  "por_donde_vamos": {
   "que_es": "Donde quedo el rumbo al cerrar la sesion del 2026-09-05. Existe porque la sesion siguiente empieza en frio y, sin esto, vuelve a decidir de memoria lo que ya se decidio con datos.",
-  "fecha": "2026-09-05",
+  "fecha": "2026-09-05 (cierre de la tarde)",
   "frente_abierto": "preceptoros.org · la web publica",
   "hecho_hoy": [
-   "OCHO LENGUAS completas: es, en, fr, pt, it, de, ru, el. Siete paginas cada una, prompts propios, los ocho companeros, bustos, comandos, los dos anuncios y la pagina de sin conexion.",
-   "El nombre de cada companero se traduce; el COMANDO no. Un comando es un identificador: si `/instalar` fuera `/install` en ingles, el mismo gesto tendria ocho nombres y ninguna guia serviria para dos idiomas. La explicacion viaja en el `title`, al pasar el cursor.",
-   "UNA SOLA CARA en toda la web: las 24 paginas interiores llevaban un busto de pixel de otra epoca y ahora llevan la misma esfera que la portada, letra por letra el mismo HTML.",
-   "INSTALAR (antes «INSTALAR AQUI») es ahora una puerta con tres caminos: la web instalable como PWA, la descarga de la app, y el catalogo de modelos DERIVADO de modelos.json.",
-   "Las cuatro puertas del cabezal, en oro, con el contraste medido en los dos temas: 9,15 · 7,30 · 9,15 · 5,32.",
-   "La web entera pasa a la estetica de la app: placa del chat transparente del todo --sin velo y sin desenfoque, la veta del marmol cruza el canto sin costura--, todo lo que se pulsa en nube violeta con canto dorado, y las dos pantallas de entrada con marmol."
+   "OCHO LENGUAS completas: es, en, fr, pt, it, de, ru, el. Siete paginas cada una, prompts propios, companeros, bustos, comandos, anuncios y pagina de sin conexion.",
+   "LA ESTETICA DE LA APP, TRAIDA A LA WEB. La placa del chat es transparente del todo --sin velo y sin desenfoque: la veta del marmol cruza el canto sin costura-- y lo que paga la legibilidad es la letra, no un fondo. Todo lo que se pulsa es nube violeta con canto dorado. Las dos pantallas de entrada llevan marmol.",
+   "EL CHAT ES UNA SOLA PLACA de altura fija: la conversacion nace abajo, empuja hacia arriba, se difumina al llegar al cabezal --mascara, no degradado-- y el campo se queda pegado abajo. Los atajos SALIERON de la placa: once pildoras son cinco filas en 375 px y dejaban la conversacion en 41 px de 620.",
+   "UN SOLO CABEZAL PARA LAS 48 INTERIORES, con los mismos botones y los mismos rotulos que la portada -- derivados de su bloque i18n, no reescritos-- y la casa como ICONO. Antes cada pagina llevaba su lista, en otro orden y con otros nombres.",
+   "HERRAMIENTAS son nubes sueltas y solo se pintan los companeros SERVIDOS: se fueron el titulo, el rotulo «MOCK · 1/8» y los siete sin adaptador. Los siete siguen en el catalogo con su `causa_no_servido`.",
+   "LA VOZ POR NUBE, PREPARADA Y APAGADA. Si el navegador dicta en el aparato, se hace local y no se pregunta. Si no, el boton ofrece la via de Google y no enciende nada hasta un SI explicito que dura UNA sesion (`sessionStorage`).",
+   "LA VELOCIDAD DEL CEREBRO, debajo del nombre del modelo, en media por hora y con sus huecos declarados. `medidas.json` lleva su contrato dentro para que lo reescriba el enjambre.",
+   "EN LA APP: el canto dorado llega a mandar, los atajos y el campo, con `--mando-aro`, que ya existia y ya gira con el tema. 617/617 en verde. COMMITEADO EN LOCAL, SIN EMPUJAR -- el Soberano aparco GitHub."
   ],
   "lo_siguiente": [
-   "LA VELOCIDAD EN LA WEB, DE VERDAD. `preceptoros-web/public/medidas.json` ya esta en produccion debajo del badge del modelo, con la forma de la ventana HORARIA --`desde`, `hasta`, `muestras`-- y su contrato dentro: quien escribe, cada cuanto y que `null` es NO_DATA con causa. Lo que falta es que el enjambre local lo VUELQUE: hoy lleva una pasada suelta de llama-bench del 2026-08-25 y cuatro huecos declarados (media por hora, sha256, TTFT, firma). El dia que se cambie de modelo, se mide y se vuelca; la pagina no calcula nada, lee y pinta.",
-   "REVISION NATIVA del ruso y del griego. Son las dos lenguas que ninguna sesion ha podido leer con oido nativo: la estructura la comprueba el gate, el registro no lo comprueba nadie. Retirar una lengua es `git rm -r public/<lengua>`, quitarla de `sw.js` y regenerar.",
-   "El resto de la web sigue donde lo dejo el handoff: la app y la web son dos capas distintas y no se mezclan."
+   "EL README, Y ES LO PRIMERO. Se pidio: en INGLES solamente --hoy son bilingues y duplican cada frase--, con frases sencillas y SIN NOMBRES PROPIOS. La app se cuenta como un medidor de IA y acceso democratizado al autoconocimiento; la web, como guia para romper la barrera de la dificultad tecnica y crear comunidad. NO SE APLICA SIN ENSENARLO ANTES: el Soberano lo pidio expresamente.",
+   "LAS FOTOS YA ESTAN HECHAS y esperan en `preceptoros-web/docs/img/`: puerta, chat, instalar y phone, en WebP, 211 KB las cuatro (venian de 1,6 MB en PNG). Se capturan con `google-chrome --headless=new --screenshot` contra un `http.server` local y se convierten con Pillow. Falta una de Herramientas abierto: en captura estatica no se puede abrir el panel, habria que hacerla con el navegador del arnes.",
+   "REVISION NATIVA del ruso y del griego: son las dos lenguas que ninguna sesion ha podido leer con oido nativo. Retirar una es `git rm -r public/<lengua>`, quitarla de `sw.js` y regenerar.",
+   "EL VOLCADO HORARIO del enjambre en `medidas.json`. Hoy hay UNA pasada de llama-bench del 2026-08-25 y cuatro huecos declarados: media por hora, sha256, TTFT y firma.",
+   "Y LO QUE EL SOBERANO DIJO COMO CRITERIO, no como tarea: icono antes que palabra siempre que se pueda. Quita trabajo a quien escribe y trabajo cognitivo a quien usa."
   ],
-  "dos_ficheros_al_borde": {
-   "que_pasa": "El tope por fichero es 16.384 B. El griego y el ruso gastan DOS bytes por letra, asi que un parrafo que en castellano cuesta 300 cuesta 600 alli. Antes de añadir prosa a cualquier pagina, se mide en griego primero.",
-   "el/instalar.html": "15.795 B · 589 libres · el mas apretado del sitio",
-   "assets/widget.css": "16.085 B · 299 libres"
+  "ficheros_al_borde": {
+   "que_pasa": "El tope por fichero es 16.384 B y HOY hay seis a menos de 1,5 KB. El griego y el ruso gastan DOS bytes por letra: un parrafo que en castellano cuesta 300 alli cuesta 600. Antes de añadir prosa a cualquier pagina se mide en griego, no en castellano.",
+   "medido": "2026-09-05",
+   "lista": [
+    "assets/chat.css 16.048",
+    "hub-textos.json 15.908",
+    "el/instalar.html 15.885",
+    "el/index.html 15.746",
+    "ru/index.html 15.189",
+    "assets/panel.css 15.105"
+   ],
+   "que_hacer": "SE PARTE, NO SE RECORTA. Hoy se partieron cuatro: `nubes.css` de `panel.css`, `puertas.css` de `widget.css`, `escribir.css` de `chat.css` y los textos del Hub de `hub.json`. Los comentarios son la documentacion de esta casa; quitarlos para que quepa es pagar el tope con lo unico que no se puede volver a deducir del codigo."
+  },
+  "donde_esta_cada_cosa": {
+   "que_es": "Mapa de lo que se partio hoy, para no buscar una regla en el fichero de ayer.",
+   "cristal y velo de cabezal y chat": "assets/widget.css",
+   "las cuatro puertas y el cabezal de las interiores": "assets/puertas.css",
+   "el mueble de los dos desplegables": "assets/panel.css",
+   "lo que hay DENTRO de Herramientas": "assets/nubes.css",
+   "el campo, los mandos y los atajos": "assets/escribir.css",
+   "las capas del chat, el pleno y los cantos": "assets/chat.css",
+   "rotulos del Hub, cola y correccion, 8 lenguas": "hub-textos.json",
+   "rotulos del cabezal interior, DERIVADOS de las portadas": "nav.json",
+   "rotulos de la pagina Instalar": "instalar.json",
+   "velocidad del cerebro y su contrato": "medidas.json"
   }
  }
 }
