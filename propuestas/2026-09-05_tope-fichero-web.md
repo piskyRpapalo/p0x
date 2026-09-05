@@ -1,7 +1,10 @@
 # Enmienda propuesta · el tope por fichero de la web
 
 **Documento destino:** `mente/doctrina/METRICAS_NORMA.md`
-**Estado:** propuesta. `editor_autorizado: carbono` — solo el Soberano canoniza.
+**Estado:** ✅ **FIRMADA por el Soberano el 2026-09-05.** Canonizada en
+`mente/doctrina/METRICAS_NORMA.md` v1.1.0, sección «El tope por fichero de la
+web · 16 KiB». Este fichero se queda como el expediente de la decisión: la
+norma lleva la regla, y aquí están los datos con los que se tomó.
 **Propone:** sesión de frontera, 2026-09-05, con medición.
 **Aplicado ya en código:** sí, commit `35bd29b` en `preceptoros-web` (gate 76/76).
 El código y la doctrina van desacoplados a propósito: el gate ya protege el

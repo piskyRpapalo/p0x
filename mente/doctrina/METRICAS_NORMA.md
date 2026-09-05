@@ -3,10 +3,10 @@ id: metricas-norma
 titulo: La Norma de Métricas — un solo esquema para la web y para la app
 tipo: doctrina
 clase: doctrina
-version: 1.0.0
+version: 1.1.0
 editor_autorizado: carbono
 metrica_exito: "cero cifra publicada (web o app) que no sea reproducible por su campo `como`; cero campo relleno con 0 cuando el estado real es NO_DATA; los dos paquetes comparables se diferencian solo en hardware, nunca en normas"
-umbral_reedicion: "que se mida un `num_ctx` distinto de 32768 en este nodo, que aparezca hardware con VRAM dedicada en el rack, o que se cierre D2 de LorAtelier (qué se paga con datos firmados)"
+umbral_reedicion: "que se mida un `num_ctx` distinto de 32768 en este nodo, que aparezca hardware con VRAM dedicada en el rack, que se cierre D2 de LorAtelier (qué se paga con datos firmados), o que un fichero de la web pase de 7 KB comprimido o su portada de 200 KB de carga inicial (§ el tope por fichero)"
 enlaces:
   - loratelier-p0x
   - doctrina-p0x-producto
@@ -14,6 +14,8 @@ enlaces:
   - instrucciones-p0x
 estado: norma propuesta · el esquema es canon en cuanto el carbono lo firme; ninguna implementación depende todavía de él
 firmado: 2026-08-31
+enmiendas:
+  - {version: 1.1.0, fecha: 2026-09-05, autor: silicio-propone-carbono-firma, que: "el tope por fichero de la web pasa de 10 KB a 16 KiB, con la cuenta que lo fija", dato: "2,43x de compresion medido sobre 77 ficheros; 43 % de prosa por fichero; 10.240 B viajaban como ~4.214, menos de un tercio de la ventana inicial"}
 ---
 
 # La Norma de Métricas
@@ -203,6 +205,48 @@ segundo caso el paquete es correcto, que es justo lo que se quería. Es lo que
 hace creíble el Benchmark público del Agora, y ya lo dice la cabecera de
 `meter.js`: *las cifras de la tabla salen de gente que midió, no de una ficha
 técnica*.
+
+## El tope por fichero de la web · 16 KiB
+
+**Firmado 2026-09-05.** Ninguna pieza servida por `preceptoros-web` —`.html`,
+`.css`, `.js`, `.json`, `.webmanifest`— pasa de **16.384 B en disco**. La cifra
+es pública: se anuncia en las tres portadas y en el README, así que cambiarla es
+cambiar una promesa, y se cambia en los cinco sitios a la vez.
+
+**De dónde sale, porque una cifra publicada tiene que ser reproducible.** Un
+fichero debe llegar en un solo viaje de red. La ventana inicial de congestión
+son ~14 KB en el cable —diez paquetes de ~1.460—; se reparte y se le da a un
+fichero la mitad, porque varios se piden en paralelo y comparten ese primer
+vuelo: 7 KB. Estos ficheros comprimen **2,43x** medido —458.360 B en disco
+contra 188.656 con `gzip -9`, sobre los 77 que la regla vigila—, así que 7 KB de
+cable son 17,4 KB de disco, redondeados a la baja al binario limpio.
+
+**Por qué no se quedó en 10 KB.** Porque ese número no acotaba la red y parecía
+que sí: a 2,43x, un fichero de 10.240 B viajaba como ~4.214, menos de un tercio
+del primer viaje. Lo que acotaba era cuánto se puede razonar por escrito. El
+**43 %** de un fichero de este árbol es prosa —aquí los comentarios son la
+documentación—, así que 10.240 B dejaban ~5.850 B de código útil; en cuanto una
+pieza pedía 6,5 KB, lo que se recortaba era el porqué. Pasó: el 2026-09-05 se
+limaron comentarios propios seis veces seguidas para volver bajo el tope, que es
+justo lo que «se parte, no se recorta» viene a impedir.
+
+**Cómo se comprueba, y por qué son dos pruebas.**
+`test_cada_fichero_bajo_el_tope` mide el disco;
+`test_ningun_fichero_gasta_medio_viaje_de_red` comprime y mide el cable. El
+segundo existe porque el primero es un **proxy**: el 2,43x es una media, y deja
+de valer en cuanto entra algo que comprime mal —base64, rutas SVG largas—. Una
+regla que se cumple por casualidad se rompe el día que alguien cambia lo casual.
+
+**Cuándo se reedita.** Cuando un fichero pase de 7 KB comprimido, o cuando la
+carga inicial de la portada pase de 200 KB en disco —hoy son 161,5 KB en 26
+ficheros—. Cualquiera de las dos obliga a rehacer esta cuenta, no a subir el
+número.
+
+**Lo que desbloquea.** `sw.js` gana 6,1 KB, que a ~22 B por línea de precache
+son sitio para ~270 ficheros más. Hasta el 2026-09-05, partir un fichero por
+asunto costaba una ranura que no había: un `capas.css` se escribió y se deshizo
+el mismo día porque su etiqueta dejaba `sw.js` en 10.244 B. Desde aquí, separar
+deja de negociar con el tope.
 
 ## Lo que esta norma NO decide
 
