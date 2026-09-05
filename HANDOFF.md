@@ -63,11 +63,41 @@ reposo 122,5 % · piensa 612,5 % · habla 490 %, con el desplazamiento 27,78 %.
 de su cuadro y al 50 % los ojos quedan descentrados respecto del aro. Firmado en
 la app el 2026-09-04.
 
-### 5 · Lo que queda del encargo
-- Portugués en la web (`traducciones/LEEME-pt.md` lleva la lista exacta).
-- Italiano, alemán, ruso y griego, después.
-- Los idiomas quedaron declarados como **plan pendiente para app y web**, después
-  de la estructura.
+### 5 · Los idiomas
+**Portugués: HECHO** (2026-09-05). Cuarta lengua, entera y en verde. Se armó
+fuera de `public/` y se movió de una vez, así que el gate no estuvo rojo por una
+lengua a medias ni un momento — que es la lección que `LEEME-pt.md` dejó escrita.
+
+El bloqueo que aquel documento anunciaba como «el hallazgo que vale para las
+cuatro lenguas siguientes» **ya no existe**: los «dos bloques de traducción» eran
+el fragmento huérfano de i18n que se borró esa misma mañana. Traducir es traducir
+un bloque.
+
+**Faltan cuatro: italiano, alemán, ruso y griego.** Medido lo que cuesta cada
+una: ~12.000 caracteres de texto visible repartidos en siete páginas, de los
+cuales 6.290 son `instalar.html` sola —que no tiene bloque i18n y lleva la mitad
+de sus cadenas en comandos que NO se traducen—. La receta que funcionó:
+
+1. Armar la lengua completa en `traducciones/<idioma>/`, nunca en `public/`.
+2. Copiar de `es/`, cambiar `lang`, `prompts-<idioma>.js` y las URL canónicas.
+3. Traducir el bloque `id="i18n"` entero y las cadenas visibles.
+4. Cablear: `prompts-<idioma>.js`, los dos anuncios, los ocho bustos, el
+   selector de la raíz, el `hreflang` en TODAS las portadas, la página sin red
+   de `sw.js`, y la cuenta de rutas de `arnes_sw.mjs` (sube de siete en siete).
+5. Mover a `public/`, regenerar el sitemap y `coherencia-publica.py --si`.
+
+El selector de la rueda ya NO hay que tocarlo: descubre las lenguas de las
+etiquetas `hreflang` de la propia página.
+
+**Y una advertencia sobre ruso y griego:** son las dos que no puedo revisar. La
+copia de producto mal traducida en un sitio público es peor que no tenerla.
+
+### 6 · El catálogo de compañeros está solo en castellano
+`hub.json` lleva UN `name` y UNA `function` por agente, sin variantes por idioma:
+«El Instalador» sale igual en la portada inglesa, la francesa y la portuguesa.
+**No lo trajo el portugués — ya pasaba.** Arreglarlo son 8 agentes × N idiomas en
+un fichero que tiene sus propias pruebas, y es decisión de contenido: puede que
+los nombres sean nombres propios y no deban traducirse.
 
 ---
 
