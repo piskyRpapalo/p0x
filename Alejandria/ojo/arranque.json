@@ -148,5 +148,18 @@
       "RETIRAR UN MANDO ES RETIRAR TAMBIEN LO QUE LE OBEDECIA. Se quito el boton y la pagina se quedo con las nubes invisibles porque el codigo que las plegaba seguia corriendo.",
       "EL NAVEGADOR SIRVE CSS VIEJO. Media hora perdida leyendo una regla que estaba en disco y no en el navegador. Un puerto nuevo por tanda: `python3 -m http.server <puerto> --directory public`."
     ]
+  },
+  "IMPORTANTE": {
+    "que": "EL INVENTARIO. Cada parte de la web y de la app, con sus secciones, sus visuales y donde vive cada cosa. Se escribio para que una sesion nueva NO repita trabajo ya hecho y pueda ir directa a lo que no esta optimizado. Leelo ANTES de tocar cualquiera de los dos productos.",
+    "fecha": "2026-09-05",
+    "fichero": "~/p0x/INVENTARIO.md",
+    "tambien": "~/preceptoros-web/docs/ESTADO.md — el estado tecnico de la web, pensado para la sesion que trabaje el GitHub (capturas, README, descripcion de los repos).",
+    "cinco_arreglos_propuestos_sin_tocar": [
+      "S · Tres guiones huerfanos en public/assets: hitos.js, manifiesto.js y pie.js. Ninguna de las 56 paginas los enlaza; 5,9 KB que el gate vigila, mide y sirve.",
+      "S · `onboarding.html` promete una descarga que `instalar.html` declara inexistente, con su NO_DATA y su fecha. Dos paginas del mismo sitio dicen cosas distintas del mismo hecho.",
+      "L · La app NO tiene tope por fichero: `dashboard.css` 83 KB y `dashboard.js` 85 KB, cinco veces el tope entero de la web. La doctrina de partir por asunto nunca se aplico alli.",
+      "M · `hub.json` lleva un solo nombre y una sola funcion por agente, sin variantes por lengua. Es decision de CONTENIDO, no tecnica.",
+      "S · `medidas.json` no tiene campo `firma`, del que ahora depende la marca «sin firmar»: sale por ausencia, no por medida. Y sus cuatro NO_DATA no se pintan en ningun sitio."
+    ]
   }
 }
