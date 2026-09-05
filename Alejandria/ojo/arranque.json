@@ -1,7 +1,7 @@
 {
  "titulo": "Arranque de sesion · lee esto ANTES de tocar nada",
  "para_quien": "Cualquier IA que abra sesion en soberano: Claude Code, cc-local o una voz del Sinodo. Es el nexo de arranque, no un resumen de cortesia.",
- "medido": "2026-09-04",
+ "medido": "2026-09-05",
  "primer_comando": "curl -s http://127.0.0.1:8790/api/arranque | python3 -m json.tool   # o: python3 ~/p0x/Alejandria/ojo/ojo.py --arranque",
  "cargar_partida": {
   "que_es": "El save game. Cuatro pilares que NO se deducen del codigo y que una sesion fria da por supuestos si nadie se los dice, mas la mision siguiente y las trampas que ya han mordido a otro. El texto no vive aqui: vive en el glosario, y esto solo dice CUALES. Si un termino de estas listas desaparece del glosario, la respuesta trae NO_DATA con su nombre en vez de callarse.",
@@ -85,5 +85,26 @@
   "estado del rack ahora": "/api/rack  (consumo_w y ollama_vivo son EN VIVO; el resto es snapshot con su frescura)",
   "el metal y sus nombres": "~/p0x/hexelion/HARDWARE_MAP.md",
   "lo que quedo pendiente": "~/p0x/mente/feedback/PENDIENTES.md"
+ },
+ "por_donde_vamos": {
+  "que_es": "Donde quedo el rumbo al cerrar la sesion del 2026-09-05. Existe porque la sesion siguiente empieza en frio y, sin esto, vuelve a decidir de memoria lo que ya se decidio con datos.",
+  "fecha": "2026-09-05",
+  "frente_abierto": "preceptoros.org · la web publica",
+  "hecho_hoy": [
+   "OCHO LENGUAS completas: es, en, fr, pt, it, de, ru, el. Siete paginas cada una, prompts propios, los ocho companeros, bustos, comandos, los dos anuncios y la pagina de sin conexion.",
+   "El nombre de cada companero se traduce; el COMANDO no. Un comando es un identificador: si `/instalar` fuera `/install` en ingles, el mismo gesto tendria ocho nombres y ninguna guia serviria para dos idiomas. La explicacion viaja en el `title`, al pasar el cursor.",
+   "UNA SOLA CARA en toda la web: las 24 paginas interiores llevaban un busto de pixel de otra epoca y ahora llevan la misma esfera que la portada, letra por letra el mismo HTML.",
+   "INSTALAR (antes «INSTALAR AQUI») es ahora una puerta con tres caminos: la web instalable como PWA, la descarga de la app, y el catalogo de modelos DERIVADO de modelos.json.",
+   "Las cuatro puertas del cabezal, en oro, con el contraste medido en los dos temas: 9,15 · 7,30 · 9,15 · 5,32."
+  ],
+  "lo_siguiente": [
+   "REVISION NATIVA del ruso y del griego. Son las dos lenguas que ninguna sesion ha podido leer con oido nativo: la estructura la comprueba el gate, el registro no lo comprueba nadie. Retirar una lengua es `git rm -r public/<lengua>`, quitarla de `sw.js` y regenerar.",
+   "El resto de la web sigue donde lo dejo el handoff: la app y la web son dos capas distintas y no se mezclan."
+  ],
+  "dos_ficheros_al_borde": {
+   "que_pasa": "El tope por fichero es 16.384 B. El griego y el ruso gastan DOS bytes por letra, asi que un parrafo que en castellano cuesta 300 cuesta 600 alli. Antes de añadir prosa a cualquier pagina, se mide en griego primero.",
+   "el/instalar.html": "15.795 B · 589 libres · el mas apretado del sitio",
+   "assets/widget.css": "16.085 B · 299 libres"
+  }
  }
 }
