@@ -95,9 +95,11 @@
    "El nombre de cada companero se traduce; el COMANDO no. Un comando es un identificador: si `/instalar` fuera `/install` en ingles, el mismo gesto tendria ocho nombres y ninguna guia serviria para dos idiomas. La explicacion viaja en el `title`, al pasar el cursor.",
    "UNA SOLA CARA en toda la web: las 24 paginas interiores llevaban un busto de pixel de otra epoca y ahora llevan la misma esfera que la portada, letra por letra el mismo HTML.",
    "INSTALAR (antes «INSTALAR AQUI») es ahora una puerta con tres caminos: la web instalable como PWA, la descarga de la app, y el catalogo de modelos DERIVADO de modelos.json.",
-   "Las cuatro puertas del cabezal, en oro, con el contraste medido en los dos temas: 9,15 · 7,30 · 9,15 · 5,32."
+   "Las cuatro puertas del cabezal, en oro, con el contraste medido en los dos temas: 9,15 · 7,30 · 9,15 · 5,32.",
+   "La web entera pasa a la estetica de la app: placa del chat transparente del todo --sin velo y sin desenfoque, la veta del marmol cruza el canto sin costura--, todo lo que se pulsa en nube violeta con canto dorado, y las dos pantallas de entrada con marmol."
   ],
   "lo_siguiente": [
+   "LA VELOCIDAD EN LA WEB, DE VERDAD. `preceptoros-web/public/medidas.json` ya esta en produccion debajo del badge del modelo, con la forma de la ventana HORARIA --`desde`, `hasta`, `muestras`-- y su contrato dentro: quien escribe, cada cuanto y que `null` es NO_DATA con causa. Lo que falta es que el enjambre local lo VUELQUE: hoy lleva una pasada suelta de llama-bench del 2026-08-25 y cuatro huecos declarados (media por hora, sha256, TTFT, firma). El dia que se cambie de modelo, se mide y se vuelca; la pagina no calcula nada, lee y pinta.",
    "REVISION NATIVA del ruso y del griego. Son las dos lenguas que ninguna sesion ha podido leer con oido nativo: la estructura la comprueba el gate, el registro no lo comprueba nadie. Retirar una lengua es `git rm -r public/<lengua>`, quitarla de `sw.js` y regenerar.",
    "El resto de la web sigue donde lo dejo el handoff: la app y la web son dos capas distintas y no se mezclan."
   ],
