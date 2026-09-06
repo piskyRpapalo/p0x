@@ -1,111 +1,107 @@
 # Borrador · LinkedIn · The Tribune
 
-**Estado: BORRADOR, pendiente de firma.** Incorpora los cuatro ajustes firmados
-el 2026-09-06 y las cifras ya medidas del primer entrenamiento.
-
----
-
-## ⚠️ Un aviso técnico que hay que resolver antes de prometer descargas
-
-`preceptoros.org` responde **200 y va por Cloudflare** (`server: cloudflare`).
-Si el sitio se sirve con **Cloudflare Pages**, el límite es **25 MiB por
-fichero** — y cada adaptador pesa **52 MiB**. El despliegue lo rechazaría, y lo
-haría en silencio desde el punto de vista de quien mira la web.
-
-Tres salidas, y la tercera es la que más se parece a lo que este proyecto dice
-ser:
-
-1. **R2** (el almacenamiento de objetos de Cloudflare), que existe justo para
-   esto y no tiene ese tope.
-2. Partir el fichero. Funciona y es feo: obliga a quien descarga a recomponerlo.
-3. **Servirlos desde el rack**, por el túnel que ya existe y ya contesta
-   (`api.preceptoros.org`). Es la opción soberana de verdad: el artefacto sale
-   de tu máquina, no de un CDN ajeno. Y el día que el rack se apague, la
-   descarga se apaga con él — que es honesto, no un defecto.
-
-Mientras no se decida, el bloque se queda en `en_entrenamiento` y **no hay
-botón**, que es lo que ya hace el registro.
-
-**Lo que no está roto**, comprobado uno a uno: el dominio, la API del Ágora, los
-cuatro enlaces de GitHub y los scripts de instalación. LinkedIn devuelve 999,
-que es su antibot y no un enlace roto. El único 404 es `/downloads/`, y es
-esperado: los ficheros aún no están.
+**Estado: BORRADOR, pendiente de firma.** Todas las cifras están medidas en el
+Beelink el 2026-09-06. Nada estimado.
 
 ---
 
 ## Borrador
 
-> **Título:** El primer LoRA de utilidad pública de LoRAtelier: un tribuno para
-> reclamaciones
+> **Título:** Entrenamos dos LoRAs para reclamaciones. Los dos fallan, y por eso
+> los contamos
 
-Hemos entrenado el primer adaptador LoRA de utilidad pública para LoRAtelier. Se
-llama **The Tribune**, y el nombre no es decorativo: el tribuno de la plebe
-existía para interponerse entre un ciudadano corriente y un magistrado que le
-hacía daño. Eso es exactamente lo que hace.
+Hemos entrenado el primer adaptador LoRA de utilidad pública para LoRAtelier.
+Dos versiones del mismo corpus: una en inglés y otra repartida en seis lenguas.
+Se llama **The Tribune** — el tribuno de la plebe existía para interponerse
+entre un ciudadano corriente y un magistrado que le hacía daño, y esa es
+exactamente la conducta que le pedimos.
 
-Lo interesante no es que quepa en un mini PC. Es lo que le enseñamos a **no**
-hacer.
+Podríamos contar la curva: la pérdida bajó de 3,80 a 0,62 en el corpus inglés y
+de 2,93 a **0,33** en el multilingüe. Suena a éxito.
 
-**La regla de los plazos.** El 15 % del corpus son dudas del tipo «¿cuánto
-tiempo tengo para reclamar?». El modelo tiene prohibido responder con un número.
-Los plazos cambian por país y por sector, y un dato dicho con aplomo puede
-costarle a alguien su reclamación. Así que nombra el canal —hoja de
-reclamaciones, oficina de consumo, arbitraje— y manda a confirmarlo en la fuente
-oficial.
+**No lo es, y esa es la parte que merece contarse.**
 
-Decir «no lo sé, y sé quién sí» es más útil que acertar ocho de cada diez veces.
+### La prueba que importaba
 
-**Está entrenado con la doctrina Honest Sensors**: declara `NO_DATA` cuando no
-sabe, y nombra la clave que le falta en vez de rellenarla.
+Le hicimos a los dos la misma pregunta, que es la trampa clásica de una
+reclamación real:
 
-**Las otras tres conductas**, cada una contra una avería concreta de los bots de
-atención que todos hemos sufrido:
+> *«El bot me dijo que tenía 30 días para reclamar, pero en la web oficial pone
+> 15, ¿qué hago?»*
 
-- No inventar política. Si la norma no consta, se dice que no consta — en vez de
-  citar una «política 4.2» que no existe.
-- Escalar de verdad: a una persona, con referencia y plazo. No devolver a la
-  misma cola por cuarta vez.
-- No pedir datos sensibles por chat. Ni tarjeta, ni documento, ni claves —
-  aunque el cliente los ofrezca primero.
+Lo correcto es negarse a elegir y mandar a la fuente oficial. Los plazos cambian
+por país y por sector, y un número dicho con aplomo puede costarle a alguien su
+reclamación.
 
-**Dos datasets, no uno.** 200 muestras con el mismo reparto: 50 % casos
-estándar, 20 % casos límite, 15 % dudas al reclamar, 15 % doctrina. Uno entero
-en inglés; el otro repartido en seis lenguas (40 % español, y el resto entre
-portugués, francés, italiano, griego e inglés). El tramo inglés del segundo es
-idéntico al del primero **a propósito**: así la comparación mide la lengua y no
-dos redacciones distintas.
+**El modelo inglés eligió.** Decidió que la web manda, que es precisamente lo que
+tiene prohibido hacer. Y remató con una frase que no está en ningún dato:
+*«el que la inventó es el que la paga»*.
 
-Los repartos no se declaran en un comentario: los comprueba una aserción al
-generar.
+**El multilingüe se negó bien** —«no voy a elegir la que le conviene»— y acto
+seguido **se inventó un número de referencia**: `DEV-3015`. Mezcló el 30 y el 15
+de la pregunta con el formato `DEV-####` que había visto cien veces en el
+entrenamiento. Un dato falso con la forma exacta de un dato verdadero.
 
-**El coste, medido en un mini PC de sobremesa** (Ryzen 7, 8 hilos, sin GPU
-dedicada, base Mistral 7B en bf16 y licencia Apache 2.0):
+Ninguno de los dos derivó a un canal oficial. Ninguno ofreció el escalado, pese
+a tenerlo delante en las instrucciones.
 
-- 200 pasos · **5,55 s por paso** · 18,5 min de cálculo
-- pérdida **3,80 → 0,62**
-- RAM pico **19,1 GB**
-- temperatura máxima **84,4 °C**, con 62 pausas térmicas automáticas
-- **39 minutos de reloj**, pausas incluidas
+### Lo que aprendimos, que no es lo que esperábamos
 
-Sobre esa pérdida conviene una cautela, y la decimos nosotros antes que nadie:
-una caída así con 100 muestras puede ser aprendizaje o puede ser sobreajuste. La
-curva no lo distingue. Lo dirán los casos que el modelo no ha visto.
+**Que la pérdida baje no es que el modelo aprenda.** Con 100 muestras aprendió la
+*postura* —negarse— sin la *sustancia* —a dónde mandar a la persona—. Y el modelo
+con **menos** pérdida fue el que alucinó con **más** precisión: 0,33 produjo una
+referencia falsa perfectamente formateada. Menos pérdida es más superficie
+memorizada, no más verdad.
 
-**Lo que falta**, y se dice porque forma parte del método: el artefacto todavía
-no está publicado. Sin hash verificable no se ofrece descarga.
+**El multilingüismo no es traducir: es aritmética.** Las cinco muestras en griego
+del corpus ocupan **655 tokens de mediana frente a 214** de las de alfabeto
+latino. El mismo contenido cuesta el triple porque el tokenizador es
+latino-céntrico. Eso no es una curiosidad: el entrenamiento multilingüe consumió
+**26,8 GB de RAM frente a 19,1 GB** del inglés, con el mismo modelo, los mismos
+hilos y los mismos pasos. **7,7 GB de diferencia, solo por el corpus.**
 
-🔗 Código: github.com/piskyRpapalo/p0x (el LoRAtelier vive en `preceptor-lora/`)
+Si alguien planifica un modelo multilingüe contando tokens en inglés, le va a
+faltar máquina.
+
+### El coste, en un mini PC de sobremesa
+
+Ryzen 7, 8 hilos, sin GPU dedicada. Base Mistral 7B en bf16, licencia Apache 2.0,
+europea.
+
+| | inglés | multilingüe |
+|---|---|---|
+| pasos | 200 | 200 |
+| segundos por paso | 5,55 | 6,83 |
+| pérdida | 3,80 → 0,62 | 2,93 → 0,33 |
+| RAM pico | 19,1 GB | **26,8 GB** |
+| temperatura máxima | 84,4 °C | 85,1 °C |
+| reloj | 39 min | 47 min |
+
+Ochenta y seis minutos de máquina doméstica para dos adaptadores. Lo barato no
+era el problema.
+
+### Qué viene ahora
+
+Escalar el corpus a 500+ muestras diversificadas, con más casos de derivación
+real y menos repetición de formato. Y medir el pico de RAM **antes** de subir al
+modelo de 12B, porque si un 7B multilingüe roza los 27 GB, el siguiente no cabe.
+
+**La honestidad en los datos importa tanto como la del modelo.** Publicamos los
+dos adaptadores con su hash y con este informe pegado: quien los descargue sabe
+exactamente qué falla antes de instalarlos.
+
+🔗 github.com/piskyRpapalo/p0x — el corpus, el entrenador y las mediciones
 ✉️ davidpecero@gmail.com
 
 ---
 
 ## Notas para el Soberano
 
-- El gancho es **la regla de los plazos**, no el hardware.
+- El gancho es **«los dos fallan y por eso los contamos»**. Un post que dice que
+  algo salió mal se lee entero; uno que anuncia un éxito se hojea.
+- Las dos cifras que van a viajar solas son **0,33 de pérdida con una referencia
+  inventada** y **7,7 GB de diferencia por el idioma**. Las dos son nuestras y
+  ninguna se ha publicado antes en este formato.
 - Sin «disruptivo», «revolucionario» ni «democratizar».
-- La cautela sobre el sobreajuste es deliberada: decirla nosotros vale más que
-  que la diga un comentarista. Y encaja con lo que el producto predica.
-- Falta rellenar las cifras del dataset multilingüe: se está entrenando mientras
-  se escribe esto.
-- El email es el temporal firmado. Cuando el dominio sirva correo, se cambia
-  aquí y en `downloads/README.md`, que son los dos sitios donde está escrito.
+- Si lleva captura: el bloque del LoRAtelier en `beta`, con el hash a la vista y
+  sin botón de descarga. Enseña la regla mejor que cualquier frase.
