@@ -63,9 +63,9 @@
    "comando": "ver /api/recursos -> Los cuatro gates"
   },
   {
-   "regla": "10.240 B por fichero en la web, .json incluido",
-   "por_que": "Cuando no cabe: se ENVUELVE (chat-router.js, comandos.js) o se PARTE (engine.js, hub-cola.js). Nunca se recorta el comentario que explica el porque.",
-   "comando": "cd ~/preceptoros-web && python3 -c \"import pathlib;[print(p.stat().st_size,p) for p in pathlib.Path('public').rglob('*') if p.is_file() and p.suffix in ('.html','.css','.js','.json') and p.stat().st_size>9000]\""
+   "regla": "16.384 B por fichero en la web, .json incluido",
+   "por_que": "Cuando no cabe: se ENVUELVE (chat-router.js, comandos.js) o se PARTE (engine.js, hub-cola.js, esquina-cuenta.css). Nunca se recorta el comentario que explica el porque. · CORREGIDO 2026-09-07: esta regla decia 10.240 B, que es el tope VIEJO. El gate exige 16.384 (mas 50 KB sprites y 30 KB laminas), y una sesion que se fie de la cifra vieja parte ficheros que no hacia falta partir -- o peor, cree que tiene menos sitio del que tiene y recorta comentarios para caber.",
+   "comando": "cd ~/p0x/preceptoros-web && python3 -c \"import pathlib;T=16384;[print(T-p.stat().st_size,p) for p in sorted(pathlib.Path('public').rglob('*')) if p.is_file() and p.suffix in ('.html','.css','.js','.json') and T-p.stat().st_size<2000]\""
   },
   {
    "regla": "Tag de modelo explicito, y `num_ctx` demostrado por dato",
@@ -93,66 +93,44 @@
  },
  "por_donde_vamos": {
   "que_es": "Donde quedo el rumbo al cerrar la sesion del 2026-09-05. Existe porque la sesion siguiente empieza en frio y, sin esto, vuelve a decidir de memoria lo que ya se decidio con datos.",
-  "fecha": "2026-09-05 (cierre de la noche · segunda tanda)",
-  "frente_abierto": "preceptoros.org · la web publica",
+  "fecha": "2026-09-07 (cierre de la madrugada)",
+  "frente_abierto": "preceptor-lora · los modelos de La Charla, en NO-GO",
   "hecho_hoy": [
-   "UN SOLO MARCO. `main:has(#chat)` lleva el canto de bronce y engloba cabezal, chat, atajos, ficha y pie. Eran tres cajas con marmol entre medias y se leian como tres cosas que casualmente estan juntas.",
-   "EL BOTON DE HERRAMIENTAS YA NO EXISTE. Sus ocho nubes bajaron a `#especificaciones`, donde se ven sin pulsar nada. Retirar el mando NO bastaba: `chat-router.js` seguia llamando a `alternar(false)` al arrancar y dejaba las nubes con `cerrado` puesto y nadie que se lo quitara -- invisibles con contenido dentro, altura cero. Se vio midiendo en el navegador.",
-   "LA FICHA DEL APARATO es una caja: quien te habla + SU FUNCION (que hasta hoy solo vivia en un `title` que en un telefono no lee nadie) + motor + velocidad + las nubes.",
-   "CABEZAL POR ESQUINAS: marca a 1,3rem arriba a la izquierda; rueda e identidad arriba a la derecha; las cuatro puertas a .62rem abajo. Sin sesion, la identidad es un icono de persona -- «Crear identidad» era la pieza mas ancha del cabezal en frances y aleman.",
-   "LA ESFERA DEJA DE APAGARSE. La traslucidez era una linea literal (`body.chat-activo .presentacion{opacity:.55}`), no un efecto. Ahora brilla en neon al pensar (`senal.css`) y lleva la nube «Activando modelo» (`senal.js`), solo mientras piensa, en las ocho lenguas.",
-   "EL CAMPO DICE CON QUIEN HABLAS. Plantilla con `{}` y no concatenacion: en aleman el verbo se parte y va al final.",
-   "TECLADO ABIERTO: `chat-panel.js` publica `--alto-visible` desde `visualViewport.height` y la pagina se reparte en columna. `dvh` no servia -- en Android el teclado se dibuja ENCIMA sin encoger la ventana, y ese era el hueco vacio de la foto del Soberano. Primer reparto dejaba el dialogo en SEIS pixeles de 380; con suelo de 7rem, campo a 2,6rem y esfera a 96px, cabe la ultima frase.",
-   "NO_DATA: «sin firmar» se pintaba en CADA fila sin mirar ningun dato -- un rotulo fijo con forma de estado. Ahora depende de `d.firma` y se dice una vez. Y `instalar.html` tenia TRES avisos para un solo hecho; queda el que esta pegado al boton que falla.",
-   "CINCO PARTICIONES por el tope de 16 KiB: `senal.css`, `senal.js`, y antes `placa.css`. Se parte por asunto, nunca se recorta comentario."
+   "LOS DOS LoRA DE LA CHARLA, ENTRENADOS. Corpus propio de 250 muestras en siete lenguas (`forja/corpus_charla.py`, con validador que se niega a escribir si hay reparos). base: 300 pasos, perdida 3,4995 -> 0,7175, RAM 20.070 MiB. multilang: 200 pasos, 3,3652 -> 0,6895, RAM 27.765 MiB. El `max_length=1024` dejo de ser intuicion: el griego llega a 796 tokens y el arabe a 578, contra 289 de la latina mas larga. Cero truncamientos.",
+   "Y EL VEREDICTO ES NO-GO, con el codigo de salida en 0. Los doce turnos dejaron de repetir instalacion --que era el encargo-- pero el modelo inventa una cifra (200 gigas por 4,4), un equipo de desarrollo y dos canales de mensajeria. Los sensores median lo comodo. Antes de reentrenar: mas muestra por lengua --quince no ensenan a conversar en arabe-- y sensores que midan la propiedad correcta.",
+   "LA WEB, CUATRO BLOQUEOS DE LA AUDITORIA DE FLUJO: el boton de descarga que daba 404 (los GGUF pesan 55 MB y Cloudflare Pages corta en 25), el README que anunciaba un modelo inexistente, el enlace a un `releases` vacio, y `esquina.css` partido por asunto.",
+   "EL CABEZAL: el perfil a la esquina junto a la rueda, y el punto verde corrido a la izquierda para no pisarlo. Punto 1120-1134, perfil 1142-1182, rueda 1189-1229.",
+   "LA PUERTA DE SALIDA DEL APORTE: el taller arma un paquete en el aparato, lo ENSEÑA entero y ofrece copiarlo y abrir el correo. Sin `fetch` ni `sendBeacon`.",
+   "OFFLINE VERIFICADO EN EL SITIO REAL, y la queja era otra cosa: 99 rutas en el shell mas 44 al vuelo, cero externos, ningun critico ausente. El armazon abre sin red; lo que no contesta sin red es el CHAT, porque quien responde es el rack.",
+   "PROPUESTA DEL PROXY DE LA FRAGUA para servir los 55 MB, con la sintaxis validada por el propio nginx."
   ],
   "lo_siguiente": [
-   "EL README, Y ES LO PRIMERO. Se pidio: en INGLES solamente --hoy son bilingues y duplican cada frase--, con frases sencillas y SIN NOMBRES PROPIOS. La app se cuenta como un medidor de IA y acceso democratizado al autoconocimiento; la web, como guia para romper la barrera de la dificultad tecnica y crear comunidad. NO SE APLICA SIN ENSENARLO ANTES: el Soberano lo pidio expresamente.",
-   "LAS FOTOS YA ESTAN HECHAS y esperan en `preceptoros-web/docs/img/`: puerta, chat, instalar y phone, en WebP, 211 KB las cuatro (venian de 1,6 MB en PNG). Se capturan con `google-chrome --headless=new --screenshot` contra un `http.server` local y se convierten con Pillow. Falta una de Herramientas abierto: en captura estatica no se puede abrir el panel, habria que hacerla con el navegador del arnes.",
-   "REVISION NATIVA del ruso y del griego: son las dos lenguas que ninguna sesion ha podido leer con oido nativo. Retirar una es `git rm -r public/<lengua>`, quitarla de `sw.js` y regenerar.",
-   "EL VOLCADO HORARIO del enjambre en `medidas.json`. Hoy hay UNA pasada de llama-bench del 2026-08-25 y cuatro huecos declarados: media por hora, sha256, TTFT y firma.",
-   "Y LO QUE EL SOBERANO DIJO COMO CRITERIO, no como tarea: icono antes que palabra siempre que se pueda. Quita trabajo a quien escribe y trabajo cognitivo a quien usa."
+   "REENTRENAR LA CHARLA, y la evidencia dice como: subir la muestra por lengua en el multilingue --quince no bastan-- y reescribir los sensores de `prueba_fuego_charla.py` para que midan cifras inventadas y canales inventados, no solo patrones de identificador.",
+   "EL VOLCADO HORARIO del enjambre en `medidas.json`. Sigue con UNA pasada del 2026-08-25 y cuatro huecos declarados: media por hora, sha256, TTFT y firma. Es lo unico de la lista anterior que sigue entero.",
+   "DEVOLVER EL BOTON DEL LoRAtelier cuando el proxy de la Fragua sirva los 55 MB: bloque `reclamaciones` a `beta` y `artefacto` de vuelta con la URL nueva. Hoy esta en `en_entrenamiento` con `artefacto: null` a proposito. Servir primero, prometer despues.",
+   "LEVANTAR EL PANEL DEL OJO (:8790), que no arranca solo y no tiene unidad systemd. Cada unidad pide firma aparte, asi que esto es una peticion, no una tarea hecha. Detalle en mente/pendientes_ojo.md.",
+   "REVISION NATIVA del ruso y del griego: sigue sin poder hacerse desde aqui, y ninguna sesion deberia fingir que la ha hecho.",
+   "Y EL CRITERIO DEL SOBERANO, que no es tarea: icono antes que palabra siempre que se pueda."
+  ],
+  "ya_no_esta_pendiente": [
+   "EL README. La lista anterior lo daba como «lo primero» y decia que eran bilingues. COMPROBADO el 2026-09-07: los dos estan en ingles solamente, con el encuadre pedido --la app «a meter for your own AI», la web «a door, and a place to meet»-- y CERO nombres propios en ambos. Hecho, no pendiente.",
+   "LAS FOTOS. Las cuatro estan en `preceptoros-web/docs/img/` Y el README las usa (chat, puerta, install, phone). La quinta que faltaba --«Herramientas abierto»-- ya no tiene sentido: ese boton se retiro y sus nubes bajaron a la ficha."
   ],
   "ficheros_al_borde": {
-   "que_pasa": "El tope por fichero es 16.384 B y HOY hay seis a menos de 1,5 KB. El griego y el ruso gastan DOS bytes por letra: un parrafo que en castellano cuesta 300 alli cuesta 600. Antes de añadir prosa a cualquier pagina se mide en griego, no en castellano.",
-   "medido": "2026-09-05",
+   "que_pasa": "El tope por fichero es 16.384 B. El griego y el ruso gastan DOS bytes por letra: un parrafo que en castellano cuesta 300 alli cuesta 600. Antes de añadir prosa a cualquier pagina se mide en griego, no en castellano.",
+   "medido": "2026-09-07",
    "lista": [
-    "assets/chat.css 16.048",
+    "el/index.html 16.182 (202 B libres · el mas apretado del repo)",
     "hub-textos.json 15.908",
-    "el/instalar.html 15.885",
-    "el/index.html 15.746",
-    "ru/index.html 15.189",
-    "assets/panel.css 15.105"
+    "ru/index.html 15.615",
+    "assets/placa.css 15.344",
+    "el/instalar.html 15.269",
+    "assets/panel.css 15.105",
+    "assets/hub.js 14.708",
+    "ru/instalar.html 14.414"
    ],
-   "que_hacer": "SE PARTE, NO SE RECORTA. Hoy se partieron cuatro: `nubes.css` de `panel.css`, `puertas.css` de `widget.css`, `escribir.css` de `chat.css` y los textos del Hub de `hub.json`. Los comentarios son la documentacion de esta casa; quitarlos para que quepa es pagar el tope con lo unico que no se puede volver a deducir del codigo."
-  },
-  "donde_esta_cada_cosa": {
-   "que_es": "Mapa de lo que se partio hoy, para no buscar una regla en el fichero de ayer.",
-   "cristal y velo de cabezal y chat": "assets/widget.css",
-   "las cuatro puertas y el cabezal de las interiores": "assets/puertas.css",
-   "el mueble de los dos desplegables": "assets/panel.css",
-   "lo que hay DENTRO de Herramientas": "assets/nubes.css",
-   "el campo, los mandos y los atajos": "assets/escribir.css",
-   "las capas del chat, el pleno y los cantos": "assets/chat.css",
-   "rotulos del Hub, cola y correccion, 8 lenguas": "hub-textos.json",
-   "rotulos del cabezal interior, DERIVADOS de las portadas": "nav.json",
-   "rotulos de la pagina Instalar": "instalar.json",
-   "velocidad del cerebro y su contrato": "medidas.json"
-  },
-  "deuda_apuntada": [
-   "`medidas.json` NO TIENE CAMPO `firma`. La marca «sin firmar» ahora depende de el, asi que hoy se pinta siempre -- correcto, pero por ausencia. Cuando el enjambre local vuelque la media horaria, que escriba `firma`; hasta entonces la estructura del contrato existe y no se usa.",
-   "Los cuatro NO_DATA con su `que` y su `causa` viven en `medidas.json` y NO se pintan. Es deliberado (pesaban mas que el dato) pero es estructura real sin uso: o se pinta en algun sitio o se retira del fichero.",
-   "El `title` de cada nube de companero sigue llevando la funcion, que ahora se pinta en la ficha. Duplicado inofensivo, pero duplicado.",
-   "README de GitHub: solo ingles, frases sencillas, SIN nombres propios. App = medidor de IA y acceso democratizado al autoconocimiento; web = guia para romper la barrera tecnica y crear comunidad. SE ENSENA AL SOBERANO ANTES DE APLICARLO.",
-   "Ruso y griego siguen sin revision nativa.",
-   "Falta una captura con el teclado abierto en el Doogee de verdad: lo de aqui esta medido con `--alto-visible` forzado a 380px en el navegador del arnes."
-  ],
-  "trampas_de_hoy": [
-   "EL GUARDIAN LEE LOS COMENTARIOS COMO CODIGO. Nombrar un radio o un `backdrop-filter` en una frase que explica por que NO se usa pone el gate rojo. Van seis veces.",
-   "LOS GUARDIANES DE MAQUETA NOMBRABAN SUS HOJAS A MANO y se ponian rojos al partir un fichero. Ahora `maqueta_de_la_portada()` DESCUBRE las hojas de las etiquetas de la portada y les quita los comentarios. Misma leccion que las lenguas y el `hreflang`.",
-   "RETIRAR UN MANDO ES RETIRAR TAMBIEN LO QUE LE OBEDECIA. Se quito el boton y la pagina se quedo con las nubes invisibles porque el codigo que las plegaba seguia corriendo.",
-   "EL NAVEGADOR SIRVE CSS VIEJO. Media hora perdida leyendo una regla que estaba en disco y no en el navegador. Un puerto nuevo por tanda: `python3 -m http.server <puerto> --directory public`."
-  ]
+   "que_hacer": "SE PARTE, NO SE RECORTA. Los comentarios son la documentacion de esta casa. · AVISO 2026-09-07: `el/index.html` bajo a 202 B libres, y ~62 los puso el `<link>` de `esquina-cuenta.css` que esta sesion añadio a las ocho portadas. La siguiente prosa en la portada griega NO cabe: hay que sacarle el bloque i18n a un fichero por lengua, como ya se hizo con `hub-textos.json` e `instalar.json`."
+  }
  },
  "IMPORTANTE": {
   "que": "EL INVENTARIO. Cada parte de la web y de la app, con sus secciones, sus visuales y donde vive cada cosa. Se escribio para que una sesion nueva NO repita trabajo ya hecho y pueda ir directa a lo que no esta optimizado. Leelo ANTES de tocar cualquiera de los dos productos.",

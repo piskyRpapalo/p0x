@@ -1669,3 +1669,39 @@ P6-1.
   Falso positivo: bloqueó la auditoría por nombrar el almacén de snapd. Se
   esquivó reescribiendo la frase, que es lo correcto ante un gate ajeno, pero la
   etiqueta miente sobre lo que ha cazado.
+
+---
+
+## Sesión 2026-09-06/07 · La Charla, la auditoría de flujo y el Ojo
+
+1. **(S) Reescribir los sensores de `prueba_fuego_charla.py` antes de reentrenar.**
+   Devolvieron código 0 sobre respuestas que inventaban una cifra (200 GB por
+   4,4), un equipo de desarrollo y dos canales de mensajería. Medían patrón de
+   identificador, alfabeto y verbos de instalación: lo cómodo. Faltan dos
+   sensores — cantidad con unidad sin respaldo, y promesa de canal.
+
+2. **(M) Subir la muestra por lengua del corpus multilingüe.** Quince muestras
+   no enseñan a conversar en árabe: la firmada sale digna y la paráfrasis se
+   desarma. El recorte a 100 se hizo por RAM, y la RAM sobró — el pico real fue
+   27.765 MiB de los 35 de alarma. Hay sitio para más muestra.
+
+3. **(S) Sacar el bloque i18n de `el/index.html` a un fichero por lengua.**
+   Quedó en 202 B libres, el más apretado del repo, y ~62 los puso el `<link>`
+   de `esquina-cuenta.css` de esta sesión. La próxima prosa en la portada griega
+   no cabe. El patrón ya existe: `hub-textos.json`, `instalar.json`.
+
+4. **(S) Levantar el panel del Ojo (:8790).** No arranca solo y no tiene unidad
+   systemd; una sesión que lo pruebe por `curl` recibe 000 y concluye que no
+   existe. Cada unidad pide firma aparte, así que esto es petición, no tarea.
+   Detalle en `mente/pendientes_ojo.md`.
+
+5. **(M) La app no sabe leer lo que la web le da.** `corregir.js` ya usa el
+   esquema de `preceptor/captura.py`, pero el puente va en un solo sentido: no
+   hay importador. Es lo que convierte «probé la web» en «tengo mi memoria».
+   Desarrollado en `propuestas/2026-09-07_app_idiomas_y_mejoras.md`.
+
+6. **(L) Los idiomas de la app: primero la forma, después las traducciones.**
+   Habla 2 lenguas contra las 8 de la web, en tres catálogos distintos, y
+   `dashboard.html` —la pantalla principal— no tiene ni un `data-i18n`. Meter
+   seis lenguas en `textos.py` tal cual lo lleva de 22 KB a ~90: la web ya pagó
+   esa factura y por eso tiene un fichero por lengua.
