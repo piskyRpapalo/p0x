@@ -129,7 +129,21 @@ se borran.
 
 ## 4 · Plan de limpieza, por orden de retorno
 
-Nada de esto se ha ejecutado: **es propuesta y la firma el Soberano.** Ninguna toca otro nodo.
+**EJECUTADO el 2026-09-06** tras la firma del Soberano, salvo lo que exige `sudo`
+o una decision suya. Lo que se hizo y lo que devolvio:
+
+| # | Estado | Resultado real |
+|---|---|---|
+| L1 | ✅ hecho | **59 servidores apagados**, 0 sockets en `0.0.0.0:81xx`, RAM disponible de 32,7 a 37,7 GB |
+| L2 | ✅ parcial | `ubuntu-insights-collect/upload.timer` y `ubuntu-report.path` **enmascarados**. `apport` sigue: es de sistema y aqui no hay sudo |
+| L3 | ✅ hecho | retirados `preceptor-cazanido-v2:latest` (roto) y `preceptor-cazanido:latest` (superado) |
+| L4 | ✅ hecho | `docker image prune -af` devolvio **228 MB**, no los 7,3 GB estimados: el resto lo sostiene el contenedor vivo |
+| L5 | ✅ **afinada** | 27 GB de modelos de video de CineK + 9,8 GB de cache de `uv`. **NO se borro la cache entera**: guardaba `unsloth/Llama-3.2-3B` (6,1 GB) y `Qwen3-4B` (7,6 GB), que son las bases de forja de LoRA. Borrarlas habria obligado a redescargarlas para el primer Mistral |
+| L6 | ⏸️ espera | los 157 GB de ComfyUI siguen ahi: frio o fuera es decision del Soberano |
+| L7 | ⏸️ propone | snaps y demonios de escritorio exigen sudo |
+| L8 | ✅ parcial | creados los tags explicitos `preceptor-v7:llama3.2-1.0` y `oficial-inventario:q4-1.0`. **Los pelados NO se retiran**: `preceptor-v7:latest` es el modelo que sirve el rack por el tunel, y quitarlo romperia a quien lo llame asi. La migracion de los que llaman es tarea aparte |
+
+Lo que sigue sin ejecutarse queda como estaba:
 
 | # | Qué | Coste | Devuelve |
 |---|---|---|---|
