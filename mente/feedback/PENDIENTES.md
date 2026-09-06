@@ -1628,3 +1628,44 @@ P6-1.
   solo tiene transparencia binaria). El script quedó copiado en
   `Cuarentena/aurelius-face-animated.gif.py` para que no se lo lleve el borrado
   del temporal. Toca al P8-9: esa lámina es una de las candidatas.
+
+## P10 · El Ojo con vector y enrutador, y la higiene del nodo (2026-09-06)
+
+- **P10-1 · Sesenta servidores web huérfanos, 38 abiertos a toda la red.** (Coste S,
+  y es lo más barato con más retorno de toda la lista.) `python3 -m http.server`
+  sirviendo `preceptoros-web/public` desde el 2026-09-05 a las 12:08, 1.353 MiB
+  de RSS. Salen del truco documentado para esquivar el service worker; el truco
+  está bien y lo que falta es el final. A partir del puerto 8161 ya se ata a
+  loopback: la práctica se corrigió sola y nadie limpió lo anterior. Al matarlos,
+  ojo con `pkill -f`, que encuentra al shell que lo invoca. Detalle completo en
+  `mente/auditorias/AUDITORIA_SOFTWARE_2026-09-06.md`.
+
+- **P10-2 · La telemetría de Canonical contradice la doctrina del nodo.** (Coste S.)
+  `ubuntu-insights` (collect y upload), `ubuntu-report.path` y `apport`, vivos y
+  subiendo, en una máquina cuya doctrina es que nada sale de ella. No es una
+  brecha: es que el nodo dice una cosa y hace otra, y eso se firma o se para.
+
+- **P10-3 · `NORMA` no tiene palabra en el léxico del Alfabeto §2.** (Coste S
+  decidirlo, y lo firma el carbono.) El vector distingue MEDIDO de NORMA
+  --declarado pero no medido--, que es la distinción que costó el techo de VRAM
+  del Jetson. El léxico solo tiene `ok`, `sin_dato`, `stale`, `degradado` y
+  `caido`. Hoy se traduce a `ok` conservando `norma: true`; es un parche. Un ID
+  nuevo entra por la ZONA EVOLUTIVA con su changelog.
+
+- **P10-4 · El experto A del enrutador nunca se ha ejecutado.** (Coste M.)
+  `qwen3-coder:30b` son 18,6 GB y cargarlo cuesta minutos de pared; el enrutador
+  lo avisa antes de elegirlo, pero su turno completo --tokens, segundos, si pasa
+  el gate de grounding-- sigue sin medir. Sin ese dato, el titular de la esfera
+  `edge-ai` es una decisión sin evidencia.
+
+- **P10-5 · Anclar la cita no ancla el razonamiento, y hoy no hay gate para eso.**
+  (Coste M.) `qwen3:4b` cita las cinco claves correctas y luego concluye que
+  59,2 W «no dan energía suficiente para un entrenamiento»: el número es real y
+  la inferencia inventada. Por eso manda el dictamen determinista. Lo que falta
+  es una forma barata de detectar que la conclusión contradice al dictamen --hoy
+  solo se compara el número de apoyos--.
+
+- **P10-6 · El guardián de higiene marca `/var/...` como RUTA-HOME.** (Coste S.)
+  Falso positivo: bloqueó la auditoría por nombrar el almacén de snapd. Se
+  esquivó reescribiendo la frase, que es lo correcto ante un gate ajeno, pero la
+  etiqueta miente sobre lo que ha cazado.
