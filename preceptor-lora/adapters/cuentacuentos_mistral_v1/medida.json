@@ -1,13 +1,13 @@
 {
  "dtype": "bfloat16",
- "fecha": "2026-09-06T16:36:08+00:00",
+ "fecha": "2026-09-06T16:52:42+00:00",
  "base": "mistralai/Mistral-7B-Instruct-v0.3",
- "pasos_hechos": 2,
- "segundos_por_paso": 11.03,
+ "pasos_hechos": 10,
+ "segundos_por_paso": 9.48,
  "perdida_primera": 3.2111,
- "perdida_ultima": 3.3135,
- "ram_pico_mb": 17427,
- "temp_final_c": 69.5,
+ "perdida_ultima": 1.9631,
+ "ram_pico_mb": 19205,
+ "temp_final_c": 79.625,
  "parado_por": null,
- "solo_medicion": true
+ "solo_medicion": false
 }

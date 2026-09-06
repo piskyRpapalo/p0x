@@ -146,6 +146,16 @@ def main(argv=None):
     # `peft` sube sus propias capas.
     ap.add_argument("--dtype", default="bfloat16",
                     choices=["bfloat16", "float32"])
+    # MEDIDO el 2026-09-06 y desmiente a la medicion de dos pasos: con 8 hilos
+    # la CPU llego a 84 C en el paso 9, en un run de NOVENTA SEGUNDOS. Los dos
+    # pasos daban 72 C y de ahi salio un «margen de 8 grados» que no existia:
+    # dos pasos no calientan un disipador, y una medida que no llega al regimen
+    # permanente no mide el regimen permanente.
+    ap.add_argument("--techo-c", type=float, default=75.0,
+                    help="si la CPU pasa de aqui, el bucle espera a que baje "
+                         "antes del paso siguiente. 0 lo desactiva")
+    ap.add_argument("--respiro-s", type=float, default=20.0,
+                    help="cuanto espera cada vez que toca el techo")
     ap.add_argument("--medir", action="store_true",
                     help="entrena SOLO --pasos y reporta segundos por paso, "
                          "pico de RAM y temperatura. Para dimensionar, no para servir")
@@ -157,7 +167,7 @@ def main(argv=None):
         "salida": str(a.salida), "pasos": a.pasos or "una epoca",
         "lora": {k: HIPER[k] for k in ("rank", "alpha", "dropout", "lr")},
         "objetivo": HIPER["objetivo"], "max_len": HIPER["max_len"],
-        "hilos": a.hilos, "dtype": a.dtype,
+        "hilos": a.hilos, "dtype": a.dtype, "techo_c": a.techo_c,
         "ram_libre_mb": round(ram_libre_mb() or 0),
         "temp_c": temperatura(),
     }
@@ -201,8 +211,18 @@ def main(argv=None):
     modelo.train()
 
     pasos = a.pasos or len(textos)
-    tiempos, perdidas = [], []
+    tiempos, perdidas, respiros, temp_max = [], [], 0, 0.0
     for paso in range(pasos):
+        # El termostato va ANTES del paso, no despues: esperar cuando ya te has
+        # pasado es contar el dano, no evitarlo.
+        while a.techo_c and not PARAR["pedido"]:
+            t = temperatura()
+            if t is None or t < a.techo_c:
+                break
+            respiros += 1
+            log.info("techo termico · %.1f C >= %.1f · respiro de %.0f s",
+                     t, a.techo_c, a.respiro_s)
+            time.sleep(a.respiro_s)
         if PARAR["pedido"]:
             log.info("parada limpia pedida por %s · se guarda lo que hay",
                      PARAR["senal"])
@@ -216,8 +236,9 @@ def main(argv=None):
         opt.step()
         opt.zero_grad()
         dt = time.monotonic() - ini
+        temp_max = max(temp_max, temperatura() or 0)
         tiempos.append(dt)
-        perdidas.append(float(salida.loss))
+        perdidas.append(salida.loss.detach().item())
         log.info("paso %d/%d · perdida %.4f · %.1f s · RAM pico %.0f MiB · %s C",
                  paso + 1, pasos, perdidas[-1], dt, ram_pico_mb(),
                  temperatura())
@@ -230,7 +251,11 @@ def main(argv=None):
         "segundos_por_paso": round(sum(tiempos) / max(len(tiempos), 1), 2),
         "perdida_primera": round(perdidas[0], 4) if perdidas else None,
         "perdida_ultima": round(perdidas[-1], 4) if perdidas else None,
+        "hilos": a.hilos,
         "ram_pico_mb": round(ram_pico_mb()),
+        "temp_max_c": round(temp_max, 1),
+        "techo_c": a.techo_c,
+        "respiros": respiros,
         "temp_final_c": temperatura(),
         "parado_por": PARAR["senal"],
         "solo_medicion": bool(a.medir),
