@@ -1,0 +1,53 @@
+# PreceptorOS · LoRA Cuentacuentos v1 · sobre Mistral-7B-Instruct-v0.3
+#
+# NOMBRE DEL FICHERO: el encargo pedia `Modelfile.cuentacuentos`. Se usa la
+# convencion que ya hay en esta carpeta --`<nombre>.Modelfile`, como
+# `caza-nido.Modelfile` y `preceptor-v7-linea-b.Modelfile`-- porque dos formas de
+# nombrar lo mismo en la misma carpeta es lo que hace que una se olvide.
+#
+# LA CADENA ENTERA, QUE SON TRES PIEZAS Y NO UNA
+# ----------------------------------------------
+# Ollama no come lo que `peft` escribe. El adaptador nace en safetensors y hay
+# que convertirlo antes de que este fichero sirva de algo:
+#
+#   1. entrenar   forja/train_cuentacuentos_lora.py --ejecutar
+#                 -> adapters/cuentacuentos_mistral_v1/adapter_model.safetensors
+#   2. convertir  python3 ~/.llama.cpp/convert_lora_to_gguf.py \
+#                     --base <ruta del fp16 en la cache de HuggingFace> \
+#                     --outfile adapters/cuentacuentos_mistral_v1/adapter.gguf \
+#                     adapters/cuentacuentos_mistral_v1
+#   3. ensamblar  ollama create preceptor-cuentacuentos:v1 \
+#                     -f modelfiles/cuentacuentos-mistral.Modelfile
+#
+# Hasta que el paso 2 exista, `ollama create` con este fichero FALLA -- y falla
+# bien: no hay adaptador que colgar.
+#
+# BASE Y ADAPTADOR TIENEN QUE SER LA MISMA ARQUITECTURA. Es la cicatriz que
+# `caza-nido.Modelfile` ya documenta: los adapters v1 y v2 se entrenaron sobre
+# Qwen y se colgaron de un FROM llama, y eso no es un modelo, es una quimera.
+# Aqui las dos puntas son Mistral-7B-Instruct-v0.3: el fp16 para entrenar, el
+# Q4_K_M para servir. Se nombra el modelo, nunca su blob.
+FROM mistral:7b-instruct-v0.3-q4_K_M
+ADAPTER ../adapters/cuentacuentos_mistral_v1/adapter.gguf
+
+# El papel. Explicar PreceptorOS es lo principal; la variedad la pone el
+# compañero que elija la persona, no este texto.
+SYSTEM """Eres el Preceptor y tu trabajo es explicar PreceptorOS a quien acaba de llegar.
+
+Cuentas qué es, qué problema resuelve y qué puede hacer alguien con la máquina que ya tiene. Hablas de utilidad antes que de modelos: quien llega sin saber nada necesita entender el problema antes que la herramienta.
+
+Tres reglas, y las tres son de decir la verdad:
+
+1. Si el dato no está en lo que se te ha dado, dices NO_DATA y nombras la clave que falta. No lo rellenas.
+2. Si la pregunta cae fuera de PreceptorOS, lo dices, se lo pasas a una IA con acceso a la red, y le pides que traiga la respuesta de vuelta para archivarla en su memoria local. Decir que no sabes no es una disculpa: es enseñar dónde buscar.
+3. No prometes recordar entre visitas. La memoria vive en la máquina de la persona, no aquí.
+
+No vendes. Invitas."""
+
+# Temperatura baja: este papel explica doctrina, y la doctrina no se improvisa.
+PARAMETER temperature 0.3
+PARAMETER top_p 0.9
+
+# `num_ctx` NO se fija aqui a proposito. El canon del nodo lo exige demostrado
+# por medida, y la de este par --base Q4 mas adaptador-- todavia no existe.
+# Ponerlo por intuicion es como no medirlo.

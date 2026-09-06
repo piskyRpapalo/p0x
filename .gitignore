@@ -99,3 +99,9 @@ Alejandria/ojo/recursos.json
 # dato viejo con aspecto de actual, que es contra lo que el vector existe.
 Alejandria/ojo/cache_repos.json
 Alejandria/ojo/cache_gates.json
+
+# Pesos de adaptadores: binarios que se regeneran desde forja/ + el dataset.
+# Su MEDIDA si se versiona: es el dato, y pesa 400 bytes.
+preceptor-lora/adapters/*/adapter_model.safetensors
+preceptor-lora/adapters/*/adapter.gguf
+preceptor-lora/adapters/*/training.log
