@@ -1,60 +1,62 @@
-# Borrador · LinkedIn · el LoRA de Atención al Público
+# Borrador · LinkedIn · The Tribune
 
-**Estado: BORRADOR, pendiente de firma.** Y con tres correcciones al encargo que
-hay que resolver **antes** de publicar, porque un post es público y este proyecto
-se sostiene sobre decir cosas comprobables.
-
----
-
-## ⚠️ Tres cosas del encargo que no se pueden publicar tal cual
-
-### 1. «Primer LoRA soberano entrenado en hardware local» es falso
-
-Este nodo ya ha entrenado LoRAs **tres veces** antes: `preceptor-cazanido` v1 y
-v3, y `preceptor-v7`. Está escrito en el inventario del propio rack —*«este nodo
-AFINA LoRAs por CPU en menos de diez minutos, y ya lo ha hecho tres veces»*— y
-cualquiera puede verlo en el repositorio público.
-
-Publicar «el primero» sería un error factual sobre nuestro propio trabajo, y el
-peor sitio para tenerlo es el post donde presumimos de medir.
-
-**Lo que sí es primero:** el primer LoRA de **utilidad pública** del LoRAtelier
-—los anteriores eran de doctrina interna y de métricas— y el primero con **dos
-datasets comparativos** para medir el efecto de la lengua.
-
-### 2. «Sin alucinaciones» no se puede afirmar, y menos antes de medir
-
-Es una promesa absoluta y no la sostiene ninguna medición. Además, cuando se
-escribe esto el entrenamiento **está corriendo**. Lo que sí se puede decir es
-concreto y más fuerte: *qué le prohibimos decir, y cómo se comprueba*.
-
-### 3. El enlace no existe
-
-`github.com/piskyRpapalo/preceptor-lora` da 404: `preceptor-lora` es una carpeta
-dentro del repositorio `p0x`, que sí es público. O se enlaza a `p0x`, o se saca
-la carpeta a repositorio propio antes de publicar.
+**Estado: BORRADOR, pendiente de firma.** Incorpora los cuatro ajustes firmados
+el 2026-09-06 y las cifras ya medidas del primer entrenamiento.
 
 ---
 
-## Borrador corregido
+## ⚠️ Un aviso técnico que hay que resolver antes de prometer descargas
 
-> **Título:** Un LoRA de atención al cliente entrenado en un mini PC — y la regla
-> que le prohibimos romper
+`preceptoros.org` responde **200 y va por Cloudflare** (`server: cloudflare`).
+Si el sitio se sirve con **Cloudflare Pages**, el límite es **25 MiB por
+fichero** — y cada adaptador pesa **52 MiB**. El despliegue lo rechazaría, y lo
+haría en silencio desde el punto de vista de quien mira la web.
 
-Entrenamos un adaptador LoRA para atender reclamaciones de consumidores. No en
-la nube: en un mini PC de sobremesa, sobre CPU, con un modelo europeo de licencia
-Apache 2.0.
+Tres salidas, y la tercera es la que más se parece a lo que este proyecto dice
+ser:
 
-Lo interesante no es que quepa en el hardware. Es lo que le enseñamos a **no**
+1. **R2** (el almacenamiento de objetos de Cloudflare), que existe justo para
+   esto y no tiene ese tope.
+2. Partir el fichero. Funciona y es feo: obliga a quien descarga a recomponerlo.
+3. **Servirlos desde el rack**, por el túnel que ya existe y ya contesta
+   (`api.preceptoros.org`). Es la opción soberana de verdad: el artefacto sale
+   de tu máquina, no de un CDN ajeno. Y el día que el rack se apague, la
+   descarga se apaga con él — que es honesto, no un defecto.
+
+Mientras no se decida, el bloque se queda en `en_entrenamiento` y **no hay
+botón**, que es lo que ya hace el registro.
+
+**Lo que no está roto**, comprobado uno a uno: el dominio, la API del Ágora, los
+cuatro enlaces de GitHub y los scripts de instalación. LinkedIn devuelve 999,
+que es su antibot y no un enlace roto. El único 404 es `/downloads/`, y es
+esperado: los ficheros aún no están.
+
+---
+
+## Borrador
+
+> **Título:** El primer LoRA de utilidad pública de LoRAtelier: un tribuno para
+> reclamaciones
+
+Hemos entrenado el primer adaptador LoRA de utilidad pública para LoRAtelier. Se
+llama **The Tribune**, y el nombre no es decorativo: el tribuno de la plebe
+existía para interponerse entre un ciudadano corriente y un magistrado que le
+hacía daño. Eso es exactamente lo que hace.
+
+Lo interesante no es que quepa en un mini PC. Es lo que le enseñamos a **no**
 hacer.
 
-**La regla de los plazos.** El 15 % del corpus son dudas del tipo «¿cuánto tiempo
-tengo para reclamar?». El modelo tiene prohibido responder con un número. Los
-plazos cambian por país y por sector, y un dato dicho con aplomo puede costarle a
-alguien su reclamación. Así que nombra el canal —hoja de reclamaciones, oficina
-de consumo, arbitraje— y manda a confirmarlo en la fuente oficial.
+**La regla de los plazos.** El 15 % del corpus son dudas del tipo «¿cuánto
+tiempo tengo para reclamar?». El modelo tiene prohibido responder con un número.
+Los plazos cambian por país y por sector, y un dato dicho con aplomo puede
+costarle a alguien su reclamación. Así que nombra el canal —hoja de
+reclamaciones, oficina de consumo, arbitraje— y manda a confirmarlo en la fuente
+oficial.
 
 Decir «no lo sé, y sé quién sí» es más útil que acertar ocho de cada diez veces.
+
+**Está entrenado con la doctrina Honest Sensors**: declara `NO_DATA` cuando no
+sabe, y nombra la clave que le falta en vez de rellenarla.
 
 **Las otras tres conductas**, cada una contra una avería concreta de los bots de
 atención que todos hemos sufrido:
@@ -66,35 +68,44 @@ atención que todos hemos sufrido:
 - No pedir datos sensibles por chat. Ni tarjeta, ni documento, ni claves —
   aunque el cliente los ofrezca primero.
 
-**Dos datasets, no uno.** 200 muestras en total, con el mismo reparto: 50 % casos
-estándar, 20 % casos límite, 15 % dudas al reclamar, 15 % doctrina. Uno entero en
-inglés; el otro repartido en seis lenguas (40 % español, y el resto entre
+**Dos datasets, no uno.** 200 muestras con el mismo reparto: 50 % casos
+estándar, 20 % casos límite, 15 % dudas al reclamar, 15 % doctrina. Uno entero
+en inglés; el otro repartido en seis lenguas (40 % español, y el resto entre
 portugués, francés, italiano, griego e inglés). El tramo inglés del segundo es
 idéntico al del primero **a propósito**: así la comparación mide la lengua y no
 dos redacciones distintas.
 
 Los repartos no se declaran en un comentario: los comprueba una aserción al
-generar. Un reparto escrito y desmentido por el fichero es peor que no tenerlo.
+generar.
 
-**El coste, medido.** [PENDIENTE — rellenar al terminar: s/paso, minutos totales,
-pico de RAM, pico de temperatura y pérdida inicial → final de cada dataset.]
+**El coste, medido en un mini PC de sobremesa** (Ryzen 7, 8 hilos, sin GPU
+dedicada, base Mistral 7B en bf16 y licencia Apache 2.0):
 
-**Lo que falta**, y se dice porque forma parte del método: el artefacto no está
-publicado, así que todavía no hay botón de descarga. Sin firma y sin hash
-verificable no se ofrece nada.
+- 200 pasos · **5,55 s por paso** · 18,5 min de cálculo
+- pérdida **3,80 → 0,62**
+- RAM pico **19,1 GB**
+- temperatura máxima **84,4 °C**, con 62 pausas térmicas automáticas
+- **39 minutos de reloj**, pausas incluidas
 
-🔗 [PENDIENTE — enlace: `p0x`, o `preceptor-lora` si se saca a repo propio]
+Sobre esa pérdida conviene una cautela, y la decimos nosotros antes que nadie:
+una caída así con 100 muestras puede ser aprendizaje o puede ser sobreajuste. La
+curva no lo distingue. Lo dirán los casos que el modelo no ha visto.
+
+**Lo que falta**, y se dice porque forma parte del método: el artefacto todavía
+no está publicado. Sin hash verificable no se ofrece descarga.
+
+🔗 Código: github.com/piskyRpapalo/p0x (el LoRAtelier vive en `preceptor-lora/`)
+✉️ davidpecero@gmail.com
 
 ---
 
 ## Notas para el Soberano
 
-- El gancho más fuerte es **la regla de los plazos**, no el hardware. «Un modelo
-  al que le prohibimos dar una fecha» se lee y se recuerda; «entrenado en local»
-  lo dice todo el mundo.
-- Los dos huecos `[PENDIENTE]` son deliberados: uno espera a la medición que está
-  corriendo, el otro a tu decisión sobre el repositorio.
-- Sin «disruptivo» ni «revolucionario», como pediste. Tampoco «democratizar».
-- Si el post lleva captura, la del LoRAtelier con los bloques en «en
-  entrenamiento» y sin botón de descarga dice más que una de código: enseña que
-  no se ofrece lo que aún no se puede comprobar.
+- El gancho es **la regla de los plazos**, no el hardware.
+- Sin «disruptivo», «revolucionario» ni «democratizar».
+- La cautela sobre el sobreajuste es deliberada: decirla nosotros vale más que
+  que la diga un comentarista. Y encaja con lo que el producto predica.
+- Falta rellenar las cifras del dataset multilingüe: se está entrenando mientras
+  se escribe esto.
+- El email es el temporal firmado. Cuando el dominio sirva correo, se cambia
+  aquí y en `downloads/README.md`, que son los dos sitios donde está escrito.
