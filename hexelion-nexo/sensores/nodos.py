@@ -170,12 +170,14 @@ def leer():
             "el panel arranco con la red cortada · los nodos remotos no se "
             "preguntan, y no preguntarlos es la respuesta correcta aqui")
 
+    detalles = []
     try:
         vivos = _tailscale()
     except Exception as e:                                       # noqa: BLE001
         vivos = {}
         aviso_ts = ("la red malla no contesta en esta maquina · de quien "
-                    f"responde no hay dato ({type(e).__name__})")
+                    "responde no hay dato")
+        detalles.append(type(e).__name__)
     else:
         aviso_ts = "" if vivos else "el tailnet no declara ningun nodo"
 
@@ -192,7 +194,8 @@ def leer():
         except Exception as e:                                   # noqa: BLE001
             aviso_gw = ("el gateway no contesta · las sondas profundas de "
                         "nodo no llegan, y lo que se sabe sale solo de la red "
-                        f"malla ({type(e).__name__})")
+                        "malla")
+            detalles.append(type(e).__name__)
 
     declarados = rack()
     if not declarados:
@@ -282,6 +285,7 @@ def leer():
         gateway_declarado=bool(base),
         avisos=avisos,
         causa=" · ".join(avisos),
+        detalle=" · ".join(detalles),
     )
 
 

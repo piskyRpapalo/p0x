@@ -1591,3 +1591,40 @@ P6-1.
   así que el candidato está en uno de esos dos sitios— y decidir si el fallo es
   un defecto o un efecto. Se mide con Pillow: canal alfa por fotograma y dónde
   el croma no llegó a recortarse.
+
+## P9 · Ecosistema GitHub reestructurado (2026-09-06)
+
+- **P9-1 · ~~`p0x` se anunciaba *(Private)* y estaba público.~~ CERRADO el
+  2026-09-06: el Soberano decidió que siga **público** como referencia de
+  estudio; el README retira la etiqueta y enlaza el repo.** (Coste S.) El texto entregado lo describe como monorepo
+  privado y `gh repo list` lo devuelve público: cualquiera que siga el rastro ve
+  doctrina, bucles y planos. Hay que decidir cuál de las dos cosas es la
+  verdadera —privatizar el repo, o quitar la etiqueta del README— porque tal y
+  como está, el perfil promete una discreción que no existe.
+
+- **P9-2 · ~~Tres cabeceras del README perdieron su emoji.~~ CERRADO el
+  2026-09-06: 🧠 · 🚀 · 🏗️ · 📚, y la última pasa a «Lexical Architecture (For
+  Study & Reference)».** (Coste S.) `## Core Philosophy` y `## Lexical Architecture` llegaron sin icono, y
+  `## Featured Projects` conserva un modificador de variación huérfano (U+FE0F)
+  que GitHub pinta como un hueco antes del título. Se escribió exacto como se
+  pidió; queda decidir qué tres iconos van ahí.
+
+- **P9-3 · La rama por defecto del repo de perfil es `docs/perfil-refactor`,
+  no `main`.** (Coste S.) Por eso el README se ve ya publicado sin fusionar
+  nada. Funciona, pero es frágil: cualquiera que asuma `main` —una automatización,
+  o una sesión futura— escribirá en la rama que no se ve. Fusionar y devolver el
+  default a `main`.
+
+- **P9-4 · El perfil depende de un fichero de otro repo por URL cruda.** (Coste
+  S.) `aurelius-face-animated.gif` vive en `preceptoros-web/public/assets/` y el
+  perfil lo consume por `raw.githubusercontent.com/.../main/...`. Renombrar el
+  fichero, mover la carpeta o cambiar la rama por defecto de la web deja el
+  perfil con la imagen rota y nadie se entera. Anotarlo donde se vigile.
+
+- **P9-5 · El croma verde ya tiene receta, y estaba en el scratchpad.** (Coste
+  S.) La lámina `Cuarentena/pixel.png` son cinco poses sobre croma; el recorte
+  bueno no sale con un umbral, sale **desmezclando** (alfa por verdor, despill,
+  redimensionado premultiplicado y tramado de Bayer para el degradado, que el GIF
+  solo tiene transparencia binaria). El script quedó copiado en
+  `Cuarentena/aurelius-face-animated.gif.py` para que no se lo lleve el borrado
+  del temporal. Toca al P8-9: esa lámina es una de las candidatas.
