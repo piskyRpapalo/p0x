@@ -12,7 +12,8 @@ bf16 con `torch 2.13.0+cpu`. Ninguna cifra es de ficha técnica.
 |---|---|---|---|---|
 | 8 hilos, sin termostato (10 pasos) | 9,48 | **84,0 °C** | 0 | 1,6 min |
 | 6 hilos, termostato a 75 °C (10 pasos) | 10,4 | **81,6 °C** | 9 de 10 | 5 min |
-| 8 hilos, termostato a 80 °C (200 pasos) | 5,55 | **84,4 °C** | 62 | 39 min |
+| 8 hilos, termostato a 80 °C · corpus EN (200 pasos) | 5,55 | **84,4 °C** | 62 | 39 min |
+| 8 hilos, termostato a 80 °C · corpus multilingüe (200 pasos) | 6,83 | **85,1 °C** | 72 | 47 min |
 
 Y la curva de enfriamiento en reposo, medida: **de 58 a 48 °C en 20 segundos**.
 La máquina disipa bien; el problema no es que acumule calor.
@@ -50,6 +51,39 @@ respetarlos conviene mirar la hoja de datos del Ryzen 7 255: si su Tjmax está m
 por encima, 84 °C sostenidos pueden ser régimen normal y no una alarma.
 
 ---
+
+### 4. El corpus multilingüe cuesta un 40 % más de RAM, y no es el modelo
+
+Los dos entrenamientos usaron **la misma base, los mismos hilos y el mismo
+número de pasos**. La única diferencia era el corpus. Y sin embargo:
+
+| | RAM pico | s/paso |
+|---|---|---|
+| corpus inglés | 19.058 MiB | 5,55 |
+| corpus multilingüe | **26.766 MiB** | 6,83 |
+
+**+7,7 GB por cambiar de corpus.** La causa está medida: las cinco muestras
+griegas ocupan **655 tokens de mediana frente a 214** de las de alfabeto latino
+— el mismo contenido cuesta el triple porque el tokenizador es latino-céntrico.
+Secuencias más largas son más activaciones, y las activaciones son la memoria.
+
+Esto reordena la prioridad para el 12B: **el techo que va a morder no es el
+térmico, es el de RAM.** Y la aritmética asusta: si un 7B multilingüe hace pico
+de 26,8 GB sobre 38 disponibles, un 12B con el mismo corpus no cabe. Antes de
+lanzarlo hay que medir su pico con **una sola muestra griega**, que es el peor
+caso, y no con el corpus entero a la hora y media.
+
+### 5. `max_len` es un techo de truncado, NO un relleno
+
+Se propuso bajarlo de 1024 a 256 para reducir calor. **No habría reducido nada.**
+En este entrenador el lote es 1 y no hay `padding=`, así que una muestra de 214
+tokens cuesta 214 tanto con `max_len=1024` como con 256. El coste va por tokens
+reales, no por el techo.
+
+Lo que sí habría hecho: **truncar las cinco muestras griegas** —todas pasan de
+256— y borrar del experimento justo la lengua que lo hacía interesante, mientras
+el log seguía diciendo que entrenaba con ella. Bajar `max_len` solo sirve para
+cortar, y aquí cortar era el daño.
 
 ## Para el Mistral Nemo 12B
 
