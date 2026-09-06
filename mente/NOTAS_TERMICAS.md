@@ -110,11 +110,11 @@ cambio:
 #   powerprofilesctl set power-saver      # y volver a `balanced` después
 ```
 
-Lo que **sí** se puede hacer sin root y está pendiente de medir: **bajar
-`max_len`**. El corpus actual usa 1024 tokens de secuencia; las muestras de
-reclamaciones son cortas —40 palabras de media en la respuesta— así que
-probablemente sobra la mitad. Menos secuencia es menos trabajo por paso, que es
-lo único que baja el pico de verdad.
+Lo que **sí** se puede hacer sin root: **acortar las muestras**, que no es lo
+mismo que bajar `max_len` — ver el hallazgo 5. El techo no cuesta nada; lo que
+cuesta son los tokens reales. Para bajar el pico hay que escribir muestras más
+cortas o partir las largas, y la que hay que mirar es la griega: 655 tokens de
+mediana contra 214 de las latinas.
 
 ---
 
