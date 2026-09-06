@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "p0x:ojo/vector-soberano/1",
+  "title": "Vector de Estado Soberano",
+  "description": "El estado del rack en el momento de una consulta, tipado y validado, para inyectarse como [SYSTEM CONTEXT] antes del prompt. Toda hoja es una LECTURA: nunca un escalar pelado, porque un numero sin su procedencia y sin su hora es un rumor con decimales. La invariante que sostiene todo lo demas la hace cumplir este esquema y no la buena voluntad de quien escriba: valor nulo si y solo si NO_DATA. Asi el cero decorativo -indistinguible de una medida- es estructuralmente imposible.",
+
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["esquema", "generado", "presupuesto", "salud_hardware",
+               "instantanea_ambiental", "estado_ecosistema", "contexto_usuario"],
+
+  "$defs": {
+    "lectura": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["clave", "estado", "valor", "unidad", "medido", "fuente"],
+      "properties": {
+        "clave":   {"type": "string", "minLength": 1},
+        "estado":  {"enum": ["MEDIDO", "NORMA", "NO_DATA", "STALE"],
+                    "description": "MEDIDO sale de un aparato o del kernel. NORMA es declarado por alguien y no medido -la distincion que el canon del nodo lleva pagando cara. NO_DATA es el hueco con su causa. STALE es un dato que fue bueno y ya no se puede leer como «lo que hay»."},
+        "valor":   {"type": ["number", "string", "boolean", "array", "object", "null"]},
+        "unidad":  {"type": "string"},
+        "medido":  {"type": "string", "description": "ISO 8601 con zona. En un hueco es la hora del intento, no del dato."},
+        "fuente":  {"type": "string", "minLength": 1,
+                    "description": "Quien lo dice. Un dato sin procedencia no se puede auditar ni desmentir."},
+        "causa":   {"type": "string", "description": "Frase para una persona: que falta y, si se puede, que hacer."},
+        "detalle": {"type": "string", "description": "Para quien depura: el nombre de la excepcion, la ruta que no estaba. Separado de `causa` a proposito -«URLError» tiene la FORMA de una explicacion y no explica nada."},
+        "remedio": {"type": "string"},
+        "nota":    {"type": "string"}
+      },
+      "allOf": [
+        {
+          "if":   {"properties": {"estado": {"const": "NO_DATA"}}, "required": ["estado"]},
+          "then": {"properties": {"valor": {"type": "null"}}, "required": ["causa"]}
+        },
+        {
+          "if":   {"properties": {"estado": {"enum": ["MEDIDO", "NORMA", "STALE"]}}, "required": ["estado"]},
+          "then": {"properties": {"valor": {"not": {"type": "null"}}}}
+        }
+      ]
+    }
+  },
+
+  "properties": {
+    "esquema": {"const": 1},
+    "generado": {"type": "string", "description": "ISO 8601 con zona."},
+
+    "presupuesto": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sin_red", "sondas", "ms"],
+      "description": "Lo que costo construir este vector. Existe porque el Ojo tiene prohibido sondar el rack al pintar: si algun dia una sonda se cuela, aqui se ve.",
+      "properties": {
+        "sin_red": {"type": "boolean"},
+        "sondas":  {"type": "array", "items": {"type": "string"},
+                    "description": "Cada salida de la maquina, nombrada. Lista vacia = no se salio."},
+        "ms":      {"type": "number", "minimum": 0}
+      }
+    },
+
+    "salud_hardware": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["soberano", "nodos"],
+      "properties": {
+        "soberano": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["cpu_temp_c", "gpu_temp_c", "gpu_ocupacion_pct", "vram_usada_b",
+                       "vram_total_b", "ram_disponible_mb", "ram_total_mb", "carga_1m"],
+          "properties": {
+            "cpu_temp_c":        {"$ref": "#/$defs/lectura"},
+            "gpu_temp_c":        {"$ref": "#/$defs/lectura"},
+            "gpu_ocupacion_pct": {"$ref": "#/$defs/lectura"},
+            "vram_usada_b":      {"$ref": "#/$defs/lectura"},
+            "vram_total_b":      {"$ref": "#/$defs/lectura"},
+            "ram_disponible_mb": {"$ref": "#/$defs/lectura"},
+            "ram_total_mb":      {"$ref": "#/$defs/lectura"},
+            "carga_1m":          {"$ref": "#/$defs/lectura"}
+          }
+        },
+        "nodos": {"$ref": "#/$defs/lectura",
+                  "description": "fragua, vigia y torre NO se sondean desde aqui: se toman del sensor `nodos` del Nexo, que ya distingue «responde en el tailnet» de «tiene servicios vivos». Abrir sesiones SSH desde un panel no es una ventana, es un agente con llaves."}
+      }
+    },
+
+    "instantanea_ambiental": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["consumo_w", "generacion_solar_w", "co2_ppm", "humedad_suelo_pct",
+                   "adsb_total", "adsb_visibles", "rs485", "esp32", "camara"],
+      "description": "Lo fisico. La mayoria son huecos declarados, y ese es el dato: en este nodo la unica cifra fisica que no sale de /sys ni de /proc es el vatimetro.",
+      "properties": {
+        "consumo_w":          {"$ref": "#/$defs/lectura"},
+        "generacion_solar_w": {"$ref": "#/$defs/lectura",
+                               "description": "SEPARADO de `consumo_w` a proposito y para siempre. El enchufe mide cuanto se gasta, no de donde viene: alimentar este campo desde el vatimetro convertiria una declaracion («99% solar») en una medida, que es el fallo exacto que el panel entero existe para impedir."},
+        "co2_ppm":            {"$ref": "#/$defs/lectura"},
+        "humedad_suelo_pct":  {"$ref": "#/$defs/lectura"},
+        "adsb_total":         {"$ref": "#/$defs/lectura"},
+        "adsb_visibles":      {"$ref": "#/$defs/lectura",
+                               "description": "Las que ademas dicen donde estan. Viaja junto a `adsb_total` porque enseñar solo las situadas seria decir «hay dos aviones» oyendo a ocho."},
+        "rs485":              {"$ref": "#/$defs/lectura"},
+        "esp32":              {"$ref": "#/$defs/lectura"},
+        "camara":             {"$ref": "#/$defs/lectura"}
+      }
+    },
+
+    "estado_ecosistema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["modelos_instalados", "modelos_cargados", "tags_pelados",
+                   "backend", "repos", "gates"],
+      "properties": {
+        "modelos_instalados": {"$ref": "#/$defs/lectura"},
+        "modelos_cargados":   {"$ref": "#/$defs/lectura",
+                               "description": "Instalado no es cargado. Un 30B en disco y un 30B en RAM son dos situaciones distintas para quien va a pedir un turno."},
+        "tags_pelados":       {"$ref": "#/$defs/lectura",
+                               "description": "Los tags sin version explicita, contados y nombrados: apuntan a variantes Thinking con razonamiento no desactivable."},
+        "backend":            {"$ref": "#/$defs/lectura",
+                               "description": "Vulkan o CPU. Solo MEDIDO si hay un modelo cargado que lo demuestre; nunca heredado de la sesion anterior."},
+        "repos":              {"$ref": "#/$defs/lectura",
+                               "description": "De cache local con su fecha. Construir el vector NO llama a GitHub: seria una sonda a la nube en el arranque de cada consulta."},
+        "gates":              {"$ref": "#/$defs/lectura",
+                               "description": "El ultimo resultado con su hora. No se re-ejecutan para pintar."}
+      }
+    },
+
+    "contexto_usuario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["idioma", "modo_respuesta", "ubicacion_aprox"],
+      "properties": {
+        "idioma":          {"$ref": "#/$defs/lectura"},
+        "modo_respuesta":  {"$ref": "#/$defs/lectura"},
+        "ubicacion_aprox": {"$ref": "#/$defs/lectura",
+                            "description": "Dato personal: grano de ciudad como mucho, de un artefacto declarado, y no sale de esta maquina."}
+      }
+    }
+  }
+}

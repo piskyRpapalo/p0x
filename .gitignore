@@ -94,3 +94,8 @@ preceptor-internal/
 Web dashboard design/
 preceptor-lora/llama.cpp/
 Alejandria/ojo/recursos.json
+
+# Caches del Ojo: estado derivado con fecha. Versionarlas seria repartir un
+# dato viejo con aspecto de actual, que es contra lo que el vector existe.
+Alejandria/ojo/cache_repos.json
+Alejandria/ojo/cache_gates.json

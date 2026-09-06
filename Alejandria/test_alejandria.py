@@ -753,10 +753,6 @@ class CargarPartida(unittest.TestCase):
         self.assertIn('"/partida.js"', ojo_py, "el servidor no sirve partida.js")
 
 
-if __name__ == "__main__":
-    unittest.main(verbosity=1)
-
-
 class ElOjoNoSirveDatoRancioComoActual(unittest.TestCase):
     """El fallo del 2026-09-01, convertido en gate.
 
@@ -803,3 +799,140 @@ class ElOjoNoSirveDatoRancioComoActual(unittest.TestCase):
         fuente = inspect.getsource(self.ojo.Ojo.do_GET)
         self.assertNotIn('componentes"]["ollama', fuente,
                          "el dato en vivo pisa el snapshot")
+
+
+class ElVectorDeEstadoSoberano(unittest.TestCase):
+    """El vector que se inyecta antes del prompt: que no pueda mentir por forma.
+
+    Casi todo se prueba con `sin_red=True`. No es por ir deprisa: un gate que
+    sale a la LAN mide la LAN, no el codigo, y se pone rojo el dia que un
+    enchufe esta apagado -- que es justo el dia en que el vector funciona BIEN,
+    declarando el hueco. El camino con red se cubre con `vector_ejemplo.json`,
+    que se genero contra el rack de verdad y viaja en el repo.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(Path(__file__).resolve().parent / "ojo"))
+        import vector
+        cls.V = vector
+        cls.v = vector.construir(sin_red=True)
+        cls.ejemplo = json.loads(
+            (RAIZ / "ojo" / "vector_ejemplo.json").read_text(encoding="utf-8"))
+
+    def _lecturas(self, v):
+        """Toda hoja del vector, con su ruta. Una hoja es lo que tiene `clave`."""
+        fuera = []
+        def anda(d, ruta=""):
+            if isinstance(d, dict) and "clave" in d and "estado" in d:
+                fuera.append((ruta, d))
+            elif isinstance(d, dict):
+                for k, x in d.items():
+                    anda(x, f"{ruta}.{k}" if ruta else k)
+        for k in ("salud_hardware", "instantanea_ambiental", "estado_ecosistema",
+                  "contexto_usuario"):
+            anda(v[k], k)
+        return fuera
+
+    def test_valida_contra_su_esquema(self):
+        self.assertEqual(self.V.validar(self.v), [])
+
+    def test_el_ejemplo_que_viaja_en_el_repo_tambien_valida(self):
+        """Si el ejemplo se queda viejo respecto al esquema, se entera el gate."""
+        self.assertEqual(self.V.validar(self.ejemplo), [])
+
+    def test_valor_nulo_si_y_solo_si_no_data(self):
+        """La invariante entera, en las dos direcciones y sobre datos reales."""
+        for ruta, d in self._lecturas(self.v) + self._lecturas(self.ejemplo):
+            with self.subTest(lectura=ruta):
+                if d["estado"] == "NO_DATA":
+                    self.assertIsNone(d["valor"], "un hueco con valor no es un hueco")
+                else:
+                    self.assertIsNotNone(d["valor"], "un dato sin valor no es un dato")
+
+    def test_el_esquema_caza_el_cero_decorativo(self):
+        """Un validador que nunca dijo que no, no prueba nada."""
+        import copy
+        malo = copy.deepcopy(self.v)
+        malo["instantanea_ambiental"]["co2_ppm"]["valor"] = 0
+        self.assertTrue(self.V.validar(malo),
+                        "el esquema deja colar un 0 donde no hay dato")
+
+    def test_todo_hueco_trae_causa_y_toda_lectura_su_procedencia(self):
+        for ruta, d in self._lecturas(self.v) + self._lecturas(self.ejemplo):
+            with self.subTest(lectura=ruta):
+                self.assertTrue(d["fuente"], "un dato sin procedencia no se audita")
+                self.assertTrue(d["medido"], "una cifra sin su hora es un rumor")
+                if d["estado"] == "NO_DATA":
+                    self.assertTrue(d.get("causa"), "un hueco sin causa es una excusa")
+
+    def test_ninguna_causa_dice_desconocido(self):
+        """La misma metrica de honestidad que el Nexo, aplicada aqui.
+
+        `detalle` SI puede traer el nombre de la excepcion: para eso existe.
+        """
+        for ruta, d in self._lecturas(self.v) + self._lecturas(self.ejemplo):
+            causa = (d.get("causa") or "").lower()
+            with self.subTest(lectura=ruta):
+                for vacia in ("unknown", "desconocido", "n/a", "error", "???"):
+                    self.assertNotIn(vacia, causa)
+
+    def test_sin_red_no_deja_ni_una_sonda(self):
+        """La bandera no es un adorno: si se cuela una salida, aqui se ve."""
+        self.assertEqual(self.v["presupuesto"]["sondas"], [])
+        self.assertTrue(self.v["presupuesto"]["sin_red"])
+
+    def test_la_generacion_solar_jamas_se_alimenta_del_vatimetro(self):
+        """El invariante doctrinal del vector, y el motivo de que exista.
+
+        El enchufe mide lo que se GASTA. Si algun dia alguien conecta esa cifra
+        a `generacion_solar_w`, una declaracion se habra convertido en una
+        medida y la regla «si solar > consumo, lanza tarea pesada» empezara a
+        contestar con un numero inventado.
+        """
+        gen = self.ejemplo["instantanea_ambiental"]["generacion_solar_w"]
+        self.assertEqual(gen["estado"], "NO_DATA")
+        self.assertIn("gasta", gen["causa"].lower())
+        fuente = inspect.getsource(self.V._ambiental)
+        self.assertNotIn("_consumo_w()", fuente.split("generacion_solar_w")[1],
+                         "el vatimetro esta alimentando la generacion")
+
+    def test_el_mapa_entre_las_dos_lenguas_es_total(self):
+        """Ningun estado del vector puede quedarse sin palabra en el Alfabeto."""
+        esquema = json.loads(
+            (RAIZ / "ojo" / "esquema_vector.json").read_text(encoding="utf-8"))
+        estados = set(esquema["$defs"]["lectura"]["properties"]["estado"]["enum"])
+        self.assertEqual(estados, set(self.V.A_ALFABETO),
+                         "el esquema y la tabla de traduccion se han bifurcado")
+        self.assertEqual(set(self.V.A_ALFABETO.values()) - {"ok"},
+                         {"sin_dato", "stale"},
+                         "una palabra que no esta en el lexico canonico §2")
+
+    def test_norma_no_se_confunde_con_medido_al_cruzar_al_alfabeto(self):
+        """`NORMA` traduce a `ok` porque el lexico §2 no tiene palabra para
+        «declarado pero no medido». La distincion se conserva en `norma: true`
+        en vez de perderse en la traduccion."""
+        sobre = self.V.a_alfabeto(self.v)
+        idioma = sobre["in"]["contexto_usuario"]["idioma"]
+        self.assertEqual(idioma["e"], "ok")
+        self.assertTrue(idioma.get("norma"), "la distincion se perdio en el cable")
+
+    def test_el_cable_pesa_bastante_menos_que_la_prosa(self):
+        """Alfabeto §6 exige >=30% de ahorro. El A/B en tokens medidos vive en
+        `mente/telemetria/lengua.jsonl`; aqui se vigila que no se degrade."""
+        prosa = json.dumps(self.ejemplo, ensure_ascii=False, indent=1)
+        cable = json.dumps(self.V.a_alfabeto(self.ejemplo), ensure_ascii=False,
+                           separators=(",", ":"))
+        self.assertLess(len(cable), len(prosa) * 0.7)
+
+    def test_construir_el_vector_no_llama_a_github(self):
+        """La lista de repos sale de cache. Preguntarle a la nube en el arranque
+        de cada consulta seria pagar latencia y dependencia en el sistema que
+        existe para no tenerlas."""
+        for fn in (self.V.construir, self.V._ecosistema):
+            self.assertNotIn("subprocess", inspect.getsource(fn))
+        self.assertIn("subprocess", inspect.getsource(self.V.refrescar_repos))
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=1)
