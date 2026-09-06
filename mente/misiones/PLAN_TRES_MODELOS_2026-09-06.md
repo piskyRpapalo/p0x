@@ -8,6 +8,85 @@ pega al lado lo que el rack dice hoy, medido, y reordena lo que la verificación
 
 ---
 
+## ENMIENDA 1 · decisiones del Soberano, 2026-09-06
+
+Dos decisiones que simplifican el plan y desactivan uno de sus bloqueos.
+
+### D1 · El mini-modelo no lleva página propia
+
+Se adapta a lo que hay. `instalar.html` ya **deriva** su catálogo de `modelos.json` en vez de
+escribirlo a mano, así que el mini-modelo entra ahí como una entrada más del catálogo, con su
+medición y su firma, sin gastar presupuesto de páginas.
+
+**Consecuencia sobre §2:** la fusión Comunidad+Perfil **deja de ser un bloqueo**. Ya no hay que
+hacerla para abrir hueco; se hace cuando valga por sí misma. El presupuesto sigue en 9/9 y nadie
+tiene que pedir amnistía.
+
+### D2 · El cuentacuentos es el papel principal del modelo que ya se sirve
+
+No es un cuarto motor: es **el papel** que se le da a la cascada que ya existe (Prompt API del
+navegador → WebLLM bajo demanda → el Ollama del visitante → el JSON para llevar). Así que el
+cuentacuentos **deja de estar bloqueado por el túnel**: funciona con lo que hay hoy.
+
+**Dónde se toca, exactamente:**
+
+| Pieza | Qué es hoy | Qué pasa a ser |
+|---|---|---|
+| `assets/prompts-<idioma>.js` → `PR.papel` | el papel del **instalador** | el papel del **cuentacuentos**: explicar PreceptorOS y responder a «¿en qué me ayuda esto?» |
+| `assets/chat-router.js` → `nido` | el papel del compañero elegido, que pisa al base | **se queda igual**: es lo que da variedad a la conversación sin mover el papel principal |
+| `assets/chat.js` → `papel()` | `nido || PR.papel` + estado | **se queda igual**: la composición ya es la correcta |
+
+**El idioma sale gratis.** El documento pedía «versiones por idioma, cada una firmada y medida»: los
+papeles **ya viven por idioma** (`prompts-es.js`, `-pt`, `-de`, `-el`, `-fr`…). No hay que inventar
+la estructura, solo escribir el texto en cada una y medirlo.
+
+**Lo que esta decisión revierte, y conviene decirlo.** `chat.js` lleva escrito: *«El papel es el del
+instalador y nada más. La memoria local y el camino de aprendizaje viven en el MVP, en la máquina de
+la persona: esta web es instalación y comunidad, y no tiene nada de eso que ofrecer.»* Era una
+decisión deliberada. La parte que **sigue siendo cierta** es la segunda: **la web no tiene memoria
+del visitante**. Por eso, de la visión del cuentacuentos:
+
+- ✅ *explicar la doctrina, responder a las preguntas base, invitar a contribuir* — se puede hoy.
+- ❌ *«cuando alguien vuelve después de semanas, recuerda su última medición»* — **no**, y no por
+  falta de modelo: la web no guarda al visitante. Esa continuidad la da el perfil firmado, no el
+  chat. Prometerla en el papel sería que el modelo inventara un recuerdo.
+
+### D3 · El filtro Caza-Nido: ida hecha, vuelta por construir
+
+La mitad de ida **ya existe y funciona**. `fallback.js` es literalmente *«el JSON que te llevas a la
+IA que ya tienes»*, y `chat.js:sobre()` compone el envío con `{origen, papel, reglas, pregunta}` — o
+sea que el papel del cuentacuentos **viaja ya** con la consulta, y la IA externa contesta sabiendo a
+qué doctrina responde.
+
+Faltan dos cosas, y son distintas:
+
+1. **El disparador.** Hoy el JSON se ofrece cuando **no hay motor** (una carencia de máquina). La
+   decisión del Soberano lo quiere también cuando **no hay dato** (una carencia de conocimiento). Es
+   el mismo mecanismo con otra causa, y encaja con lo que el glosario ya llama *kill switch
+   pedagógico*: el agente dice que no lo sabe y enseña a traer la respuesta.
+2. **La vuelta, que no existe.** No hay ningún camino de entrada: nada permite pegar lo que la IA
+   externa contestó. Y es la pieza que el Soberano pide por su nombre — *«me traes el resultado para
+   que compare con mi conocimiento»*. Es **lo único genuinamente nuevo** de esta enmienda.
+
+**Lo que la vuelta exige pensar antes de escribirla:** lo que entra por ahí es texto de una IA de
+terceros, y va a entrar en un chat que habla con la doctrina. Se trata como **dato, nunca como
+instrucción**: se muestra, se compara, se puede archivar — y no se obedece. Un texto externo que
+entra sin esa frontera es la puerta por la que alguien le dicta al cuentacuentos lo que tiene que
+decir.
+
+### Lo que queda desbloqueado, y lo que sigue bloqueado
+
+- ✅ **Cuentacuentos**: empezable hoy, sin túnel. Es texto de papel, no infraestructura.
+- ✅ **Mini-modelo**: sin bloqueo de página. Sigue pendiente **medirlo en el Doogee** antes de
+  publicarlo.
+- ⏳ **La vuelta del Caza-Nido**: diseño nuevo, con su frontera de confianza.
+- ⏳ **El túnel al rack**: ya no bloquea al cuentacuentos. Sigue siendo la decisión para que el rack
+  sirva a visitantes anónimos, si algún día se quiere.
+- ❌ **La continuidad entre visitas**: no la da el chat. La da el perfil.
+
+
+---
+
 ## 1 · Lo asumido contra lo medido
 
 Seis supuestos del documento, comprobados el 2026-09-06 contra el rack real. Tres se sostienen, dos
