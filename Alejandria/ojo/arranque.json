@@ -1,165 +1,170 @@
 {
-  "titulo": "Arranque de sesion · lee esto ANTES de tocar nada",
-  "para_quien": "Cualquier IA que abra sesion en soberano: Claude Code, cc-local o una voz del Sinodo. Es el nexo de arranque, no un resumen de cortesia.",
-  "medido": "2026-09-05",
-  "primer_comando": "curl -s http://127.0.0.1:8790/api/arranque | python3 -m json.tool   # o: python3 ~/p0x/Alejandria/ojo/ojo.py --arranque",
-  "cargar_partida": {
-    "que_es": "El save game. Cuatro pilares que NO se deducen del codigo y que una sesion fria da por supuestos si nadie se los dice, mas la mision siguiente y las trampas que ya han mordido a otro. El texto no vive aqui: vive en el glosario, y esto solo dice CUALES. Si un termino de estas listas desaparece del glosario, la respuesta trae NO_DATA con su nombre en vez de callarse.",
-    "los_cuatro_pilares": [
-      "Doctrina Caza-Nido",
-      "Arquitectura de 3 Capas",
-      "La Verdad del Silicio",
-      "Bug LoRA Thinking · CERRADO el 2026-09-02"
-    ],
-    "de_donde_vienes": "SAVE GAME · lo que hizo la sesion del 2026-09-04",
-    "a_donde_vas": "SIGUIENTE MISION · lo que quedo abierto el 2026-09-04",
-    "lo_que_te_va_a_morder": [
-      "preceptoros-pwa.service (antes aurelius.service)",
-      "el bucle verde · Restart=always y salir 0",
-      "la aritmetica de las tiras, y como se mide el arte",
-      "La Necropolis · lo que ya se mato, y por que",
-      "Donde el inventario de Gemini NO cuadra con el rack",
-      "los repos, y no son tres",
-      "Los repos en GitHub, y cuales son PUBLICOS",
-      "el gate corre solo, en un hook",
-      "los dos techos de la web",
-      "el service worker te ensena codigo viejo",
-      "el cache del navegador, hermano del service worker",
-      "no hay cwebp en este nodo (ni ImageMagick)",
-      "gate",
-      "NO_DATA"
-    ],
-    "y_para_eso_lee": [
-      "El Camino (The Path) y La Brujula (The Compass)",
-      "El rack fisico completo (Le Jardin, Lisboa)",
-      "cc-local · las tres condiciones",
-      "lo que este rack te da"
-    ]
-  },
-  "donde_estas": {
-    "nodo": "soberano · Beelink Ryzen 7 255 · 64 GB · Radeon 780M · sin CUDA",
-    "eres": "el ejecutor. La doctrina la valida el Preceptor fuera del rack: despliegas, no reescribes por iniciativa.",
-    "canon": "~/CLAUDE.md (symlink a p0x/deploy/soberano/) · doctrina en mente/doctrina/ · cuaderno en OPERACIONES.md"
-  },
-  "las_seis_reglas_que_mas_se_rompen": [
-    {
-      "regla": "Comprueba P0X_BRAIN ANTES de actuar",
-      "por_que": "Si vale `local` no tocas canon, no propones enmiendas de doctrina y no emites veredictos de arquitectura. Si no esta puesto eres frontera: PARA y propon delegar a `cc-local` todo inventario, refactor mecanico o tanda de tests.",
-      "comando": "echo ${P0X_BRAIN:-<frontera>}"
-    },
-    {
-      "regla": "Solo `soberano` se toca. Lo demas es PROPOSE-ONLY",
-      "por_que": "la-fragua, la-torre, el-vigia: se leen, no se cambian por SSH. Todo cambio sale como artefacto a ~/p0x/propuestas/.",
-      "comando": "ls ~/p0x/propuestas/"
-    },
-    {
-      "regla": "Ningun diff existe hasta que pasa el gate",
-      "por_que": "Un diff en rojo no es un entregable, es ruido. Hay un hook que los corre y bloquea. Ver el recurso «Los cuatro gates».",
-      "comando": "ver /api/recursos -> Los cuatro gates"
-    },
-    {
-      "regla": "10.240 B por fichero en la web, .json incluido",
-      "por_que": "Cuando no cabe: se ENVUELVE (chat-router.js, comandos.js) o se PARTE (engine.js, hub-cola.js). Nunca se recorta el comentario que explica el porque.",
-      "comando": "cd ~/preceptoros-web && python3 -c \"import pathlib;[print(p.stat().st_size,p) for p in pathlib.Path('public').rglob('*') if p.is_file() and p.suffix in ('.html','.css','.js','.json') and p.stat().st_size>9000]\""
-    },
-    {
-      "regla": "Tag de modelo explicito, y `num_ctx` demostrado por dato",
-      "por_que": "Un tag pelado apunta a variantes Thinking con razonamiento no desactivable. 262k cuelga runtimes en este hardware: la ventana medida es 32768.",
-      "comando": "ollama ps && ollama list"
-    },
-    {
-      "regla": "Jamas firmas valor, y ningun servicio sin firma explicita",
-      "por_que": "Las claves SSH de aqui son auth-only. Crear una unidad systemd o una linea de cron es dejar algo corriendo con tus permisos cuando nadie mira.",
-      "comando": "systemctl --user list-units --type=service,timer   # al cerrar sesion"
-    }
+ "titulo": "Arranque de sesion · lee esto ANTES de tocar nada",
+ "para_quien": "Cualquier IA que abra sesion en soberano: Claude Code, cc-local o una voz del Sinodo. Es el nexo de arranque, no un resumen de cortesia.",
+ "medido": "2026-09-07",
+ "primer_comando": "curl -s http://127.0.0.1:8790/api/arranque | python3 -m json.tool   # o: python3 ~/p0x/Alejandria/ojo/ojo.py --arranque",
+ "cargar_partida": {
+  "que_es": "El save game. Cuatro pilares que NO se deducen del codigo y que una sesion fria da por supuestos si nadie se los dice, mas la mision siguiente y las trampas que ya han mordido a otro. El texto no vive aqui: vive en el glosario, y esto solo dice CUALES. Si un termino de estas listas desaparece del glosario, la respuesta trae NO_DATA con su nombre en vez de callarse.",
+  "los_cuatro_pilares": [
+   "Doctrina Caza-Nido",
+   "Arquitectura de 3 Capas",
+   "La Verdad del Silicio",
+   "Bug LoRA Thinking · CERRADO el 2026-09-02"
   ],
-  "como_se_cierra": [
-    "Parar-y-reportar: que se hizo, que dato salio, que fallo. Ante un comando que va a fallar o sale del alcance: PARA, no improvises un sustituto.",
-    "Actualiza recursos.json si usaste un recurso nuevo o si uno declarado dejo de responder.",
-    "Commit por bloque. `git push` SOLO con la firma explicita del Soberano.",
-    "3-6 sugerencias accionables (S/M/L) anexadas a mente/feedback/PENDIENTES.md."
+  "de_donde_vienes": "SAVE GAME · lo que hizo la sesion del 2026-09-04",
+  "a_donde_vas": "SIGUIENTE MISION · lo que quedo abierto el 2026-09-04",
+  "lo_que_te_va_a_morder": [
+   "preceptoros-pwa.service (antes aurelius.service)",
+   "el bucle verde · Restart=always y salir 0",
+   "la aritmetica de las tiras, y como se mide el arte",
+   "La Necropolis · lo que ya se mato, y por que",
+   "Donde el inventario de Gemini NO cuadra con el rack",
+   "los repos, y no son tres",
+   "Los repos en GitHub, y cuales son PUBLICOS",
+   "el gate corre solo, en un hook",
+   "los dos techos de la web",
+   "el service worker te ensena codigo viejo",
+   "el cache del navegador, hermano del service worker",
+   "no hay cwebp en este nodo (ni ImageMagick)",
+   "gate",
+   "NO_DATA",
+   "al partir una hoja por el tope, el asunto tiene mas mitades de las que ves",
+   "un sensor en verde puede fabricar salud",
+   "el estado de un registro no es lo que el render obedece",
+   "el guardian tiene un suelo duro que ninguna firma exime",
+   "un bucle que espera con pgrep -f se encuentra a si mismo"
   ],
-  "donde_mirar_antes_de_preguntar": {
-    "que tengo a mano": "/api/recursos",
-    "que significa esa jerga": "/api/glosario",
-    "estado del rack ahora": "/api/rack  (consumo_w y ollama_vivo son EN VIVO; el resto es snapshot con su frescura)",
-    "el metal y sus nombres": "~/p0x/hexelion/HARDWARE_MAP.md",
-    "lo que quedo pendiente": "~/p0x/mente/feedback/PENDIENTES.md"
+  "y_para_eso_lee": [
+   "El Camino (The Path) y La Brujula (The Compass)",
+   "El rack fisico completo (Le Jardin, Lisboa)",
+   "cc-local · las tres condiciones",
+   "lo que este rack te da"
+  ]
+ },
+ "donde_estas": {
+  "nodo": "soberano · Beelink Ryzen 7 255 · 64 GB · Radeon 780M · sin CUDA",
+  "eres": "el ejecutor. La doctrina la valida el Preceptor fuera del rack: despliegas, no reescribes por iniciativa.",
+  "canon": "~/CLAUDE.md (symlink a p0x/deploy/soberano/) · doctrina en mente/doctrina/ · cuaderno en OPERACIONES.md"
+ },
+ "las_seis_reglas_que_mas_se_rompen": [
+  {
+   "regla": "Comprueba P0X_BRAIN ANTES de actuar",
+   "por_que": "Si vale `local` no tocas canon, no propones enmiendas de doctrina y no emites veredictos de arquitectura. Si no esta puesto eres frontera: PARA y propon delegar a `cc-local` todo inventario, refactor mecanico o tanda de tests.",
+   "comando": "echo ${P0X_BRAIN:-<frontera>}"
   },
-  "por_donde_vamos": {
-    "que_es": "Donde quedo el rumbo al cerrar la sesion del 2026-09-05. Existe porque la sesion siguiente empieza en frio y, sin esto, vuelve a decidir de memoria lo que ya se decidio con datos.",
-    "fecha": "2026-09-05 (cierre de la noche · segunda tanda)",
-    "frente_abierto": "preceptoros.org · la web publica",
-    "hecho_hoy": [
-      "UN SOLO MARCO. `main:has(#chat)` lleva el canto de bronce y engloba cabezal, chat, atajos, ficha y pie. Eran tres cajas con marmol entre medias y se leian como tres cosas que casualmente estan juntas.",
-      "EL BOTON DE HERRAMIENTAS YA NO EXISTE. Sus ocho nubes bajaron a `#especificaciones`, donde se ven sin pulsar nada. Retirar el mando NO bastaba: `chat-router.js` seguia llamando a `alternar(false)` al arrancar y dejaba las nubes con `cerrado` puesto y nadie que se lo quitara -- invisibles con contenido dentro, altura cero. Se vio midiendo en el navegador.",
-      "LA FICHA DEL APARATO es una caja: quien te habla + SU FUNCION (que hasta hoy solo vivia en un `title` que en un telefono no lee nadie) + motor + velocidad + las nubes.",
-      "CABEZAL POR ESQUINAS: marca a 1,3rem arriba a la izquierda; rueda e identidad arriba a la derecha; las cuatro puertas a .62rem abajo. Sin sesion, la identidad es un icono de persona -- «Crear identidad» era la pieza mas ancha del cabezal en frances y aleman.",
-      "LA ESFERA DEJA DE APAGARSE. La traslucidez era una linea literal (`body.chat-activo .presentacion{opacity:.55}`), no un efecto. Ahora brilla en neon al pensar (`senal.css`) y lleva la nube «Activando modelo» (`senal.js`), solo mientras piensa, en las ocho lenguas.",
-      "EL CAMPO DICE CON QUIEN HABLAS. Plantilla con `{}` y no concatenacion: en aleman el verbo se parte y va al final.",
-      "TECLADO ABIERTO: `chat-panel.js` publica `--alto-visible` desde `visualViewport.height` y la pagina se reparte en columna. `dvh` no servia -- en Android el teclado se dibuja ENCIMA sin encoger la ventana, y ese era el hueco vacio de la foto del Soberano. Primer reparto dejaba el dialogo en SEIS pixeles de 380; con suelo de 7rem, campo a 2,6rem y esfera a 96px, cabe la ultima frase.",
-      "NO_DATA: «sin firmar» se pintaba en CADA fila sin mirar ningun dato -- un rotulo fijo con forma de estado. Ahora depende de `d.firma` y se dice una vez. Y `instalar.html` tenia TRES avisos para un solo hecho; queda el que esta pegado al boton que falla.",
-      "CINCO PARTICIONES por el tope de 16 KiB: `senal.css`, `senal.js`, y antes `placa.css`. Se parte por asunto, nunca se recorta comentario."
-    ],
-    "lo_siguiente": [
-      "EL README, Y ES LO PRIMERO. Se pidio: en INGLES solamente --hoy son bilingues y duplican cada frase--, con frases sencillas y SIN NOMBRES PROPIOS. La app se cuenta como un medidor de IA y acceso democratizado al autoconocimiento; la web, como guia para romper la barrera de la dificultad tecnica y crear comunidad. NO SE APLICA SIN ENSENARLO ANTES: el Soberano lo pidio expresamente.",
-      "LAS FOTOS YA ESTAN HECHAS y esperan en `preceptoros-web/docs/img/`: puerta, chat, instalar y phone, en WebP, 211 KB las cuatro (venian de 1,6 MB en PNG). Se capturan con `google-chrome --headless=new --screenshot` contra un `http.server` local y se convierten con Pillow. Falta una de Herramientas abierto: en captura estatica no se puede abrir el panel, habria que hacerla con el navegador del arnes.",
-      "REVISION NATIVA del ruso y del griego: son las dos lenguas que ninguna sesion ha podido leer con oido nativo. Retirar una es `git rm -r public/<lengua>`, quitarla de `sw.js` y regenerar.",
-      "EL VOLCADO HORARIO del enjambre en `medidas.json`. Hoy hay UNA pasada de llama-bench del 2026-08-25 y cuatro huecos declarados: media por hora, sha256, TTFT y firma.",
-      "Y LO QUE EL SOBERANO DIJO COMO CRITERIO, no como tarea: icono antes que palabra siempre que se pueda. Quita trabajo a quien escribe y trabajo cognitivo a quien usa."
-    ],
-    "ficheros_al_borde": {
-      "que_pasa": "El tope por fichero es 16.384 B y HOY hay seis a menos de 1,5 KB. El griego y el ruso gastan DOS bytes por letra: un parrafo que en castellano cuesta 300 alli cuesta 600. Antes de añadir prosa a cualquier pagina se mide en griego, no en castellano.",
-      "medido": "2026-09-05",
-      "lista": [
-        "assets/chat.css 16.048",
-        "hub-textos.json 15.908",
-        "el/instalar.html 15.885",
-        "el/index.html 15.746",
-        "ru/index.html 15.189",
-        "assets/panel.css 15.105"
-      ],
-      "que_hacer": "SE PARTE, NO SE RECORTA. Hoy se partieron cuatro: `nubes.css` de `panel.css`, `puertas.css` de `widget.css`, `escribir.css` de `chat.css` y los textos del Hub de `hub.json`. Los comentarios son la documentacion de esta casa; quitarlos para que quepa es pagar el tope con lo unico que no se puede volver a deducir del codigo."
-    },
-    "donde_esta_cada_cosa": {
-      "que_es": "Mapa de lo que se partio hoy, para no buscar una regla en el fichero de ayer.",
-      "cristal y velo de cabezal y chat": "assets/widget.css",
-      "las cuatro puertas y el cabezal de las interiores": "assets/puertas.css",
-      "el mueble de los dos desplegables": "assets/panel.css",
-      "lo que hay DENTRO de Herramientas": "assets/nubes.css",
-      "el campo, los mandos y los atajos": "assets/escribir.css",
-      "las capas del chat, el pleno y los cantos": "assets/chat.css",
-      "rotulos del Hub, cola y correccion, 8 lenguas": "hub-textos.json",
-      "rotulos del cabezal interior, DERIVADOS de las portadas": "nav.json",
-      "rotulos de la pagina Instalar": "instalar.json",
-      "velocidad del cerebro y su contrato": "medidas.json"
-    },
-    "deuda_apuntada": [
-      "`medidas.json` NO TIENE CAMPO `firma`. La marca «sin firmar» ahora depende de el, asi que hoy se pinta siempre -- correcto, pero por ausencia. Cuando el enjambre local vuelque la media horaria, que escriba `firma`; hasta entonces la estructura del contrato existe y no se usa.",
-      "Los cuatro NO_DATA con su `que` y su `causa` viven en `medidas.json` y NO se pintan. Es deliberado (pesaban mas que el dato) pero es estructura real sin uso: o se pinta en algun sitio o se retira del fichero.",
-      "El `title` de cada nube de companero sigue llevando la funcion, que ahora se pinta en la ficha. Duplicado inofensivo, pero duplicado.",
-      "README de GitHub: solo ingles, frases sencillas, SIN nombres propios. App = medidor de IA y acceso democratizado al autoconocimiento; web = guia para romper la barrera tecnica y crear comunidad. SE ENSENA AL SOBERANO ANTES DE APLICARLO.",
-      "Ruso y griego siguen sin revision nativa.",
-      "Falta una captura con el teclado abierto en el Doogee de verdad: lo de aqui esta medido con `--alto-visible` forzado a 380px en el navegador del arnes."
-    ],
-    "trampas_de_hoy": [
-      "EL GUARDIAN LEE LOS COMENTARIOS COMO CODIGO. Nombrar un radio o un `backdrop-filter` en una frase que explica por que NO se usa pone el gate rojo. Van seis veces.",
-      "LOS GUARDIANES DE MAQUETA NOMBRABAN SUS HOJAS A MANO y se ponian rojos al partir un fichero. Ahora `maqueta_de_la_portada()` DESCUBRE las hojas de las etiquetas de la portada y les quita los comentarios. Misma leccion que las lenguas y el `hreflang`.",
-      "RETIRAR UN MANDO ES RETIRAR TAMBIEN LO QUE LE OBEDECIA. Se quito el boton y la pagina se quedo con las nubes invisibles porque el codigo que las plegaba seguia corriendo.",
-      "EL NAVEGADOR SIRVE CSS VIEJO. Media hora perdida leyendo una regla que estaba en disco y no en el navegador. Un puerto nuevo por tanda: `python3 -m http.server <puerto> --directory public`."
-    ]
+  {
+   "regla": "Solo `soberano` se toca. Lo demas es PROPOSE-ONLY",
+   "por_que": "la-fragua, la-torre, el-vigia: se leen, no se cambian por SSH. Todo cambio sale como artefacto a ~/p0x/propuestas/.",
+   "comando": "ls ~/p0x/propuestas/"
   },
-  "IMPORTANTE": {
-    "que": "EL INVENTARIO. Cada parte de la web y de la app, con sus secciones, sus visuales y donde vive cada cosa. Se escribio para que una sesion nueva NO repita trabajo ya hecho y pueda ir directa a lo que no esta optimizado. Leelo ANTES de tocar cualquiera de los dos productos.",
-    "fecha": "2026-09-05",
-    "fichero": "~/p0x/INVENTARIO.md",
-    "tambien": "~/preceptoros-web/docs/ESTADO.md — el estado tecnico de la web, pensado para la sesion que trabaje el GitHub (capturas, README, descripcion de los repos).",
-    "cinco_arreglos_propuestos_sin_tocar": [
-      "S · Tres guiones huerfanos en public/assets: hitos.js, manifiesto.js y pie.js. Ninguna de las 56 paginas los enlaza; 5,9 KB que el gate vigila, mide y sirve.",
-      "S · `onboarding.html` promete una descarga que `instalar.html` declara inexistente, con su NO_DATA y su fecha. Dos paginas del mismo sitio dicen cosas distintas del mismo hecho.",
-      "L · La app NO tiene tope por fichero: `dashboard.css` 83 KB y `dashboard.js` 85 KB, cinco veces el tope entero de la web. La doctrina de partir por asunto nunca se aplico alli.",
-      "M · `hub.json` lleva un solo nombre y una sola funcion por agente, sin variantes por lengua. Es decision de CONTENIDO, no tecnica.",
-      "S · `medidas.json` no tiene campo `firma`, del que ahora depende la marca «sin firmar»: sale por ausencia, no por medida. Y sus cuatro NO_DATA no se pintan en ningun sitio."
-    ]
+  {
+   "regla": "Ningun diff existe hasta que pasa el gate",
+   "por_que": "Un diff en rojo no es un entregable, es ruido. Hay un hook que los corre y bloquea. Ver el recurso «Los cuatro gates».",
+   "comando": "ver /api/recursos -> Los cuatro gates"
+  },
+  {
+   "regla": "10.240 B por fichero en la web, .json incluido",
+   "por_que": "Cuando no cabe: se ENVUELVE (chat-router.js, comandos.js) o se PARTE (engine.js, hub-cola.js). Nunca se recorta el comentario que explica el porque.",
+   "comando": "cd ~/preceptoros-web && python3 -c \"import pathlib;[print(p.stat().st_size,p) for p in pathlib.Path('public').rglob('*') if p.is_file() and p.suffix in ('.html','.css','.js','.json') and p.stat().st_size>9000]\""
+  },
+  {
+   "regla": "Tag de modelo explicito, y `num_ctx` demostrado por dato",
+   "por_que": "Un tag pelado apunta a variantes Thinking con razonamiento no desactivable. 262k cuelga runtimes en este hardware: la ventana medida es 32768.",
+   "comando": "ollama ps && ollama list"
+  },
+  {
+   "regla": "Jamas firmas valor, y ningun servicio sin firma explicita",
+   "por_que": "Las claves SSH de aqui son auth-only. Crear una unidad systemd o una linea de cron es dejar algo corriendo con tus permisos cuando nadie mira.",
+   "comando": "systemctl --user list-units --type=service,timer   # al cerrar sesion"
   }
+ ],
+ "como_se_cierra": [
+  "Parar-y-reportar: que se hizo, que dato salio, que fallo. Ante un comando que va a fallar o sale del alcance: PARA, no improvises un sustituto.",
+  "Actualiza recursos.json si usaste un recurso nuevo o si uno declarado dejo de responder.",
+  "Commit por bloque. `git push` SOLO con la firma explicita del Soberano.",
+  "3-6 sugerencias accionables (S/M/L) anexadas a mente/feedback/PENDIENTES.md."
+ ],
+ "donde_mirar_antes_de_preguntar": {
+  "que tengo a mano": "/api/recursos",
+  "que significa esa jerga": "/api/glosario",
+  "estado del rack ahora": "/api/rack  (consumo_w y ollama_vivo son EN VIVO; el resto es snapshot con su frescura)",
+  "el metal y sus nombres": "~/p0x/hexelion/HARDWARE_MAP.md",
+  "lo que quedo pendiente": "~/p0x/mente/feedback/PENDIENTES.md"
+ },
+ "por_donde_vamos": {
+  "que_es": "Donde quedo el rumbo al cerrar la sesion del 2026-09-05. Existe porque la sesion siguiente empieza en frio y, sin esto, vuelve a decidir de memoria lo que ya se decidio con datos.",
+  "fecha": "2026-09-05 (cierre de la noche · segunda tanda)",
+  "frente_abierto": "preceptoros.org · la web publica",
+  "hecho_hoy": [
+   "UN SOLO MARCO. `main:has(#chat)` lleva el canto de bronce y engloba cabezal, chat, atajos, ficha y pie. Eran tres cajas con marmol entre medias y se leian como tres cosas que casualmente estan juntas.",
+   "EL BOTON DE HERRAMIENTAS YA NO EXISTE. Sus ocho nubes bajaron a `#especificaciones`, donde se ven sin pulsar nada. Retirar el mando NO bastaba: `chat-router.js` seguia llamando a `alternar(false)` al arrancar y dejaba las nubes con `cerrado` puesto y nadie que se lo quitara -- invisibles con contenido dentro, altura cero. Se vio midiendo en el navegador.",
+   "LA FICHA DEL APARATO es una caja: quien te habla + SU FUNCION (que hasta hoy solo vivia en un `title` que en un telefono no lee nadie) + motor + velocidad + las nubes.",
+   "CABEZAL POR ESQUINAS: marca a 1,3rem arriba a la izquierda; rueda e identidad arriba a la derecha; las cuatro puertas a .62rem abajo. Sin sesion, la identidad es un icono de persona -- «Crear identidad» era la pieza mas ancha del cabezal en frances y aleman.",
+   "LA ESFERA DEJA DE APAGARSE. La traslucidez era una linea literal (`body.chat-activo .presentacion{opacity:.55}`), no un efecto. Ahora brilla en neon al pensar (`senal.css`) y lleva la nube «Activando modelo» (`senal.js`), solo mientras piensa, en las ocho lenguas.",
+   "EL CAMPO DICE CON QUIEN HABLAS. Plantilla con `{}` y no concatenacion: en aleman el verbo se parte y va al final.",
+   "TECLADO ABIERTO: `chat-panel.js` publica `--alto-visible` desde `visualViewport.height` y la pagina se reparte en columna. `dvh` no servia -- en Android el teclado se dibuja ENCIMA sin encoger la ventana, y ese era el hueco vacio de la foto del Soberano. Primer reparto dejaba el dialogo en SEIS pixeles de 380; con suelo de 7rem, campo a 2,6rem y esfera a 96px, cabe la ultima frase.",
+   "NO_DATA: «sin firmar» se pintaba en CADA fila sin mirar ningun dato -- un rotulo fijo con forma de estado. Ahora depende de `d.firma` y se dice una vez. Y `instalar.html` tenia TRES avisos para un solo hecho; queda el que esta pegado al boton que falla.",
+   "CINCO PARTICIONES por el tope de 16 KiB: `senal.css`, `senal.js`, y antes `placa.css`. Se parte por asunto, nunca se recorta comentario."
+  ],
+  "lo_siguiente": [
+   "EL README, Y ES LO PRIMERO. Se pidio: en INGLES solamente --hoy son bilingues y duplican cada frase--, con frases sencillas y SIN NOMBRES PROPIOS. La app se cuenta como un medidor de IA y acceso democratizado al autoconocimiento; la web, como guia para romper la barrera de la dificultad tecnica y crear comunidad. NO SE APLICA SIN ENSENARLO ANTES: el Soberano lo pidio expresamente.",
+   "LAS FOTOS YA ESTAN HECHAS y esperan en `preceptoros-web/docs/img/`: puerta, chat, instalar y phone, en WebP, 211 KB las cuatro (venian de 1,6 MB en PNG). Se capturan con `google-chrome --headless=new --screenshot` contra un `http.server` local y se convierten con Pillow. Falta una de Herramientas abierto: en captura estatica no se puede abrir el panel, habria que hacerla con el navegador del arnes.",
+   "REVISION NATIVA del ruso y del griego: son las dos lenguas que ninguna sesion ha podido leer con oido nativo. Retirar una es `git rm -r public/<lengua>`, quitarla de `sw.js` y regenerar.",
+   "EL VOLCADO HORARIO del enjambre en `medidas.json`. Hoy hay UNA pasada de llama-bench del 2026-08-25 y cuatro huecos declarados: media por hora, sha256, TTFT y firma.",
+   "Y LO QUE EL SOBERANO DIJO COMO CRITERIO, no como tarea: icono antes que palabra siempre que se pueda. Quita trabajo a quien escribe y trabajo cognitivo a quien usa."
+  ],
+  "ficheros_al_borde": {
+   "que_pasa": "El tope por fichero es 16.384 B y HOY hay seis a menos de 1,5 KB. El griego y el ruso gastan DOS bytes por letra: un parrafo que en castellano cuesta 300 alli cuesta 600. Antes de añadir prosa a cualquier pagina se mide en griego, no en castellano.",
+   "medido": "2026-09-05",
+   "lista": [
+    "assets/chat.css 16.048",
+    "hub-textos.json 15.908",
+    "el/instalar.html 15.885",
+    "el/index.html 15.746",
+    "ru/index.html 15.189",
+    "assets/panel.css 15.105"
+   ],
+   "que_hacer": "SE PARTE, NO SE RECORTA. Hoy se partieron cuatro: `nubes.css` de `panel.css`, `puertas.css` de `widget.css`, `escribir.css` de `chat.css` y los textos del Hub de `hub.json`. Los comentarios son la documentacion de esta casa; quitarlos para que quepa es pagar el tope con lo unico que no se puede volver a deducir del codigo."
+  },
+  "donde_esta_cada_cosa": {
+   "que_es": "Mapa de lo que se partio hoy, para no buscar una regla en el fichero de ayer.",
+   "cristal y velo de cabezal y chat": "assets/widget.css",
+   "las cuatro puertas y el cabezal de las interiores": "assets/puertas.css",
+   "el mueble de los dos desplegables": "assets/panel.css",
+   "lo que hay DENTRO de Herramientas": "assets/nubes.css",
+   "el campo, los mandos y los atajos": "assets/escribir.css",
+   "las capas del chat, el pleno y los cantos": "assets/chat.css",
+   "rotulos del Hub, cola y correccion, 8 lenguas": "hub-textos.json",
+   "rotulos del cabezal interior, DERIVADOS de las portadas": "nav.json",
+   "rotulos de la pagina Instalar": "instalar.json",
+   "velocidad del cerebro y su contrato": "medidas.json"
+  },
+  "deuda_apuntada": [
+   "`medidas.json` NO TIENE CAMPO `firma`. La marca «sin firmar» ahora depende de el, asi que hoy se pinta siempre -- correcto, pero por ausencia. Cuando el enjambre local vuelque la media horaria, que escriba `firma`; hasta entonces la estructura del contrato existe y no se usa.",
+   "Los cuatro NO_DATA con su `que` y su `causa` viven en `medidas.json` y NO se pintan. Es deliberado (pesaban mas que el dato) pero es estructura real sin uso: o se pinta en algun sitio o se retira del fichero.",
+   "El `title` de cada nube de companero sigue llevando la funcion, que ahora se pinta en la ficha. Duplicado inofensivo, pero duplicado.",
+   "README de GitHub: solo ingles, frases sencillas, SIN nombres propios. App = medidor de IA y acceso democratizado al autoconocimiento; web = guia para romper la barrera tecnica y crear comunidad. SE ENSENA AL SOBERANO ANTES DE APLICARLO.",
+   "Ruso y griego siguen sin revision nativa.",
+   "Falta una captura con el teclado abierto en el Doogee de verdad: lo de aqui esta medido con `--alto-visible` forzado a 380px en el navegador del arnes."
+  ],
+  "trampas_de_hoy": [
+   "EL GUARDIAN LEE LOS COMENTARIOS COMO CODIGO. Nombrar un radio o un `backdrop-filter` en una frase que explica por que NO se usa pone el gate rojo. Van seis veces.",
+   "LOS GUARDIANES DE MAQUETA NOMBRABAN SUS HOJAS A MANO y se ponian rojos al partir un fichero. Ahora `maqueta_de_la_portada()` DESCUBRE las hojas de las etiquetas de la portada y les quita los comentarios. Misma leccion que las lenguas y el `hreflang`.",
+   "RETIRAR UN MANDO ES RETIRAR TAMBIEN LO QUE LE OBEDECIA. Se quito el boton y la pagina se quedo con las nubes invisibles porque el codigo que las plegaba seguia corriendo.",
+   "EL NAVEGADOR SIRVE CSS VIEJO. Media hora perdida leyendo una regla que estaba en disco y no en el navegador. Un puerto nuevo por tanda: `python3 -m http.server <puerto> --directory public`."
+  ]
+ },
+ "IMPORTANTE": {
+  "que": "EL INVENTARIO. Cada parte de la web y de la app, con sus secciones, sus visuales y donde vive cada cosa. Se escribio para que una sesion nueva NO repita trabajo ya hecho y pueda ir directa a lo que no esta optimizado. Leelo ANTES de tocar cualquiera de los dos productos.",
+  "fecha": "2026-09-05",
+  "fichero": "~/p0x/INVENTARIO.md",
+  "tambien": "~/preceptoros-web/docs/ESTADO.md — el estado tecnico de la web, pensado para la sesion que trabaje el GitHub (capturas, README, descripcion de los repos).",
+  "cinco_arreglos_propuestos_sin_tocar": [
+   "S · Tres guiones huerfanos en public/assets: hitos.js, manifiesto.js y pie.js. Ninguna de las 56 paginas los enlaza; 5,9 KB que el gate vigila, mide y sirve.",
+   "S · `onboarding.html` promete una descarga que `instalar.html` declara inexistente, con su NO_DATA y su fecha. Dos paginas del mismo sitio dicen cosas distintas del mismo hecho.",
+   "L · La app NO tiene tope por fichero: `dashboard.css` 83 KB y `dashboard.js` 85 KB, cinco veces el tope entero de la web. La doctrina de partir por asunto nunca se aplico alli.",
+   "M · `hub.json` lleva un solo nombre y una sola funcion por agente, sin variantes por lengua. Es decision de CONTENIDO, no tecnica.",
+   "S · `medidas.json` no tiene campo `firma`, del que ahora depende la marca «sin firmar»: sale por ausencia, no por medida. Y sus cuatro NO_DATA no se pintan en ningun sitio."
+  ]
+ }
 }

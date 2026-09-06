@@ -1,7 +1,7 @@
 {
  "titulo": "Cómo funciona el enjambre",
  "entrada": "Lo que el panel dice en jerga, dicho en palabras. Cada entrada lleva dónde verlo con tus propios ojos: si no hay comando que lo enseñe, no es conocimiento, es una creencia.",
- "medido": "2026-09-04",
+ "medido": "2026-09-07",
  "entradas": [
   {
    "termino": "el enjambre",
@@ -400,6 +400,41 @@
    "que_hace": "Las caras del producto son TIRAS de fotogramas pintadas como `background`, y ahi hay dos formas de romperlas que no dan error y se ven fatal. Aprendido en metal el 2026-09-04, en la app y en la web. (1) EL TAMANO Y LAS PARADAS VIAJAN JUNTOS. Con N cuadros, `background-size: N*100%` hace que cada cuadro llene la caja y las paradas caen en k/(N-1). Al acercar un zoom Z el tamano pasa a N*Z*100% y las paradas YA NO son esas: el paso es Z/(N*Z-1). Subir el tamano sin recalcular ensena medio cuadro y medio del siguiente a la vez. Y hay un limite: el centro de ventana c debe cumplir 0,5/Z <= c <= 1-0,5/Z, o la ventana se sale de su cuadro y se cuela el vecino. (2) `steps(n, jump-none)` DA n PARADAS, NO n+1. Una tira de cuatro colores con `steps(3)` pone una parada en la juntura entre el segundo y el tercero: medio de cada uno, o sea un circulo casi vacio. Estuvo asi meses sin que nadie lo viera, porque al 400 % la juntura es un hilo; al acercar se vuelve un dedo. (3) EL ARTE SE MIDE, NO SE MIRA. Con Pillow se saca el centro de masa y la extension de la figura por fotograma, y eso dice cuanto se puede recortar y cuanto esta descentrado el dibujo. Aqui salio que el busto viene dibujado 13,6 % a la izquierda, y que el laser falseaba la medida: contando el haz el desvio parecia 8,7 %, solo el marmol 11,3 %, solo la cara 13,6 %. Filtrar por saturacion separa el marmol del neon. Lo que el css no puede corregir --y aqui no puede-- se arregla en la herramienta que genera la tira.",
    "donde_verlo": "grep -n 'steps(' ~/p0x/preceptor/interface/dashboard.css  ·  python3 -c \"from PIL import Image; im=Image.open('...webp'); print(im.size)\"",
    "fuente": "medido 2026-09-04 en preceptor y preceptoros-web"
+  },
+  {
+   "termino": "al partir una hoja por el tope, el asunto tiene mas mitades de las que ves",
+   "estado": "OK",
+   "que_hace": "`esquina.css` llego al tope de 16 KB y se partio por asunto --lo correcto, y lo que la cabecera de `acceso.css` manda: «se parte y NO se recortan comentarios»--. El corte se hizo por el bloque «con cuenta». Y salio mal DOS VECES la misma noche, por la misma causa: se movio una declaracion del asunto y se dejaron otras atras. (1) `max-width:100%` del bloque movil se BORRO en vez de moverse, asi que gano el `calc(100% - 8rem)` de escritorio y la pastilla de la cuenta se estrangulaba a 375 px. (2) `top:calc(40px + 1.5rem)` se fue a la hoja nueva --que carga DESPUES-- y le gano al `top:8.4rem` del movil que se quedo en la vieja: el `top` computado cayo de 134,4 a 64 px y la esfera subio setenta pixeles, encima de la frase solar y de la propia cuenta. Esa segunda la reporto el Soberano con una captura de su telefono. LA REGLA: antes de mover una sola linea, listar TODAS las declaraciones de ese selector en el fichero, media query incluida. `.presentacion` tenia tres, no dos. Y comprobar el resultado midiendo `getComputedStyle`, no leyendo el diff.",
+   "donde_verlo": "grep -n 'presentacion\\|#identity' ~/p0x/preceptoros-web/public/assets/esquina*.css\n# y en el navegador, que es donde se ve de verdad:\n# getComputedStyle(document.querySelector('.presentacion')).top",
+   "fuente": "OPERACIONES.md 2026-09-06 · commits 147c37b y b3b0fcb de preceptoros-web"
+  },
+  {
+   "termino": "un sensor en verde puede fabricar salud",
+   "estado": "OK",
+   "que_hace": "La Prueba de Fuego de los LoRA de La Charla devolvio codigo 0 --cero rojos-- sobre respuestas que fallaban el criterio escrito por el carbono. Los sensores median lo comodo: patron de identificador (`[A-Z]{2,5}-\\d+`), alfabeto de la respuesta, verbos de instalacion, URLs y correos. Todo eso estaba limpio. Lo que NO median: que el modelo afirmara que «el modelo base ocupa unos 200 gigas» --son 4,4--, que inventara un «equipo de desarrollo» al que enviar el feedback, y que en arabe ofreciera un canal de Twitter y otro de Telegram. Ninguna de esas cosas existe, y las tres pasaron el filtro. UN VERDE FALSO ES PEOR QUE UN ROJO: el rojo se investiga; el verde cierra la puerta. Antes de fiarse de un codigo de salida, leer los transcripts.",
+   "donde_verlo": "cat ~/p0x/preceptor-lora/pruebas/prueba_fuego_charla.json\nsed -n '100,150p' ~/p0x/preceptor-lora/forja/prueba_fuego.log",
+   "fuente": "Prueba de Fuego 2026-09-07 · commit 5c1c8f0"
+  },
+  {
+   "termino": "el estado de un registro no es lo que el render obedece",
+   "estado": "OK",
+   "que_hace": "El LoRAtelier pintaba un boton de descarga hacia un 404 --el GGUF pesa 55 MB y Cloudflare Pages corta en 25, asi que el .gguf daba 404 y su .sha256 daba 200: se publicaba el hash de un fichero que no se podia bajar--. La orden fue bajar el bloque de `beta` a `en_entrenamiento`. NO HABRIA SERVIDO DE NADA: la condicion real de `taller.js` es `!bloque.artefacto || !bloque.artefacto.sha256_hash`, asi que el rotulo habria cambiado y el boton roto seguiria ahi. Hubo que poner `artefacto: null`, que es el molde que ya usan los bloques sin fichero servible. LA REGLA: antes de cambiar un dato para cambiar una pantalla, leer la condicion del render. Un estado que nadie consulta es decoracion.",
+   "donde_verlo": "grep -n -B3 'sin-descarga' ~/p0x/preceptoros-web/public/assets/taller.js",
+   "fuente": "commit 147c37b de preceptoros-web"
+  },
+  {
+   "termino": "el guardian tiene un suelo duro que ninguna firma exime",
+   "estado": "OK",
+   "que_hace": "Escribiendo la propuesta del proxy de la Fragua, el guardian de higiene bloqueo el commit por la IP de tailnet. Se le puso `guardia:permitir <motivo>` en la linea --que es la excepcion declarada que el propio mensaje ofrece-- y VOLVIO A BLOQUEAR. La causa esta en `deploy/comun/hooks/guardia_higiene.py`: `D8_JAMAS = {TOKEN-PROVEEDOR, IP-TAILNET, CLAVE-PRIVADA}` no lo exime ninguna decision firmada, y solo pasan bajo `Cuarentena/salida/` o `docs/post_verificacion/`. Las reglas de RUTA si aceptan la excepcion; estas tres no. LA SALIDA NO ES `--no-verify`: es un marcador --`IP_TAILNET_SOBERANO`-- y un paso que lo sustituya al aplicar. Sale mejor de todas formas: una IP de tailnet cambia al reinstalar un nodo y un fichero que la lleva cocida envejece en silencio.",
+   "donde_verlo": "grep -n 'D8_JAMAS\\|RUTAS_CANON_D23' ~/p0x/deploy/comun/hooks/guardia_higiene.py",
+   "fuente": "propuestas/nginx_fragua_downloads.conf · commit d88eb92"
+  },
+  {
+   "termino": "un bucle que espera con pgrep -f se encuentra a si mismo",
+   "estado": "OK",
+   "que_hace": "Para esperar a que terminara un entrenamiento se lanzo `while pgrep -f lanzar_charla.sh; do sleep 60; done`. El propio comando CONTIENE esa cadena, asi que `pgrep -f` se encuentra a si mismo y el bucle no sale nunca: el entrenamiento habia terminado hacia veinte minutos y el vigia seguia diciendo «ENTRENANDO». Y al limpiarlo con `pkill -f`, el patron se llevo por delante el comando que lo estaba ejecutando (codigo 144). Es hermana de la trampa de `pkill -f` que ya estaba en `recursos.json`, y se pago igual por no leerla. LA SALIDA: esperar por el PID concreto, o comprobar el ARTEFACTO --que exista `medida.json`-- en vez de el proceso.",
+   "donde_verlo": "# lo barato y sin trampa:\ntest -f ~/p0x/preceptor-lora/adapters/charla_multilang_v1/medida.json && echo listo",
+   "fuente": "sesion 2026-09-06/07"
   }
  ]
 }
