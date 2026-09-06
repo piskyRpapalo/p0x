@@ -144,3 +144,58 @@ La cifra es pública: se anuncia en las tres portadas y en el README, así que s
 cambia en los cinco sitios a la vez. Enmienda propuesta para `METRICAS_NORMA.md`
 en `propuestas/2026-09-05_tope-fichero-web.md` — ese documento es
 `editor_autorizado: carbono` y solo el Soberano lo canoniza.
+
+---
+
+## 2026-09-06 · El botón de perfil vivía pegado a la frase solar, y por qué
+
+**El síntoma que reportó el Soberano:** el símbolo de perfil aparecía en el
+Beelink pero no en Android, y en el PC estaba pegado a la frase de energía en
+vez de a la rueda de ajustes, «que es su lugar en todo caso».
+
+**La causa, medida y no supuesta.** `esquina.css` del 2026-09-06 (mañana) sacó
+la identidad del posicionamiento absoluto:
+
+```css
+#cabezal #identity{position:static;order:30;flex:1 1 100%;margin:.1rem 0 0}
+```
+
+Esa regla acierta para el estado CON sesión, que era el que la motivó: el nombre
+se abre con dos palabras y compartiendo fila con la rueda o se corta o empuja.
+Pero cobra el precio en el otro estado. **Sin sesión la identidad es un icono de
+40 px**, y `flex:1 1 100%` en una fila que en escritorio *no envuelve* no lo baja
+de línea: lo convierte en una caja elástica con el dibujo pegado a su borde
+izquierdo. Medido en 1280 px: identidad en x=512 con **493 px de ancho**, rueda
+en x=1189. Ni esquina, ni gemelos.
+
+Y explica el «no se ve en Android» sin necesidad de un segundo fallo: el icono
+estaba, pero donde nadie lo busca.
+
+**Por qué la regla móvil tampoco servía.** `#cabezal:has(.identity-icono)
+#identity{margin-left:auto}` llevaba puesta desde antes y no hacía nada, por la
+misma razón que la de `movil.css` en su día: con `flex:1 1 100%` la caja ocupa
+la fila entera, no sobra hueco, y **un margen automático sin hueco que repartir
+no empuja nada**. Le faltaba `flex:0 0 auto`, no otra declaración de intención.
+
+**El arreglo, en dos capas.** El absoluto vuelve condicionado al estado que lo
+necesita —`:has(.identity-icono)` *es* «sin sesión», porque esa clase la pone
+`auth.js` sólo en esa rama, así que el selector lee el estado en vez de
+obligar a declararlo dos veces— y en el teléfono se queda estático con
+`flex:0 0 auto`, que es lo que por fin le da hueco al `margin-left:auto`.
+
+**Y una colisión que el primer arreglo creó.** Al mandar el perfil a
+`right:3.4rem` se descubrió que **ése era ya el sitio del punto verde**
+(`.cab-enlaces`, en `acceso.css`): dos cajas absolutas con el mismo `right` se
+pisaban 14 px. Medido: perfil 1149-1189, punto 1175-1189. Se movió el punto y no
+el perfil, y el criterio no es estético: **el punto informa, el perfil es una
+puerta**. Ceden los avisos, no las puertas. Final: punto 1127-1141 · 8 px ·
+perfil 1149-1189 · 7 px · rueda 1196-1236.
+
+**Deuda declarada, y va contra mí.** La cabecera de `acceso.css` dice que cuando
+un fichero llega al tope «se parte por el asunto y **no se recortan
+comentarios**, que es la regla de la casa». Yo recorté los míos: `esquina.css`
+pasó de 15,7 KB a 17,3 con el comentario entero y lo bajé a 16.329 B podando mi
+propia prosa, que es exactamente lo que esa cabecera prohíbe. Se hizo así para
+no meter una reestructuración dentro de un arreglo de una línea, y el precio
+está aquí escrito: **`esquina.css` queda con 55 B libres**. El siguiente cambio
+en esa hoja no cabe — hay que partirla por asunto, como se hizo con `acceso.css`.

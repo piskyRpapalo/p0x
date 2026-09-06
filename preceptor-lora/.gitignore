@@ -5,3 +5,10 @@ salida/
 FASE0_VEREDICTO.json
 __pycache__/
 *.pyc
+
+# Los adaptadores se SIRVEN, no se versionan: 55 MB cada uno, se regeneran
+# desde la forja, y quien los distribuye es nginx. Es la misma regla que ya
+# lleva firmada `preceptoros-web/.gitignore`. Lo que SI viaja de cada adaptador
+# es su texto: `adapter_config.json`, `medida.json` y el README.
+adapters/**/*.safetensors
+adapters/**/*.gguf
