@@ -950,5 +950,94 @@ class ElVectorDeEstadoSoberano(unittest.TestCase):
         self.assertIn("subprocess", inspect.getsource(self.V.refrescar_repos))
 
 
+class ElEnrutadorDelOjo(unittest.TestCase):
+    """Quien contesta, con que contrato y sin llamar a nadie para probarlo."""
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(Path(__file__).resolve().parent / "ojo"))
+        import enrutador, vector
+        cls.E, cls.V = enrutador, vector
+        cls.v = json.loads(
+            (RAIZ / "ojo" / "vector_ejemplo.json").read_text(encoding="utf-8"))
+
+    def test_cada_experto_tiene_su_contrato_en_disco_y_con_la_version_anclada(self):
+        """Orquesta §2.2: MDs renderizados con su version, o se aborta."""
+        for eid in self.E.EXPERTOS:
+            with self.subTest(experto=eid):
+                cuerpo, fallo = self.E.contrato(eid)
+                self.assertEqual(fallo, "")
+                self.assertTrue(cuerpo)
+
+    def test_una_version_que_no_cuadra_aborta_en_vez_de_servir(self):
+        viejo = self.E.EXPERTOS["fisico"]["ancla"]
+        self.E.EXPERTOS["fisico"]["ancla"] = ("version", "0.0.0-inventada")
+        try:
+            cuerpo, fallo = self.E.contrato("fisico")
+            self.assertIsNone(cuerpo)
+            self.assertIn("aborta", fallo)
+        finally:
+            self.E.EXPERTOS["fisico"]["ancla"] = viejo
+
+    def test_enruta_por_intencion_y_edge_ai_es_el_titular(self):
+        casos = {"¿puedo entrenar un LoRA ahora?": "fisico",
+                 "que dice el canon sobre firmar valor": "codice",
+                 "refactoriza el script de tests": "edge-ai",
+                 "hola": "edge-ai"}
+        for consulta, esperado in casos.items():
+            with self.subTest(consulta=consulta):
+                self.assertEqual(self.E.elegir(consulta, self.v)[0], esperado)
+
+    def test_componer_no_llama_a_nadie(self):
+        """El plan del turno se arma entero sin red: por eso se puede probar."""
+        fuente = inspect.getsource(self.E.componer)
+        self.assertNotIn("urlopen", fuente)
+        plan = self.E.componer("¿puedo entrenar un LoRA ahora?", self.v)
+        self.assertEqual(plan["experto"], "fisico")
+        self.assertTrue(plan["peticion"]["format"], "la salida sale sin acotar")
+
+    def test_el_render_declara_que_sustituye_la_lista_blanca_de_la_voz(self):
+        """La voz se queda intacta en disco; lo que cambia es el render, y se dice."""
+        plan = self.E.componer("¿puedo entrenar un LoRA ahora?", self.v)
+        self.assertTrue(any("CONTRATO DE DATOS" in x for x in plan["sustituciones"]))
+        self.assertNotIn("hexelion:telemetry:m5:last", plan["peticion"]["system"],
+                         "la lista blanca de La Torre sigue en el prompt")
+
+    def test_el_prompt_enseña_las_rutas_que_luego_exige_citar(self):
+        """No se puede pedir que cite de una lista que nunca vio: el modelo se
+        inventaba `/api/health/models` imitando el estilo del contrato."""
+        plan = self.E.componer("¿puedo entrenar un LoRA ahora?", self.v)
+        self.assertIn("instantanea_ambiental.consumo_w", plan["peticion"]["system"])
+
+    def test_el_gate_de_grounding_caza_una_cita_inventada(self):
+        inventada = {"apoyado_en": ["/api/health/nodes"]}
+        self.assertTrue(self.E.comprobar_apoyos(inventada, self.v))
+
+    def test_el_gate_de_grounding_caza_apoyarse_en_un_hueco(self):
+        """Citar `generacion_solar_w` como si tuviera valor es la invencion que
+        toda esta arquitectura existe para impedir."""
+        sobre_hueco = {"apoyado_en": ["instantanea_ambiental.generacion_solar_w"]}
+        fallos = self.E.comprobar_apoyos(sobre_hueco, self.v)
+        self.assertTrue(any("hueco" in f for f in fallos))
+
+    def test_una_cita_legitima_pasa(self):
+        self.assertEqual(
+            self.E.comprobar_apoyos(
+                {"apoyado_en": ["instantanea_ambiental.consumo_w"]}, self.v), [])
+
+    def test_el_dictamen_fisico_no_necesita_modelo_y_declara_su_frontera(self):
+        """Regla de oro §3: si es determinista, se ejecuta directo. Y la regla
+        del solar se declara no evaluable en vez de estimarse."""
+        d = self.E.dictamen_fisico(self.v)
+        self.assertIn(d["veredicto"], ("si", "si, con reservas", "no",
+                                       "no se puede saber"))
+        self.assertIn("instantanea_ambiental.generacion_solar_w", d["sin_dato"])
+        self.assertTrue(any("NO es evaluable" in m for m in d["motivos"]))
+        for ruta in d["apoyado_en"]:
+            with self.subTest(ruta=ruta):
+                self.assertEqual(self.E.comprobar_apoyos(
+                    {"apoyado_en": [ruta]}, self.v), [])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=1)
