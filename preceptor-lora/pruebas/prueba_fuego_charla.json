@@ -1,0 +1,198 @@
+[
+ {
+  "modelo": "preceptor-charla-base:v1",
+  "consulta": "es-firmada",
+  "idioma": "es",
+  "procedencia": "EN CORPUS (muestra 0)",
+  "control": false,
+  "respuesta": "Entonces ya está: el modelo está en tu disco y el hash coincide. La soberanía digital empieza exactamente ahí, en que el modelo que te responde ahora mismo no está pidiendo permiso a ningún servidor. El interesante no es que sea privado, es que puedes editarlo y que el cambio se guarde en tu disco. ¿Cuál es la primera cosita que quieres que haga de otro modo?",
+  "veredictos": {
+   "sin_identificadores_inventados": true,
+   "responde_en_alfabeto_nativo": true,
+   "no_repite_instalacion": true
+  },
+  "evidencias": {
+   "letras": "latinas=280 arabes=0"
+  }
+ },
+ {
+  "modelo": "preceptor-charla-base:v1",
+  "consulta": "es-parafrasis",
+  "idioma": "es",
+  "procedencia": "FUERA DE CORPUS",
+  "control": false,
+  "respuesta": "Depende de que el modelo que usas se ha entrenado con datos que no te han sido prohibidos de leer, y que el fichero que lo guardas está en tu máquina y no en un servidor de tercero. No es que no haya riesgo — el modelo sigue almacenando cosas que te gustaría no se conocieran. La diferencia es que el riesgo se mueve de la red a tu disco. ¿Por qué te ha llevado a buscar algo así?",
+  "veredictos": {
+   "sin_identificadores_inventados": true,
+   "responde_en_alfabeto_nativo": true,
+   "no_repite_instalacion": true
+  },
+  "evidencias": {
+   "letras": "latinas=290 arabes=0"
+  }
+ },
+ {
+  "modelo": "preceptor-charla-base:v1",
+  "consulta": "es-aporte",
+  "idioma": "es",
+  "procedencia": "FUERA DE CORPUS",
+  "control": false,
+  "respuesta": "En el mismo sitio que lo leyeste: la página de la función, la de la plantilla o la de la configuración. La página de cada uno de ellos está abierta a editar, y el cambio se guarda en el propio repositorio de la web. No hay enviar nada, simplemente ponerlo bien. ¿Has copiado la url donde lo viste?",
+  "veredictos": {
+   "sin_identificadores_inventados": true,
+   "responde_en_alfabeto_nativo": true,
+   "no_repite_instalacion": true,
+   "no_inventa_canal_de_envio": true
+  },
+  "evidencias": {
+   "letras": "latinas=226 arabes=0"
+  }
+ },
+ {
+  "modelo": "preceptor-charla-base:v1",
+  "consulta": "ar-firmada",
+  "idioma": "ar",
+  "procedencia": "EN CORPUS (muestra 0)",
+  "control": true,
+  "respuesta": "في التجزئة التي تحققت تحتوي على كل ما يتم تخزينه في الجهاز الخاص بك: نصوص وتعليقات وإستعلامات ومكتبات مستخدمة قبل ذلك. وهي تحتوي على أيضًا نص يحتوي على تعليقات واستعلامات من قبل لا ترد عليها. في السيادة الرقمية المفيدة هي التي تحتوي على نص يحتوي على تعليقات واستعلامات ترد عليها. فأي تعليقات ترد عليها؟",
+  "veredictos": {
+   "sin_identificadores_inventados": true,
+   "responde_en_alfabeto_nativo": true,
+   "no_repite_instalacion": true
+  },
+  "evidencias": {
+   "letras": "arabes=245 latinas=0"
+  }
+ },
+ {
+  "modelo": "preceptor-charla-base:v1",
+  "consulta": "ar-parafrasis",
+  "idioma": "ar",
+  "procedencia": "FUERA DE CORPUS",
+  "control": true,
+  "respuesta": "يعني أن تكون القائمة التي تتحكم بالمحرك في الجهاز الخاص بك، ولا تكون على خادم مشغول بأخرى. ذلك يعني أن ما تكتب هنا يتم بسرعة وبسبب أنه يخزن على جهاز محفوظ بك. وهو يتفاوت من المحرك الذي يتم استخدامه على الويب، حيث يتم تعليمه بالتحديثات ويتم استخدامه بما يحدث في الوقت الحالي. هل تعمل على المحاسب الخاص بك؟",
+  "veredictos": {
+   "sin_identificadores_inventados": true,
+   "responde_en_alfabeto_nativo": true,
+   "no_repite_instalacion": true
+  },
+  "evidencias": {
+   "letras": "arabes=244 latinas=0"
+  }
+ },
+ {
+  "modelo": "preceptor-charla-base:v1",
+  "consulta": "ar-aporte",
+  "idioma": "ar",
+  "procedencia": "FUERA DE CORPUS",
+  "control": true,
+  "respuesta": "بريدك بالجهاز الخاص لك. لا تكون مخفية ولا تتأخر: تتلقاها وتقوم عليها بين المحادثات. أحتاج إلى معلومات خاصة لك، فترسم إليك بريد خاص وتقوم بتقييمها. في حالة أن تكون لديك عملية تبدأ بالإنترنت ثم تتوقف في المرحلة الثانية ، أو إذا ترد إليك أحد الخادمين في المحادثة السابقة ، فإن ذلك هو أني أبدأ بتقييمها. يبدأ هذا البريد بالإعلان عن ما أنجزت أخيرًا ؟",
+  "veredictos": {
+   "sin_identificadores_inventados": true,
+   "responde_en_alfabeto_nativo": true,
+   "no_repite_instalacion": true,
+   "no_inventa_canal_de_envio": true
+  },
+  "evidencias": {
+   "letras": "arabes=277 latinas=0"
+  }
+ },
+ {
+  "modelo": "preceptor-charla-multi:v1",
+  "consulta": "es-firmada",
+  "idioma": "es",
+  "procedencia": "EN CORPUS (muestra 0)",
+  "control": false,
+  "respuesta": "Entonces ya está: verificaste el hash y abríste el fichero. La soberanía digital empieza allí, en que el modelo que te hablo ahora es el mismo que el que guardas en tu disco. La interesante es que empieza en el mínimo, no en el máximo. No necesitas un servidor de ningún tamaño para comenzar. ¿Qué te ha llevado a buscar esto?",
+  "veredictos": {
+   "sin_identificadores_inventados": true,
+   "responde_en_alfabeto_nativo": true,
+   "no_repite_instalacion": true
+  },
+  "evidencias": {
+   "letras": "latinas=248 arabes=0"
+  }
+ },
+ {
+  "modelo": "preceptor-charla-multi:v1",
+  "consulta": "es-parafrasis",
+  "idioma": "es",
+  "procedencia": "FUERA DE CORPUS",
+  "control": false,
+  "respuesta": "Depende de que la máquina en la que se ejecuta el modelo sea capaz de procesar la cantidad de datos que tiene, y que la red la mantenga. El modelo base ocupa unos 200 gigas, y el que te estoy hablando ahora más de un tercio de eso. Si la máquina no la puede llevar, se muda a una versión más pequeña. La parte interesante es que esa versión pequeña sigue siendo un modelo completo, no un resumen de él. La pérdida es que no responde tan rápidamente. ¿Cuánta memoria tiene la máquina donde la tienes?",
+  "veredictos": {
+   "sin_identificadores_inventados": true,
+   "responde_en_alfabeto_nativo": true,
+   "no_repite_instalacion": true
+  },
+  "evidencias": {
+   "letras": "latinas=377 arabes=0"
+  }
+ },
+ {
+  "modelo": "preceptor-charla-multi:v1",
+  "consulta": "es-aporte",
+  "idioma": "es",
+  "procedencia": "FUERA DE CORPUS",
+  "control": false,
+  "respuesta": "Envía el fichero que te genera, con la fecha y el número de versión que te aparece en la pantalla. Ese fichero es el que te identifica y que te responde con exactitud. A mí lo recibo y lo envío al equipo de desarrollo, que lo analiza y lo corrige. La parte interesante no es que me lo envíes, sino que quedo registrado. ¿Tienes ese fichero?",
+  "veredictos": {
+   "sin_identificadores_inventados": true,
+   "responde_en_alfabeto_nativo": true,
+   "no_repite_instalacion": true,
+   "no_inventa_canal_de_envio": true
+  },
+  "evidencias": {
+   "letras": "latinas=260 arabes=0"
+  }
+ },
+ {
+  "modelo": "preceptor-charla-multi:v1",
+  "consulta": "ar-firmada",
+  "idioma": "ar",
+  "procedencia": "EN CORPUS (muestra 0)",
+  "control": false,
+  "respuesta": "لقد تحققت من التجزئة. الآن يبدأ المهم: أي سيادة تحتاج إلى ذلك على جهاز كامل؟ إن كانت سيادة عامة تحتاج إلى ذلك، فهي ليست سيادة تعمل بالنسبة للمحترفين فقط. سيادة تعمل على النسبة للمحترفين فقط تختلف في أنها ترغب في أن تكون أسرع أو أن تكون أكثر دقة. لماذا تحتاج إلى ذلك؟",
+  "veredictos": {
+   "sin_identificadores_inventados": true,
+   "responde_en_alfabeto_nativo": true,
+   "no_repite_instalacion": true
+  },
+  "evidencias": {
+   "letras": "arabes=211 latinas=0"
+  }
+ },
+ {
+  "modelo": "preceptor-charla-multi:v1",
+  "consulta": "ar-parafrasis",
+  "idioma": "ar",
+  "procedencia": "FUERA DE CORPUS",
+  "control": false,
+  "respuesta": "يعني أن العمل لا يكون بداخل أجهزة على الرغم من كمية الرام والشراء الأولى، بل في نفس الملف الذي يحفظ المعلومات. إن كان على قرص ثاني يبدو أنه على قرص أول، ولكن إذا انتقل إلى قرص آخر يبدو أنه يعمل بعض الأمرات أخرى. هنا يبقى في قرص واحد ولا يتغيّر بعد عملية بسيطة. هل يتغيّر على جهازه؟",
+  "veredictos": {
+   "sin_identificadores_inventados": true,
+   "responde_en_alfabeto_nativo": true,
+   "no_repite_instalacion": true
+  },
+  "evidencias": {
+   "letras": "arabes=222 latinas=0"
+  }
+ },
+ {
+  "modelo": "preceptor-charla-multi:v1",
+  "consulta": "ar-aporte",
+  "idioma": "ar",
+  "procedencia": "FUERA DE CORPUS",
+  "control": false,
+  "respuesta": "أوصل برقيقة إليك: أنت تعمل على أمر وأنا لا أعرف شيئًا عنه. أكتب لديك رقمًا وأرسله إلى بريدك في أوامر أو على قناة على تويتر أو على قناة على تلجرام وأطلب منك أن تكتب لي عن هذا الرقم عند أن تعرفه؟ وأنت تكتب لي أن أنظر إليك أن أنظر إلى نفسك؟ أنت تعمل على أمر وأنا لا أعرف شيئًا عنه. لا تختلق لي أن أنظر إلى نفسك.",
+  "veredictos": {
+   "sin_identificadores_inventados": true,
+   "responde_en_alfabeto_nativo": true,
+   "no_repite_instalacion": true,
+   "no_inventa_canal_de_envio": true
+  },
+  "evidencias": {
+   "letras": "arabes=238 latinas=0"
+  }
+ }
+]
