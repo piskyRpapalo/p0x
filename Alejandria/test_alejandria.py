@@ -925,6 +925,22 @@ class ElVectorDeEstadoSoberano(unittest.TestCase):
                            separators=(",", ":"))
         self.assertLess(len(cable), len(prosa) * 0.7)
 
+    def test_el_backend_mide_donde_corre_el_modelo_y_no_su_familia(self):
+        """Cicatriz de esta misma sesion, convertida en gate.
+
+        La primera version leia `details.family` de `/api/ps` y publicaba
+        `backend: MEDIDO «llama»`. Eso es la familia del MODELO, no el backend
+        de computo: un MEDIDO que no mide lo que dice medir es peor que un
+        hueco, porque nadie lo revisa. Lo que si mide el reparto es `size_vram`
+        contra `size`.
+        """
+        fuente = inspect.getsource(self.V._ecosistema)
+        self.assertNotIn('"family"', fuente, "el backend volvio a leer la familia")
+        self.assertIn("size_vram", fuente)
+        b = self.ejemplo["estado_ecosistema"]["backend"]
+        if b["estado"] != "NO_DATA":
+            self.assertIn(b["valor"], ("GPU", "CPU", "hibrido CPU+GPU"))
+
     def test_construir_el_vector_no_llama_a_github(self):
         """La lista de repos sale de cache. Preguntarle a la nube en el arranque
         de cada consulta seria pagar latencia y dependencia en el sistema que

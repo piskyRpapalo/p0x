@@ -395,9 +395,32 @@ def _ecosistema(sondas, sin_red):
                              "hasta": v.get("expires_at", "")[:19]} for v in vivos],
                            "modelos", "ollama /api/ps")
             if vivos:
-                backend = lectura("backend",
-                                  vivos[0].get("details", {}).get("family", "") or "cargado",
-                                  "backend", "ollama /api/ps")
+                # `details.family` es la familia del MODELO («llama»), no el
+                # backend de computo. Confundirlos daria un MEDIDO que no mide
+                # lo que dice medir, que es peor que un hueco. Lo que si mide el
+                # reparto es `size_vram` contra `size`: cuanto del modelo esta
+                # en la GPU.
+                v0 = vivos[0]
+                vram, total = v0.get("size_vram", 0), v0.get("size", 0)
+                nota_gpu = ("en este nodo la ruta de GPU es Vulkan segun el canon "
+                            "-- eso es DECLARADO, no medido aqui: esta lectura solo "
+                            "demuestra si el modelo esta en la GPU o en la CPU")
+                if not total:
+                    backend = hueco("backend", "backend",
+                                    "el modelo cargado no declara su tamaño · sin "
+                                    "el no se sabe donde corre",
+                                    "ollama /api/ps")
+                elif vram >= total * 0.9:
+                    backend = lectura("backend", "GPU", "backend",
+                                      "ollama /api/ps · size_vram >= 90% de size",
+                                      nota=nota_gpu)
+                elif vram > 0:
+                    backend = lectura("backend", "hibrido CPU+GPU", "backend",
+                                      f"ollama /api/ps · {round(100*vram/total)}% "
+                                      "del modelo en VRAM", nota=nota_gpu)
+                else:
+                    backend = lectura("backend", "CPU", "backend",
+                                      "ollama /api/ps · size_vram = 0")
             else:
                 # No se hereda de la sesion anterior: Vulkan puede caerse entre
                 # arranques segun el drop-in, y suponerlo es como no medirlo.

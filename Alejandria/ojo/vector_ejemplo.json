@@ -1,6 +1,6 @@
 {
  "esquema": 1,
- "generado": "2026-09-06T07:07:12+01:00",
+ "generado": "2026-09-06T07:11:00+01:00",
  "presupuesto": {
   "sin_red": false,
   "sondas": [
@@ -10,24 +10,24 @@
    "ollama:/api/tags (loopback)",
    "ollama:/api/ps (loopback)"
   ],
-  "ms": 102.4
+  "ms": 61.1
  },
  "salud_hardware": {
   "soberano": {
    "cpu_temp_c": {
     "clave": "cpu_temp_c",
     "estado": "MEDIDO",
-    "valor": 48.8,
+    "valor": 48.1,
     "unidad": "grados C",
-    "medido": "2026-09-06T07:07:12+01:00",
+    "medido": "2026-09-06T07:11:00+01:00",
     "fuente": "temp1_input del hwmon cuyo name es k10temp, en milesimas"
    },
    "gpu_temp_c": {
     "clave": "gpu_temp_c",
     "estado": "MEDIDO",
-    "valor": 43.0,
+    "valor": 42.0,
     "unidad": "C",
-    "medido": "2026-09-06T07:07:12+01:00",
+    "medido": "2026-09-06T07:11:00+01:00",
     "fuente": "/sys hwmon amdgpu · edge"
    },
    "gpu_ocupacion_pct": {
@@ -35,15 +35,15 @@
     "estado": "MEDIDO",
     "valor": 5,
     "unidad": "%",
-    "medido": "2026-09-06T07:07:12+01:00",
+    "medido": "2026-09-06T07:11:00+01:00",
     "fuente": "/sys drm · gpu_busy_percent"
    },
    "vram_usada_b": {
     "clave": "vram_usada_b",
     "estado": "MEDIDO",
-    "valor": 4228218880,
+    "valor": 4228227072,
     "unidad": "B",
-    "medido": "2026-09-06T07:07:12+01:00",
+    "medido": "2026-09-06T07:11:00+01:00",
     "fuente": "/sys drm · mem_info_vram_used",
     "nota": "carve-out de la misma DDR5 que usa la CPU, asi que estos bytes YA estan contados en la RAM del sistema: no se suman"
    },
@@ -52,16 +52,16 @@
     "estado": "MEDIDO",
     "valor": 4294967296,
     "unidad": "B",
-    "medido": "2026-09-06T07:07:12+01:00",
+    "medido": "2026-09-06T07:11:00+01:00",
     "fuente": "/sys drm · mem_info_vram_total",
     "nota": "carve-out de la misma DDR5 que usa la CPU, asi que estos bytes YA estan contados en la RAM del sistema: no se suman"
    },
    "ram_disponible_mb": {
     "clave": "ram_disponible_mb",
     "estado": "MEDIDO",
-    "valor": 32747,
+    "valor": 32093,
     "unidad": "MiB",
-    "medido": "2026-09-06T07:07:12+01:00",
+    "medido": "2026-09-06T07:11:00+01:00",
     "fuente": "MemAvailable de /proc/meminfo, que es lo que de verdad se puede pedir -- no lo libre, que ignora la cache reclamable"
    },
    "ram_total_mb": {
@@ -69,15 +69,15 @@
     "estado": "MEDIDO",
     "valor": 58981,
     "unidad": "MiB",
-    "medido": "2026-09-06T07:07:12+01:00",
+    "medido": "2026-09-06T07:11:00+01:00",
     "fuente": "MemTotal de /proc/meminfo"
    },
    "carga_1m": {
     "clave": "carga_1m",
     "estado": "MEDIDO",
-    "valor": 1.94,
+    "valor": 1.27,
     "unidad": "carga",
-    "medido": "2026-09-06T07:07:12+01:00",
+    "medido": "2026-09-06T07:11:00+01:00",
     "fuente": "/proc/loadavg"
    }
   },
@@ -94,7 +94,7 @@
     ]
    },
    "unidad": "nodos",
-   "medido": "2026-09-06T07:07:12+01:00",
+   "medido": "2026-09-06T07:11:00+01:00",
    "fuente": "hexelion-nexo/sensores"
   }
  },
@@ -102,9 +102,9 @@
   "consumo_w": {
    "clave": "consumo_w",
    "estado": "MEDIDO",
-   "valor": 57.1,
+   "valor": 57.9,
    "unidad": "W",
-   "medido": "2026-09-06T07:07:12+01:00",
+   "medido": "2026-09-06T07:11:00+01:00",
    "fuente": "Nous A1T por HTTP local"
   },
   "generacion_solar_w": {
@@ -112,7 +112,7 @@
    "estado": "NO_DATA",
    "valor": null,
    "unidad": "W",
-   "medido": "2026-09-06T07:07:12+01:00",
+   "medido": "2026-09-06T07:11:00+01:00",
    "fuente": "canon del nodo",
    "causa": "nadie mide la generacion en este rack · el vatimetro mide lo que se GASTA, no de donde viene",
    "remedio": "un medidor del lado del panel, o un inversor que publique",
@@ -123,7 +123,7 @@
    "estado": "NO_DATA",
    "valor": null,
    "unidad": "ppm",
-   "medido": "2026-09-06T07:07:12+01:00",
+   "medido": "2026-09-06T07:11:00+01:00",
    "fuente": "hexelion-nexo/sensores/jardin",
    "causa": "modulo de permacultura: sin carpeta en disco · no hay jardin/ · no hay hexelion/jardin/"
   },
@@ -132,7 +132,7 @@
    "estado": "NO_DATA",
    "valor": null,
    "unidad": "%",
-   "medido": "2026-09-06T07:07:12+01:00",
+   "medido": "2026-09-06T07:11:00+01:00",
    "fuente": "hexelion-nexo/sensores/jardin",
    "causa": "modulo de permacultura: sin carpeta en disco · no hay jardin/ · no hay hexelion/jardin/"
   },
@@ -141,7 +141,7 @@
    "estado": "NO_DATA",
    "valor": null,
    "unidad": "aeronaves",
-   "medido": "2026-09-06T07:07:12+01:00",
+   "medido": "2026-09-06T07:11:00+01:00",
    "fuente": "hexelion-nexo/sensores/adsb",
    "causa": "el gateway de la antena no contesta · de las aeronaves no hay dato",
    "detalle": "URLError"
@@ -151,7 +151,7 @@
    "estado": "NO_DATA",
    "valor": null,
    "unidad": "aeronaves",
-   "medido": "2026-09-06T07:07:12+01:00",
+   "medido": "2026-09-06T07:11:00+01:00",
    "fuente": "hexelion-nexo/sensores/adsb",
    "causa": "el gateway de la antena no contesta · de las aeronaves no hay dato",
    "detalle": "URLError"
@@ -161,7 +161,7 @@
    "estado": "NO_DATA",
    "valor": null,
    "unidad": "lecturas",
-   "medido": "2026-09-06T07:07:12+01:00",
+   "medido": "2026-09-06T07:11:00+01:00",
    "fuente": "barrido del repo",
    "causa": "no hay ningun lector de RS485 en el repo · el bus solo aparece nombrado en documentacion",
    "remedio": "si se cablea, el colector sale como propuesta en p0x/propuestas/ -- no se aplica por SSH desde aqui"
@@ -171,7 +171,7 @@
    "estado": "NO_DATA",
    "valor": null,
    "unidad": "lecturas",
-   "medido": "2026-09-06T07:07:12+01:00",
+   "medido": "2026-09-06T07:11:00+01:00",
    "fuente": "declarado por el Soberano el 2026-09-06",
    "causa": "retirado de los dispositivos · pendiente de reconexion",
    "remedio": "al reconectarlo, actualizar recursos.json del Ojo"
@@ -181,7 +181,7 @@
    "estado": "NO_DATA",
    "valor": null,
    "unidad": "fotogramas",
-   "medido": "2026-09-06T07:07:12+01:00",
+   "medido": "2026-09-06T07:11:00+01:00",
    "fuente": "declarado por el Soberano el 2026-09-06",
    "causa": "retirada de los dispositivos · pendiente de reconexion",
    "remedio": "al reconectarla, actualizar recursos.json del Ojo"
@@ -202,7 +202,7 @@
     "qwen3:4b"
    ],
    "unidad": "modelos",
-   "medido": "2026-09-06T07:07:12+01:00",
+   "medido": "2026-09-06T07:11:00+01:00",
    "fuente": "ollama /api/tags"
   },
   "modelos_cargados": {
@@ -211,11 +211,11 @@
    "valor": [
     {
      "nombre": "llama3.2:3b",
-     "hasta": "2026-09-06T07:11:48"
+     "hasta": "2026-09-06T07:12:20"
     }
    ],
    "unidad": "modelos",
-   "medido": "2026-09-06T07:07:12+01:00",
+   "medido": "2026-09-06T07:11:00+01:00",
    "fuente": "ollama /api/ps"
   },
   "tags_pelados": {
@@ -228,17 +228,18 @@
     "preceptor-v7:latest"
    ],
    "unidad": "tags",
-   "medido": "2026-09-06T07:07:12+01:00",
+   "medido": "2026-09-06T07:11:00+01:00",
    "fuente": "ollama /api/tags",
    "nota": "apuntan a variantes Thinking con razonamiento no desactivable"
   },
   "backend": {
    "clave": "backend",
    "estado": "MEDIDO",
-   "valor": "llama",
+   "valor": "GPU",
    "unidad": "backend",
-   "medido": "2026-09-06T07:07:12+01:00",
-   "fuente": "ollama /api/ps"
+   "medido": "2026-09-06T07:11:00+01:00",
+   "fuente": "ollama /api/ps · size_vram >= 90% de size",
+   "nota": "en este nodo la ruta de GPU es Vulkan segun el canon -- eso es DECLARADO, no medido aqui: esta lectura solo demuestra si el modelo esta en la GPU o en la CPU"
   },
   "repos": {
    "clave": "repos",
@@ -299,7 +300,7 @@
    "estado": "NO_DATA",
    "valor": null,
    "unidad": "gates",
-   "medido": "2026-09-06T07:07:12+01:00",
+   "medido": "2026-09-06T07:11:00+01:00",
    "fuente": "cache local",
    "causa": "no hay cache en cache_gates.json",
    "remedio": "correr los gates y escribir cache_gates.json"
@@ -311,7 +312,7 @@
    "estado": "NORMA",
    "valor": "es",
    "unidad": "idioma",
-   "medido": "2026-09-06T07:07:12+01:00",
+   "medido": "2026-09-06T07:11:00+01:00",
    "fuente": "canon del nodo · CLAUDE.md",
    "nota": "doctrina, reportes y commits en español; la UI de herramientas que lo pidan, en ingles"
   },
@@ -320,7 +321,7 @@
    "estado": "NORMA",
    "valor": "parar-y-reportar",
    "unidad": "modo",
-   "medido": "2026-09-06T07:07:12+01:00",
+   "medido": "2026-09-06T07:11:00+01:00",
    "fuente": "canon del nodo · CLAUDE.md"
   },
   "ubicacion_aprox": {
@@ -328,7 +329,7 @@
    "estado": "NO_DATA",
    "valor": null,
    "unidad": "ciudad",
-   "medido": "2026-09-06T07:07:12+01:00",
+   "medido": "2026-09-06T07:11:00+01:00",
    "fuente": "Alejandria/identidad_publica.json",
    "causa": "ningun artefacto local la declara",
    "remedio": "añadir `ciudad` a identidad_publica.json si se quiere que el vector la lleve"
