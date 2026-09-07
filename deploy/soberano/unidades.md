@@ -144,3 +144,33 @@ este build NO tiene `--reasoning off`». Es falso en los **dos** binarios de est
   que la instalada (1.947 B frente a 549 B).
 - `ollama.service` (nivel sistema) — dice `active` y **el puerto 11434 rechaza conexiones**.
   Servicio que se declara vivo y no atiende: el mismo modo de fallo que S0 vigila.
+  · **CORREGIDO 2026-09-07:** ya no es cierto. El 11434 atiende — se le pidieron
+  turnos a seis modelos distintos esta madrugada, con sus tok/s medidos. Se deja
+  la línea vieja tachada en vez de borrarla: saber que estuvo caído y cuándo
+  volvió es parte del dato.
+
+## `buzon-medidas.service` — **PROPUESTA, no instalada** (2026-09-07)
+
+**Qué hace.** Recibe `POST /api/v1/medidas-temp` y guarda la medida en
+`~/.preceptoros/medidas_temp.db`. Append-only: solo INSERT, y `processed` la
+mueve únicamente `scripts/sync_medidas_to_fragua.py`.
+
+**Qué toca.** Ese único fichero SQLite y el puerto **8791 en 127.0.0.1**. Nada
+más. Sin dependencias: `http.server` de la biblioteca estándar, porque en este
+nodo no hay FastAPI ni sudo para instalarlo — desviación declarada respecto al
+encargo, que pedía FastAPI.
+
+**Cómo se apaga.** `systemctl --user disable --now buzon-medidas`. Y mientras no
+se instale, se prueba a mano con
+`python3 deploy/soberano/medidas_temp_api.py` y `Ctrl-C`.
+
+**Por qué NO está instalada.** El canon pide firma explícita por unidad y que el
+bucle se construya y se pruebe primero. Está construido y probado; la firma de
+la unidad es un paso aparte.
+
+**Y algo que hay que saber antes de firmarla:** hoy **no la alcanza un navegador
+de fuera**. `api.preceptoros.org` sale por el túnel de la-fragua, y
+`downloads.preceptoros.org` sí apunta a la IP pública de este nodo
+(95.92.164.201) pero no responde — el puerto no está abierto. La alcanzan el
+navegador del propio Soberano y la tailnet. El trabajo que falta es de red, no
+de código.

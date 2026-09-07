@@ -1,0 +1,26 @@
+# NO INSTALADA. Este fichero existe para que el Soberano la lea antes de
+# firmarla, que es lo que el canon pide: «se pide firma para CADA unidad, una
+# por una». El buzon ya se ha construido y probado a mano --alta con firma y
+# sin ella, basura rechazada, ruta desconocida en 404--; convertirlo en
+# servicio es el paso siguiente y separado.
+#
+#   Instalar:  cp deploy/soberano/buzon-medidas.service ~/.config/systemd/user/
+#              systemctl --user daemon-reload && systemctl --user enable --now buzon-medidas
+#   Apagar:    systemctl --user disable --now buzon-medidas
+#   Ver:       curl -s http://127.0.0.1:8791/salud
+[Unit]
+Description=Preceptor · buzon temporal de medidas de testers
+After=network.target
+
+[Service]
+Type=simple
+# Ruta absoluta y no `python3` a secas: los servicios de systemd no cargan
+# ~/.bashrc y no ven ~/.local/bin. Es la cicatriz de la mision Ventana Viva.
+ExecStart=/usr/bin/python3 %h/p0x/deploy/soberano/medidas_temp_api.py
+Restart=on-failure
+RestartSec=10
+# Se ata a 127.0.0.1 por lo que dice el guion, no por lo que diga esta unidad:
+# un servicio que acepta escrituras no nace escuchando en todas las interfaces.
+
+[Install]
+WantedBy=default.target
