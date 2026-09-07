@@ -1705,3 +1705,32 @@ P6-1.
    `dashboard.html` —la pantalla principal— no tiene ni un `data-i18n`. Meter
    seis lenguas en `textos.py` tal cual lo lleva de 22 KB a ~90: la web ya pagó
    esa factura y por eso tiene un fichero por lengua.
+
+---
+
+## Sesión 2026-09-07 (tarde) · lo que sale de la ronda 2
+
+7. **(M) Los términos dorados son material de entrenamiento, no un estilo.**
+   Si la web pinta `NO_DATA` —y los demás términos de doctrina— en dorado, el
+   modelo tiene que **emitirlos de forma consistente** o el resaltado no tiene
+   qué agarrar. Se resuelve como los atajos: **una lista compartida** que leen
+   el render y el generador del corpus. Un término dorado sin muestras que lo
+   enseñen es un resaltado que no se enciende nunca; y una conducta entrenada
+   sin término reconocible es una conducta que el ojo no distingue de la prosa.
+   Candidatos medidos hoy en el corpus: `NO_DATA` (ya sale), y por decidir:
+   IronClaw, Caza-Nido, el Nido, la Frontera, el hueco declarado.
+
+8. **(S) El modelo «presupone» hardware que no puede ver.** Afirmó *«tenemos
+   8 GB en mi tank3»* — un dato del equipo del Soberano que nadie le dio. Es la
+   misma familia que las cifras inventadas de la ronda 1, pero peor: no se
+   inventa una especificación general, se la inventa **sobre tu máquina**.
+   La ronda 2 ya quita las cifras del corpus; falta enseñarle a **preguntar**
+   por el hardware en vez de suponerlo, que es justo lo que hace la muestra
+   nueva del atajo «dame los pasos». Comprobar en la Prueba de Fuego.
+
+9. **(S) El system prompt se escapa al diálogo.** En la captura del teléfono se
+   lee `[SYSTEM STATE] ... Device: Android Steps: 1 [/SYSTEM` dentro de la
+   conversación, y trozos de las instrucciones de la casa. Un 7B cuantizado
+   recita el reglamento cuando el prompt es largo — ya medido esta madrugada—,
+   pero además hay un bloque de estado que la web inyecta y que **no debería
+   ser visible**. Dos causas distintas con el mismo síntoma.
