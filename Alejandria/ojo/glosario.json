@@ -435,6 +435,13 @@
    "que_hace": "Para esperar a que terminara un entrenamiento se lanzo `while pgrep -f lanzar_charla.sh; do sleep 60; done`. El propio comando CONTIENE esa cadena, asi que `pgrep -f` se encuentra a si mismo y el bucle no sale nunca: el entrenamiento habia terminado hacia veinte minutos y el vigia seguia diciendo «ENTRENANDO». Y al limpiarlo con `pkill -f`, el patron se llevo por delante el comando que lo estaba ejecutando (codigo 144). Es hermana de la trampa de `pkill -f` que ya estaba en `recursos.json`, y se pago igual por no leerla. LA SALIDA: esperar por el PID concreto, o comprobar el ARTEFACTO --que exista `medida.json`-- en vez de el proceso.",
    "donde_verlo": "# lo barato y sin trampa:\ntest -f ~/p0x/preceptor-lora/adapters/charla_multilang_v1/medida.json && echo listo",
    "fuente": "sesion 2026-09-06/07"
+  },
+  {
+   "termino": "cada nodo tiene SU usuario, y `~` no es el mismo en los dos",
+   "estado": "OK",
+   "que_hace": "`soberano` es `pisky`, `la-fragua` es `ubuntu`, `la-torre` es `jetson`. Lo dice el `config` de SSH de este nodo, y ahi se comprueba en vez de recordarlo. IMPORTA porque casi todo lo que sale de aqui hacia otro nodo es propose-only: un artefacto que alguien va a pegar ALLI. Y en ese artefacto `~` y `$HOME` se expanden al usuario que EJECUTA, no al que escribio: una ruta con `~` redactada desde soberano y aplicada en la-fragua apunta a otro sitio sin avisar -- falla callando, o escribe donde no toca. LA REGLA: en propose-only las rutas del nodo destino van absolutas y con su usuario dentro, nunca con `~`; y una unidad systemd de sistema alla lleva `User=` y `Group=` explicitos. Y EL ERROR SIMETRICO, que es el que casi se comete al corregir el primero: una unidad `--user` del propio soberano NO admite `User=` ni `Group=` --systemd los rechaza en unidades de usuario-- y usa `%h`, que ya da el home correcto. Ponerle el usuario de otro nodo «por si acaso» la rompe. Antes de tocar un usuario en un fichero: preguntar en que NODO corre eso.",
+   "donde_verlo": "grep -A4 'Host la-fragua' ~/.ssh/config   # User ubuntu\n# y la regla entera en el canon del nodo, seccion «Cada nodo tiene SU usuario»",
+   "fuente": "~/.ssh/config · CLAUDE.md del nodo · sesion 2026-09-07"
   }
  ]
 }

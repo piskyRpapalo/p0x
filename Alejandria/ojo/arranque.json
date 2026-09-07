@@ -32,7 +32,8 @@
    "un sensor en verde puede fabricar salud",
    "el estado de un registro no es lo que el render obedece",
    "el guardian tiene un suelo duro que ninguna firma exime",
-   "un bucle que espera con pgrep -f se encuentra a si mismo"
+   "un bucle que espera con pgrep -f se encuentra a si mismo",
+   "cada nodo tiene SU usuario, y `~` no es el mismo en los dos"
   ],
   "y_para_eso_lee": [
    "El Camino (The Path) y La Brujula (The Compass)",

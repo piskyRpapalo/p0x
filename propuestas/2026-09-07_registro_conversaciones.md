@@ -88,6 +88,16 @@ def registrar_conversacion(c: ConversacionEntra):
     return {"guardado": True}
 ```
 
+**Y el usuario de la-fragua es `ubuntu`, no `pisky`.** Lo dice `~/.ssh/config`
+(`Host la-fragua` → `User ubuntu`), y aquí importa de verdad porque este endpoint
+sí escribe en el home de allá: la base va en **`/home/ubuntu/.preceptoros/`** <!-- guardia:permitir la ruta del nodo destino ES el contenido de la propuesta -->
+**`conversaciones.db`**, y no en el home de este nodo. Escrito con la ruta entera y no
+con `~`, que se expande al usuario que ejecuta y es justo donde se cuela el
+error. Si el API corre bajo systemd, su unidad lleva `User=ubuntu` y
+`Group=ubuntu` — eso es una unidad de SISTEMA en la Fragua, distinta de la
+unidad `--user` del buzón del Soberano, donde `User=` ni siquiera está
+permitido.
+
 El esquema es el mismo de `scripts/revisor_ia.py` — se copia de ahí, no se
 reescribe: dos esquemas para la misma tabla es el sitio donde un día se pierde
 un campo.
