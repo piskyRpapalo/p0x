@@ -1,0 +1,17 @@
+{
+ "dtype": "bfloat16",
+ "fecha": "2026-09-07T00:29:01+00:00",
+ "base": "mistralai/Mistral-7B-Instruct-v0.3",
+ "pasos_hechos": 100,
+ "segundos_por_paso": 6.97,
+ "perdida_primera": 3.4995,
+ "perdida_ultima": 1.1597,
+ "hilos": 8,
+ "ram_pico_mb": 19685,
+ "temp_max_c": 86.4,
+ "techo_c": 80.0,
+ "respiros": 25,
+ "temp_final_c": 77.25,
+ "parado_por": null,
+ "solo_medicion": false
+}
