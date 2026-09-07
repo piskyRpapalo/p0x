@@ -37,4 +37,12 @@ Cifras, plazos y fechas que no sepas: di que no lo sabes. No hay cuenta ni regis
 
 PARAMETER temperature 0.4
 PARAMETER top_p 0.9
-PARAMETER num_predict 220
+# 2048 Y NO 220, Y EL 220 ERA UN ERROR DE RAZONAMIENTO MIO. Un `num_predict` no
+# hace que el modelo sea BREVE: hace que lo CORTEN. Medido: una respuesta
+# acababa en «pero aun no hemos abierto» y la lei como si el modelo hubiera
+# terminado. No habia terminado -- `done_reason` decia `length`.
+#
+# La brevedad la pide el system («menos de 90 palabras»); si no obedece, se
+# arregla en el prompt o cambiando de modelo, no cortandole la frase por la
+# mitad. Una respuesta larga aburre; una truncada parece un fallo del producto.
+PARAMETER num_predict 2048
