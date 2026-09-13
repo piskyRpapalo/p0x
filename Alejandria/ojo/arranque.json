@@ -94,7 +94,7 @@
  },
  "por_donde_vamos": {
   "que_es": "Savegame de la sesion del 2026-09-13. Escrito a mano por la sesion de frontera, no por el modelo local: cierra una ronda larga y la sintesis automatica no vio la mitad.",
-  "fecha": "2026-09-13 05:30",
+  "fecha": "2026-09-13 06:15",
   "escrito_por": "Claude Opus 5 · sesion de frontera",
   "frente_abierto": "La tuberia esta entera y probada. El cuello ahora es VOLUMEN de feedback real: la pool de charla-web tiene 6 filas y solo 2 firmadas por personas. Existe espacios/sintetico con 49 pares generados por el rack, EN CUARENTENA, para probar el ciclo de entrenamiento sin depender de testers.",
   "hecho": [
@@ -109,13 +109,16 @@
    "El service worker se actualiza SOLO: verificado en el Doogee contra produccion sin tocar el telefono. pwa.js pide registration.update() en cada carga.",
    "bin/inyeccion_dataset.py: 49 pares sinteticos en espacios/sintetico con la clave DECLARADA del rack (publica en config/clave_sintetica_publica.json, privada en ~/.preceptoros/, fuera del repo). charla-web intacta.",
    "bin/rama_publica.py: la rama publica se construye con dos filtros --forma y CONTENIDO-- y cuelga del tip ya publicado. GitHub: 445 ficheros, cero logica.",
-   "mente/aprendizaje/OPTIMIZACIONES.md: 20 entradas con su comando de revertir."
+   "mente/aprendizaje/OPTIMIZACIONES.md: 20 entradas con su comando de revertir.",
+   "El sintetico encontro TRES fallos en la puerta, no un LoRA. Tres pasadas sobre las mismas 12 filas: ataques falsos 5→0→0, vetos indebidos 6→6→0, al dataset 3→3→8. El unico veto que queda es real: fuga de IP privada.",
+   "PRINCIPIO NUEVO, en turnos.py: la capa determinista DECIDE, el modelo ACONSEJA. Sin fuga y sin forma de orden, la reserva del modelo no veta: viaja anotada hasta el juez, que es quien tiene rubrica.",
+   "Cero regresion probada por HASH: el dataset de charla-web sigue en c90bf3df543fdc2f... antes y despues de los tres arreglos del Guardian."
   ],
   "lo_siguiente": [
-   "Correr turnos.py --espacio sintetico sobre las 49 filas y mirar la DISTRIBUCION de notas. Si sale baja, el dato es que el generador escribe mal.",
-   "Con el dataset sintetico juzgado, probar el Forjador de verdad: entrenar un LoRA y evaluarlo. Su ficha DEBE decir que aprendio de datos sinteticos.",
-   "El cuello real: que alguien use la web. La tuberia ya no es el problema.",
-   "FIRMAR o descartar el dataset candidato de charla-web: 2 filas, nota 8.0."
+   "Correr turnos.py sobre las 49 filas sinteticas completas (no solo 12) y mirar la distribucion entera de notas.",
+   "Con el dataset sintetico juzgado, probar el Forjador: entrenar un LoRA y evaluarlo. Su ficha DEBE decir que aprendio de datos sinteticos.",
+   "FIRMAR o descartar el dataset candidato de charla-web: 2 filas, nota 8.0, sha256 c90bf3df543fdc2f...",
+   "El cuello real sigue siendo que alguien use la web. La tuberia ya no es el problema, y ahora ademas se sabe que la puerta no tira lo bueno."
   ],
   "lo_que_no_se_sabe": [
    "NO_DATA: tok_s_vatio de ningun nodo. El enchufe A1T mide la REGLETA (impresora + TV + rack juntos), no el Beelink. Toda cifra en mWh del laboratorio es NORMA, no MEDIDO, y COSTE.md lo dice.",
