@@ -1,0 +1,129 @@
+01:09:02  plan · {"base": "mistralai/Mistral-7B-Instruct-v0.3", "dataset": "../data/sft_charla_base_v1.jsonl", "muestras": 150, "salida": "../adapters/charla_base_v2", "pasos": 100, "lora": {"rank": 16, "alpha": 32, "dropout": 0.05, "lr": 0.0001}, "objetivo": ["q_proj", "k_proj", "v_proj", "o_proj"], "max_len": 1024, "hilos": 8, "dtype": "bfloat16", "techo_c": 80.0, "ram_libre_mb": 37090, "temp_c": 67.625}
+01:09:04  base cargada en 2 s · RAM pico 553 MiB · libre 37035 MiB
+01:09:04  adaptador · 13,631,488 entrenables de 7,261,655,040 (0.188%)
+01:09:11  paso 1/100 · perdida 3.4995 · 6.9 s · RAM pico 16348 MiB · 75.5 C
+01:09:16  paso 2/100 · perdida 4.4491 · 5.2 s · RAM pico 16348 MiB · 76.25 C
+01:09:22  paso 3/100 · perdida 2.9244 · 6.4 s · RAM pico 17023 MiB · 77.375 C
+01:09:32  paso 4/100 · perdida 3.1301 · 10.1 s · RAM pico 17689 MiB · 78.0 C
+01:09:38  paso 5/100 · perdida 3.4224 · 5.2 s · RAM pico 17689 MiB · 80.125 C
+01:09:38  techo termico · 80.1 C >= 80.0 · respiro de 20 s
+01:10:12  paso 6/100 · perdida 2.3637 · 14.8 s · RAM pico 17689 MiB · 72.0 C
+01:10:21  paso 7/100 · perdida 3.1184 · 8.8 s · RAM pico 17689 MiB · 73.375 C
+01:10:31  paso 8/100 · perdida 3.1499 · 9.4 s · RAM pico 17689 MiB · 77.75 C
+01:10:40  paso 9/100 · perdida 2.8788 · 9.5 s · RAM pico 17689 MiB · 74.875 C
+01:10:53  paso 10/100 · perdida 2.4986 · 12.4 s · RAM pico 17689 MiB · 76.25 C
+01:11:01  paso 11/100 · perdida 2.5039 · 8.1 s · RAM pico 17796 MiB · 86.375 C
+01:11:01  techo termico · 86.4 C >= 80.0 · respiro de 20 s
+01:11:26  paso 12/100 · perdida 2.4675 · 5.2 s · RAM pico 17796 MiB · 80.875 C
+01:11:26  techo termico · 80.9 C >= 80.0 · respiro de 20 s
+01:11:54  paso 13/100 · perdida 2.8039 · 8.0 s · RAM pico 17796 MiB · 77.5 C
+01:12:00  paso 14/100 · perdida 2.5213 · 6.5 s · RAM pico 17796 MiB · 79.25 C
+01:12:07  paso 15/100 · perdida 2.6808 · 6.3 s · RAM pico 17796 MiB · 80.75 C
+01:12:07  techo termico · 80.8 C >= 80.0 · respiro de 20 s
+01:12:34  paso 16/100 · perdida 2.5350 · 7.5 s · RAM pico 18129 MiB · 77.875 C
+01:12:41  paso 17/100 · perdida 2.1854 · 6.6 s · RAM pico 18129 MiB · 78.25 C
+01:12:47  paso 18/100 · perdida 2.0204 · 6.1 s · RAM pico 18129 MiB · 80.25 C
+01:12:47  techo termico · 80.2 C >= 80.0 · respiro de 20 s
+01:13:13  paso 19/100 · perdida 2.1578 · 6.3 s · RAM pico 18129 MiB · 76.875 C
+01:13:20  paso 20/100 · perdida 1.9893 · 6.4 s · RAM pico 18129 MiB · 78.375 C
+01:13:26  paso 21/100 · perdida 2.0879 · 6.1 s · RAM pico 18129 MiB · 79.75 C
+01:13:32  paso 22/100 · perdida 1.7583 · 6.4 s · RAM pico 18132 MiB · 82.125 C
+01:13:32  techo termico · 82.1 C >= 80.0 · respiro de 20 s
+01:13:58  paso 23/100 · perdida 1.9852 · 5.9 s · RAM pico 18132 MiB · 76.375 C
+01:14:04  paso 24/100 · perdida 1.9206 · 5.8 s · RAM pico 18132 MiB · 77.875 C
+01:14:10  paso 25/100 · perdida 1.8513 · 6.4 s · RAM pico 18132 MiB · 80.125 C
+01:14:10  techo termico · 80.1 C >= 80.0 · respiro de 20 s
+01:14:36  paso 26/100 · perdida 1.9732 · 5.3 s · RAM pico 18132 MiB · 75.75 C
+01:14:49  paso 27/100 · perdida 1.5124 · 13.0 s · RAM pico 18132 MiB · 73.75 C
+01:14:55  paso 28/100 · perdida 1.6784 · 6.7 s · RAM pico 18132 MiB · 79.875 C
+01:15:00  paso 29/100 · perdida 1.9326 · 5.1 s · RAM pico 18132 MiB · 80.75 C
+01:15:00  techo termico · 80.8 C >= 80.0 · respiro de 20 s
+01:15:27  paso 30/100 · perdida 1.4714 · 6.4 s · RAM pico 18166 MiB · 76.125 C
+01:15:34  paso 31/100 · perdida 1.3731 · 7.4 s · RAM pico 18656 MiB · 79.0 C
+01:15:44  paso 32/100 · perdida 1.4683 · 9.9 s · RAM pico 18656 MiB · 77.375 C
+01:15:49  paso 33/100 · perdida 1.7996 · 5.3 s · RAM pico 18656 MiB · 81.0 C
+01:15:49  techo termico · 81.0 C >= 80.0 · respiro de 20 s
+01:16:16  paso 34/100 · perdida 1.7537 · 7.1 s · RAM pico 18656 MiB · 77.25 C
+01:16:23  paso 35/100 · perdida 1.4976 · 6.4 s · RAM pico 18656 MiB · 77.875 C
+01:16:29  paso 36/100 · perdida 1.6655 · 6.5 s · RAM pico 18656 MiB · 79.875 C
+01:16:37  paso 37/100 · perdida 1.7211 · 7.6 s · RAM pico 18697 MiB · 81.375 C
+01:16:37  techo termico · 81.4 C >= 80.0 · respiro de 20 s
+01:17:02  paso 38/100 · perdida 1.7121 · 5.1 s · RAM pico 18697 MiB · 76.5 C
+01:17:09  paso 39/100 · perdida 1.2950 · 6.7 s · RAM pico 18697 MiB · 78.5 C
+01:17:16  paso 40/100 · perdida 1.3425 · 7.5 s · RAM pico 19071 MiB · 80.125 C
+01:17:16  techo termico · 80.1 C >= 80.0 · respiro de 20 s
+01:17:43  paso 41/100 · perdida 1.3911 · 6.6 s · RAM pico 19071 MiB · 75.625 C
+01:17:50  paso 42/100 · perdida 1.4300 · 7.4 s · RAM pico 19071 MiB · 78.375 C
+01:17:56  paso 43/100 · perdida 1.5954 · 5.4 s · RAM pico 19071 MiB · 79.5 C
+01:18:02  paso 44/100 · perdida 1.3690 · 6.4 s · RAM pico 19071 MiB · 80.875 C
+01:18:02  techo termico · 80.9 C >= 80.0 · respiro de 20 s
+01:18:29  paso 45/100 · perdida 1.2694 · 6.6 s · RAM pico 19071 MiB · 76.5 C
+01:18:35  paso 46/100 · perdida 1.2915 · 6.1 s · RAM pico 19071 MiB · 78.375 C
+01:18:41  paso 47/100 · perdida 1.3799 · 6.7 s · RAM pico 19071 MiB · 78.875 C
+01:18:57  paso 48/100 · perdida 1.3494 · 15.8 s · RAM pico 19071 MiB · 74.5 C
+01:19:04  paso 49/100 · perdida 1.2855 · 6.4 s · RAM pico 19071 MiB · 82.625 C
+01:19:04  techo termico · 82.6 C >= 80.0 · respiro de 20 s
+01:19:30  paso 50/100 · perdida 1.6100 · 5.9 s · RAM pico 19071 MiB · 77.25 C
+01:19:37  paso 51/100 · perdida 1.2617 · 7.6 s · RAM pico 19071 MiB · 79.25 C
+01:19:42  paso 52/100 · perdida 1.3910 · 5.0 s · RAM pico 19071 MiB · 79.875 C
+01:19:47  paso 53/100 · perdida 1.4923 · 5.0 s · RAM pico 19071 MiB · 80.5 C
+01:19:47  techo termico · 80.5 C >= 80.0 · respiro de 20 s
+01:20:14  paso 54/100 · perdida 1.3393 · 6.6 s · RAM pico 19071 MiB · 77.125 C
+01:20:20  paso 55/100 · perdida 1.3883 · 6.4 s · RAM pico 19071 MiB · 78.0 C
+01:20:27  paso 56/100 · perdida 1.1725 · 6.3 s · RAM pico 19071 MiB · 79.75 C
+01:20:32  paso 57/100 · perdida 1.4650 · 5.4 s · RAM pico 19071 MiB · 82.875 C
+01:20:32  techo termico · 82.9 C >= 80.0 · respiro de 20 s
+01:20:58  paso 58/100 · perdida 1.5540 · 6.2 s · RAM pico 19071 MiB · 76.75 C
+01:21:14  paso 59/100 · perdida 1.2664 · 16.1 s · RAM pico 19168 MiB · 73.375 C
+01:21:21  paso 60/100 · perdida 1.4127 · 6.4 s · RAM pico 19168 MiB · 80.5 C
+01:21:21  techo termico · 80.5 C >= 80.0 · respiro de 20 s
+01:21:48  paso 61/100 · perdida 1.1300 · 7.3 s · RAM pico 19168 MiB · 76.5 C
+01:21:55  paso 62/100 · perdida 1.1063 · 7.2 s · RAM pico 19168 MiB · 78.375 C
+01:22:02  paso 63/100 · perdida 1.1261 · 6.6 s · RAM pico 19168 MiB · 79.875 C
+01:22:08  paso 64/100 · perdida 1.5208 · 6.7 s · RAM pico 19168 MiB · 81.375 C
+01:22:08  techo termico · 81.4 C >= 80.0 · respiro de 20 s
+01:22:34  paso 65/100 · perdida 2.0962 · 5.4 s · RAM pico 19168 MiB · 76.75 C
+01:22:40  paso 66/100 · perdida 1.3858 · 6.4 s · RAM pico 19168 MiB · 77.75 C
+01:22:46  paso 67/100 · perdida 1.5407 · 6.1 s · RAM pico 19168 MiB · 79.625 C
+01:22:53  paso 68/100 · perdida 1.0952 · 6.4 s · RAM pico 19168 MiB · 80.625 C
+01:22:53  techo termico · 80.6 C >= 80.0 · respiro de 20 s
+01:23:18  paso 69/100 · perdida 1.3723 · 5.4 s · RAM pico 19168 MiB · 76.5 C
+01:23:24  paso 70/100 · perdida 1.3526 · 6.3 s · RAM pico 19168 MiB · 77.625 C
+01:23:31  paso 71/100 · perdida 1.5489 · 6.4 s · RAM pico 19168 MiB · 83.125 C
+01:23:31  techo termico · 83.1 C >= 80.0 · respiro de 20 s
+01:23:58  paso 72/100 · perdida 1.2153 · 7.1 s · RAM pico 19168 MiB · 75.75 C
+01:24:04  paso 73/100 · perdida 1.3976 · 6.3 s · RAM pico 19168 MiB · 77.0 C
+01:24:10  paso 74/100 · perdida 1.3509 · 6.0 s · RAM pico 19168 MiB · 79.125 C
+01:24:16  paso 75/100 · perdida 1.2903 · 6.3 s · RAM pico 19168 MiB · 80.25 C
+01:24:16  techo termico · 80.2 C >= 80.0 · respiro de 20 s
+01:24:43  paso 76/100 · perdida 1.0979 · 6.2 s · RAM pico 19168 MiB · 75.875 C
+01:24:48  paso 77/100 · perdida 1.5070 · 5.4 s · RAM pico 19168 MiB · 77.125 C
+01:24:55  paso 78/100 · perdida 0.9771 · 6.6 s · RAM pico 19168 MiB · 78.75 C
+01:25:01  paso 79/100 · perdida 1.1530 · 6.1 s · RAM pico 19179 MiB · 80.0 C
+01:25:01  techo termico · 80.0 C >= 80.0 · respiro de 20 s
+01:25:26  paso 80/100 · perdida 1.2376 · 5.5 s · RAM pico 19191 MiB · 76.0 C
+01:25:33  paso 81/100 · perdida 1.2513 · 6.6 s · RAM pico 19191 MiB · 78.625 C
+01:25:39  paso 82/100 · perdida 1.1915 · 6.5 s · RAM pico 19282 MiB · 79.125 C
+01:25:44  paso 83/100 · perdida 1.5267 · 4.9 s · RAM pico 19282 MiB · 79.625 C
+01:25:50  paso 84/100 · perdida 1.3288 · 5.3 s · RAM pico 19282 MiB · 81.25 C
+01:25:50  techo termico · 81.2 C >= 80.0 · respiro de 20 s
+01:26:16  paso 85/100 · perdida 1.1790 · 6.7 s · RAM pico 19282 MiB · 76.75 C
+01:26:24  paso 86/100 · perdida 1.3247 · 7.2 s · RAM pico 19330 MiB · 77.75 C
+01:26:34  paso 87/100 · perdida 1.5582 · 10.4 s · RAM pico 19609 MiB · 77.875 C
+01:26:40  paso 88/100 · perdida 1.5896 · 5.9 s · RAM pico 19609 MiB · 80.875 C
+01:26:40  techo termico · 80.9 C >= 80.0 · respiro de 20 s
+01:27:10  paso 89/100 · perdida 1.4298 · 9.9 s · RAM pico 19609 MiB · 74.25 C
+01:27:17  paso 90/100 · perdida 1.1468 · 7.3 s · RAM pico 19685 MiB · 78.75 C
+01:27:23  paso 91/100 · perdida 1.0535 · 6.2 s · RAM pico 19685 MiB · 80.5 C
+01:27:23  techo termico · 80.5 C >= 80.0 · respiro de 20 s
+01:27:50  paso 92/100 · perdida 1.1501 · 6.2 s · RAM pico 19685 MiB · 76.75 C
+01:27:56  paso 93/100 · perdida 1.3591 · 6.1 s · RAM pico 19685 MiB · 77.625 C
+01:28:01  paso 94/100 · perdida 1.3223 · 4.9 s · RAM pico 19685 MiB · 78.375 C
+01:28:10  paso 95/100 · perdida 1.1212 · 9.9 s · RAM pico 19685 MiB · 78.0 C
+01:28:16  paso 96/100 · perdida 0.8959 · 5.8 s · RAM pico 19685 MiB · 81.875 C
+01:28:16  techo termico · 81.9 C >= 80.0 · respiro de 20 s
+01:28:42  paso 97/100 · perdida 1.0443 · 5.9 s · RAM pico 19685 MiB · 77.125 C
+01:28:49  paso 98/100 · perdida 1.0188 · 6.4 s · RAM pico 19685 MiB · 77.75 C
+01:28:54  paso 99/100 · perdida 1.4329 · 5.0 s · RAM pico 19685 MiB · 78.0 C
+01:29:01  paso 100/100 · perdida 1.1597 · 7.3 s · RAM pico 19685 MiB · 80.25 C
+01:29:01  guardado en ../adapters/charla_base_v2 · {"dtype": "bfloat16", "fecha": "2026-09-07T00:29:01+00:00", "base": "mistralai/Mistral-7B-Instruct-v0.3", "pasos_hechos": 100, "segundos_por_paso": 6.97, "perdida_primera": 3.4995, "perdida_ultima": 1.1597, "hilos": 8, "ram_pico_mb": 19685, "temp_max_c": 86.4, "techo_c": 80.0, "respiros": 25, "temp_final_c": 77.25, "parado_por": null, "solo_medicion": false}
