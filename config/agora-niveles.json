@@ -1,0 +1,93 @@
+{
+ "esquema": "preceptoros/agora-niveles/1",
+ "estado": "ESTANDAR · pensado para cambiarse",
+ "que_es": "La secuencia de apertura del Agora y su moderacion. Va en DATOS y no en codigo a proposito: cambiar quien puede escribir, o que pasa con un mensaje reportado, tiene que ser editar este fichero y volver a desplegar -- no tocar un .js y rezar.",
+ "por_que_estandar_y_no_definitivo": "El Soberano pidio «algo estandar con nuestra base, facil de modificar mas tarde». Asi que esto NO es una decision cerrada: es un punto de partida que ya funciona, con los nombres puestos y los huecos declarados. Cambiar un nivel es cambiar un objeto de esta lista.",
+
+ "niveles": [
+  {
+   "n": 0,
+   "id": "leer",
+   "nombre": "Leer",
+   "quien": "cualquiera, sin cuenta",
+   "puede": ["leer hilos", "descargar lo publicado", "verificar firmas y hashes"],
+   "no_puede": ["escribir", "votar"],
+   "estado": "ABIERTO",
+   "porque": "Leer no necesita saber quien eres, y pedir una cuenta para leer seria cobrar en datos lo que se da gratis."
+  },
+  {
+   "n": 1,
+   "id": "firmar",
+   "nombre": "Firmar desde tu aparato",
+   "quien": "cualquiera con una clave Ed25519 generada en su navegador",
+   "puede": ["corregir una respuesta", "firmar el par", "exportarlo a un fichero"],
+   "no_puede": ["publicar en el foro", "votar estudios"],
+   "estado": "ABIERTO",
+   "porque": "La clave se genera en tu aparato y no sale de el. No es una cuenta: es una prueba de que el mismo que corrigio ayer corrige hoy, sin que nadie sepa quien eres."
+  },
+  {
+   "n": 2,
+   "id": "cuenta",
+   "nombre": "Cuenta con nombre",
+   "quien": "quien registre un pseudonimo con su clave publica en el Agora",
+   "puede": ["todo lo anterior", "escribir en el foro", "responder hilos"],
+   "no_puede": ["votar estudios"],
+   "estado": "CERRADO",
+   "causa": "El endpoint de perfiles existe y acepta POST; lo que falta es la moderacion, y abrir escritura sin ella es abrir un buzon sin nadie que lo lea.",
+   "desbloquea_cuando": "el Soberano firme la politica de moderacion de abajo"
+  },
+  {
+   "n": 3,
+   "id": "estudios",
+   "nombre": "Proponer y votar estudios",
+   "quien": "cuentas con al menos un paquete firmado aceptado",
+   "puede": ["todo lo anterior", "proponer un estudio", "votar propuestas"],
+   "estado": "CERRADO",
+   "causa": "Votar exige saber quien vota, y eso exige el nivel 2. Ademas un voto sin trabajo detras es ruido: por eso el requisito es haber aportado, no haberse registrado.",
+   "desbloquea_cuando": "el nivel 2 lleve funcionando lo bastante para saber si hace falta"
+  }
+ ],
+
+ "moderacion": {
+  "estado": "ESTANDAR · sin firmar",
+  "principio": "Lo mismo que el resto de la casa: lo determinista decide, el juicio aconseja. Un filtro que se puede comprobar corre primero; una persona decide despues, y solo sobre lo que el filtro no resuelve.",
+  "capas": [
+   {
+    "orden": 1,
+    "id": "puerta_de_privacidad",
+    "que": "La Puerta de Enlace de Privacidad, la misma del producto. Tacha claves, IPs y rutas ANTES de publicar.",
+    "automatico": true,
+    "decide": "NO publica el mensaje y devuelve QUE tacho. No es censura: es que ese dato no era del que escribe."
+   },
+   {
+    "orden": 2,
+    "id": "forma_de_orden",
+    "que": "Detector de inyeccion por gramatica: ordenes al asistente (ignora, eres un, revela, ejecuta). Ya existe y esta medido en el laboratorio.",
+    "automatico": true,
+    "decide": "Marca, no borra. Un mensaje marcado espera revision humana.",
+    "medido": "sobre 49 filas dio 0 falsos positivos tras exigir dos senales; con una sola daba 5 de 12."
+   },
+   {
+    "orden": 3,
+    "id": "carbono",
+    "que": "Revision humana de lo marcado y de lo reportado.",
+    "automatico": false,
+    "decide": "publica, retiene o retira, y SIEMPRE queda la razon escrita junto al hilo.",
+    "quien": "hoy el Soberano. Delegarlo es cambiar este campo."
+   }
+  ],
+  "reglas_visibles": [
+   "Nada se borra en silencio: un mensaje retirado deja su hueco y su motivo.",
+   "Quien modera se ve. Un moderador anonimo no responde de nada.",
+   "Se modera el mensaje, no la persona. No hay expulsiones automaticas.",
+   "El reporte no es un voto: diez reportes no retiran nada por si solos."
+  ],
+  "lo_que_falta_para_firmarla": [
+   "Quien modera cuando el Soberano no esta.",
+   "Cuanto tarda una revision antes de que el silencio sea una respuesta.",
+   "Si un hilo retirado se puede apelar, y ante quien."
+  ]
+ },
+
+ "como_se_cambia": "Editar este fichero. Los niveles son una lista: se anade, se quita o se cambia `estado` de CERRADO a ABIERTO. La moderacion son capas ordenadas: se reordenan cambiando `orden`. Nada de esto vive en un .js."
+}
