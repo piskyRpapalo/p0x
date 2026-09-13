@@ -1,0 +1,64 @@
+{
+ "esquema": "preceptoros/panel-estudio/1",
+ "id": "telemetria",
+ "ambito": "interno",
+ "modelo": {
+  "tag": "granite3-dense:8b",
+  "sha256": "1a9a388336073f25f143cdd39abe37b306a367d031d6c04a79bbb545232ae113",
+  "medida": {
+   "tok_s": 14.31,
+   "segundos": 8.5,
+   "carga_base": 1.04,
+   "cuando": "2026-09-13 · Beelink Ryzen 7 255 + Radeon 780M"
+  }
+ },
+ "entorno": {
+  "paquete": "entorno-estudio-v1.tar.gz",
+  "sha256": "6e8595090dea1df547293d5f064bc2679c5425c017c57bc2efa0a6e3159fb8bd",
+  "bytes": 3096
+ },
+ "loop": {
+  "turnos": [
+   {
+    "n": 1,
+    "papel": "bibliotecario",
+    "modelo": "qwen2.5-coder:3b"
+   },
+   {
+    "n": 2,
+    "papel": "analista",
+    "modelo": "deepseek-r1:7b"
+   },
+   {
+    "n": 3,
+    "papel": "guardian",
+    "modelo": "granite3-dense:8b"
+   },
+   {
+    "n": 4,
+    "papel": "forjador",
+    "modelo": null,
+    "nota": "Python puro, sin LLM"
+   }
+  ]
+ },
+ "reglas": {
+  "puerta_de_privacidad": "Tacha claves, IPs y rutas ANTES de que nada salga.",
+  "propose_only": "Nada se escribe sin --ejecutar; nada cruza a otro nodo sin artefacto.",
+  "sin_firma_no_entra": "Una fila sin `user_hash` verificado no llega al dataset.",
+  "tope_de_ritmo": "5 vueltas por minuto. La iGPU es una y la comparten los bucles."
+ },
+ "juez": {
+  "modelo": "qwen2.5:14b",
+  "rubrica": "CHECKPOINTS.md · 5 joyas, 0-2 cada una",
+  "dos_capas": "determinista primero, MoE despues. Una sola capa es NO_DATA."
+ },
+ "textos": {
+  "es": {
+   "nombre": "Telemetría",
+   "que_hace": "Audita lecturas de sensores campo a campo: comprueba la coherencia interna antes de creerse ninguna cifra.",
+   "que_falla": "Hoy no tiene de qué comer: cero sensores conectados en hexelion-nexo. Nace seco y lo declara.",
+   "para_quien": "El rack, no el público. Este panel NO se publica."
+  }
+ }
+}

@@ -1,0 +1,24 @@
+{
+ "esquema": "preceptoros/panel-estudio/1",
+ "que_es": "La forma de UN panel de estudio. La misma para un modelo publico de Comunidad y para un estudio interno del laboratorio: cambia el ambito y cambian los TEXTOS, no la estructura.",
+ "por_que_una_sola": "Dos estructuras para la misma cosa divergen. Paso con el esquema del paquete de correcciones --la web escribia `pares` y la app leia `correcciones`-- y el fichero se rechazaba entero sin decir por que. Un exportador y un importador que dicen ser el mismo esquema y no se entienden son dos esquemas.",
+ "campos": {
+  "id": "estable y NO traducible. Es la llave; el nombre visible cambia, esto no.",
+  "ambito": "publico | interno. Lo unico que decide donde se pinta.",
+  "modelo": "tag explicito + sha256 del fichero + la medida, con su carga base.",
+  "entorno": "el paquete descargable del entorno de estudio, con su sha256.",
+  "loop": "los turnos, cada uno con su papel y su modelo. Es el mismo loop.",
+  "reglas": "los limites del estudio. La Puerta de Enlace de Privacidad va SIEMPRE.",
+  "juez": "quien puntua y contra que rubrica. Nunca es el mismo que escribe.",
+  "textos": "LO UNICO QUE CAMBIA POR ESTUDIO. Por idioma: nombre, que hace, que falla, para quien."
+ },
+ "obligatorios": ["id", "ambito", "modelo", "loop", "reglas", "juez", "textos"],
+ "reglas_duras": {
+  "tag_explicito": "Ningun tag pelado ni `:latest`. Apuntan a variantes cuyo razonamiento no se puede apagar.",
+  "sha256_o_no_entra": "Un modelo sin hash no identifica nada: dos ficheros con el mismo nombre no son el mismo fichero.",
+  "medida_con_carga": "Toda cifra de tok/s lleva la carga base de la maquina. Sin ella no es reproducible.",
+  "juez_distinto_del_escritor": "Quien escribe no se puntua. Un veredicto de una sola capa es NO_DATA.",
+  "que_falla_es_obligatorio": "Cada panel dice lo que NO hace bien. Un panel que solo dice virtudes es publicidad.",
+  "id_no_se_traduce": "El identificador va en ingles o en clave y no se localiza; lo visible si."
+ }
+}
