@@ -10,15 +10,27 @@
   "loop": "los turnos, cada uno con su papel y su modelo. Es el mismo loop.",
   "reglas": "los limites del estudio. La Puerta de Enlace de Privacidad va SIEMPRE.",
   "juez": "quien puntua y contra que rubrica. Nunca es el mismo que escribe.",
-  "textos": "LO UNICO QUE CAMBIA POR ESTUDIO. Por idioma: nombre, que hace, que falla, para quien."
+  "textos": "LO UNICO QUE CAMBIA POR ESTUDIO. Por idioma: nombre, que hace, que falla, para quien.",
+  "lore": "OPCIONAL. El mundo del estudio, por idioma: escenario, personajes con su defecto, aperturas y cierres. Vive AQUI y no en un `worldstate/` aparte porque el panel ya es la unidad replicable: un estudio interno y uno publico son el mismo objeto."
  },
- "obligatorios": ["id", "ambito", "modelo", "loop", "reglas", "juez", "textos"],
+ "obligatorios": [
+  "id",
+  "ambito",
+  "modelo",
+  "loop",
+  "reglas",
+  "juez",
+  "textos"
+ ],
  "reglas_duras": {
   "tag_explicito": "Ningun tag pelado ni `:latest`. Apuntan a variantes cuyo razonamiento no se puede apagar.",
   "sha256_o_no_entra": "Un modelo sin hash no identifica nada: dos ficheros con el mismo nombre no son el mismo fichero.",
   "medida_con_carga": "Toda cifra de tok/s lleva la carga base de la maquina. Sin ella no es reproducible.",
   "juez_distinto_del_escritor": "Quien escribe no se puntua. Un veredicto de una sola capa es NO_DATA.",
   "que_falla_es_obligatorio": "Cada panel dice lo que NO hace bien. Un panel que solo dice virtudes es publicidad.",
-  "id_no_se_traduce": "El identificador va en ingles o en clave y no se localiza; lo visible si."
+  "id_no_se_traduce": "El identificador va en ingles o en clave y no se localiza; lo visible si.",
+  "lore_no_lo_genera_el_modelo": "El texto se pega por id; ningun modelo lo genera ni lo parafrasea. Es la misma regla que ya sostiene `preceptor/narrador.py`.",
+  "personaje_con_defecto": "Todo personaje del lore lleva `defecto`. Un personaje sin defecto es un folleto, y ademas el defecto ES la prueba: el de la Guardiana es el test de alucinacion vestido de ficcion.",
+  "ids_internos_fuera_del_glosario": "Los `id` internos NO se le ensenan al modelo. Ensenarle que `X` se llama «Y» es ensenarle `X`, y tarde o temprano lo dice. Lo aprendio `narrador.py` y aqui rige igual."
  }
 }

@@ -1,0 +1,20 @@
+{
+ "esquema": "laboratorio/salud/1",
+ "cuando": "2026-09-13T01:37:53+00:00",
+ "ollama": {
+  "vivo": true,
+  "dicho": "responde"
+ },
+ "ultimo_ciclo": {
+  "nota": 8.0,
+  "sha256": "325faa50236fb478dcaef8e9d60f37ae6b1616a0d68e217b31191c3a3c6719c6",
+  "cuando": "2026-09-13T01:37:45+00:00"
+ },
+ "tope_por_minuto": 5,
+ "turnos": {
+  "1": "qwen2.5-coder:3b",
+  "2": "qwen2.5:7b",
+  "3": "granite3-dense:8b",
+  "5": "qwen3-coder:30b"
+ }
+}
