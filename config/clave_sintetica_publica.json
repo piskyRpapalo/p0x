@@ -1,0 +1,7 @@
+{
+ "que_es": "Clave PUBLICA Ed25519 del rack para feedback sintetico.",
+ "para_que": "Toda fila de la pool cuyo user_hash sea esta publica la firmo el RACK, no una persona. Se comprueba comparando, no confiando: por eso esta versionada.",
+ "la_privada": "Vive en ~/.preceptoros/clave_sintetica.json, FUERA del repo. El canon prohibe material de firma en el arbol y este repo tiene espejo publico.",
+ "no_confundir": "No es firma de VALOR (NEAR, atestacion). Es una etiqueta criptografica de procedencia.",
+ "publica": "fe8bba4d52bf6722bf9eb2c1dd19d4cbcf3d315a4b4437b1bb8e6dddf5af4fda"
+}
