@@ -1,0 +1,5 @@
+{
+ "que_es": "Clave PUBLICA con la que se comprueban las medidas firmadas del Libro de Pruebas de preceptoros.org.",
+ "como": "Cada linea `tipo: medida` del ledger se firma sobre su propio JSON canonico SIN el campo `firma`. Se verifica, no se confia.",
+ "publica": "43878feb84dbd604a93109640b77e3820b18dace2d4cdedfd45113ed8cbeec6d"
+}
