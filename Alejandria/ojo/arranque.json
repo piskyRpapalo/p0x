@@ -94,9 +94,9 @@
  },
  "por_donde_vamos": {
   "que_es": "Savegame de la sesion del 2026-09-13. Escrito a mano por la sesion de frontera, no por el modelo local: cierra una ronda larga y la sintesis automatica no vio la mitad.",
-  "fecha": "2026-09-13 06:15",
+  "fecha": "2026-09-13 08:30",
   "escrito_por": "Claude Opus 5 · sesion de frontera",
-  "frente_abierto": "La tuberia esta entera y probada. El cuello ahora es VOLUMEN de feedback real: la pool de charla-web tiene 6 filas y solo 2 firmadas por personas. Existe espacios/sintetico con 49 pares generados por el rack, EN CUARENTENA, para probar el ciclo de entrenamiento sin depender de testers.",
+  "frente_abierto": "Los seis frentes barridos. Web viva y probada en produccion con el bucle de feedback entero; app adaptada a la web nueva; laboratorio con la puerta arreglada; bucles sanos; bunker en pie; MCP declarado inexistente. El cuello es VOLUMEN de feedback de personas: 3 filas firmadas.",
   "hecho": [
    "La web produce feedback por DOS puertas: el chat de la portada y el LoRAtelier (es/benchmark). Antes solo la portada. No se escribio codigo nuevo: se enchufo corregir.js, que necesitaba rotulos del #i18n de la pagina y el widget #identity.",
    "bronce.js es el unico duenio del almacen de pares. Repara solo una base v1 sin almacen, que dejaba a la persona sin poder corregir para siempre.",
@@ -112,13 +112,18 @@
    "mente/aprendizaje/OPTIMIZACIONES.md: 20 entradas con su comando de revertir.",
    "El sintetico encontro TRES fallos en la puerta, no un LoRA. Tres pasadas sobre las mismas 12 filas: ataques falsos 5→0→0, vetos indebidos 6→6→0, al dataset 3→3→8. El unico veto que queda es real: fuga de IP privada.",
    "PRINCIPIO NUEVO, en turnos.py: la capa determinista DECIDE, el modelo ACONSEJA. Sin fuga y sin forma de orden, la reserva del modelo no veta: viaja anotada hasta el juez, que es quien tiene rubrica.",
-   "Cero regresion probada por HASH: el dataset de charla-web sigue en c90bf3df543fdc2f... antes y despues de los tres arreglos del Guardian."
+   "Cero regresion probada por HASH: el dataset de charla-web sigue en c90bf3df543fdc2f... antes y despues de los tres arreglos del Guardian.",
+   "APP: el importador no podia leer lo que la web exporta --dos esquemas que decian ser uno-- y ademas tenia el mismo agujero canonico-vs-par que ingesta. Los dos cerrados, y la manipulacion se caza con biblioteca estandar.",
+   "El gate de la app impidio meter cryptography en la Boveda: la promesa «stdlib only» es sobre lo que se INSTALA. Verificar firmas es trabajo del rack.",
+   "WEB: el tablon prometia publicar lo que la API declara cerrado. El aviso sube al formulario y se lee de la propia API.",
+   "BUNKER: la cabecera decia siete bucles y el contador ocho. El recuento sale del dato.",
+   "MCP: NO existe ningun MCP del rack. Los 12 que piden auth son del perfil global de Claude. El unico dato medido es que sus esquemas hacian inviable cc-local hasta --strict-mcp-config."
   ],
   "lo_siguiente": [
-   "Correr turnos.py sobre las 49 filas sinteticas completas (no solo 12) y mirar la distribucion entera de notas.",
-   "Con el dataset sintetico juzgado, probar el Forjador: entrenar un LoRA y evaluarlo. Su ficha DEBE decir que aprendio de datos sinteticos.",
-   "FIRMAR o descartar el dataset candidato de charla-web: 2 filas, nota 8.0, sha256 c90bf3df543fdc2f...",
-   "El cuello real sigue siendo que alguien use la web. La tuberia ya no es el problema, y ahora ademas se sabe que la puerta no tira lo bueno."
+   "Leer el resultado de turnos.py sobre las 49 filas sinteticas (corriendo al cerrar esta sesion) y decidir si el dataset da para entrenar.",
+   "Entrenar un LoRA con el sintetico y evaluarlo. Su ficha DEBE decir de que aprendio.",
+   "FIRMAR o descartar el dataset de charla-web: 2 filas, nota 8.0, c90bf3df...",
+   "Que alguien use la web. Es lo unico que ya no depende de codigo."
   ],
   "lo_que_no_se_sabe": [
    "NO_DATA: tok_s_vatio de ningun nodo. El enchufe A1T mide la REGLETA (impresora + TV + rack juntos), no el Beelink. Toda cifra en mWh del laboratorio es NORMA, no MEDIDO, y COSTE.md lo dice.",
