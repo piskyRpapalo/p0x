@@ -314,6 +314,53 @@ delegar, cuenta turnos, no líneas.
 - **Sin sudo interactivo en `soberano`.** No hay contraseña cacheada; instalar vía binarios de
   usuario (releases prebuilt, `uv`, `nvm`) en vez de `apt` cuando sea posible.
 
+## La capa de optimizadores · firmada 2026-09-13
+
+**Toda ronda de trabajo lleva una pasada de optimización, y no se pide permiso para
+hacerla.** Lo firmó el Soberano con estas palabras, que valen como definición del
+encargo:
+
+> *«debes suplir las mejoras básicas que yo no veo, debido a mi falta de educación
+> básica y la evolución edge. si puedes enseñar algo al sistema desde tu posición, lo
+> dejas registro localizable sin preguntar. hay demasiado de tu razonamiento que vale
+> oro y no me da tiempo a leer.»*
+
+### Qué es una optimización aquí
+
+No es refactorizar por gusto. Es **el hueco que se ve desde dentro del trabajo y que
+nadie más va a ver**: el fichero a noventa bytes de su techo, la guarda que se quedó
+vigilando la puerta por la que ya no pasa nadie, el umbral que nunca se calibró, el
+`LAST` que se lee sin mirar la ventana. Sale de hacer la tarea, no de buscarla.
+
+### Las cuatro condiciones, y ninguna es opcional
+
+1. **Se hace, no se pregunta.** Preguntar cada mejora cuesta más atención de la que
+   la mejora vale, y esa atención es el recurso escaso de este proyecto.
+2. **Se registra en `mente/aprendizaje/OPTIMIZACIONES.md`**, append-only, separando
+   siempre tres cosas: **qué vi**, **la lección** y **qué toqué**. La lección va
+   aparte a propósito — el cambio caduca cuando el fichero se reescribe; la lección
+   no, y es la que alimenta al RAG y más adelante al LoRA.
+3. **Cada una se revierte sola**, con su comando escrito al lado. No «revertir la
+   sesión»: revertir *esa* decisión sin tocar las demás. `bin/optimizaciones.py`
+   genera la página para leerlas y decidir de un vistazo.
+4. **Se cuentan al final del trabajo**, no durante. El Soberano las revisa cuando
+   tiene la cabeza para ello, y revierte lo que no le guste.
+
+### Lo que esta capa NO autoriza
+
+La firma cubre **mejoras**, no fronteras. Siguen intactas y por encima de ella:
+propose-only hacia otros nodos · jamás firmar valor · ninguna unidad systemd sin
+firma explícita, una por una · nada sale a un remoto público sin decirlo antes. Una
+optimización que cruce una de esas líneas **se propone, no se hace** — y la propia
+línea del canon manda sobre la comodidad de no preguntar.
+
+### Los errores propios también se anotan
+
+Una entrada sin cambio de código es válida y se escribe igual: dar un bucle semanal
+por muerto leyendo su `LAST` sin mirar la ventana es exactamente lo que la siguiente
+sesión repetiría si no queda escrito. **Una corrección que solo vive en el chat se
+pierde.**
+
 ## Estructura del repo (recordatorio)
 
 `mente/` = Segundo Cerebro (doctrina, manual, alfabeto, telemetría, feedback/PENDIENTES.md).

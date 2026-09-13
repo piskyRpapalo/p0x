@@ -1,129 +1,134 @@
 {
-  "titulo": "Arranque de sesion · lee esto ANTES de tocar nada",
-  "para_quien": "Cualquier IA que abra sesion en soberano: Claude Code, cc-local o una voz del Sinodo. Es el nexo de arranque, no un resumen de cortesia.",
-  "medido": "2026-09-12",
-  "primer_comando": "curl -s http://127.0.0.1:8790/api/arranque | python3 -m json.tool   # o: python3 ~/p0x/Alejandria/ojo/ojo.py --arranque",
-  "cargar_partida": {
-    "que_es": "El save game. Cuatro pilares que NO se deducen del codigo y que una sesion fria da por supuestos si nadie se los dice, mas la mision siguiente y las trampas que ya han mordido a otro. El texto no vive aqui: vive en el glosario, y esto solo dice CUALES. Si un termino de estas listas desaparece del glosario, la respuesta trae NO_DATA con su nombre en vez de callarse.",
-    "los_cuatro_pilares": [
-      "Doctrina Caza-Nido",
-      "Arquitectura de 3 Capas",
-      "La Verdad del Silicio",
-      "Bug LoRA Thinking · CERRADO el 2026-09-02"
-    ],
-    "de_donde_vienes": "SAVE GAME · lo que hizo la sesion del 2026-09-04",
-    "a_donde_vas": "SIGUIENTE MISION · lo que quedo abierto el 2026-09-04",
-    "lo_que_te_va_a_morder": [
-      "preceptoros-pwa.service (antes aurelius.service)",
-      "el bucle verde · Restart=always y salir 0",
-      "la aritmetica de las tiras, y como se mide el arte",
-      "La Necropolis · lo que ya se mato, y por que",
-      "Donde el inventario de Gemini NO cuadra con el rack",
-      "los repos, y no son tres",
-      "Los repos en GitHub, y cuales son PUBLICOS",
-      "el gate corre solo, en un hook",
-      "los dos techos de la web",
-      "el service worker te ensena codigo viejo",
-      "el cache del navegador, hermano del service worker",
-      "no hay cwebp en este nodo (ni ImageMagick)",
-      "gate",
-      "NO_DATA",
-      "al partir una hoja por el tope, el asunto tiene mas mitades de las que ves",
-      "un sensor en verde puede fabricar salud",
-      "el estado de un registro no es lo que el render obedece",
-      "el guardian tiene un suelo duro que ninguna firma exime",
-      "un bucle que espera con pgrep -f se encuentra a si mismo",
-      "cada nodo tiene SU usuario, y `~` no es el mismo en los dos"
-    ],
-    "y_para_eso_lee": [
-      "El Camino (The Path) y La Brujula (The Compass)",
-      "El rack fisico completo (Le Jardin, Lisboa)",
-      "cc-local · las tres condiciones",
-      "lo que este rack te da"
-    ]
-  },
-  "donde_estas": {
-    "nodo": "soberano · Beelink Ryzen 7 255 · 64 GB · Radeon 780M · sin CUDA",
-    "eres": "el ejecutor. La doctrina la valida el Preceptor fuera del rack: despliegas, no reescribes por iniciativa.",
-    "canon": "~/CLAUDE.md (symlink a p0x/deploy/soberano/) · doctrina en mente/doctrina/ · cuaderno en OPERACIONES.md"
-  },
-  "las_seis_reglas_que_mas_se_rompen": [
-    {
-      "regla": "Comprueba P0X_BRAIN ANTES de actuar",
-      "por_que": "Si vale `local` no tocas canon, no propones enmiendas de doctrina y no emites veredictos de arquitectura. Si no esta puesto eres frontera: PARA y propon delegar a `cc-local` todo inventario, refactor mecanico o tanda de tests.",
-      "comando": "echo ${P0X_BRAIN:-<frontera>}"
-    },
-    {
-      "regla": "Solo `soberano` se toca. Lo demas es PROPOSE-ONLY",
-      "por_que": "la-fragua, la-torre, el-vigia: se leen, no se cambian por SSH. Todo cambio sale como artefacto a ~/p0x/propuestas/.",
-      "comando": "ls ~/p0x/propuestas/"
-    },
-    {
-      "regla": "Ningun diff existe hasta que pasa el gate",
-      "por_que": "Un diff en rojo no es un entregable, es ruido. Hay un hook que los corre y bloquea. Ver el recurso «Los cuatro gates».",
-      "comando": "ver /api/recursos -> Los cuatro gates"
-    },
-    {
-      "regla": "16.384 B por fichero en la web, .json incluido",
-      "por_que": "Cuando no cabe: se ENVUELVE (chat-router.js, comandos.js) o se PARTE (engine.js, hub-cola.js, esquina-cuenta.css). Nunca se recorta el comentario que explica el porque. · CORREGIDO 2026-09-07: esta regla decia 10.240 B, que es el tope VIEJO. El gate exige 16.384 (mas 50 KB sprites y 30 KB laminas), y una sesion que se fie de la cifra vieja parte ficheros que no hacia falta partir -- o peor, cree que tiene menos sitio del que tiene y recorta comentarios para caber.",
-      "comando": "cd ~/p0x/preceptoros-web && python3 -c \"import pathlib;T=16384;[print(T-p.stat().st_size,p) for p in sorted(pathlib.Path('public').rglob('*')) if p.is_file() and p.suffix in ('.html','.css','.js','.json') and T-p.stat().st_size<2000]\""
-    },
-    {
-      "regla": "Tag de modelo explicito, y `num_ctx` demostrado por dato",
-      "por_que": "Un tag pelado apunta a variantes Thinking con razonamiento no desactivable. 262k cuelga runtimes en este hardware: la ventana medida es 32768.",
-      "comando": "ollama ps && ollama list"
-    },
-    {
-      "regla": "Jamas firmas valor, y ningun servicio sin firma explicita",
-      "por_que": "Las claves SSH de aqui son auth-only. Crear una unidad systemd o una linea de cron es dejar algo corriendo con tus permisos cuando nadie mira.",
-      "comando": "systemctl --user list-units --type=service,timer   # al cerrar sesion"
-    }
+ "titulo": "Arranque de sesion · lee esto ANTES de tocar nada",
+ "para_quien": "Cualquier IA que abra sesion en soberano: Claude Code, cc-local o una voz del Sinodo. Es el nexo de arranque, no un resumen de cortesia.",
+ "medido": "2026-09-12",
+ "primer_comando": "curl -s http://127.0.0.1:8790/api/arranque | python3 -m json.tool   # o: python3 ~/p0x/Alejandria/ojo/ojo.py --arranque",
+ "cargar_partida": {
+  "que_es": "El save game. Cuatro pilares que NO se deducen del codigo y que una sesion fria da por supuestos si nadie se los dice, mas la mision siguiente y las trampas que ya han mordido a otro. El texto no vive aqui: vive en el glosario, y esto solo dice CUALES. Si un termino de estas listas desaparece del glosario, la respuesta trae NO_DATA con su nombre en vez de callarse.",
+  "los_cuatro_pilares": [
+   "Doctrina Caza-Nido",
+   "Arquitectura de 3 Capas",
+   "La Verdad del Silicio",
+   "Bug LoRA Thinking · CERRADO el 2026-09-02"
   ],
-  "como_se_cierra": [
-    "Parar-y-reportar: que se hizo, que dato salio, que fallo. Ante un comando que va a fallar o sale del alcance: PARA, no improvises un sustituto.",
-    "Actualiza recursos.json si usaste un recurso nuevo o si uno declarado dejo de responder.",
-    "Commit por bloque. `git push` SOLO con la firma explicita del Soberano.",
-    "3-6 sugerencias accionables (S/M/L) anexadas a mente/feedback/PENDIENTES.md."
+  "de_donde_vienes": "SAVE GAME · lo que hizo la sesion del 2026-09-04",
+  "a_donde_vas": "SIGUIENTE MISION · lo que quedo abierto el 2026-09-04",
+  "lo_que_te_va_a_morder": [
+   "preceptoros-pwa.service (antes aurelius.service)",
+   "el bucle verde · Restart=always y salir 0",
+   "la aritmetica de las tiras, y como se mide el arte",
+   "La Necropolis · lo que ya se mato, y por que",
+   "Donde el inventario de Gemini NO cuadra con el rack",
+   "los repos, y no son tres",
+   "Los repos en GitHub, y cuales son PUBLICOS",
+   "el gate corre solo, en un hook",
+   "los dos techos de la web",
+   "el service worker te ensena codigo viejo",
+   "el cache del navegador, hermano del service worker",
+   "no hay cwebp en este nodo (ni ImageMagick)",
+   "gate",
+   "NO_DATA",
+   "al partir una hoja por el tope, el asunto tiene mas mitades de las que ves",
+   "un sensor en verde puede fabricar salud",
+   "el estado de un registro no es lo que el render obedece",
+   "el guardian tiene un suelo duro que ninguna firma exime",
+   "un bucle que espera con pgrep -f se encuentra a si mismo",
+   "cada nodo tiene SU usuario, y `~` no es el mismo en los dos"
   ],
-  "donde_mirar_antes_de_preguntar": {
-    "que tengo a mano": "/api/recursos",
-    "que significa esa jerga": "/api/glosario",
-    "estado del rack ahora": "/api/rack  (consumo_w y ollama_vivo son EN VIVO; el resto es snapshot con su frescura)",
-    "el metal y sus nombres": "~/p0x/hexelion/HARDWARE_MAP.md",
-    "lo que quedo pendiente": "~/p0x/mente/feedback/PENDIENTES.md"
+  "y_para_eso_lee": [
+   "El Camino (The Path) y La Brujula (The Compass)",
+   "El rack fisico completo (Le Jardin, Lisboa)",
+   "cc-local · las tres condiciones",
+   "lo que este rack te da"
+  ]
+ },
+ "donde_estas": {
+  "nodo": "soberano · Beelink Ryzen 7 255 · 64 GB · Radeon 780M · sin CUDA",
+  "eres": "el ejecutor. La doctrina la valida el Preceptor fuera del rack: despliegas, no reescribes por iniciativa.",
+  "canon": "~/CLAUDE.md (symlink a p0x/deploy/soberano/) · doctrina en mente/doctrina/ · cuaderno en OPERACIONES.md"
+ },
+ "las_seis_reglas_que_mas_se_rompen": [
+  {
+   "regla": "Comprueba P0X_BRAIN ANTES de actuar",
+   "por_que": "Si vale `local` no tocas canon, no propones enmiendas de doctrina y no emites veredictos de arquitectura. Si no esta puesto eres frontera: PARA y propon delegar a `cc-local` todo inventario, refactor mecanico o tanda de tests.",
+   "comando": "echo ${P0X_BRAIN:-<frontera>}"
   },
-  "por_donde_vamos": {
-    "que_es": "Donde quedo el rumbo. Lo escribe el cerebro principal del rack desde hechos medidos, no una persona de memoria.",
-    "fecha": "2026-09-12 23:10",
-    "escrito_por": "oficial-inventario:q4-1.0",
-    "frente_abierto": "El bucle director tiene una cola de 4 elementos y 4 frenos recientes por histeresis, mientras la carga del sistema es de 3.07, superando el umbral de 2.0.",
-    "hecho": [
-      "Se han realizado 20 commits hoy, incluyendo fixes en bunker, sintesis y telemetria.",
-      "El bucle guardian ha mirado 104 ficheros y encontrado 1 hallazgo.",
-      "El bucle afinador y curador reportan una carga de 3.07, superior al umbral de 2.0.",
-      "Hay 6 features en estado 'pending', bloqueadas por dependencias o decisiones del Soberano.",
-      "El hallazgo más repetido es 'transformers:herramientas/medir_tokens.py' con 5 apariciones."
-    ],
-    "lo_siguiente": [
-      "Resolver la cola de 4 elementos del bucle director, ya que tiene 4 frenos recientes por histeresis.",
-      "Reducir la carga del sistema de 3.07 a por debajo de 2.0, ya que el afinador y curador la reportan como excesiva.",
-      "Revisar el hallazgo repetido 'transformers:herramientas/medir_tokens.py' (5 veces) para determinar si es un error o una característica esperada."
-    ],
-    "lo_que_no_se_sabe": [
-      "NO_DATA: La impresora no aparece en hexelion-nexo/sensores/, por lo que no se puede determinar su estado o configuración."
-    ]
+  {
+   "regla": "Solo `soberano` se toca. Lo demas es PROPOSE-ONLY",
+   "por_que": "la-fragua, la-torre, el-vigia: se leen, no se cambian por SSH. Todo cambio sale como artefacto a ~/p0x/propuestas/.",
+   "comando": "ls ~/p0x/propuestas/"
   },
-  "IMPORTANTE": {
-    "que": "EL INVENTARIO. Cada parte de la web y de la app, con sus secciones, sus visuales y donde vive cada cosa. Se escribio para que una sesion nueva NO repita trabajo ya hecho y pueda ir directa a lo que no esta optimizado. Leelo ANTES de tocar cualquiera de los dos productos.",
-    "fecha": "2026-09-05",
-    "fichero": "~/p0x/INVENTARIO.md",
-    "tambien": "~/preceptoros-web/docs/ESTADO.md — el estado tecnico de la web, pensado para la sesion que trabaje el GitHub (capturas, README, descripcion de los repos).",
-    "cinco_arreglos_propuestos_sin_tocar": [
-      "S · Tres guiones huerfanos en public/assets: hitos.js, manifiesto.js y pie.js. Ninguna de las 56 paginas los enlaza; 5,9 KB que el gate vigila, mide y sirve.",
-      "S · `onboarding.html` promete una descarga que `instalar.html` declara inexistente, con su NO_DATA y su fecha. Dos paginas del mismo sitio dicen cosas distintas del mismo hecho.",
-      "L · La app NO tiene tope por fichero: `dashboard.css` 83 KB y `dashboard.js` 85 KB, cinco veces el tope entero de la web. La doctrina de partir por asunto nunca se aplico alli.",
-      "M · `hub.json` lleva un solo nombre y una sola funcion por agente, sin variantes por lengua. Es decision de CONTENIDO, no tecnica.",
-      "S · `medidas.json` no tiene campo `firma`, del que ahora depende la marca «sin firmar»: sale por ausencia, no por medida. Y sus cuatro NO_DATA no se pintan en ningun sitio."
-    ]
+  {
+   "regla": "Ningun diff existe hasta que pasa el gate",
+   "por_que": "Un diff en rojo no es un entregable, es ruido. Hay un hook que los corre y bloquea. Ver el recurso «Los cuatro gates».",
+   "comando": "ver /api/recursos -> Los cuatro gates"
+  },
+  {
+   "regla": "16.384 B por fichero en la web, .json incluido",
+   "por_que": "Cuando no cabe: se ENVUELVE (chat-router.js, comandos.js) o se PARTE (engine.js, hub-cola.js, esquina-cuenta.css). Nunca se recorta el comentario que explica el porque. · CORREGIDO 2026-09-07: esta regla decia 10.240 B, que es el tope VIEJO. El gate exige 16.384 (mas 50 KB sprites y 30 KB laminas), y una sesion que se fie de la cifra vieja parte ficheros que no hacia falta partir -- o peor, cree que tiene menos sitio del que tiene y recorta comentarios para caber.",
+   "comando": "cd ~/p0x/preceptoros-web && python3 -c \"import pathlib;T=16384;[print(T-p.stat().st_size,p) for p in sorted(pathlib.Path('public').rglob('*')) if p.is_file() and p.suffix in ('.html','.css','.js','.json') and T-p.stat().st_size<2000]\""
+  },
+  {
+   "regla": "Tag de modelo explicito, y `num_ctx` demostrado por dato",
+   "por_que": "Un tag pelado apunta a variantes Thinking con razonamiento no desactivable. 262k cuelga runtimes en este hardware: la ventana medida es 32768.",
+   "comando": "ollama ps && ollama list"
+  },
+  {
+   "regla": "Jamas firmas valor, y ningun servicio sin firma explicita",
+   "por_que": "Las claves SSH de aqui son auth-only. Crear una unidad systemd o una linea de cron es dejar algo corriendo con tus permisos cuando nadie mira.",
+   "comando": "systemctl --user list-units --type=service,timer   # al cerrar sesion"
   }
+ ],
+ "como_se_cierra": [
+  "Parar-y-reportar: que se hizo, que dato salio, que fallo. Ante un comando que va a fallar o sale del alcance: PARA, no improvises un sustituto.",
+  "Actualiza recursos.json si usaste un recurso nuevo o si uno declarado dejo de responder.",
+  "Commit por bloque. `git push` SOLO con la firma explicita del Soberano.",
+  "3-6 sugerencias accionables (S/M/L) anexadas a mente/feedback/PENDIENTES.md."
+ ],
+ "donde_mirar_antes_de_preguntar": {
+  "que tengo a mano": "/api/recursos",
+  "que significa esa jerga": "/api/glosario",
+  "estado del rack ahora": "/api/rack  (consumo_w y ollama_vivo son EN VIVO; el resto es snapshot con su frescura)",
+  "el metal y sus nombres": "~/p0x/hexelion/HARDWARE_MAP.md",
+  "lo que quedo pendiente": "~/p0x/mente/feedback/PENDIENTES.md"
+ },
+ "por_donde_vamos": {
+  "que_es": "Savegame de la sesion del 2026-09-13. Escrito a mano por la sesion de frontera, no por el modelo local: cierra una ronda larga y la sintesis automatica no vio la mitad.",
+  "fecha": "2026-09-13 04:00",
+  "escrito_por": "Claude Opus 5 · sesion de frontera",
+  "frente_abierto": "La cadena de feedback esta CERRADA y probada de punta a punta: web -> firma Ed25519 en el navegador -> exportacion a fichero -> adb pull -> ingesta.py verifica -> pool con user_hash -> turnos.py 5 turnos -> dataset candidato en la bandeja. Faltan volumen y la firma del primer dataset.",
+  "hecho": [
+   "La web produce feedback por DOS puertas: el chat de la portada y el LoRAtelier (es/benchmark). Antes solo la portada. No se escribio codigo nuevo: se enchufo corregir.js, que necesitaba rotulos del #i18n de la pagina y el widget #identity.",
+   "bronce.js es el unico duenio del almacen de pares. Repara solo una base v1 sin almacen, que dejaba a la persona sin poder corregir para siempre.",
+   "El service worker NO subia de version al desplegar: la web servia ficheros viejos a quien ya la conocia. config/sw-huella.txt ata el sha256 de todo public/ a la VERSION, y el gate lo exige.",
+   "turnos.py con el mapeo firmado y el Guardian como PUERTA (corre primero). Probado con un ataque real: se registra como intento_inyeccion en loops.db.",
+   "gc_loras.py reparte por FAMILIA, no por fecha: nunca deja una capacidad sin adaptador. Nunca ejecutado en real todavia.",
+   "GitHub publico de p0x: 478 ficheros, CERO ejecutables. El push de master a GitHub esta bloqueado en la config (pushurl NO-PUSH://).",
+   "mente/aprendizaje/OPTIMIZACIONES.md: 14 entradas con su comando de revertir. La capa de optimizadores es regla firmada en CLAUDE.md."
+  ],
+  "lo_siguiente": [
+   "FIRMAR o descartar el dataset candidato: 2 filas, nota media 8.0, sha256 c90bf3df543fdc2f... Esta en preceptor-internal/docs/bandeja_firmas.md.",
+   "Ejecutar gc_loras.py --ejecutar cuando se quiera: archiva 3 adaptadores superados (245,6 MB) y conserva una copia de cada capacidad.",
+   "Conseguir VOLUMEN de feedback. La pool tiene 2 filas firmadas y 3 heredadas sin firma. El cuello ya no es tecnico: es que alguien use la web.",
+   "El Doogee corre un service worker viejo. Limpiar datos del sitio en ese aparato antes de volver a probar nada ahi."
+  ],
+  "lo_que_no_se_sabe": [
+   "NO_DATA: tok_s_vatio de ningun nodo. El enchufe A1T mide la REGLETA (impresora + TV + rack juntos), no el Beelink. Toda cifra en mWh del laboratorio es NORMA, no MEDIDO, y COSTE.md lo dice.",
+   "NO_DATA: ningun sensor en hexelion-nexo/sensores/. Los espacios telemetria y jardin siguen vacios y declarados.",
+   "NO_DATA: el endpoint /api/v1/conversation-log de la-fragua sigue sin desplegar y sus tres condiciones sin cumplir. La exportacion las esquiva: no recolecta, entrega."
+  ]
+ },
+ "IMPORTANTE": {
+  "que": "EL INVENTARIO. Cada parte de la web y de la app, con sus secciones, sus visuales y donde vive cada cosa. Se escribio para que una sesion nueva NO repita trabajo ya hecho y pueda ir directa a lo que no esta optimizado. Leelo ANTES de tocar cualquiera de los dos productos.",
+  "fecha": "2026-09-05",
+  "fichero": "~/p0x/INVENTARIO.md",
+  "tambien": "~/preceptoros-web/docs/ESTADO.md — el estado tecnico de la web, pensado para la sesion que trabaje el GitHub (capturas, README, descripcion de los repos).",
+  "cinco_arreglos_propuestos_sin_tocar": [
+   "S · Tres guiones huerfanos en public/assets: hitos.js, manifiesto.js y pie.js. Ninguna de las 56 paginas los enlaza; 5,9 KB que el gate vigila, mide y sirve.",
+   "S · `onboarding.html` promete una descarga que `instalar.html` declara inexistente, con su NO_DATA y su fecha. Dos paginas del mismo sitio dicen cosas distintas del mismo hecho.",
+   "L · La app NO tiene tope por fichero: `dashboard.css` 83 KB y `dashboard.js` 85 KB, cinco veces el tope entero de la web. La doctrina de partir por asunto nunca se aplico alli.",
+   "M · `hub.json` lleva un solo nombre y una sola funcion por agente, sin variantes por lengua. Es decision de CONTENIDO, no tecnica.",
+   "S · `medidas.json` no tiene campo `firma`, del que ahora depende la marca «sin firmar»: sale por ausencia, no por medida. Y sus cuatro NO_DATA no se pintan en ningun sitio."
+  ]
+ }
 }
