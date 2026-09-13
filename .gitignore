@@ -105,3 +105,48 @@ Alejandria/ojo/cache_gates.json
 preceptor-lora/adapters/*/adapter_model.safetensors
 preceptor-lora/adapters/*/adapter.gguf
 preceptor-lora/adapters/*/training.log
+
+# El enlace simbolico a la web, que NO es la web. `preceptoros-web/` apunta a
+# ~/preceptoros-web, que es su propio repo con su propio remoto en GitHub.
+# Sin esta linea git lo ve como un symlink suelto y un `add -A` lo commitea:
+# el repo del rack se quedaria con un puntero a una ruta que solo existe en
+# este disco, y en cualquier otro nodo apuntaria a nada.
+preceptoros-web
+
+# Registros de entrenamiento de la forja. `preceptor-lora/*.log` (arriba) solo
+# cubria la raiz, y los de `forja/` llevaban semanas asomando en `git status`.
+#
+# SE IGNORAN EN VEZ DE MOVERLOS a una carpeta aparte, y es desviacion
+# declarada del encargo: mover los que hay es una limpieza de una vez, y la
+# proxima corrida los vuelve a escribir aqui porque los guiones que los
+# generan viven en esta misma carpeta. Ignorar es el arreglo que dura; mover
+# sin tocar los guiones solo aplaza el mismo `git status` sucio.
+preceptor-lora/forja/*.log
+
+# Salida de `ollama show`, que el propio fichero declara en su cabecera. Se
+# regenera con un comando y su nombre ya dice que es temporal.
+preceptor-lora/forja/Modelfile.temp
+
+# Laminas generadas por la herramienta de diseño: 5 PNG de ~1,2 MB cada uno.
+# NO SE BORRAN --son arte, no residuo, y el encargo solo autorizaba borrar
+# residuo-- pero tampoco entran al repo por peso. Si esta secuencia es marca
+# que hay que conservar, entra por la puerta de `marca/` con su acta, no de
+# rebote por un `git add -A`. Queda dicho para que se decida a proposito.
+Alejandria/marca/Pensamiento./
+
+# Log de ejecución del Ojo del Soberano. Se regenera en cada arranque y hoy
+# pesa 0 B: versionarlo es meter ruido de ejecución en la historia del repo.
+Alejandria/ojo/ojo.log
+
+# Volcados de la auditoría del 2026-09-11: 40 MB de listados y greps crudos,
+# uno solo de 26 MB. Es material REGENERABLE con el script que lo produjo, no
+# un entregable. La historia de git no se comprime hacia atrás: lo que entra
+# pesa para siempre, y este es justo el caso que el .gitignore de `preceptor`
+# ya describe para `dist/`. Si algún hallazgo merece conservarse, entra
+# redactado en `mente/auditorias/` con su acta, no como volcado en bruto.
+audit_report/
+
+# Respaldos que `sintesis.py` deja antes de escribir el rumbo. Son una red, no
+# historia: uno por ejecucion y regenerables. Viven en
+# ~/.preceptoros/respaldos-arranque/, fuera del arbol.
+Alejandria/ojo/arranque.json.backup-*

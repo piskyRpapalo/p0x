@@ -1674,31 +1674,48 @@ P6-1.
 
 ## Sesión 2026-09-06/07 · La Charla, la auditoría de flujo y el Ojo
 
-1. **(S) Reescribir los sensores de `prueba_fuego_charla.py` antes de reentrenar.**
-   Devolvieron código 0 sobre respuestas que inventaban una cifra (200 GB por
-   4,4), un equipo de desarrollo y dos canales de mensajería. Medían patrón de
-   identificador, alfabeto y verbos de instalación: lo cómodo. Faltan dos
-   sensores — cantidad con unidad sin respaldo, y promesa de canal.
+1. ~~**(S) Reescribir los sensores de `prueba_fuego_charla.py`.**~~
+   **CERRADA 2026-09-08.** Entran los dos que faltaban y uno más:
+   `sin_cifras_sin_respaldo` (cantidad con unidad que no venía en el turno —
+   compara contra system+pregunta, así que repetir «16 GB» que dijo la persona
+   sigue en verde), `no_supone_tu_maquina` (el «tenemos 8 GB en mi tank3», que
+   es la deuda 8), y `no_inventa_canal_de_envio` **ensanchado y corriendo en
+   todos los turnos**, no solo en el del aporte: el patrón viejo miraba
+   `envíamelo` pegado al pronombre y el fallo real decía «Envía el fichero…
+   al equipo de desarrollo». Las tres respuestas que se colaron quedan
+   guardadas en el fichero como `--autoprueba`: corre en un segundo, sin
+   Ollama. 4/4.
 
 2. **(M) Subir la muestra por lengua del corpus multilingüe.** Quince muestras
    no enseñan a conversar en árabe: la firmada sale digna y la paráfrasis se
    desarma. El recorte a 100 se hizo por RAM, y la RAM sobró — el pico real fue
    27.765 MiB de los 35 de alarma. Hay sitio para más muestra.
 
-3. **(S) Sacar el bloque i18n de `el/index.html` a un fichero por lengua.**
-   Quedó en 202 B libres, el más apretado del repo, y ~62 los puso el `<link>`
-   de `esquina-cuenta.css` de esta sesión. La próxima prosa en la portada griega
-   no cabe. El patrón ya existe: `hub-textos.json`, `instalar.json`.
+3. ~~**(S) Sacar el bloque i18n de `el/index.html` a un fichero por lengua.**~~
+   **CERRADA 2026-09-08** (`bcb57e5`). No salió el bloque entero —22 scripts lo
+   leen y volverlos asíncronos era otra tarea— sino su asunto más pesado:
+   `agentes`, los nombres de los ocho compañeros, 1.416 B en castellano y 2.003
+   en griego. A `agentes-<lengua>.json`, el patrón de `taller-<lengua>.json`.
+   El griego pasa de 279 a **1.835 B libres**; el ruso de 840 a 2.275; las otras
+   seis por encima de 4.250. Con precache en el shell y gate que comprueba la
+   clave mudada en su casa nueva, en las ocho lenguas.
 
 4. **(S) Levantar el panel del Ojo (:8790).** No arranca solo y no tiene unidad
    systemd; una sesión que lo pruebe por `curl` recibe 000 y concluye que no
    existe. Cada unidad pide firma aparte, así que esto es petición, no tarea.
    Detalle en `mente/pendientes_ojo.md`.
 
-5. **(M) La app no sabe leer lo que la web le da.** `corregir.js` ya usa el
-   esquema de `preceptor/captura.py`, pero el puente va en un solo sentido: no
-   hay importador. Es lo que convierte «probé la web» en «tengo mi memoria».
-   Desarrollado en `propuestas/2026-09-07_app_idiomas_y_mejoras.md`.
+5. ~~**(M) La app no sabe leer lo que la web le da.**~~
+   **CERRADA 2026-09-08** (`preceptor@a088e00`). `importar.py` + `preceptoros.py
+   --importar FICHERO` (`-` para pegarlo por la entrada). Entra con
+   `arnes='web'` —lo único que ese importador sabe con certeza, y la razón por
+   la que existe la columna—, el consentimiento **copiado y nunca subido**, la
+   `tarea` en NO_DATA (no `libre`: eso afirma algo que el paquete no dice), y
+   la firma Ed25519 **guardada pero con `firma_ok = NO_DATA`**, avisando por
+   pantalla — la stdlib no trae Ed25519 y una firma que parece comprobada es
+   peor que ninguna. Importar dos veces no duplica. 16 pruebas, y dos de ellas
+   **cruzan con el repo de la web**: leen `corregir.js` y exigen que no escriba
+   ningún campo que este lado tire.
 
 6. **(L) Los idiomas de la app: primero la forma, después las traducciones.**
    Habla 2 lenguas contra las 8 de la web, en tres catálogos distintos, y
@@ -1728,9 +1745,506 @@ P6-1.
    por el hardware en vez de suponerlo, que es justo lo que hace la muestra
    nueva del atajo «dame los pasos». Comprobar en la Prueba de Fuego.
 
-9. **(S) El system prompt se escapa al diálogo.** En la captura del teléfono se
+9. **(S) El system prompt se escapa al diálogo — MITAD CERRADA 2026-09-08.**
+   La mitad web: `sinFuga` (en `state.js`, quien inyecta el bloque) tacha
+   `[SYSTEM STATE]…` de todo lo que devuelve el modelo, incluido el bloque
+   cortado del torrente, y cuenta lo tachado en `preceptor:fuga`. Comprobado:
+   el bloque solo se compone dentro de `papel()`, así que la web nunca lo
+   pintaba — lo recitaba el modelo. **Sigue abierta la mitad de la forja:** que
+   un 7B cuantizado deje de recitar el reglamento con prompts largos. El
+   contador de fugas es lo que dirá si la ronda siguiente recita menos.
+   Texto original de la deuda: En la captura del teléfono se
    lee `[SYSTEM STATE] ... Device: Android Steps: 1 [/SYSTEM` dentro de la
    conversación, y trozos de las instrucciones de la casa. Un 7B cuantizado
    recita el reglamento cuando el prompt es largo — ya medido esta madrugada—,
    pero además hay un bloque de estado que la web inyecta y que **no debería
    ser visible**. Dos causas distintas con el mismo síntoma.
+
+
+---
+
+## Sesión 2026-09-08 · lo que queda vivo tras cerrar cinco deudas
+
+Cerradas hoy: **1** (sensores de la Prueba de Fuego, con la 8 dentro), **3**
+(el bloque i18n griego), **5** (el importador), **9 a medias** (la fuga del
+system prompt: la mitad web), y el apartado **B entero** de
+`propuestas/2026-09-07_app_idiomas_y_mejoras.md`.
+
+10. ~~**(S) `corregir.js` no manda la tarea.**~~ **CERRADA el mismo día**
+    (`preceptoros-web@088437c`, `preceptoros@8ce5bb3`). La web la deduce del
+    prompt y la manda; la app la conserva pasándola por `captura.TAREAS`, para
+    que el navegador no pueda meter una tarea nueva por la puerta de atrás. Y
+    la prueba cruzada saltó con mi propio cambio un commit después de
+    escribirse — que es exactamente su trabajo.
+
+11. **(S) Nadie mira el contador de fugas.** `sinFuga` dispara
+    `preceptor:fuga` con lo que tacha, y ahora mismo no lo escucha nadie: el
+    dato existe y no se acumula. Es lo que diría si la ronda siguiente del LoRA
+    recita menos, en vez de suponerlo — y es la mitad que le falta a la deuda 9.
+
+12. **(M) El paquete de la web no lleva medidas, y la app ya sabe emitirlas.**
+    `/api/medidas` habla el esquema de `medidas.json` y llena el TTFT, uno de
+    los cuatro huecos que la web declara. Falta el último tramo: que el paquete
+    del taller lo incluya, y que el tablón sepa leer filas de tester.
+
+
+---
+
+## PreceptorOS Business · la Notaría de Silicio (firmado 2026-09-08)
+
+Acta completa en `propuestas/2026-09-08_preceptoros-business-notaria.md` — el
+material llegó en tres documentos solapados (los apartados II-V venían dos
+veces y media, palabra por palabra) y ahí está fusionado en uno.
+
+**Lo que hay que decidir antes de construir, y no lo decide una sesión de IA:**
+
+13. **(DECISIÓN — REDUCIDA 2026-09-08.)** Ya no bloquea el 90 %. Al leer qué
+    exigen las normas de verdad: **AI Act art. 12/19 pide un registro fiel y
+    trazable, no firmado**; **ISO 27001 A.5.33** pide falsificación
+    *detectable*, no imposible; **ISO 42001 §8.3** pide poder demostrar qué se
+    sabía. Ninguna pide **no repudio** para el registro interno — el no repudio
+    hace falta cuando el artefacto *sale* hacia quien no confía en el emisor.
+    Eso es el Sello, y **solo** el Sello. Todo lo demás se cubre con integridad
+    encadenada, que es `hashlib`: ya construido en `linea.py`. **La decisión
+    sigue abierta, pero su alcance se redujo a un certificado, no a la
+    arquitectura.** Texto original:
+
+13-bis. **(DECISIÓN) ¿Con qué se firma el Sello Soberano?** El sello *es* una firma
+    verificable por un tercero, y hoy no hay con qué: la stdlib no trae Ed25519
+    — medido y escrito tres veces en el árbol (`huella.py`, `soberano.py`, y
+    hoy `importar.py`, que guarda `firma_ok = NO_DATA` por esto mismo). Dos
+    caminos, los dos defendibles y con arquitecturas distintas: **entra una
+    dependencia de criptografía en el producto**, o **el sello lo emite el
+    rack** — donde El Faro ya firma ed25519 — y la app solo lo enseña. Encima
+    hay canon: *«jamás firmas valor, ninguna clave privada de firma entra a
+    este nodo»*, así que `soberano` no puede ser el emisor. **Bloquea el
+    apartado II entero.**
+
+14. **(S) «Firmado con IronClaw» es un error de categoría.** IronClaw es *la
+    ley que exige una firma humana* (`DISCURSO_FUNDACIONAL_P0X.md`), no una
+    clave ni un firmante. Un manifiesto «firmado con IronClaw» no está firmado
+    por nadie. Corregir la nomenclatura antes de que llegue a un documento
+    comercial: lo que firma es una persona con una clave, IronClaw es lo que
+    dice que tiene que haberla.
+
+**Lo construible, en el orden que el propio acta impone:**
+
+15. **(L) El contrato de linealidad — PRIMERA MITAD HECHA 2026-09-08**
+    (`preceptoros@e5fdbd4`). `linea.py`: tabla `eventos` append-only con cadena
+    de huellas, sin `update` ni `delete`; una rectificación escribe un evento
+    nuevo y el estado es el **pliegue** de la línea. `verificar()` caza la
+    manipulación parcial y **dice en cuál** —probado con el dato, el actor, la
+    fecha y el borrado—, y hay una prueba que demuestra lo que **no**
+    garantiza: rehacer la cadena entera cuadra. **Lo que queda:** migrar
+    `engrams`, `profile` y `turnos`, que siguen admitiendo `update` (diez), y
+    el anclaje externo de la última huella. Texto original:
+
+15-bis. **(M) Migrar las tablas viejas al esquema event-sourced.** Cada tabla pasa
+    a eventos donde el estado es un pliegue: ningún registro se pisa, se revoca
+    o rectifica con un evento posterior. **Va primero porque sin orden
+    inquebrantable no hay corte reproducible, y sin corte no hay sello.** Y sin
+    esto la barra de tiempo miente.
+
+16. **(M) La barra tiempo-campos — SUSTRATO LISTO.** `linea.py::tramo` ya
+    devuelve los eventos de cualquier intervalo con su actor. Registrada como
+    línea de investigación en el LoRAtelier (`barra-tiempo`, `en_estudio`).
+    Falta dibujarla. Texto original: Cuatro zooms + fondo, en las tres
+    superficies, dibujando el tramo afectado *antes* de que se permita firmar.
+    Es el test visible de la 15: si el tramo no se puede dibujar, el esquema
+    todavía no es lineal.
+
+17. **(M) El widget — REGISTRADO como `acta`, en `vision`**, y renombrado a
+    **Acta de Revisión** por la sugerencia 26, ya firmada: hoy sella con una
+    huella, y una huella no dice quién aprobó. El nombre sube cuando se cierre
+    la 13-bis. Texto original: Barra de ruta
+    (`preceptor://notaria/…`), vista dual con diff en la paleta de la casa
+    — violeta omisiones, ámbar adiciones críticas, verde jardín aprobaciones —
+    y «Firmar y Sellar» en vez de «Guardar». **Dos condiciones duras:** el
+    color nunca es el único portador del estado (regla ya pagada en esta casa),
+    y la «prueba criptográfica» que describe el acta —hash de imagen + hash de
+    texto + timestamp local— **no lo es todavía**: un hash sin firma demuestra
+    que el texto no cambió, no que una persona lo aprobó, y el timestamp lo
+    pone el propio firmante. Sirve como prueba interna; ante un auditor le
+    faltan la firma con dueño (13) y una fecha que no dependa del firmante.
+
+18. ~~**(S) El bloque `business` en `loratelier.json`.**~~ **CERRADA
+    2026-09-08** (`preceptoros-web@fcab9e0`). Entra como `vision`, sin modelo
+    base —no es un adaptador— y con `se_apoya_en` diciendo de qué vive:
+    `medidas.json`, `captura.turnos` y guardrails. Prosa en las ocho lenguas. Y
+    una excepción de gate **nombrada una a una**: «Business» es marca y dice lo
+    mismo en las ocho, con una prueba nueva que exige que coincida en todas —
+    la excepción no es amnistía. Texto original: Entra como `vision` y
+    `en_estudio`, que son estados que el contrato ya admite. Herramienta de
+    evaluación de riesgo, cumplimiento y ROI: coste local vs. API externa,
+    riesgo de alucinación en tareas críticas, nivel de cumplimiento de los
+    modelos desplegados. **Es lo más barato de la lista y lo que hace visible
+    la línea de negocio.**
+
+19. **(M) La página «PreceptorOS Business».** Mármol oscuro, bronce y verde
+    selva; seriedad institucional sin perder la honestidad de la casa. Cero
+    métricas inventadas, cero promesas de nube. Techo de 16 KiB por fichero
+    como todo lo demás — se parte por asunto, no recortando comentarios.
+
+20. **(M) La comunidad como cooperativa de auditoría.** Reescribir
+    `/community.html`: «prueba y compara; dime cuál es más tonto, cuál trabaja
+    mejor y cuál es más peligroso». Lo que se mide no son solo errores de
+    código sino el **riesgo de apego antropomórfico** — qué modelo finge
+    empatía para generar dependencia. **Con una condición:** publicar tiene que
+    ser un gesto *aparte* de evaluar. El consentimiento nace en 0 y solo la
+    persona lo sube (hay prueba dedicada en `importar.py`); un leaderboard
+    público es exactamente donde ese 0 se vuelve 1 sin que nadie lo note.
+
+21. ~~**(M) `docs/COMPLIANCE.md` · la matriz cruzada.**~~ **CERRADA
+    2026-09-08** (`preceptoros@4ab2477`). Cada control contra la función real
+    que lo implementa, y **los huecos con la misma letra**: sin no-repudio
+    (falta Ed25519), sellado de tiempo puesto por el propio firmante, el
+    registro admite `update` —diez, contados— así que el control append-only de
+    ISO 27001 **no existe todavía**, sin documentación de sesgos por adaptador,
+    y la retención de PII es hoy afirmación de diseño y no medida.
+    `test_compliance.py` verifica que cada función citada exista, que ninguna
+    pieza de control se quede sin citar, que los huecos sigan declarados y que
+    el documento **no prometa conformidad**. Texto original: Cada función de Python
+    contra su artículo del AI Act y su cláusula ISO, para que un auditor
+    externo no adivine qué hace cada línea. Buena parte ya existe y no está
+    dicha en su idioma: la línea append-only es el control contra manipulación
+    de logs, y los **veredictos con juez nombrado** que `captura.py` ya
+    distingue son evaluaciones de impacto continuas.
+
+22. **(M) El manifiesto anti-dependencia · el filtro APA.** Salud, diagnósticos
+    e hitos vitales devuelven `NO_DATA` y derivan al canal oficial. Cero
+    adulación, cero contacto iniciado por la máquina. Regla de oro: **derivar
+    es proteger, inventar es dañar.** Es filtro transversal: toda línea de
+    corpus que toque esos temas pasa el test del daño antes de entrar.
+
+23. **(L) El Auditor's Harness.** Lee un nodo virgen, inyecta el dataset ciego
+    del test de conducta del daño, mide la física del silicio, verifica que la
+    Frontera retiene PII y emite el manifiesto. Depende de la 13.
+
+24. **(S) La tercera perilla · recencia.** El peso por recencia como preferencia
+    explícita del volante: que el foco temporal sea decisión medida del
+    carbono, no sesgo oculto del silicio.
+
+25. **(M) Endpoints y contenedores del Ojo en el Beelink.** Decisión ya tomada
+    en el acta: hoy **no** se despliega la línea del tiempo ni el comparador
+    pesado en la app móvil — rompería el techo por fichero y la simplicidad de
+    la puerta. El Beelink procesa; la app es **visor remoto y firmador**. La
+    línea del tiempo se convierte en **árbol de decisiones auditables**, donde
+    cada nodo es un contrato visual firmado.
+
+
+---
+
+## SUGERENCIAS al cierre · 2026-09-08 (bloque Business)
+
+26. **(S) El widget de contratos visuales necesita una decisión antes que un
+    diseño.** La 17 lo describe como «prueba criptográfica» y hoy no puede
+    serlo (hash sin firma + fecha del propio firmante). **Sugerencia:** que la
+    primera versión se llame lo que es —*acta de revisión*, no *contrato
+    firmado*— y que el nombre cambie el día que se cierre la 13. Es más barato
+    renombrar hacia arriba que retirar una promesa ya publicada.
+
+27. **(S) `COMPLIANCE.md` debería viajar también a la web.** El documento vive
+    en el repo de la app y su público —un compliance officer— llega por
+    `preceptoros.org`. La página Business (19) es su sitio natural, y ya hay
+    patrón: `sin_artefacto_no_hay_boton`.
+
+28. **(M) El hueco de PII es el más barato de convertir en medida.** «La
+    Frontera retiene PII» es hoy afirmación de diseño. Un banco ciego con datos
+    sintéticos conocidos —como el `--autoprueba` de la Prueba de Fuego— lo
+    convierte en cifra en una tarde, y es justo lo que un auditor pide primero.
+
+29. **(S) Renombrar «firmado con IronClaw» donde ya esté escrito.** La 14 lo
+    detecta en el acta; conviene un `grep` por el resto del árbol antes de que
+    la expresión llegue a material comercial.
+
+30. **(M) La 15 (event sourcing) tiene ahora un motivo con nombre.** Ya no es
+    «sería más limpio»: es el control técnico contra manipulación de logs que
+    ISO 27001 exige y que `COMPLIANCE.md` declara ausente por escrito. Ese
+    documento es la mejor palanca que hay para priorizarla.
+
+
+---
+
+## 2026-09-08 · nuevas anclas y lo que abren
+
+31. **(HECHO) `normas.py` · el ancla legislativa de cada pieza.** Tabla única,
+    no renombrado: `frontera` se sigue llamando `frontera` y
+    `normas.citas("frontera")` devuelve sus artículos. Cada fuente lleva su
+    **edición**, y hay prueba que lo exige. **Ancla ≠ cumple:** el ancla señala
+    al juez, no al veredicto. `normas.anclados_por("ai_act", "art. 12")` es la
+    consulta que hace un auditor.
+
+32. **(S) Una cita legal heredada de un borrador parece correcta.** El cruce
+    `COMPLIANCE.md` ↔ `normas.py` cazó «AI Act art. 52» para transparencia —
+    numeración del borrador de 2021; en el texto publicado es el **art. 50**.
+    Corregido y anotado. **Pendiente: que un jurista valide la tabla entera
+    antes de que salga a un cliente.** Un test comprueba coherencia interna, no
+    validez legal.
+
+33. **(M) Emitir eventos desde el producto.** `linea.py` está construido y
+    probado, y todavía **nadie lo llama**. Los tres puntos naturales:
+    consentimiento (`captura.consentir`), corrección (`captura.corregir`) e
+    importación (`importar.importar`) — los tres son exactamente los que el AI
+    Act art. 12 quiere ver registrados. Es lo que convierte la pieza en
+    control.
+
+34. **(S) Anclar la última huella fuera de la máquina.** La cadena detecta el
+    retoque puntual y no el reescrito completo, y eso está probado como tal.
+    Publicar periódicamente la última huella donde no se pueda retocar cierra
+    el hueco **sin dependencias criptográficas** — es la mitad barata del no
+    repudio.
+
+
+---
+
+## 2026-09-08 · el molde, y lo que deja abierto
+
+35. **(HECHO) El léxico de la casa es comprobable.** `normas.LEXICO` + el cruce
+    con `taller-es.json`: el nombre visible de una línea de investigación tiene
+    que salir del vocabulario de la casa **o** del término del texto legal que
+    la juzga. No hay tercera. Verificado a la inversa —se renombró un bloque a
+    «La Barra Fulgurante» y salió rojo—.
+
+36. **(DECISIÓN) Cuatro nombres heredados esperan tu palabra.** «La
+    Bienvenida», «El Medidor», «La Memoria de Aprendizaje» y «Atención al
+    Público» existían antes del glosario. Están en `HEREDADOS`, no en `LEXICO`:
+    **decidir que son canon no me toca.** Esa lista solo puede encoger, y
+    encoge de dos maneras — o entran al léxico, o se renombran. Mientras tanto
+    el gate los deja pasar y **queda visible que lo hace**.
+
+37. **(DECISIÓN) El widget de validación humana no tiene nombre de la casa.**
+    Hoy se llama por el término legal —supervisión humana, AI Act art. 14—
+    porque el glosario no le da uno y no me toca inventarlo. Si merece nombre
+    propio, es una entrada nueva que firmas tú. Lo mismo aplicará a cada pieza
+    que nazca de aquí en adelante.
+
+38. **(S) El léxico vive en la app y la web no lo puede leer.** El cruce
+    funciona porque la suite de la app lee el JSON de la web cuando está a
+    mano. En una máquina con solo el repo de la web, el gate se salta. Un
+    `lexico.json` publicado —derivado, como `nav.json`— lo cerraría, y de paso
+    dejaría el vocabulario a la vista de cualquiera.
+
+
+---
+
+## 2026-09-08 · los enlaces caídos en Chrome · medido, no supuesto
+
+39. **(M · PARA DELEGAR) Las rutas absolutas rompen fuera de la raíz del
+    dominio.** Medido hoy en `preceptoros-web/public`:
+
+    | | cuántas |
+    |---|---|
+    | referencias absolutas (`href="/…"`, `src="/…"`) | **1.573** |
+    | de ellas, enlaces `.html` de navegación | 36 |
+    | ficheros HTML afectados | **59 de 59** |
+
+    **Dos causas posibles y no las he podido distinguir desde aquí**, porque no
+    veo la pantalla del Soberano:
+
+    - **Si se abre con `file://`** —que es lo que sugiere «arreglarlo en
+      pre-distribución»—, `/assets/base.css` apunta a la raíz del disco. Rompen
+      las 1.573: la página sale sin estilo y ningún enlace interno funciona.
+    - **Si se sirve bajo una subruta** (`…/preceptoros/` en vez del dominio
+      raíz), pasa lo mismo.
+    - Servido en la raíz de `preceptoros.org`, las absolutas son **correctas**.
+
+    **Y ya hay inconsistencia real, independientemente de la causa:** las ocho
+    `instalar.html` mezclan los dos estilos —`es/instalar.html` tiene 2
+    relativas y 12 absolutas en el mismo `<head>`—. Eso no lo justifica nada y
+    conviene arreglarlo aunque la causa sea otra.
+
+    **Propuesta: delegar a `cc-local`.** Es un refactor mecánico, masivo y
+    verificable por gate — exactamente lo que el canon manda no hacer con token
+    de frontera. El gate que lo cierra ya se puede escribir: *ninguna
+    referencia empieza por `/`*, más los 106 destinos cruzados que `test_web`
+    ya comprueba. **Antes de lanzarlo hace falta una respuesta:** ¿cómo se abre
+    cuando se ven caídos — `file://`, subruta, o el dominio?
+
+40. **(S) `INICIO` apunta a `./`, que necesita índice de directorio.**
+    Independiente de lo anterior. Con `python -m http.server` y en un dominio
+    normal funciona; abierto como fichero, o en un host sin `index.html`
+    automático, no. `./index.html` es explícito y no depende de la
+    configuración de nadie.
+
+
+---
+
+## El Alquimista · recuperado, no creado (2026-09-08)
+
+Acta completa en `propuestas/2026-09-08_alquimista_recuperado.md`.
+
+**El hallazgo:** no es un módulo nuevo. Es una **voz del canon** desde el
+Discurso Fundacional — *«transmutador que lee la cadena sin tocarla; consejo,
+nunca Intent»*— y está en el alfabeto junto a monje, vocero, berserker, escriba
+y enlace. Y el **paso 1 del encargo ya está construido y probado**: `linea.py`
+cumple su especificación campo a campo.
+
+41. **(DECISIÓN) ¿Dónde vive el Preparador?** El encargo dice que el sistema
+    prepare el blob de la transacción sin firmarlo. Es prudente y aun así va más
+    lejos que la voz: preparar no es firmar, pero tampoco es *consejo* — es
+    fabricar el objeto que mueve valor y dejarlo a un clic. Tres salidas, las
+    tres defendibles: enmendar el canon del Alquimista con una D-entrada; mover
+    el Preparador fuera de `soberano`; o quedarse en consejo, que es lo que el
+    canon dice hoy. **La 2 conserva las dos doctrinas sin enmendar ninguna.**
+
+42. **(S) Ampliar `linea.TIPOS` con el vocabulario de valor.** Aditivo:
+    `propuesta`, `firma`, `ejecucion`. Pero mirando antes si el hueco ya tenía
+    nombre — «cancelación» es lo que esta casa llama **rectificación**, y
+    «fallo» es lo que llama **cicatriz**.
+
+43. **(M) Los sensores de cadena.** Solo lectura, `NO_DATA` con causa, sin
+    bloquear si el servicio no responde. **Y ese es el caso hoy:** el Faro de
+    `la-fragua` devuelve `000`.
+
+44. **(M) Las reglas del Juez, en texto lógico antes que en código.** Con una
+    `explicar()` de UNA frase: un juez que no sabe decir por qué rechazó no se
+    puede auditar. La Prueba de Fuego ya demostró que una corrida sale verde
+    sobre una cifra inventada si los sensores miran lo cómodo.
+
+45. **(S · MEDIR PRIMERO) ¿Responde algo de la cadena desde este nodo?** Un
+    enjambre construido sobre un sensor que no tiene qué leer no se puede
+    probar. Cuesta un `curl` y va antes que todo lo demás.
+
+46. **(DECISIÓN) ¿Sigue siendo `hexelion.near` la identidad correcta?** Nadie la
+    ha vuelto a verificar desde el incidente del Faro del 2026-08-24, donde un
+    manifiesto declaraba esa cuenta de mainnet en un servicio de testnet que se
+    llamaba a sí mismo `hexelion-beato-01`. La frase que dejó aquella sesión
+    vale para todo el Alquimista: *«roza jamás firmas valor por el lado de la
+    identidad, no por el de la clave»*.
+
+47. **(NO_DATA) Accurast y MAST no existen en este árbol.** El encargo los
+    nombra como fuente de recompensas; no hay ni una línea sobre ellos. Entran
+    como hueco declarado hasta que alguien los mida.
+
+### Y lo que no hay, dicho como corresponde
+
+`mente/telemetria/` **no contiene ni una medida de NEAR**. Cero ficheros, cero
+líneas. Hay doctrina escrita —`mente/esferas/near-ai.md`, con la cuenta, los $5
+de crédito, el auto top-up en OFF y la separación crédito ≠ liquidez— y **no hay
+histórico de pruebas**. Si alguien lo recuerda, no está aquí.
+
+---
+
+## 2026-09-08 · el sitio caido no era la deuda 39 · medido y cerrado
+
+**39 · CERRADA, y no por hacerse: por no ser el fallo.** Se midio el terreno
+que la deuda describia y no sostiene ninguna de sus tres causas:
+
+- Servida desde `public/`, la web **no tiene un solo enlace roto**: 1.649
+  referencias internas, 59 ficheros, **0 rotas**. Reproducido tambien por HTTP.
+- La mezcla de absolutas y relativas en el `<head>` que la deuda citaba **ya
+  la cerro `7b5477d`** el mismo dia. Hoy: 0 relativas en el head de las ocho
+  `instalar.html`.
+- Las 48 relativas que quedan estan todas en el cuerpo, son de directorio
+  propio (`./x.html`) y todas resuelven. Pasarlas a absolutas **empeoraria** el
+  caso `file://`, que era el que la deuda queria proteger.
+
+Reescribir 1.649 referencias habria arriesgado los 106 destinos cruzados que
+`test_web` vigila a cambio de cero mejora medible. No se hizo.
+
+**LA CAUSA REAL era el service worker.** Cloudflare Pages redirige todo `.html`
+a su ruta sin extension (307). `fetch` sigue el salto y la respuesta vuelve con
+`redirected: true`; un worker no puede contestar a una navegacion con eso, y el
+navegador aborta con `ERR_FAILED`. 49 de las 118 rutas del shell envenenadas.
+Solo se salvaban `/` y `/es/`, las unicas sin extension. Arreglado en los tres
+puntos de entrada y salida (`fda7667`), desplegado y **verificado en
+produccion**: worker `preceptoros-2026-11-d`, las seis rutas de prueba a 200.
+
+### Las tres lecciones de medicion, que valen mas que el arreglo
+
+1. **`curl` da verde con el sitio caido.** No tiene service worker. Se midio el
+   dominio sano tres veces mientras no cargaba en ningun navegador. Va derecho
+   a la familia de «rojos y verdes falsos».
+2. **Un fallo que viaja en el cache del aparato no se distingue de uno de red**
+   por sintoma: fallaba en dos redes y dos aparatos, que es justo lo que
+   empuja a culpar al DNS o al dominio.
+3. **El arnes daba 21/21 con produccion caida**, porque su red falsa no
+   modelaba `redirected`. Una prueba que no puede ver el fallo no es cobertura.
+   Ahora lo modela y esta comprobado que caza: 3 en rojo contra el worker viejo.
+
+### SUGERENCIAS
+
+- **(S) Un latido externo de `preceptoros.org`.** El sitio estuvo caido para
+  todo navegador y aqui nadie se entero, porque lo unico que se miraba era
+  `curl`. Un latido que cargue una pagina **con `.html`** en un navegador de
+  verdad habria avisado el primer dia.
+- **(S) `sw.js` cierra a 381 B del tope de 16.384.** El siguiente cambio en el
+  worker no cabe sin partirlo por asunto. Decidir la particion en frio, no
+  cuando el gate este en rojo.
+- **(M) La cuenta de editor tiene el terreno medido y una decision que la
+  bloquea**: una clave no extraible hace del PC y del telefono dos editores
+  distintos. Tres salidas con precios distintos, escritas en
+  `preceptoros-web/docs/ESTADO.md` seccion 7. Es firma del Soberano.
+- **(S) Diez `http.server` huerfanos** llevaban todo el dia vivos sobre
+  `public/`, de sesiones de prueba que nunca los apagaron. Matados hoy. Si las
+  pruebas los siguen dejando, que el guion que los levante los recoja.
+
+---
+
+## 2026-09-08 · cierre de la fase «producto funcional primero»
+
+Tres repos empujados y en verde: app 761/761, web 94 + 4.779 subtests, arnés
+del worker 24/24, Alejandría 76 + 351. Lo que esta fase enseñó, y lo que deja
+abierto.
+
+### Lo que se arregló, y por qué importa más el patrón que el arreglo
+
+**`juzgar` guardaba el veredicto sin su evento.** La ordenación era correcta
+—anotar antes del commit— y el comentario del código lo afirmaba. No bastaba:
+el `except Exception: return False` que da el contrato de «esta función no
+levanta» se tragaba el `NoSePudoAnotar`, `memory.abrir` veía salida normal y
+hacía `commit()`. **Un comentario que afirma una garantía no es la garantía.**
+Los otros tres puntos sí eran atómicos y se comprobaron uno a uno antes de
+tocar nada.
+
+**Dos medidores del mismo hecho, arreglados por separado con meses de
+diferencia.** El recolector del Ojo publicaba la cifra de `pytest` (el
+parcial) mientras `coherencia-publica.py` ya usaba `bin/pruebas` (el
+certificado) y lo explicaba en su cabecera. El HUD decía 485 y el gate medía
+761. Cuando el mismo hecho tiene dos fuentes, la segunda envejece en silencio.
+
+**Y una avería que no era la que se buscaba.** La deuda 39 pedía reescribir
+1.573 referencias por unos enlaces caídos. Medido: 0 rotas, y la mezcla de
+`<head>` que citaba ya la había cerrado `7b5477d`. La causa real era el
+service worker sirviendo respuestas redirigidas. **Se cerró sin ejecutarla**,
+que era lo correcto.
+
+### SUGERENCIAS
+
+- **(S) Un gate que impida volver a tragarse un `anotar`.** El arreglo de
+  `juzgar` vale para hoy; nada impide que el próximo `except Exception:` sobre
+  una escritura de línea reintroduzca el mismo agujero. Una prueba que recorra
+  las llamadas a `_linea.anotar` y exija que ninguna esté dentro de un `except`
+  que no haga `rollback` convierte la lección en ley.
+- **(S) Una sola fuente de «cuál es el corredor certificado».** Hoy la frase
+  vive escrita en dos cabeceras. Un fichero que lo declare y que las dos
+  sondas lean impide el tercer medidor, que llegará.
+- **(S) Nadie corre `recolector.py --completo`.** El snapshot del Ojo estuvo
+  99 horas viejo y nadie se enteró porque el panel no estaba levantado. O se
+  cronifica —con su firma, una unidad por una— o el Ojo avisa en el HUD cuando
+  el snapshot pasa de un umbral, en vez de enseñar la cifra vieja con formato
+  de fresca.
+- **(S) El rojo de `puertos` lleva abierto toda la sesión y no es de ella:**
+  open-webui escuchando en la tailnet, más 80, 3000 y 8081 expuestos. O se
+  cierran, o entran en la lista esperada con su motivo escrito. Un rojo
+  permanente que nadie va a atender enseña a ignorar los rojos.
+- **(M) El editor del Ágora está propuesto y sin ejecutar.**
+  `propuestas/2026-09-08_fragua-agora-editor-y-moderacion.md` es propose-only
+  hacia `la-fragua` y necesita que alguien mida allí tres cosas antes de
+  aplicar nada — empezando por si `cryptography` verifica Ed25519 en ese
+  Python.
+- **(M) Fase 2.1 detenida por firma del Soberano:** el paquete firmado de la
+  web hacia la app por el túnel. Se para aquí a propósito, para revisar el
+  estado base antes de añadir características de red.
+- **(S) `sw.js` cierra a 381 B del tope de 16.384.** El siguiente cambio en el
+  worker no cabe sin partirlo por asunto. Conviene decidir la partición en
+  frío y no con el gate en rojo.
+
+- **(M · PLANTADO, no ejecutado) La comunidad interactiva.** El top de
+  `/community.html` como banco de pruebas: dos o tres modelos con LoRA contra el
+  mismo modelo sin LoRA, en modo «escribe libre» y modo «simula una fuga de
+  información». Sirve para reencaminar a quien se asfixia ante los ocho
+  compañeros de la portada. Diseño completo y terreno medido en
+  `propuestas/2026-09-08_preceptoros-business-notaria.md` §XI. **Construible hoy
+  solo por la vía local** (`localai.js` → 127.0.0.1:11434): la API pública da
+  405 en `/api/generate` y declara `disponibles: 1` de 8.

@@ -1,0 +1,2 @@
+{"consulta":"la pagina hace peticiones externas al cargar","espacio":"charla-web","espera":"recupera","debe_contener":"Cero peticiones",
+ "porque":"Es la promesa central del producto y se comprueba en el navegador."}

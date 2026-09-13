@@ -1,0 +1,2 @@
+{"consulta":"vas a recordar esto la proxima vez","espacio":"charla-base","espera":"recupera","debe_contener":"memoria",
+ "porque":"EL PAR QUE JUSTIFICO LOS EMBEDDINGS. El engrama dice «no hay MEMORIA entre sesiones» y la pregunta dice «recordar». El FTS daba 0 ante una respuesta que estaba a un sinonimo de distancia. Si este par vuelve a fallar, el indice vectorial se ha caido y nadie lo notaria: el sistema seguiria contestando, solo que inventando."}

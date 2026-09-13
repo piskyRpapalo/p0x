@@ -17,6 +17,10 @@ del Soberano»* + *«`systemctl --user list-units` al cerrar cada sesión»*. Fi
 | `preceptoros-pwa.service` | La cara (PWA) en `127.0.0.1:8740`, vía `bin/preceptoros-servicio` | `Type=simple` + `Restart=always`, permanente | Escribe `~/.preceptoros/pwa.log` | 2026-08-25 · **FIRMADA** como `aurelius.service`; **renombrada por el Soberano el 2026-09-04**. Verificada tras el renombrado: `active running`, `NRestarts=0`, cara HTTP 200 | `systemctl --user disable --now preceptoros-pwa.service` |
 | `10-motor-vulkan.conf` | **Drop-in.** Apunta el motor del turno al envoltorio Vulkan en vez del binario CPU del PATH | con la unidad; no añade disparo propio | Solo pone `PRECEPTOROS_MOTOR`. Mismo modelo (el 4B), misma memoria, mismo puerto | 2026-08-25 · firmado y **ACTIVO** (un turno real en 4 s por `/api/charla`). 🔴 **HUÉRFANO desde el renombrado del 2026-09-04** — ver abajo | `rm ~/.config/systemd/user/preceptoros-pwa.service.d/10-motor-vulkan.conf && systemctl --user daemon-reload && systemctl --user restart preceptoros-pwa.service` |
 
+| `director.timer` | **Meta-bucle (L4).** Lee los latidos, reparte la cola de ventanas y **marca muertos** a los bucles que fallan dos ventanas seguidas. Propone, no ejecuta: lo que toca producto o memoria va a `docs/bandeja_firmas.md` | cada 15 min (`OnCalendar=*:0/15:00`, ±60 s), `Persistent=true` — es la `ventana_s=900` que el propio bucle declara en `loops.db` | Escribe `loops.db`, `plan_ventanas.json` y el cerrojo `flock` en el directorio de datos, y una fila en la bandeja de firmas. `ProtectSystem=strict` + `ReadWritePaths` con **los dos nombres** del directorio de datos (`~/.aurelius` es symlink a `~/.preceptoros`) para que no se caiga el día que el symlink se retire | 2026-09-12 · firmada por el Soberano (Frente A, Opción A). **Probada a mano** antes de cronificar: dejó latido y su primera pasada en 20 días se declaró muerta a sí misma, que es justo su trabajo. 🟡 **INSTALADA Y NO ACTIVA** — el arranque bajo systemd y el `enable` quedaron pendientes de la mano del Soberano | `systemctl --user disable --now director.timer` |
+
+| `ojo-soberano.service` | **El Ojo del Soberano**: nexo de arranque de toda sesión de IA en este nodo (`/api/arranque`) y panel del laboratorio. `ojo.py --check` da «SIRVE · 12 piezas presentes» | `Type=simple` + `Restart=on-failure`, permanente | Escucha **solo en 127.0.0.1:8790** --lo fija el propio `ojo.py`--, así que no se expone a la tailnet. `ProtectSystem=strict` + `ReadWritePaths` al árbol del Ojo y al directorio de datos | 2026-09-12 · firmada por el Soberano. **Probada a mano** antes de instalar: `/`, `/vivo` y `/api/arranque` devolvieron 200. 🟡 **INSTALADA Y NO ACTIVA** -- el `enable` queda para la mano del Soberano | `systemctl --user disable --now ojo-soberano.service` |
+
 ### 🔴 El renombrado del 2026-09-04 desconectó el motor Vulkan
 
 El Soberano renombró `aurelius.service` → `preceptoros-pwa.service`. La unidad quedó
@@ -174,3 +178,47 @@ de fuera**. `api.preceptoros.org` sale por el túnel de la-fragua, y
 (95.92.164.201) pero no responde — el puerto no está abierto. La alcanzan el
 navegador del propio Soberano y la tailnet. El trabajo que falta es de red, no
 de código.
+
+### 🟡 `director.timer` queda instalada y apagada (2026-09-12)
+
+El bucle estaba **huérfano**: `ventana_s=900` en `loops.db` y ninguna unidad que lo
+disparase. No corría desde hacía 20,5 días, y nadie lo marcaba muerto porque **quien
+detecta a los muertos es él mismo**. Un vigilante ausente no puede declarar su propia
+ausencia.
+
+Probado a mano el 2026-09-12, y funciona: `pasada()` devolvió
+`{"accion": "marcar_muerto", "porque": "sin latido desde hace 1772189 s, más de 2 ventanas
+de 900 s"}`, dejó su par `entra`/`sale` en `latidos` y escribió una fila de severidad alta
+en la bandeja. La tabla `bucles` pasó de mentir por omisión a decir `director · muerto`.
+
+**Lo que falta, y no se hizo por decisión de no hacerlo a medias:** los ficheros están en
+`~/.config/systemd/user/` y `daemon-reload` está hecho, pero `director.timer` sigue
+`disabled`. Faltan dos órdenes, en este orden — la primera es la prueba bajo systemd que
+las tres unidades hermanas también pasaron antes de cronificarse:
+
+    systemctl --user start director.service      # prueba: debe dejar latido
+    systemctl --user enable --now director.timer # y entonces se cronifica
+
+**Aviso sobre `--informe`:** la unidad invoca `director.py` **desnudo**, sin ese flag.
+`main()` con `--informe` hace `print(informe(db)); return 0` — imprime y sale. Un timer con
+`--informe` habría corrido cada 15 minutos sin marcar a nadie: el vigilante puesto y
+apagado a la vez.
+
+**Deriva detectada de paso, y es otra firma:** las unidades de `~/.config/systemd/user/`
+son **copias** de las de `deploy/soberano/`, no symlinks, y ya han divergido
+(`diff afinador.service` da distinto). El repo no refleja lo que corre.
+
+### 🪦 `aurelius-interfaz.service`, enterrado (2026-09-12)
+
+Estaba `inactive` + `disabled` desde hacía semanas y se retiró por firma del Soberano.
+**No era una unidad parada: era un puntero a un árbol que ya no existe.** Su
+`ExecStart` apuntaba a `~/aurelius/scripts/servir_interfaz.py`, y ese repo entero
+**no está en el disco**. Comprobado antes de borrar, no después.
+
+La orden pedía no perder «los widgets decentes: mapas de aviones, barcos, batería de
+la Orange Pi». No había nada que rescatar: el repo no existe, y esos mismos conceptos
+**ya viven en el Ojo** (`ojo-shelter.html`, `vector.py`, `enrutador.py`, `grafo.json`).
+Se enterró el contenedor, no las piezas, porque las piezas estaban en otro sitio.
+
+Retirada de `~/.config/systemd/user/` y de `deploy/soberano/`. La copia versionada
+sigue en la historia de git para quien quiera leerla.

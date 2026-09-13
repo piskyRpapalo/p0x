@@ -199,3 +199,14 @@ propia prosa, que es exactamente lo que esa cabecera prohíbe. Se hizo así para
 no meter una reestructuración dentro de un arreglo de una línea, y el precio
 está aquí escrito: **`esquina.css` queda con 55 B libres**. El siguiente cambio
 en esa hoja no cabe — hay que partirla por asunto, como se hizo con `acceso.css`.
+
+## ⚠️ TRAMPA DEL SYMLINK: ~/.aurelius (2026-09-12)
+`~/.aurelius` es un symlink intencional que apunta a `~/.preceptoros`.
+Cinco archivos resuelven rutas a través de él: `latido.py`, `director.py`, `curador.py`, `cerebro.py`, `test_guardian.py`.
+**NUNCA BORRAR `~/.aurelius`**. Hacerlo apaga el latido de todo el sistema de bucles. La migración de rutas a `~/.preceptoros` queda pendiente para una sesión futura con el gate estable.
+
+**Comprobado el 2026-09-12** (Frente A, Orden 4): mismo inodo `1703947` para
+`~/.aurelius/loops.db` y `~/.preceptoros/loops.db`. No hay dos bases de datos —
+hay una, vista por dos nombres. Los árboles de auditoría que marcan «BASURA
+AURELIUS · BORRAR» se refieren a residuos del renombrado del producto, **no a
+este enlace**, que es lo único que sostiene esas cinco rutas hoy.

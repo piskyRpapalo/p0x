@@ -1,0 +1,19 @@
+# Las bases de un espacio son DATO SOBERANO y no entran a la historia. El esquema
+# (.sql) si se versiona: eso es codigo y se audita en un diff. Misma regla que puso
+# `*.db` en el .gitignore de `preceptor` el 2026-09-12.
+*.db
+*.sqlite
+
+# LOS SIDECAR DEL DIARIO WAL. `*.db` NO los cubre --se llaman `rag.db-wal` y
+# `rag.db-shm`, con guion-- y se colaron al repo en el commit de los espacios.
+# Son el mismo dato soberano por otra puerta, y ademas cambian en cada lectura:
+# versionarlos ensucia todos los diffs con ruido binario.
+*.db-wal
+*.db-shm
+*.sqlite-wal
+*.sqlite-shm
+
+# Los informes de `validar.sh` son MEDIDAS regenerables, fechadas, y una por
+# ejecucion. Se leen, se actuan y se tiran. Lo que merezca sobrevivir va a
+# `progreso/history.md`, que es la bitacora append-only y esa si se versiona.
+progreso/validacion_*.md

@@ -1,8 +1,0 @@
-# PROPUESTO, NO HABILITADO — par del timer adjunto.
-[Unit]
-Description=HEXELION — residencia qwen3:4b en la-torre (anti nvmap error 12)
-After=ollama.service
-
-[Service]
-Type=oneshot
-ExecStart=%h/bin/modelo_residente.sh

@@ -1,0 +1,160 @@
+{
+  "esquema": "laboratorio/modelos/1",
+  "estado": "MEDIDO",
+  "medido": "2026-09-12 · Beelink Ryzen 7 255 + Radeon 780M · ollama ps: 100% GPU (Vulkan)",
+  "nota": "Fichero de DATOS a proposito. El Soberano cambiara de modelo en semanas: cambiarlo debe ser editar esto, no tocar reflexion.py. Un modelo no entra por fama, entra por medida.",
+  "reglas": {
+    "tag_explicito": "Se rechaza cualquier tag ':latest'. Apuntan a variantes cuyo razonamiento no se puede apagar.",
+    "sin_thinking": "CORREGIDA 2026-09-13 POR MEDIDA. Decia «se rechaza cualquier modelo cuyo `ollama show` declare la capacidad `thinking`». Eso rechaza por FICHA, y esta casa juzga por medida. Medido con `medir_modelo.py`: con `think:false` + `format:json`, `deepseek-r1:7b` (16,66 tok/s) y `swift-qwen:27b` (4,44 tok/s) devuelven el esquema COMPLETO, sin vaciarse y sin filtrar el bloque de razonamiento. La regla pasa a ser: se rechaza el modelo que, MEDIDO contra el esquema del juez, se vacie, filtre razonamiento o ignore el esquema. `qwen3:4b` sigue rechazado por eso mismo --respuesta VACIA con 48 tokens gastados en pensar--, que es de donde salio la regla y sigue siendo verdad.",
+    "num_ctx": "8192, medido hoy en ambos papeles a 100% GPU. NUNCA el 262144 que declara la ficha: el canon lo prohibe por dato.",
+    "temperatura_critico": "0. Un juez que no es reproducible no es un juez."
+  },
+  "papeles": {
+    "escritor": {
+      "modelo": "mistral-nemo:12b-instruct-2407-q4_K_M",
+      "num_ctx": 8192,
+      "temperature": 0.2,
+      "generacion_tok_s": 11.04,
+      "porque": "El que mejor obedece: se le pidio UNA frase y dio una frase. Sin thinking."
+    },
+    "escritor_respaldo": {
+      "modelo": "llama3.2:3b",
+      "num_ctx": 8192,
+      "temperature": 0.2,
+      "generacion_tok_s": 36.7,
+      "porque": "Rapido y limpio, pero verboso y generico. Respaldo, no titular."
+    },
+    "critico": {
+      "modelo": "qwen3-coder:30b",
+      "num_ctx": 8192,
+      "temperature": 0,
+      "format": "json",
+      "generacion_tok_s": 35.8,
+      "porque": "Devolvio el JSON pedido EXACTO. Es MoE A3B: pesa 30B y activa ~3B, por eso un 30B va a 35 tok/s en una iGPU."
+    },
+    "triaje": {
+      "modelo": "preceptor-cazanido-v3:llama3.2",
+      "num_ctx": 4096,
+      "temperature": 0.0,
+      "generacion_tok_s": 49.0,
+      "porque": "Clasifica y SE QUEDA DENTRO DEL VOCABULARIO. Medido 2026-09-12 contra los otros dos candidatos: `llama3.2:3b` devolvio «Interactivo» --una clase que no existe-- y `preceptor-v7:llama3.2-1.0` contesto «NO_DATA.» a TODO. Un clasificador que inventa categorias o que se niega a clasificar no es un clasificador."
+    },
+    "embeddings": {
+      "modelo": "nomic-embed-text:v1.5-768",
+      "dimensiones": 768,
+      "umbral_similitud": 0.55,
+      "porque": "Recuperacion semantica para lo que el FTS no alcanza. MEDIDO 2026-09-12: «vas a recordar esto» daba 0 engramas en charla-base teniendo delante uno que dice «no hay MEMORIA entre sesiones» -- dice memoria, no recordar. Con vectores: 4.",
+      "tag_explicito": "copiado de `nomic-embed-text:latest` con `ollama cp`. El canon prohibe los tags pelados y no se declara una excepcion por comodidad cuando la copia cuesta un segundo.",
+      "el_umbral_no_es_decoracion": "sin el, el vecino mas cercano SIEMPRE existe y el RAG contesta a todo. El par de calibracion 13 lo defiende: «cual es la capital de Francia» contra telemetria debe devolver CERO.",
+      "hibrido": "el FTS va PRIMERO y manda; lo vectorial entra despues, solo para el hueco que deja el sinonimo"
+    }
+  },
+  "rechazados": [
+    {
+      "modelo": "oficial-inventario:q4-1.0",
+      "que_es": "Qwen 3.8 · arquitectura qwen35 · 27.3B DENSO · thinking",
+      "papel_probado": "critico",
+      "generacion_tok_s": 4.72,
+      "porque": "NO lo descarta la lentitud. Con format:json IGNORO el esquema pedido e invento el suyo (status/comando/servicio_afectado): es un afinado con persona de inventario, no un juez neutral."
+    },
+    {
+      "modelo": "qwen3:4b",
+      "papel_probado": "escritor",
+      "generacion_tok_s": 29.2,
+      "porque": "Variante Thinking. Devolvio respuesta VACIA consumiendo los 48 tokens en el bloque de razonamiento."
+    },
+    {
+      "modelo": "preceptor-v7:llama3.2-1.0",
+      "papel_probado": "triaje",
+      "generacion_tok_s": 44.4,
+      "porque": "Contesta «NO_DATA.» a cualquier consulta. No es un fallo del prompt: esta AFINADO para eso, y la cabecera de `scripts/revisor_ia.py` ya lo dejaba escrito --«esta entrenado para responder NO_DATA, que es exactamente la conducta que arruina un trabajo de analisis»--. La nota de la casa acerto y ahora esta medido tambien para clasificar."
+    },
+    {
+      "modelo": "llama3.2:3b",
+      "papel_probado": "triaje",
+      "generacion_tok_s": 52.6,
+      "porque": "El mas rapido, pero INVENTA CATEGORIAS: devolvio «Interactivo», que no esta en el vocabulario cerrado. Sigue sirviendo como Escritor de consultas simples, donde no hay vocabulario que respetar."
+    }
+  ],
+  "tope_vueltas": 3,
+  "nota_minima": 8,
+  "enrutado": {
+    "estado": "MEDIDO",
+    "porque_existe": "Por ESPECIALIZACION, no por ahorro. Medido 2026-09-12: el 30B es el SEGUNDO MAS RAPIDO del rack (35,8 tok/s) porque es MoE A3B --pesa 30B y activa ~3B--, asi que enrutar «hacia abajo» para ir mas deprisa lleva a mistral-nemo a 11 tok/s, TRES VECES mas lento. Lo que si paga es mandar cada consulta a quien mejor lo hace.",
+    "sin_desalojo": "Medido: los tres modelos CONVIVEN en la 780M (19 + 3,9 + 6,0 GB, 100% GPU, 12 GiB libres). Volver al 30B tras usar el 4B costo 0,2 s. No hay penalizacion por conmutar, y esa era la objecion que hacia inviable el enrutamiento. Se midio y no existe.",
+    "clases": {
+      "codigo": {
+        "modelo": "qwen3-coder:30b",
+        "porque": "esta afinado para codigo y es el que devuelve JSON exacto"
+      },
+      "analisis": {
+        "modelo": "qwen3-coder:30b",
+        "porque": "razonamiento multipaso sobre datos tecnicos"
+      },
+      "conversacional": {
+        "modelo": "mistral-nemo:12b-instruct-2407-q4_K_M",
+        "porque": "el que mejor obedece una instruccion de tono; 11 tok/s es aceptable en un turno de charla"
+      },
+      "simple": {
+        "modelo": "llama3.2:3b",
+        "porque": "saludo o pregunta directa: 36,7 tok/s y no hace falta mas"
+      }
+    },
+    "orden": "DETERMINISTA PRIMERO. La mayoria de consultas se clasifican por forma sin gastar un token; el modelo de triaje solo entra cuando la heuristica no se moja. Preguntar a un LLM lo que decide una regla es pagar por una respuesta que ya tenias."
+  },
+  "medicion_esquema_juez": {
+    "estado": "MEDIDO",
+    "cuando": "2026-09-13 · Beelink Ryzen 7 255 + Radeon 780M",
+    "como": "python3 medir_modelo.py <tags> · think:false, format:json, temperature 0, num_ctx 8192, num_predict 512",
+    "que_mide": "vacio / fuga de razonamiento / esquema completo. NO mide si juzga BIEN: eso lo mide calibracion/, y son cosas distintas.",
+    "texto_juzgado": "«El rack consume 186,90 W. Lo dice el enchufe.» -- una cifra SIN etiqueta MEDIDO/NORMA/NO_DATA y SIN `arnes:`. Falla los criterios 2 y 3 de la rubrica.",
+    "resultados": [
+      {
+        "modelo": "qwen2.5-coder:3b",
+        "esquema": "ACEPTADO",
+        "tok_s": 35.9,
+        "segundos": 5.4,
+        "nota_que_puso": 8
+      },
+      {
+        "modelo": "deepseek-r1:7b",
+        "esquema": "ACEPTADO",
+        "tok_s": 16.66,
+        "segundos": 10.5,
+        "nota_que_puso": 8,
+        "declara_thinking": true
+      },
+      {
+        "modelo": "qwen2.5:7b",
+        "esquema": "ACEPTADO",
+        "tok_s": 16.72,
+        "segundos": 13.8,
+        "nota_que_puso": 0
+      },
+      {
+        "modelo": "granite3-dense:8b",
+        "esquema": "ACEPTADO",
+        "tok_s": 15.46,
+        "segundos": 11.3,
+        "nota_que_puso": 8
+      },
+      {
+        "modelo": "qwen2.5:14b",
+        "esquema": "ACEPTADO",
+        "tok_s": 9.22,
+        "segundos": 26.9,
+        "nota_que_puso": 4
+      },
+      {
+        "modelo": "swift-qwen:27b",
+        "esquema": "ACEPTADO",
+        "tok_s": 4.44,
+        "segundos": 52.8,
+        "nota_que_puso": 2,
+        "declara_thinking": true
+      }
+    ],
+    "el_hallazgo_que_importa": "Los seis pasan el esquema y ponen notas de 0 a 8 AL MISMO TEXTO. Devolver JSON valido no es juzgar: los que pusieron 8 dejaron pasar una cifra sin etiqueta, que es justo lo que los criterios 2 y 3 existen para cazar. Ningun modelo entra en `papeles` por pasar esta prueba -- solo deja de estar descartado por ella. Quien promueve es `calibracion/`, 13 pares, 4 de ellos esperando `vacio`.",
+    "consecuencia_para_turnos": "Turno 5 NO usa swift-qwen:27b, y ya no por thinking: por reloj. 4,44 tok/s y 52,8 s de pared contra los 35,8 tok/s MEDIDOS de qwen3-coder:30b para el mismo trabajo. La ficha del briefing ya lo decia --«demasiado lento»--; ahora esta medido en esta maquina y no en otra."
+  }
+}

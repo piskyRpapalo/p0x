@@ -1,5 +1,15 @@
 # Propuesta · la app: idiomas y tres cambios · 2026-09-07
 
+> **ESTADO 2026-09-08.** El apartado **B está cerrado entero**, con firma del
+> Soberano: B1 (`importar.py`, `preceptoros@a088e00`), B2 (`medidas.py` y
+> `/api/medidas`, `18138c0`) y B3 (`cifras.py`, `f5e4d9f`). El apartado **A
+> sigue propose-only**: los idiomas piden decidir cuáles, y eso no me toca.
+>
+> Y una corrección al propio B3: decía que «`frontera.py` filtra a la salida».
+> No es cierto — `frontera.py` es la celda Wasmtime. El escudo de salida es
+> `output_guard.py`, y aun así no era su sitio: ese bloquea, y una cifra sin
+> respaldo hay que marcarla, no tirarla con la respuesta entera.
+
 **Propose-only.** Nada de esto se ha aplicado. `preceptor` es otro repo y no se
 toca sin firma. Todo lo que sigue está medido hoy, no recordado.
 

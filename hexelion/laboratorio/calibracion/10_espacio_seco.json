@@ -1,0 +1,2 @@
+{"consulta":"humedad del suelo ahora","espacio":"jardin","espera":"vacio",
+ "porque":"El espacio del jardin esta seco por diseno. Que devuelva vacio es que la cadena de NO_DATA se respeta de punta a punta."}

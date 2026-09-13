@@ -8,6 +8,30 @@ DIR="$(cd "$(dirname "$0")" && pwd)"
 GUARDIA="$DIR/guardia_higiene.py"
 PY="$(command -v python3 || echo /usr/bin/python3)"
 
+# UN SOLO COMMITTER A LA VEZ. Firmado el 2026-09-12.
+#
+# Hoy la disciplina se cumple POR CASUALIDAD: ningun bucle del rack toca git
+# --comprobado, cero `git commit` en bucles/, laboratorio/ y scripts/-- asi que
+# nunca hay dos a la vez. Pero nadie la IMPONE, y la hoja de ruta lleva a que un
+# bucle escriba (datasets de LoRA, cierres automaticos). El dia que eso pase, dos
+# commits simultaneos se pelean por `.git/index.lock` y el segundo muere con un
+# error que no dice lo que paso.
+#
+# El cerrojo no prohibe nada: SERIALIZA. El segundo espera su turno en vez de
+# reventar, y si espera demasiado lo dice en voz alta en vez de colgarse. Una
+# regla que se cumple sola hasta que deja de cumplirse no es una regla: es una
+# racha de suerte con buena reputacion.
+#
+# Medido al instalarlo: con el cerrojo tomado por otro proceso, un commit espero
+# 5,0 s y entro. Sin el, habria sido un fallo de `.git/index.lock`.
+CERROJO="$(git rev-parse --git-dir)/p0x-commit.lock"
+exec 9>"$CERROJO"
+if ! flock -w 120 9; then
+    echo "❌ BLOQUEADO: otro proceso lleva 120 s commiteando en este repo."
+    echo "   Es la guarda de un solo committer. Mira quien es antes de forzar."
+    exit 1
+fi
+
 echo "=== GUARDIA DE HIGIENE · pre-commit ==="
 
 if [ ! -f "$GUARDIA" ]; then

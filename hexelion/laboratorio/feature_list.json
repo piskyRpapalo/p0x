@@ -1,0 +1,79 @@
+{
+  "esquema": "laboratorio/features/1",
+  "regla": "UNA feature a la vez. Nada pasa a in_progress mientras otra lo este. Un tablero con tres cosas a medias no dice que se esta haciendo: dice que no se esta terminando ninguna.",
+  "estados": [
+    "pending",
+    "in_progress",
+    "done",
+    "blocked"
+  ],
+  "features": [
+    {
+      "id": "harness-estructura",
+      "estado": "done",
+      "que": "README, CHECKPOINTS, modelos.json, feature_list, progreso/, _template, init.sh con ratchet"
+    },
+    {
+      "id": "colocacion-matriz",
+      "estado": "done",
+      "que": "colocacion.json: que modelo va en que arquitectura, por tok/s/vatio MEDIDO"
+    },
+    {
+      "id": "reflexion-bucle",
+      "estado": "done",
+      "que": "reflexion.py: RAG -> Escritor -> juez-ensamble -> bandeja de firmas"
+    },
+    {
+      "id": "espacios-charla",
+      "estado": "done",
+      "que": "espacios/charla-web y charla-base desde _template, con sus datos heredados"
+    },
+    {
+      "id": "espacios-fisicos",
+      "estado": "done",
+      "que": "espacios/telemetria y jardin, VACIOS y declarados NO_DATA hasta que haya sensor"
+    },
+    {
+      "id": "dispositivos-vivos",
+      "estado": "done",
+      "que": "Que Jetson (la-torre) y Orange Pi / RK3588 (usuario ubuntu) esten FUNCIONANDO. Solo eso: vivos y alcanzables. Nada de colocar modelos todavia · MEDIDO 2026-09-12 por ssh: la-fragua (Orange Pi 5 Plus, RK3588, 15 GiB, up 7h16m) y la-torre (Jetson Orin Nano Super, 7,4 GiB, up 7h18m). Los dos responden.",
+      "porque": "Orden del Soberano 2026-09-12: primero que respondan. ESP32 y antenas van despues"
+    },
+    {
+      "id": "espacio-impresion3d",
+      "estado": "pending",
+      "que": "Telemetria local de la Bambu A1 Mini. Anomalia de capa = veredicto DETERMINISTA, no opinion de un LLM",
+      "bloqueado_por": "NO_DATA: la impresora no aparece en hexelion-nexo/sensores/ · Y va DESPUES de los dispositivos: orden del Soberano 2026-09-12."
+    },
+    {
+      "id": "espacio-osint-pasivo",
+      "estado": "pending",
+      "que": "Cruza ADS-B/AIS propios como ground-truth. Guardrails redactan ANTES de cualquier egreso",
+      "bloqueado_por": "Una feature a la vez. Y exige decidir la regla de identificadores de terceros · Y va DESPUES de los dispositivos: orden del Soberano 2026-09-12."
+    },
+    {
+      "id": "depin-keyless",
+      "estado": "pending",
+      "que": "Atestacion de trabajo fisico. FUERA de la web y de la app PreceptorOS",
+      "bloqueado_por": "OTRO PLAN, por decision del Soberano el 2026-09-12: la cripto se trata aparte, cuando se haga el DASHBOARD DE HEXELION, y queda completamente fuera de web y app. Ademas la cabecera de monje/genesis.py declara que ahi no existe concepto alguno de cripto ni de alquiler de computo: mover esa frontera exige su propia firma."
+    },
+    {
+      "id": "firma-ed25519-al-canal",
+      "estado": "pending",
+      "que": "Que la firma que auth.js genera en el navegador LLEGUE a user_hash del canal local",
+      "bloqueado_por": "MEDIDO 2026-09-12: las 6 conversaciones tienen user_hash VACIO. El flujo promete que todo se firma y hoy no se firma nada. Es trabajo de la web (Paso 2)"
+    },
+    {
+      "id": "migracion-topic-keys",
+      "estado": "pending",
+      "que": "Tablas topic_keys y contradicciones en memory.db, migracion aditiva con backup",
+      "bloqueado_por": "Tocar la memoria viva y estrenar un harness el mismo dia es mover dos variables"
+    },
+    {
+      "id": "medir-tok-s-vatio-edge",
+      "estado": "pending",
+      "que": "tok/s/vatio real en RK3588 (la-fragua) y Jetson (la-torre)",
+      "bloqueado_por": "Propose-only: sale como artefacto a p0x/propuestas/, no se ejecuta por SSH desde aqui"
+    }
+  ]
+}

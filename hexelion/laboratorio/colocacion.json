@@ -1,0 +1,96 @@
+{
+  "esquema": "laboratorio/colocacion/1",
+  "estado": "PARCIAL",
+  "nota": "La matriz que `monje/genesis.py` consulta antes de despachar. REGLA: un modelo no se coloca por TAMANO, se coloca por tok/s/vatio MEDIDO en ESA arquitectura. Hoy solo una de las cuatro filas tiene medida, y las otras tres lo dicen en vez de rellenarse. Una matriz con cifras supuestas coloca mal y nadie se entera.",
+  "medido": "2026-09-12 · soberano (tok/s), la-fragua y la-torre (vivos, RAM). Vatios: NO_DATA en los tres",
+  "nodos": {
+    "soberano": {
+      "arquitectura": "x86_64 · AMD Ryzen 7 255 · iGPU Radeon 780M",
+      "backend": "Vulkan · MEDIDO: `ollama ps` da 100% GPU con 19 GB cargados",
+      "papel": "El Critico. Densos medianos y MoE A3B",
+      "tok_s": {
+        "valor": 35.8,
+        "estado": "MEDIDO",
+        "como": "qwen3-coder:30b · num_ctx 8192 · 2026-09-12"
+      },
+      "vatios": {
+        "valor": null,
+        "estado": "NO_DATA",
+        "causa": "no se midio el consumo; hay enchufe medidor en el inventario del Ojo pero no se uso"
+      },
+      "tok_s_vatio": {
+        "valor": null,
+        "estado": "NO_DATA",
+        "causa": "falta el denominador"
+      },
+      "nota_moe": "CPU PURO ES FALSO EN ESTE NODO. Medido 2026-09-12: `ollama ps` da 100% GPU con 19 GB cargados en la Radeon 780M por Vulkan. No hay nada que descargar a RAM: un offload hibrido empeoraria un estado que ya esta entero en GPU."
+    },
+    "la-fragua": {
+      "arquitectura": "Orange Pi 5 Plus · RK3588 · usuario `ubuntu` · host ssh `la-fragua`",
+      "papel": "Triaje de sensores y wake. Modelos <1B o NPU. NUNCA densos grandes",
+      "tok_s": {
+        "valor": null,
+        "estado": "NO_DATA",
+        "causa": "nunca medido en esta arquitectura"
+      },
+      "vatios": {
+        "valor": null,
+        "estado": "NO_DATA",
+        "causa": "idem"
+      },
+      "como_medir": "PROPOSE-ONLY: el artefacto sale a `p0x/propuestas/` con rutas absolutas y el usuario del nodo dentro. Nunca `~`, que se expande al que ejecuta",
+      "ES_LA_MISMA_MAQUINA_QUE": "el «Orange Pi». la-fragua ES un Orange Pi 5 Plus (RK3588). No son dos nodos.",
+      "vivo": {
+        "estado": "MEDIDO",
+        "como": "ssh 2026-09-12 · up 7h16m · carga 0.25"
+      },
+      "ram": {
+        "total_gib": 15,
+        "disponible_gib": 14,
+        "estado": "MEDIDO"
+      },
+      "techo_de_modelo": "NO cabe qwen3-coder:30b (19 GB). Con 15 GiB totales el techo real esta bastante por debajo: se mide antes de colocar, no se supone."
+    },
+    "la-torre": {
+      "arquitectura": "NVIDIA Jetson Orin Nano Developer Kit Super · CUDA · usuario `jetson` · host ssh `la-torre`",
+      "papel": "Modelos medios y vision",
+      "restriccion_dura": "MEMORIA COMPARTIDA: UNA inferencia a la vez. Se serializa con asyncio.Lock -- leccion ya pagada, no se vuelve a pagar",
+      "tok_s": {
+        "valor": null,
+        "estado": "NO_DATA",
+        "causa": "nunca medido en esta arquitectura"
+      },
+      "vatios": {
+        "valor": null,
+        "estado": "NO_DATA",
+        "causa": "idem"
+      },
+      "como_medir": "PROPOSE-ONLY, igual que la-fragua",
+      "vivo": {
+        "estado": "MEDIDO",
+        "como": "ssh 2026-09-12 · up 7h18m · carga 0.09"
+      },
+      "ram": {
+        "total_gib": 7.4,
+        "disponible_gib": 6.1,
+        "estado": "MEDIDO"
+      },
+      "techo_de_modelo": "IMPOSIBLE FISICO para qwen3-coder:30b: son 19 GB contra 7,4 GiB TOTALES, y ademas la RAM se comparte con la GPU. Cualquier plan que coloque un 30B aqui esta mal por aritmetica, no por configuracion."
+    },
+    "esp32": {
+      "arquitectura": "MCU",
+      "papel": "Telemetria pura",
+      "prohibido": [
+        "cualquier LLM",
+        "cualquier clave privada"
+      ],
+      "porque": "Un microcontrolador que firma es una clave privada en un sitio sin arranque verificado. Mide y calla"
+    }
+  },
+  "quien_consulta": {
+    "fichero": "monje/genesis.py",
+    "que_es": "El semaforo termico del Monje: `optimo | templado | peligro_termico`, y `sin_dato_termico` si el SO no expone sensores",
+    "frontera_que_NO_se_cruza": "Su cabecera declara: «No es una metrica de rentabilidad ni existe aqui concepto alguno de cripto o alquiler de computo». Nada de atestacion economica entra ahi. Mover esa frontera exige firma propia -- ver `depin-keyless` en feature_list.json"
+  },
+  "nota_direcciones": "AQUI NO VAN DIRECCIONES. Se nombra el host de `~/.ssh/config` y punto: ese fichero es donde el canon dice que se comprueba un nodo, «no de memoria». La guardia de higiene bloqueo este mismo commit el 2026-09-12 por meter IPs de tailnet en un fichero versionado, y tenia razon: una IP en el repo envejece mal y ademas es infraestructura. El nombre del host no caduca; la direccion si."
+}

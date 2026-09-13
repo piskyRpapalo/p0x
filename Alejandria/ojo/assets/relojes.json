@@ -1,0 +1,44 @@
+{
+ "hoja": "relojes de estado.png",
+ "alto": 516,
+ "ancho": 1263,
+ "relojes": {
+  "dias": {
+   "ventana": {
+    "x": 120,
+    "y": 265,
+    "w": 210,
+    "h": 134
+   },
+   "x": 0,
+   "y": 0,
+   "w": 419,
+   "h": 516
+  },
+  "horas": {
+   "ventana": {
+    "x": 146,
+    "y": 243,
+    "w": 189,
+    "h": 108
+   },
+   "x": 419,
+   "y": 54,
+   "w": 442,
+   "h": 462
+  },
+  "minutos": {
+   "ventana": {
+    "x": 65,
+    "y": 162,
+    "w": 245,
+    "h": 216
+   },
+   "x": 861,
+   "y": 59,
+   "w": 402,
+   "h": 457
+  }
+ },
+ "nota": "`ventana` es el hueco transparente del display, en coordenadas del propio reloj. Las cifras van DETRAS y asoman por ahi."
+}

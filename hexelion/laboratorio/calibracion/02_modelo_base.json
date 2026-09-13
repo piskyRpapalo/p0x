@@ -1,0 +1,2 @@
+{"consulta":"cuanto ocupa el modelo","espacio":"charla-web","espera":"recupera","debe_contener":"4,4 GB",
+ "porque":"El adaptador son 26 MB y el modelo 4,4 GB. Mezclarlas da un dato falso sin mentir a proposito."}
