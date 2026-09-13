@@ -314,6 +314,28 @@ delegar, cuenta turnos, no líneas.
 - **Sin sudo interactivo en `soberano`.** No hay contraseña cacheada; instalar vía binarios de
   usuario (releases prebuilt, `uv`, `nvm`) en vez de `apt` cuando sea posible.
 
+## Dónde trabaja Claude · firmado 2026-09-13
+
+**Claude trabaja en la web de PreceptorOS, no en el dashboard interno.**
+
+- **Sí:** `~/preceptoros-web/` (el sitio público), la app en `~/p0x/preceptor/`
+  cuando el cambio de la web la afecta, y el laboratorio en
+  `~/p0x/hexelion/laboratorio/` cuando toca el camino del feedback.
+- **No:** `~/p0x/Alejandria/ojo/` — el Ojo y el Búnker del puerto 8790. Ese
+  panel es del Soberano, y se toca cuando él lo pide, no de paso.
+
+**Por qué se escribe.** Ya había pasado dos veces en la misma sesión: se dijo
+«deja el búnker ahora» y unas horas después yo estaba arreglándole un rótulo
+porque lo vi torcido al mirar otra cosa. Que el arreglo fuera correcto y el gate
+verde **no lo hace en alcance**: es atención gastada donde nadie la pidió, y en un
+proyecto cuyo recurso escaso es la atención del carbono, eso cuesta.
+
+**Y no contradice la capa de optimizadores.** Esa capa autoriza arreglar el hueco
+que se ve *desde dentro del trabajo encargado*. Un hueco que se ve desde fuera de
+ese trabajo se **anota** en `mente/aprendizaje/OPTIMIZACIONES.md` y se deja
+propuesto. La diferencia entre las dos cosas es de dónde salió el hallazgo, no de
+lo bueno que sea el arreglo.
+
 ## La capa de optimizadores · firmada 2026-09-13
 
 **Toda ronda de trabajo lleva una pasada de optimización, y no se pide permiso para
