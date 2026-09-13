@@ -94,9 +94,9 @@
  },
  "por_donde_vamos": {
   "que_es": "Savegame de la sesion del 2026-09-13. Escrito a mano por la sesion de frontera, no por el modelo local: cierra una ronda larga y la sintesis automatica no vio la mitad.",
-  "fecha": "2026-09-13 04:00",
+  "fecha": "2026-09-13 05:30",
   "escrito_por": "Claude Opus 5 · sesion de frontera",
-  "frente_abierto": "La cadena de feedback esta CERRADA y probada de punta a punta: web -> firma Ed25519 en el navegador -> exportacion a fichero -> adb pull -> ingesta.py verifica -> pool con user_hash -> turnos.py 5 turnos -> dataset candidato en la bandeja. Faltan volumen y la firma del primer dataset.",
+  "frente_abierto": "La tuberia esta entera y probada. El cuello ahora es VOLUMEN de feedback real: la pool de charla-web tiene 6 filas y solo 2 firmadas por personas. Existe espacios/sintetico con 49 pares generados por el rack, EN CUARENTENA, para probar el ciclo de entrenamiento sin depender de testers.",
   "hecho": [
    "La web produce feedback por DOS puertas: el chat de la portada y el LoRAtelier (es/benchmark). Antes solo la portada. No se escribio codigo nuevo: se enchufo corregir.js, que necesitaba rotulos del #i18n de la pagina y el widget #identity.",
    "bronce.js es el unico duenio del almacen de pares. Repara solo una base v1 sin almacen, que dejaba a la persona sin poder corregir para siempre.",
@@ -104,18 +104,25 @@
    "turnos.py con el mapeo firmado y el Guardian como PUERTA (corre primero). Probado con un ataque real: se registra como intento_inyeccion en loops.db.",
    "gc_loras.py reparte por FAMILIA, no por fecha: nunca deja una capacidad sin adaptador. Nunca ejecutado en real todavia.",
    "GitHub publico de p0x: 478 ficheros, CERO ejecutables. El push de master a GitHub esta bloqueado en la config (pushurl NO-PUSH://).",
-   "mente/aprendizaje/OPTIMIZACIONES.md: 14 entradas con su comando de revertir. La capa de optimizadores es regla firmada en CLAUDE.md."
+   "mente/aprendizaje/OPTIMIZACIONES.md: 14 entradas con su comando de revertir. La capa de optimizadores es regla firmada en CLAUDE.md.",
+   "gc_loras EJECUTADO: 5 adaptadores vivos (uno por capacidad), 3 archivados en adapters/archive/. Registrado en loops.db. Nada perdido.",
+   "El service worker se actualiza SOLO: verificado en el Doogee contra produccion sin tocar el telefono. pwa.js pide registration.update() en cada carga.",
+   "bin/inyeccion_dataset.py: 49 pares sinteticos en espacios/sintetico con la clave DECLARADA del rack (publica en config/clave_sintetica_publica.json, privada en ~/.preceptoros/, fuera del repo). charla-web intacta.",
+   "bin/rama_publica.py: la rama publica se construye con dos filtros --forma y CONTENIDO-- y cuelga del tip ya publicado. GitHub: 445 ficheros, cero logica.",
+   "mente/aprendizaje/OPTIMIZACIONES.md: 20 entradas con su comando de revertir."
   ],
   "lo_siguiente": [
-   "FIRMAR o descartar el dataset candidato: 2 filas, nota media 8.0, sha256 c90bf3df543fdc2f... Esta en preceptor-internal/docs/bandeja_firmas.md.",
-   "Ejecutar gc_loras.py --ejecutar cuando se quiera: archiva 3 adaptadores superados (245,6 MB) y conserva una copia de cada capacidad.",
-   "Conseguir VOLUMEN de feedback. La pool tiene 2 filas firmadas y 3 heredadas sin firma. El cuello ya no es tecnico: es que alguien use la web.",
-   "El Doogee corre un service worker viejo. Limpiar datos del sitio en ese aparato antes de volver a probar nada ahi."
+   "Correr turnos.py --espacio sintetico sobre las 49 filas y mirar la DISTRIBUCION de notas. Si sale baja, el dato es que el generador escribe mal.",
+   "Con el dataset sintetico juzgado, probar el Forjador de verdad: entrenar un LoRA y evaluarlo. Su ficha DEBE decir que aprendio de datos sinteticos.",
+   "El cuello real: que alguien use la web. La tuberia ya no es el problema.",
+   "FIRMAR o descartar el dataset candidato de charla-web: 2 filas, nota 8.0."
   ],
   "lo_que_no_se_sabe": [
    "NO_DATA: tok_s_vatio de ningun nodo. El enchufe A1T mide la REGLETA (impresora + TV + rack juntos), no el Beelink. Toda cifra en mWh del laboratorio es NORMA, no MEDIDO, y COSTE.md lo dice.",
    "NO_DATA: ningun sensor en hexelion-nexo/sensores/. Los espacios telemetria y jardin siguen vacios y declarados.",
-   "NO_DATA: el endpoint /api/v1/conversation-log de la-fragua sigue sin desplegar y sus tres condiciones sin cumplir. La exportacion las esquiva: no recolecta, entrega."
+   "NO_DATA: el endpoint /api/v1/conversation-log de la-fragua sigue sin desplegar y sus tres condiciones sin cumplir. La exportacion las esquiva: no recolecta, entrega.",
+   "NO_DATA: si un LoRA entrenado con datos sinteticos sirve para algo. Estos pares prueban que la TUBERIA funciona, no que el sistema sirva a nadie. Son cosas distintas y el checkpoint del espacio lo dice.",
+   "NO_DATA: el rack solo tiene 23 engramas. Los 49 pares salen de esos 23 hechos vistos desde 5 angulos, no de 49 temas."
   ]
  },
  "IMPORTANTE": {
