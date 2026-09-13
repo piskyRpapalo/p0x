@@ -112,49 +112,182 @@
       {
         "modelo": "qwen2.5-coder:3b",
         "esquema": "ACEPTADO",
-        "tok_s": 35.9,
-        "segundos": 5.4,
-        "nota_que_puso": 8
+        "tok_s": 33.89,
+        "segundos": 3.2,
+        "nota_que_puso": 8,
+        "maquina": {
+          "estado": "MEDIDO",
+          "carga_1min": 1.04,
+          "carga_5min": 2.89,
+          "nucleos": 16,
+          "residentes_en_gpu": [
+            "qwen2.5:14b",
+            "deepseek-r1:7b",
+            "qwen2.5-coder:3b"
+          ],
+          "carga_base": 1.04,
+          "residentes_base": [
+            "qwen2.5:14b",
+            "deepseek-r1:7b",
+            "qwen2.5-coder:3b"
+          ]
+        }
       },
       {
         "modelo": "deepseek-r1:7b",
         "esquema": "ACEPTADO",
-        "tok_s": 16.66,
-        "segundos": 10.5,
+        "tok_s": 15.45,
+        "segundos": 6.6,
         "nota_que_puso": 8,
-        "declara_thinking": true
+        "maquina": {
+          "estado": "MEDIDO",
+          "carga_1min": 1.04,
+          "carga_5min": 2.89,
+          "nucleos": 16,
+          "residentes_en_gpu": [
+            "qwen2.5-coder:3b",
+            "qwen2.5:14b",
+            "deepseek-r1:7b"
+          ],
+          "carga_base": 1.04,
+          "residentes_base": [
+            "qwen2.5:14b",
+            "deepseek-r1:7b",
+            "qwen2.5-coder:3b"
+          ]
+        }
       },
       {
         "modelo": "qwen2.5:7b",
         "esquema": "ACEPTADO",
-        "tok_s": 16.72,
-        "segundos": 13.8,
-        "nota_que_puso": 0
+        "tok_s": 15.34,
+        "segundos": 14.6,
+        "nota_que_puso": 0,
+        "maquina": {
+          "estado": "MEDIDO",
+          "carga_1min": 2.11,
+          "carga_5min": 3.05,
+          "nucleos": 16,
+          "residentes_en_gpu": [
+            "deepseek-r1:7b",
+            "qwen2.5-coder:3b",
+            "qwen2.5:14b"
+          ],
+          "carga_base": 1.04,
+          "residentes_base": [
+            "qwen2.5:14b",
+            "deepseek-r1:7b",
+            "qwen2.5-coder:3b"
+          ]
+        }
       },
       {
         "modelo": "granite3-dense:8b",
         "esquema": "ACEPTADO",
-        "tok_s": 15.46,
-        "segundos": 11.3,
-        "nota_que_puso": 8
+        "tok_s": 14.31,
+        "segundos": 8.5,
+        "nota_que_puso": 8,
+        "maquina": {
+          "estado": "MEDIDO",
+          "carga_1min": 2.64,
+          "carga_5min": 3.12,
+          "nucleos": 16,
+          "residentes_en_gpu": [
+            "qwen2.5:7b",
+            "deepseek-r1:7b",
+            "qwen2.5-coder:3b"
+          ],
+          "carga_base": 1.04,
+          "residentes_base": [
+            "qwen2.5:14b",
+            "deepseek-r1:7b",
+            "qwen2.5-coder:3b"
+          ]
+        }
       },
       {
         "modelo": "qwen2.5:14b",
         "esquema": "ACEPTADO",
-        "tok_s": 9.22,
-        "segundos": 26.9,
-        "nota_que_puso": 4
+        "tok_s": 8.77,
+        "segundos": 22.3,
+        "nota_que_puso": 4,
+        "maquina": {
+          "estado": "MEDIDO",
+          "carga_1min": 2.83,
+          "carga_5min": 3.15,
+          "nucleos": 16,
+          "residentes_en_gpu": [
+            "granite3-dense:8b",
+            "deepseek-r1:7b",
+            "qwen2.5-coder:3b"
+          ],
+          "carga_base": 1.04,
+          "residentes_base": [
+            "qwen2.5:14b",
+            "deepseek-r1:7b",
+            "qwen2.5-coder:3b"
+          ]
+        }
       },
       {
         "modelo": "swift-qwen:27b",
         "esquema": "ACEPTADO",
-        "tok_s": 4.44,
-        "segundos": 52.8,
+        "tok_s": 4.26,
+        "segundos": 54.7,
         "nota_que_puso": 2,
-        "declara_thinking": true
+        "maquina": {
+          "estado": "MEDIDO",
+          "carga_1min": 4.25,
+          "carga_5min": 3.45,
+          "nucleos": 16,
+          "residentes_en_gpu": [
+            "qwen2.5:14b",
+            "deepseek-r1:7b",
+            "qwen2.5-coder:3b"
+          ],
+          "carga_base": 1.04,
+          "residentes_base": [
+            "qwen2.5:14b",
+            "deepseek-r1:7b",
+            "qwen2.5-coder:3b"
+          ]
+        }
+      },
+      {
+        "modelo": "qwen3-coder:30b",
+        "esquema": "ACEPTADO",
+        "tok_s": 32.03,
+        "segundos": 23.0,
+        "nota_que_puso": 4,
+        "maquina": {
+          "estado": "MEDIDO",
+          "carga_1min": 4.11,
+          "carga_5min": 3.52,
+          "nucleos": 16,
+          "residentes_en_gpu": [
+            "swift-qwen:27b"
+          ],
+          "carga_base": 1.04,
+          "residentes_base": [
+            "qwen2.5:14b",
+            "deepseek-r1:7b",
+            "qwen2.5-coder:3b"
+          ]
+        }
       }
     ],
     "el_hallazgo_que_importa": "Los seis pasan el esquema y ponen notas de 0 a 8 AL MISMO TEXTO. Devolver JSON valido no es juzgar: los que pusieron 8 dejaron pasar una cifra sin etiqueta, que es justo lo que los criterios 2 y 3 existen para cazar. Ningun modelo entra en `papeles` por pasar esta prueba -- solo deja de estar descartado por ella. Quien promueve es `calibracion/`, 13 pares, 4 de ellos esperando `vacio`.",
-    "consecuencia_para_turnos": "Turno 5 NO usa swift-qwen:27b, y ya no por thinking: por reloj. 4,44 tok/s y 52,8 s de pared contra los 35,8 tok/s MEDIDOS de qwen3-coder:30b para el mismo trabajo. La ficha del briefing ya lo decia --«demasiado lento»--; ahora esta medido en esta maquina y no en otra."
+    "consecuencia_para_turnos": "Turno 5 NO usa swift-qwen:27b, y ya no por thinking: por reloj. 4,44 tok/s y 52,8 s de pared contra los 35,8 tok/s MEDIDOS de qwen3-coder:30b para el mismo trabajo. La ficha del briefing ya lo decia --«demasiado lento»--; ahora esta medido en esta maquina y no en otra.",
+    "linea_base": {
+      "carga_1min": 1.04,
+      "nucleos": 16,
+      "residentes_en_gpu": [
+        "qwen2.5:14b",
+        "deepseek-r1:7b",
+        "qwen2.5-coder:3b"
+      ],
+      "porque": "La carga de ANTES de medir, tomada una sola vez. La de durante siempre es alta porque la inferencia la sube ella sola: en este nodo una peticion pone el loadavg por encima de 2. Sin este dato una cifra de tok/s no es reproducible."
+    },
+    "remedido_limpio": "2026-09-13. Las cifras anteriores se tomaron sin declarar la carga, y algunas con una tanda propia corriendo detras: qwen3-coder:30b llego a dar 18,68 tok/s teniendo 35,8 registrados. Estas se tomaron con la maquina a 1,04 sobre 16 hilos, y cada una lleva su carga dentro."
   }
 }
